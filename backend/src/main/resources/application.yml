@@ -49,6 +49,7 @@ ndzela:
   ocpp:
     base-url: ${NDZELA_OCPP_BASE_URL:http://localhost:8080}
     api-key: ${NDZELA_OCPP_API_KEY}
+    signing-secret: ${NDZELA_OCPP_SIGNING_SECRET:}
   charging:
     plug-in-timeout: 60s
     sweep-interval: 15s

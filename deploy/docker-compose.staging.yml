@@ -1,0 +1,61 @@
+services:
+  postgres:
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ndzela
+      POSTGRES_USER: ndzela
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
+    volumes:
+      - ndzela-pg:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ndzela"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  maildev:
+    image: maildev/maildev
+    restart: unless-stopped
+    ports:
+      - "127.0.0.1:${MAILDEV_PORT:-1080}:1080"
+
+  backend:
+    build:
+      context: ../backend
+    restart: unless-stopped
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      DB_URL: jdbc:postgresql://postgres:5432/ndzela
+      DB_USER: ndzela
+      DB_PASSWORD: ${DB_PASSWORD}
+      MAIL_HOST: maildev
+      MAIL_PORT: 1025
+      NDZELA_JWT_SECRET: ${NDZELA_JWT_SECRET:?NDZELA_JWT_SECRET is required}
+      NDZELA_CODE_PEPPER: ${NDZELA_CODE_PEPPER:?NDZELA_CODE_PEPPER is required}
+      NDZELA_OCPP_BASE_URL: ${NDZELA_OCPP_BASE_URL:?NDZELA_OCPP_BASE_URL is required}
+      NDZELA_OCPP_API_KEY: ${NDZELA_OCPP_API_KEY:?NDZELA_OCPP_API_KEY is required}
+      NDZELA_WALLET_CURRENCY: ${NDZELA_WALLET_CURRENCY:-XAF}
+      NDZELA_PRICE_PER_KWH: ${NDZELA_PRICE_PER_KWH:-}
+      NDZELA_PAYMENT_PROVIDER: sandbox
+      SERVER_FORWARD_HEADERS_STRATEGY: framework
+
+  caddy:
+    image: caddy:2
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+      - "443:443"
+    environment:
+      DOMAIN: ${DOMAIN:?DOMAIN is required}
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+      - caddy-data:/data
+
+volumes:
+  ndzela-pg:
+  caddy-data:

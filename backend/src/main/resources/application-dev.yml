@@ -1,0 +1,12 @@
+ndzela:
+  security:
+    jwt-secret: dev-only-secret-change-me-0123456789abcdef0123456789
+    code-pepper: dev-only-pepper
+  ocpp:
+    api-key: dev-mobile-key-never-use-in-prod
+  payment:
+    provider: sandbox
+  charging:
+    price-per-kwh-minor: 150
+  wallet:
+    currency: XOF

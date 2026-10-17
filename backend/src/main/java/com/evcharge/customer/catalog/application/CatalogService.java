@@ -4,6 +4,8 @@ import com.evcharge.customer.catalog.application.port.StationDirectory;
 import com.evcharge.customer.catalog.domain.QrContent;
 import com.evcharge.customer.catalog.domain.Station;
 import com.evcharge.customer.shared.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -11,6 +13,8 @@ import java.util.List;
 
 @Service
 public class CatalogService {
+
+    private static final Logger log = LoggerFactory.getLogger(CatalogService.class);
 
     private final StationDirectory directory;
 
@@ -34,10 +38,14 @@ public class CatalogService {
 
     public ResolvedConnector resolveQr(String scanned) {
         String token = QrContent.tokenOf(scanned);
+        log.info("QR scan received content='{}' extractedToken='{}'", scanned, token);
         if (token.isEmpty()) {
             throw invalidQr();
         }
-        var ref = directory.resolveQr(token).orElseThrow(CatalogService::invalidQr);
+        var ref = directory.resolveQr(token).orElseThrow(() -> {
+            log.warn("QR token '{}' not found on the charging network", token);
+            return invalidQr();
+        });
         Station station = directory.find(ref.stationId()).orElseThrow(CatalogService::invalidQr);
         return new ResolvedConnector(station, station.connector(ref.connectorId())
                 .orElseThrow(CatalogService::invalidQr));

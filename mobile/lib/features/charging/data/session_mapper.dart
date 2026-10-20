@@ -35,6 +35,7 @@ abstract final class SessionMapper {
     durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
     voltage: (json['voltage'] as num?)?.toDouble(),
     currentAmpere: (json['currentAmpere'] as num?)?.toDouble(),
+    sampledAt: _time(json['sampledAt']),
   );
 
   static EstimatedCost _estimate(Map<String, dynamic> json) => EstimatedCost(

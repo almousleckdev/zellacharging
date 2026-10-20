@@ -23,8 +23,10 @@ class PriceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  Strings.amountSoFar,
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  session.state.isLive
+                      ? Strings.amountSoFar
+                      : Strings.amountPaid,
+                  style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
@@ -34,6 +36,7 @@ class PriceCard extends StatelessWidget {
                   child: Text(
                     session.priceText,
                     style: theme.textTheme.headlineLarge?.copyWith(
+                      fontSize: 36,
                       fontWeight: FontWeight.w800,
                     ),
                   ),

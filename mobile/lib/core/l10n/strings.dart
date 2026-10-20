@@ -145,6 +145,10 @@ abstract final class Strings {
   static const cost = 'Cost';
   static const price = 'Price';
   static const amountSoFar = 'Amount so far';
+  static const amountPaid = 'Amount paid';
+  static const updated = 'Updated';
+  static const ago = 'ago';
+  static const lastReading = 'Last reading';
   static const estimated = 'Estimated';
   static const charged = 'Charged';
   static const unplugNotice =

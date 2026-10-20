@@ -6,6 +6,7 @@ import com.evcharge.customer.shared.Money;
 import com.evcharge.customer.wallet.WalletFunding;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 
 @Component
@@ -20,12 +21,25 @@ public class SessionCostEstimator {
     }
 
     public Optional<Money> estimate(ChargingSession session, Optional<Metering> metering) {
-        if (session.costMinor() != null || settings.pricePerKwhMinor() == null) {
+        if (session.costMinor() != null) {
             return Optional.empty();
         }
-        return metering.map(Metering::totalKwh).map(kwh -> {
-            Money reserved = funding.reserved(session.id());
-            return Money.forEnergy(kwh, settings.pricePerKwhMinor(), reserved.currency(), reserved.decimals());
-        });
+        return metering.map(Metering::totalKwh).flatMap(kwh -> priced(session, kwh));
+    }
+
+    public Optional<Money> finalCost(ChargingSession session) {
+        if (session.costMinor() != null || session.energyKwh() == null) {
+            return Optional.empty();
+        }
+        return priced(session, session.energyKwh());
+    }
+
+    private Optional<Money> priced(ChargingSession session, BigDecimal kwh) {
+        if (settings.pricePerKwhMinor() == null) {
+            return Optional.empty();
+        }
+        Money reserved = funding.reserved(session.id());
+        return Optional.of(Money.forEnergy(kwh, settings.pricePerKwhMinor(), reserved.currency(),
+                reserved.decimals()));
     }
 }

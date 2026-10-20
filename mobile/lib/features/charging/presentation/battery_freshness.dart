@@ -1,0 +1,38 @@
+import 'package:flutter/material.dart';
+
+import '../../../core/format/duration_format.dart';
+import '../../../core/l10n/strings.dart';
+import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_spacing.dart';
+import '../domain/charging_session.dart';
+
+class BatteryFreshness extends StatelessWidget {
+  const BatteryFreshness({super.key, required this.session});
+
+  final ChargingSession session;
+
+  static const _staleAfter = Duration(seconds: 90);
+
+  @override
+  Widget build(BuildContext context) {
+    final sampled = session.metering?.sampledAt;
+    if (!session.state.isLive || sampled == null) {
+      return const SizedBox.shrink();
+    }
+    final age = DateTime.now().difference(sampled);
+    final stale = age > _staleAfter;
+    final color = stale ? AppColors.primary : AppColors.chargeDeep;
+    final label = stale ? Strings.lastReading : Strings.updated;
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(Icons.circle, size: 8, color: color),
+        const SizedBox(width: AppSpacing.xs + 2),
+        Text(
+          '$label ${DurationFormat.compact(age.inSeconds.clamp(0, 86400))} ${Strings.ago}',
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(color: color),
+        ),
+      ],
+    );
+  }
+}

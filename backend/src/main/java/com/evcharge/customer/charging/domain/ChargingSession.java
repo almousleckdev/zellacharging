@@ -40,4 +40,9 @@ public record ChargingSession(
                 remote.costMinor(), remote.currency(), remote.currencyDecimals(), remote.stopReason(),
                 createdAt, now);
     }
+
+    public ChargingSession withCost(long minor, String costCurrency, int decimals, Instant now) {
+        return new ChargingSession(id, customerId, stationId, connectorId, idTag, state, failureCode, transactionId,
+                startedAt, stoppedAt, energyKwh, minor, costCurrency, decimals, stopReason, createdAt, now);
+    }
 }

@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../shared/widgets/metric_grid.dart';
-import '../../../shared/widgets/metric_tile.dart';
 import '../domain/charging_session.dart';
 import 'charged_pill.dart';
+import 'finished_metrics.dart';
 import 'live_metrics.dart';
 import 'session_formatting.dart';
 import 'session_message_card.dart';
@@ -34,28 +32,8 @@ class ChargingMetrics extends StatelessWidget {
         if (session.state.isLive)
           LiveMetrics(session: session)
         else
-          _finished(),
+          FinishedMetrics(session: session),
       ],
     );
   }
-
-  Widget _finished() => MetricGrid(
-    tiles: [
-      MetricTile(
-        icon: Icons.timer_outlined,
-        label: Strings.duration,
-        value: session.durationText,
-      ),
-      MetricTile(
-        icon: Icons.bolt_rounded,
-        label: Strings.energy,
-        value: session.energyText,
-      ),
-      MetricTile(
-        icon: Icons.payments_outlined,
-        label: Strings.cost,
-        value: session.costText,
-      ),
-    ],
-  );
 }

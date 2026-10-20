@@ -21,14 +21,17 @@ public class SessionReconciler {
     private final SessionRepository sessions;
     private final SessionSettings settings;
     private final SessionSettlement settlement;
+    private final SessionCostEstimator estimator;
     private final Clock clock;
 
     public SessionReconciler(ChargingGateway gateway, SessionRepository sessions,
-                             SessionSettings settings, SessionSettlement settlement, Clock clock) {
+                             SessionSettings settings, SessionSettlement settlement,
+                             SessionCostEstimator estimator, Clock clock) {
         this.gateway = gateway;
         this.sessions = sessions;
         this.settings = settings;
         this.settlement = settlement;
+        this.estimator = estimator;
         this.clock = clock;
     }
 
@@ -39,13 +42,23 @@ public class SessionReconciler {
         Instant now = clock.instant();
         Optional<RemoteSession> remote = findRemote(session);
         ChargingSession next = remote
-                .map(found -> session.withRemote(found, nextState(session, found), now))
+                .map(found -> priced(session.withRemote(found, nextState(session, found), now), now))
                 .orElseGet(() -> expireIfStale(session, now));
         if (!next.equals(session)) {
             sessions.update(next);
             settlement.settle(next);
         }
         return next;
+    }
+
+    private ChargingSession priced(ChargingSession session, Instant now) {
+        boolean finished = session.state() == SessionState.COMPLETED || session.state() == SessionState.ABANDONED;
+        if (!finished) {
+            return session;
+        }
+        return estimator.finalCost(session)
+                .map(cost -> session.withCost(cost.minor(), cost.currency(), cost.decimals(), now))
+                .orElse(session);
     }
 
     private Optional<RemoteSession> findRemote(ChargingSession session) {

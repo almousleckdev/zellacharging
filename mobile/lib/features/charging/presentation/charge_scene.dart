@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../domain/charging_session.dart';
 import '../domain/session_state.dart';
+import 'battery_freshness.dart';
 import 'car_battery_painter.dart';
 import 'charge_hero.dart';
 import 'session_formatting.dart';
@@ -58,6 +59,7 @@ class _ChargeSceneState extends State<ChargeScene>
     return Column(
       children: [
         ChargeHero(session: session),
+        BatteryFreshness(session: session),
         const SizedBox(height: AppSpacing.xs),
         FractionallySizedBox(
           widthFactor: 0.82,

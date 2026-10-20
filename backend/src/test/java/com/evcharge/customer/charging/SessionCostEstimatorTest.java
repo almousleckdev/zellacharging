@@ -62,4 +62,17 @@ class SessionCostEstimatorTest {
     void estimatesNothingOnceTheFinalCostIsKnown() {
         assertThat(estimator(150L).estimate(session(400L), reading("2.5"))).isEmpty();
     }
+
+    @Test
+    void finalCostIsEnergyTimesPriceWhenThePlatformSentNone() {
+        ChargingSession done = new ChargingSession(UUID.randomUUID(), UUID.randomUUID(), "CP-1", 1, "Z-X",
+                SessionState.COMPLETED, null, 7, NOW, NOW, new BigDecimal("2.5"), null, null, null, null, NOW, NOW);
+
+        assertThat(estimator(150L).finalCost(done)).contains(new Money(375, "XAF", 0));
+    }
+
+    @Test
+    void finalCostKeepsThePlatformCost() {
+        assertThat(estimator(150L).finalCost(session(400L))).isEmpty();
+    }
 }

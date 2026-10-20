@@ -5,6 +5,7 @@ class Metering {
     this.durationSeconds,
     this.voltage,
     this.currentAmpere,
+    this.sampledAt,
   });
 
   final double? totalKwh;
@@ -12,4 +13,5 @@ class Metering {
   final int? durationSeconds;
   final double? voltage;
   final double? currentAmpere;
+  final DateTime? sampledAt;
 }

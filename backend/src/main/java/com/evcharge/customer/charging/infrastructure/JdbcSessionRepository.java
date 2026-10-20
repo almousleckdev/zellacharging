@@ -11,6 +11,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -78,6 +79,18 @@ class JdbcSessionRepository implements SessionRepository {
                 .param("cost", s.costMinor()).param("currency", s.currency())
                 .param("decimals", s.currencyDecimals()).param("reason", s.stopReason())
                 .param("updatedAt", Timestamps.toDb(s.updatedAt())).param("id", s.id()).update();
+    }
+
+    @Override
+    public void recordBattery(UUID id, BigDecimal percent) {
+        jdbc.sql("update charging_session set battery_percent = :percent where id = :id")
+                .param("percent", percent).param("id", id).update();
+    }
+
+    @Override
+    public Optional<BigDecimal> batteryOf(UUID id) {
+        return jdbc.sql("select battery_percent from charging_session where id = :id")
+                .param("id", id).query(BigDecimal.class).optional();
     }
 
     @Override

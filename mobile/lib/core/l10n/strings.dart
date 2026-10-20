@@ -144,6 +144,11 @@ abstract final class Strings {
   static const duration = 'Duration';
   static const cost = 'Cost';
   static const price = 'Price';
+  static const amountSoFar = 'Amount so far';
+  static const estimated = 'Estimated';
+  static const charged = 'Charged';
+  static const unplugNotice =
+      'Do not unplug the cable while charging. Stop the charge here first, then unplug.';
   static const priceEstimated = 'Price (est.)';
   static const elapsed = 'Time elapsed';
   static const voltage = 'Voltage';
@@ -161,7 +166,6 @@ abstract final class Strings {
   static const waitingForPlug = 'Waiting for the charger to start...';
   static const finishing = 'Stopping the charge...';
   static const sessionFailed = 'The charge could not be started.';
-  static const sessionDone = 'Charge complete';
   static const sessionStates = {
     'requested': 'Starting',
     'startAccepted': 'Waiting for vehicle',

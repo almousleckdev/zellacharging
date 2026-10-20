@@ -17,7 +17,13 @@ record OcppMeteringPayload(
         Instant sampledAt) {
 
     Metering toDomain() {
-        return new Metering(totalKwh, currentPowerKw, stateOfChargePercent, durationSeconds, voltage,
-                currentAmpere, sampledAt);
+        return new Metering(totalKwh, currentPowerKw, readLevel(), durationSeconds, voltage, currentAmpere,
+                sampledAt);
+    }
+
+    private BigDecimal readLevel() {
+        boolean real = stateOfChargePercent != null && stateOfChargePercent.signum() > 0
+                && stateOfChargePercent.compareTo(BigDecimal.valueOf(100)) <= 0;
+        return real ? stateOfChargePercent : null;
     }
 }

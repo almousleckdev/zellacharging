@@ -24,6 +24,7 @@ record SessionResponse(
         String stopReason,
         Instant createdAt,
         MeteringResponse metering,
+        BigDecimal batteryPercent,
         EstimatedCostResponse estimatedCost) {
 
     record MeteringResponse(BigDecimal totalKwh, BigDecimal powerKw, BigDecimal stateOfChargePercent,
@@ -44,10 +45,11 @@ record SessionResponse(
         }
     }
 
-    static SessionResponse from(ChargingSession s, Metering metering, Optional<Money> estimate) {
+    static SessionResponse from(ChargingSession s, Metering metering, BigDecimal batteryPercent,
+                                Optional<Money> estimate) {
         return new SessionResponse(s.id(), s.stationId(), s.connectorId(), s.state().name(), s.failureCode(),
                 s.startedAt(), s.stoppedAt(), s.energyKwh(), s.costMinor(), s.currency(), s.currencyDecimals(),
                 s.stopReason(), s.createdAt(), MeteringResponse.from(metering),
-                EstimatedCostResponse.from(estimate));
+                batteryPercent, EstimatedCostResponse.from(estimate));
     }
 }

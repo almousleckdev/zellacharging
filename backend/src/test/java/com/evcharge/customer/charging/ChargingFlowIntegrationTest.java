@@ -92,7 +92,8 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
                 .andExpect(jsonPath("$.state").value("ACTIVE"))
                 .andExpect(jsonPath("$.metering.totalKwh").value(1.5))
                 .andExpect(jsonPath("$.metering.voltage").value(402.1))
-                .andExpect(jsonPath("$.metering.currentAmpere").value(74.6));
+                .andExpect(jsonPath("$.metering.currentAmpere").value(74.6))
+                .andExpect(jsonPath("$.batteryPercent").value(40));
 
         postAs(customer, "/v1/sessions/" + sessionId + "/stop", "{}").andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("STOPPING"));
@@ -106,7 +107,8 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
         getAs(customer, "/v1/sessions/" + sessionId).andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("COMPLETED"))
                 .andExpect(jsonPath("$.costMinor").value(300))
-                .andExpect(jsonPath("$.currency").value("XOF"));
+                .andExpect(jsonPath("$.currency").value("XOF"))
+                .andExpect(jsonPath("$.batteryPercent").value(40));
         getAs(customer, "/v1/sessions/active").andExpect(status().isNoContent());
     }
 

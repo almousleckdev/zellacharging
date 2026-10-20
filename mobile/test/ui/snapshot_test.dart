@@ -33,6 +33,12 @@ void main() {
           ),
         ),
       );
+      await tester.runAsync(
+        () => precacheImage(
+          const AssetImage('assets/images/charging_scene.png'),
+          tester.element(find.byType(Scaffold).first),
+        ),
+      );
       for (var i = 0; i < 8; i++) {
         await tester.pump(const Duration(milliseconds: 150));
       }

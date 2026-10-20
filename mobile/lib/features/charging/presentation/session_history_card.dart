@@ -6,7 +6,6 @@ import '../../../shared/widgets/icon_badge.dart';
 import '../../../shared/widgets/soft_card.dart';
 import '../../../shared/widgets/status_chip.dart';
 import '../domain/charging_session.dart';
-import '../domain/session_state.dart';
 import 'session_formatting.dart';
 
 class SessionHistoryCard extends StatelessWidget {
@@ -19,12 +18,6 @@ class SessionHistoryCard extends StatelessWidget {
   final ChargingSession session;
   final VoidCallback onTap;
 
-  Color get _color => switch (session.state) {
-    SessionState.completed => AppColors.success,
-    SessionState.failed || SessionState.abandoned => AppColors.danger,
-    _ => AppColors.primary,
-  };
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
@@ -35,7 +28,7 @@ class SessionHistoryCard extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          IconBadge(icon: Icons.ev_station_rounded, color: _color),
+          IconBadge(icon: Icons.ev_station_rounded, color: session.stateColor),
           const SizedBox(width: AppSpacing.md),
           Expanded(
             child: Column(
@@ -65,7 +58,7 @@ class SessionHistoryCard extends StatelessWidget {
                 style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: AppSpacing.xs),
-              StatusChip(label: session.stateLabel, color: _color),
+              StatusChip(label: session.stateLabel, color: session.stateColor),
             ],
           ),
         ],

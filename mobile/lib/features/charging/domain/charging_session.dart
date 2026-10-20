@@ -10,11 +10,14 @@ class ChargingSession {
     required this.state,
     required this.createdAt,
     this.failureCode,
+    this.startedAt,
+    this.stoppedAt,
     this.energyKwh,
     this.costMinor,
     this.currency,
     this.currencyDecimals,
     this.metering,
+    this.batteryPercent,
     this.estimatedCost,
   });
 
@@ -24,11 +27,14 @@ class ChargingSession {
   final SessionState state;
   final DateTime createdAt;
   final String? failureCode;
+  final DateTime? startedAt;
+  final DateTime? stoppedAt;
   final double? energyKwh;
   final int? costMinor;
   final String? currency;
   final int? currencyDecimals;
   final Metering? metering;
+  final double? batteryPercent;
   final EstimatedCost? estimatedCost;
 
   double? get shownEnergyKwh => metering?.totalKwh ?? energyKwh;

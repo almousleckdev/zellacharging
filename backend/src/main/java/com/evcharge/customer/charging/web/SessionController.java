@@ -51,7 +51,7 @@ class SessionController {
 
     @GetMapping
     List<SessionResponse> history(@AuthenticationPrincipal Jwt jwt) {
-        return sessions.history(customer(jwt)).stream().map(session -> SessionResponse.from(session, null, Optional.empty())).toList();
+        return sessions.history(customer(jwt)).stream().map(session -> SessionResponse.from(session, null, null, Optional.empty())).toList();
     }
 
     @GetMapping("/{id}")
@@ -66,7 +66,8 @@ class SessionController {
 
     private SessionResponse present(ChargingSession session) {
         Optional<Metering> reading = metering.of(session);
-        return SessionResponse.from(session, reading.orElse(null), estimator.estimate(session, reading));
+        return SessionResponse.from(session, reading.orElse(null), metering.batteryOf(session, reading).orElse(null),
+                estimator.estimate(session, reading));
     }
 
     private static UUID customer(Jwt jwt) {

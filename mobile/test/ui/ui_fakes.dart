@@ -54,10 +54,10 @@ ChargingSession session(SessionState state, {int? cost}) => ChargingSession(
   costMinor: cost,
   currency: 'XAF',
   currencyDecimals: 0,
+  batteryPercent: 67,
   metering: const Metering(
     totalKwh: 125.43,
     powerKw: 59.9,
-    stateOfChargePercent: 67,
     durationSeconds: 7385,
     voltage: 402,
     currentAmpere: 148.9,

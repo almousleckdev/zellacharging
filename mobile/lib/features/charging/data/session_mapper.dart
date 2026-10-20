@@ -14,19 +14,24 @@ abstract final class SessionMapper {
       state: SessionState.parse(json['state'] as String),
       createdAt: DateTime.parse(json['createdAt'] as String),
       failureCode: json['failureCode'] as String?,
+      startedAt: _time(json['startedAt']),
+      stoppedAt: _time(json['stoppedAt']),
       energyKwh: (json['energyKwh'] as num?)?.toDouble(),
       costMinor: (json['costMinor'] as num?)?.toInt(),
       currency: json['currency'] as String?,
       currencyDecimals: json['currencyDecimals'] as int?,
       metering: metering == null ? null : _metering(metering),
+      batteryPercent: (json['batteryPercent'] as num?)?.toDouble(),
       estimatedCost: estimate == null ? null : _estimate(estimate),
     );
   }
 
+  static DateTime? _time(Object? value) =>
+      value == null ? null : DateTime.parse(value as String);
+
   static Metering _metering(Map<String, dynamic> json) => Metering(
     totalKwh: (json['totalKwh'] as num?)?.toDouble(),
     powerKw: (json['powerKw'] as num?)?.toDouble(),
-    stateOfChargePercent: (json['stateOfChargePercent'] as num?)?.toDouble(),
     durationSeconds: (json['durationSeconds'] as num?)?.toInt(),
     voltage: (json['voltage'] as num?)?.toDouble(),
     currentAmpere: (json['currentAmpere'] as num?)?.toDouble(),

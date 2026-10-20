@@ -12,5 +12,8 @@ abstract final class AppColors {
   static const border = Color(0xFFE2E8F0);
   static const success = Color(0xFF16A34A);
   static const danger = Color(0xFFDC2626);
+  static const chargeDeep = Color(0xFF15803D);
+  static const chargeGreen = Color(0xFF22C55E);
+  static const chargeGlow = Color(0xFF2DD4BF);
   static const neutral = Color(0xFF94A3B8);
 }

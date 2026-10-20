@@ -27,7 +27,7 @@ class ActiveSessionBanner extends ConsumerWidget {
             Expanded(
               child: Text(
                 '${Strings.activeSession} · ${session.stationId}',
-                style: const TextStyle(fontWeight: FontWeight.w700),
+                style: const TextStyle(),
               ),
             ),
             const Text(

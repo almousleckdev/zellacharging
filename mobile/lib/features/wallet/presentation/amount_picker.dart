@@ -35,7 +35,6 @@ class AmountPicker extends StatelessWidget {
               color: amount == selected ? AppColors.primary : AppColors.border,
             ),
             labelStyle: TextStyle(
-              fontWeight: FontWeight.w600,
               color: amount == selected ? Colors.white : AppColors.textPrimary,
             ),
           ),

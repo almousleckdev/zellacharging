@@ -14,21 +14,16 @@ class SectionTitle extends StatelessWidget {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: Theme.of(
-            context,
-          ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+        Expanded(
+          child: Text(title, style: Theme.of(context).textTheme.titleMedium),
         ),
         if (onViewAll != null)
           GestureDetector(
+            behavior: HitTestBehavior.opaque,
             onTap: onViewAll,
             child: const Text(
               Strings.viewAll,
-              style: TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w600,
-              ),
+              style: TextStyle(color: AppColors.primary),
             ),
           ),
       ],

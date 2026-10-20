@@ -8,5 +8,7 @@ public record Metering(
         BigDecimal powerKw,
         BigDecimal stateOfChargePercent,
         Long durationSeconds,
+        BigDecimal voltage,
+        BigDecimal currentAmpere,
         Instant sampledAt) {
 }

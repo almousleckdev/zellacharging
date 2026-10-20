@@ -1,0 +1,31 @@
+package com.evcharge.customer.charging.application;
+
+import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.Metering;
+import com.evcharge.customer.shared.Money;
+import com.evcharge.customer.wallet.WalletFunding;
+import org.springframework.stereotype.Component;
+
+import java.util.Optional;
+
+@Component
+public class SessionCostEstimator {
+
+    private final WalletFunding funding;
+    private final SessionSettings settings;
+
+    public SessionCostEstimator(WalletFunding funding, SessionSettings settings) {
+        this.funding = funding;
+        this.settings = settings;
+    }
+
+    public Optional<Money> estimate(ChargingSession session, Optional<Metering> metering) {
+        if (session.costMinor() != null || settings.pricePerKwhMinor() == null) {
+            return Optional.empty();
+        }
+        return metering.map(Metering::totalKwh).map(kwh -> {
+            Money reserved = funding.reserved(session.id());
+            return Money.forEnergy(kwh, settings.pricePerKwhMinor(), reserved.currency(), reserved.decimals());
+        });
+    }
+}

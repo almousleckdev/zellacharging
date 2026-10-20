@@ -12,9 +12,12 @@ record OcppMeteringPayload(
         BigDecimal currentPowerKw,
         BigDecimal stateOfChargePercent,
         Long durationSeconds,
+        BigDecimal voltage,
+        BigDecimal currentAmpere,
         Instant sampledAt) {
 
     Metering toDomain() {
-        return new Metering(totalKwh, currentPowerKw, stateOfChargePercent, durationSeconds, sampledAt);
+        return new Metering(totalKwh, currentPowerKw, stateOfChargePercent, durationSeconds, voltage,
+                currentAmpere, sampledAt);
     }
 }

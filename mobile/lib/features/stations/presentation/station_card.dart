@@ -29,9 +29,9 @@ class StationCard extends StatelessWidget {
               children: [
                 Text(
                   station.id,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleMedium,
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(_details, style: _detailsStyle(theme)),

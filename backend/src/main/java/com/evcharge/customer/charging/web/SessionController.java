@@ -1,8 +1,10 @@
 package com.evcharge.customer.charging.web;
 
 import com.evcharge.customer.charging.application.MeteringService;
+import com.evcharge.customer.charging.application.SessionCostEstimator;
 import com.evcharge.customer.charging.application.SessionService;
 import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.Metering;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @RestController
@@ -25,10 +28,12 @@ class SessionController {
 
     private final SessionService sessions;
     private final MeteringService metering;
+    private final SessionCostEstimator estimator;
 
-    SessionController(SessionService sessions, MeteringService metering) {
+    SessionController(SessionService sessions, MeteringService metering, SessionCostEstimator estimator) {
         this.sessions = sessions;
         this.metering = metering;
+        this.estimator = estimator;
     }
 
     @PostMapping
@@ -46,7 +51,7 @@ class SessionController {
 
     @GetMapping
     List<SessionResponse> history(@AuthenticationPrincipal Jwt jwt) {
-        return sessions.history(customer(jwt)).stream().map(session -> SessionResponse.from(session, null)).toList();
+        return sessions.history(customer(jwt)).stream().map(session -> SessionResponse.from(session, null, Optional.empty())).toList();
     }
 
     @GetMapping("/{id}")
@@ -60,7 +65,8 @@ class SessionController {
     }
 
     private SessionResponse present(ChargingSession session) {
-        return SessionResponse.from(session, metering.of(session).orElse(null));
+        Optional<Metering> reading = metering.of(session);
+        return SessionResponse.from(session, reading.orElse(null), estimator.estimate(session, reading));
     }
 
     private static UUID customer(Jwt jwt) {

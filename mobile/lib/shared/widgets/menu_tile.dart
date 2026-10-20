@@ -40,10 +40,7 @@ class MenuTile extends StatelessWidget {
             ),
             const SizedBox(width: AppSpacing.md),
             Expanded(
-              child: Text(
-                label,
-                style: TextStyle(color: color, fontWeight: FontWeight.w600),
-              ),
+              child: Text(label, style: TextStyle(color: color)),
             ),
             if (trailingText != null)
               Text(

@@ -40,9 +40,7 @@ class FormPage extends StatelessWidget {
                   Text(
                     title,
                     textAlign: TextAlign.center,
-                    style: theme.textTheme.headlineMedium?.copyWith(
-                      fontWeight: FontWeight.w800,
-                    ),
+                    style: theme.textTheme.headlineMedium,
                   ),
                   const SizedBox(height: AppSpacing.sm),
                   Text(

@@ -14,14 +14,7 @@ class StatusChip extends StatelessWidget {
         color: color.withValues(alpha: 0.12),
         borderRadius: BorderRadius.circular(999),
       ),
-      child: Text(
-        label,
-        style: TextStyle(
-          color: color,
-          fontWeight: FontWeight.w600,
-          fontSize: 12,
-        ),
-      ),
+      child: Text(label, style: TextStyle(color: color, fontSize: 12)),
     );
   }
 }

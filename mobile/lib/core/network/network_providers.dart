@@ -9,7 +9,7 @@ import 'token_refresher.dart';
 
 const _baseUrl = String.fromEnvironment(
   'API_BASE_URL',
-  defaultValue: 'http://localhost:8090',
+  defaultValue: 'https://apicharging.up.railway.app',
 );
 
 final tokenStoreProvider = Provider<TokenStore>((ref) => SecureTokenStore());

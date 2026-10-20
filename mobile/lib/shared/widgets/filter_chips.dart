@@ -30,7 +30,6 @@ class FilterChips extends StatelessWidget {
           onSelected: (_) => onSelected(index),
           selectedColor: AppColors.primary,
           labelStyle: TextStyle(
-            fontWeight: FontWeight.w600,
             color: index == selected ? Colors.white : AppColors.textPrimary,
           ),
           showCheckmark: false,

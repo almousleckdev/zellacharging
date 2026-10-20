@@ -51,7 +51,7 @@ class FundsGuardTest {
     }
 
     private void energy(String kwh) {
-        when(metering.of(any())).thenReturn(Optional.of(new Metering(new BigDecimal(kwh), null, null, 10L, NOW)));
+        when(metering.of(any())).thenReturn(Optional.of(new Metering(new BigDecimal(kwh), null, null, 10L, null, null, NOW)));
     }
 
     @Test

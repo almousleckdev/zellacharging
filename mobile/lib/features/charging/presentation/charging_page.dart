@@ -10,10 +10,11 @@ import '../../../shared/widgets/error_banner.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../domain/charging_session.dart';
 import '../domain/session_state.dart';
-import 'charge_ring.dart';
+import 'charge_car_graphic.dart';
 import 'charging_metrics.dart';
 import 'session_formatting.dart';
 import 'session_providers.dart';
+import 'stop_confirm_sheet.dart';
 
 class ChargingPage extends ConsumerStatefulWidget {
   const ChargingPage({super.key, required this.sessionId});
@@ -25,8 +26,9 @@ class ChargingPage extends ConsumerStatefulWidget {
 }
 
 class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
-  void _stop() {
-    submit(() async {
+  Future<void> _stop() async {
+    if (!await confirmStop(context)) return;
+    await submit(() async {
       await ref.read(sessionRepositoryProvider).stop(widget.sessionId);
       ref.invalidate(liveSessionProvider(widget.sessionId));
       ref.invalidate(activeSessionProvider);
@@ -56,18 +58,18 @@ class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
             Text(
               '${session.stationId} · ${Strings.connectorLabel} ${session.connectorId}',
               textAlign: TextAlign.center,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
-            const SizedBox(height: AppSpacing.xs),
-            Text(
-              _message(session),
-              textAlign: TextAlign.center,
-              style: const TextStyle(color: AppColors.textSecondary),
-            ),
+            if (session.state != SessionState.active) ...[
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                _message(session),
+                textAlign: TextAlign.center,
+                style: const TextStyle(color: AppColors.textSecondary),
+              ),
+            ],
             const SizedBox(height: AppSpacing.lg),
-            Center(child: ChargeRing(session: session)),
+            ChargeCarGraphic(session: session),
             const SizedBox(height: AppSpacing.lg),
             if (errorMessage != null) ...[
               ErrorBanner(message: errorMessage!),

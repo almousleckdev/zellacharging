@@ -20,10 +20,7 @@ class HomeHeader extends StatelessWidget {
           backgroundColor: AppColors.primarySoft,
           child: Text(
             profile?.initials ?? '',
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w800,
-            ),
+            style: const TextStyle(color: AppColors.primary),
           ),
         ),
         const SizedBox(width: AppSpacing.md),
@@ -35,9 +32,7 @@ class HomeHeader extends StatelessWidget {
                 profile == null
                     ? Strings.appName
                     : '${Strings.greeting}, ${profile!.firstName}',
-                style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+                style: theme.textTheme.titleMedium,
               ),
               Text(
                 Strings.tagline,

@@ -16,19 +16,14 @@ class AuthSwitchLink extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Row(
-      mainAxisAlignment: MainAxisAlignment.center,
+    return Wrap(
+      alignment: WrapAlignment.center,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
         Text(prompt),
         TextButton(
           onPressed: onTap,
-          child: Text(
-            action,
-            style: const TextStyle(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w700,
-            ),
-          ),
+          child: Text(action, style: const TextStyle(color: AppColors.primary)),
         ),
       ],
     );

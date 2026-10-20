@@ -20,9 +20,35 @@ extension SessionFormatting on ChargingSession {
       ? '--'
       : DurationFormat.compact(metering!.durationSeconds!);
 
+  String get voltageText => metering?.voltage == null
+      ? '--'
+      : '${metering!.voltage!.toStringAsFixed(0)} ${Strings.voltageUnit}';
+
+  String get currentText => metering?.currentAmpere == null
+      ? '--'
+      : '${metering!.currentAmpere!.toStringAsFixed(1)} ${Strings.currentUnit}';
+
   String get costText => costMinor == null || currency == null
       ? '--'
       : MoneyFormat.format(costMinor!, currency!, currencyDecimals ?? 0);
+
+  String get priceText {
+    final estimate = estimatedCost;
+    if (costMinor != null || estimate == null) return costText;
+    return MoneyFormat.format(
+      estimate.minor,
+      estimate.currency,
+      estimate.decimals,
+    );
+  }
+
+  bool get priceIsEstimate => costMinor == null && estimatedCost != null;
+
+  double get chargeLevel {
+    final percent = metering?.stateOfChargePercent;
+    if (percent != null) return (percent / 100).clamp(0.0, 1.0);
+    return state.isLive ? 0 : 1;
+  }
 
   String get stateLabel => Strings.sessionStates[state.name] ?? state.name;
 }

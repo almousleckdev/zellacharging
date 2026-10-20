@@ -128,11 +128,6 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
 
   Widget _heading(String text) => Padding(
     padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-    child: Text(
-      text,
-      style: Theme.of(
-        context,
-      ).textTheme.titleSmall?.copyWith(fontWeight: FontWeight.w700),
-    ),
+    child: Text(text, style: Theme.of(context).textTheme.titleSmall),
   );
 }

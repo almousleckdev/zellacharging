@@ -21,10 +21,7 @@ class ProfileHeader extends StatelessWidget {
             backgroundColor: AppColors.primary,
             child: Text(
               profile.initials,
-              style: theme.textTheme.titleLarge?.copyWith(
-                color: Colors.white,
-                fontWeight: FontWeight.w700,
-              ),
+              style: theme.textTheme.titleLarge?.copyWith(color: Colors.white),
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -32,18 +29,7 @@ class ProfileHeader extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  profile.fullName,
-                  style: theme.textTheme.titleMedium?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
-                Text(
-                  profile.contact,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
-                ),
+                Text(profile.fullName, style: theme.textTheme.titleMedium),
               ],
             ),
           ),

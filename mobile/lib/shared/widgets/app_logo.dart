@@ -37,8 +37,7 @@ class AppLogo extends StatelessWidget {
           Strings.appName.toUpperCase(),
           style: TextStyle(
             fontSize: size * 0.34,
-            fontWeight: FontWeight.w900,
-            letterSpacing: 1.5,
+            letterSpacing: 3,
             color: AppColors.primary,
           ),
         ),

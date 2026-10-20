@@ -38,9 +38,7 @@ class StationDetailPage extends ConsumerWidget {
             const SizedBox(height: AppSpacing.md),
             Text(
               Strings.connectors,
-              style: Theme.of(
-                context,
-              ).textTheme.titleMedium?.copyWith(fontWeight: FontWeight.w700),
+              style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.md),
             for (final connector in data.connectors) ...[

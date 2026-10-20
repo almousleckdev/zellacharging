@@ -29,14 +29,7 @@ class BottomBarItem extends StatelessWidget {
             children: [
               Icon(icon, color: color),
               const SizedBox(height: 2),
-              Text(
-                label,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: color,
-                  fontWeight: selected ? FontWeight.w700 : FontWeight.w500,
-                ),
-              ),
+              Text(label, style: TextStyle(fontSize: 11, color: color)),
             ],
           ),
         ),

@@ -39,10 +39,7 @@ class ConnectorTile extends StatelessWidget {
             backgroundColor: AppColors.primarySoft,
             child: Text(
               '${connector.connectorId}',
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w800,
-              ),
+              style: const TextStyle(color: AppColors.primary),
             ),
           ),
           const SizedBox(width: AppSpacing.md),
@@ -52,9 +49,7 @@ class ConnectorTile extends StatelessWidget {
               children: [
                 Text(
                   connector.connectorType ?? Strings.connector,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  style: theme.textTheme.titleSmall,
                 ),
                 if (power != null)
                   Text(

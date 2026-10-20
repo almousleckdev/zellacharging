@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../../core/l10n/strings.dart';
-import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/metric_grid.dart';
 import '../../../shared/widgets/metric_tile.dart';
 import '../domain/charging_session.dart';
 import 'session_formatting.dart';
@@ -13,14 +13,13 @@ class ChargingMetrics extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GridView.count(
-      crossAxisCount: 2,
-      shrinkWrap: true,
-      physics: const NeverScrollableScrollPhysics(),
-      mainAxisSpacing: AppSpacing.sm,
-      crossAxisSpacing: AppSpacing.sm,
-      childAspectRatio: 1.9,
-      children: [
+    return MetricGrid(
+      tiles: [
+        MetricTile(
+          icon: Icons.timer_outlined,
+          label: Strings.elapsed,
+          value: session.durationText,
+        ),
         MetricTile(
           icon: Icons.bolt_rounded,
           label: Strings.energy,
@@ -32,21 +31,22 @@ class ChargingMetrics extends StatelessWidget {
           value: session.powerText,
         ),
         MetricTile(
-          icon: Icons.battery_charging_full_rounded,
-          label: Strings.battery,
-          value: session.batteryText,
+          icon: Icons.payments_outlined,
+          label: session.priceIsEstimate
+              ? Strings.priceEstimated
+              : Strings.price,
+          value: session.priceText,
         ),
         MetricTile(
-          icon: Icons.timer_outlined,
-          label: Strings.duration,
-          value: session.durationText,
+          icon: Icons.electric_meter_outlined,
+          label: Strings.voltage,
+          value: session.voltageText,
         ),
-        if (!session.state.isLive)
-          MetricTile(
-            icon: Icons.payments_outlined,
-            label: Strings.cost,
-            value: session.costText,
-          ),
+        MetricTile(
+          icon: Icons.electrical_services_rounded,
+          label: Strings.current,
+          value: session.currentText,
+        ),
       ],
     );
   }

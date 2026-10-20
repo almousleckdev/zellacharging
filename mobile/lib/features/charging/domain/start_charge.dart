@@ -4,6 +4,7 @@ import 'charge_quote.dart';
 import 'charge_request.dart';
 import 'charging_session.dart';
 import 'session_repository.dart';
+import 'session_state.dart';
 
 class StartCharge {
   StartCharge(
@@ -26,11 +27,15 @@ class StartCharge {
     if (quote.needsPayment) {
       await _collect(request, quote.shortfallMinor);
     }
-    return _sessions.start(
+    final session = await _sessions.start(
       request.stationId,
       request.connectorId,
       request.amountMinor,
     );
+    if (session.state == SessionState.failed) {
+      throw ApiError.fromCode(session.failureCode);
+    }
+    return session;
   }
 
   Future<void> _collect(ChargeRequest request, int shortfall) async {

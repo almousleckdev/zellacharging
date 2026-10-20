@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/format/money_format.dart';
 import '../../../../core/l10n/strings.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/network/api_error.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/submit_mixin.dart';
 import '../../../../shared/widgets/async_body.dart';
-import '../../../../shared/widgets/error_banner.dart';
-import '../../../../shared/widgets/primary_button.dart';
-import '../../../../shared/widgets/section_title.dart';
+import '../../../../shared/widgets/labeled_section.dart';
 import '../../../profile/presentation/profile_providers.dart';
 import '../../../stations/domain/station.dart';
 import '../../../stations/presentation/station_providers.dart';
@@ -19,11 +16,12 @@ import '../../../wallet/domain/mobile_operator.dart';
 import '../../../wallet/presentation/wallet_providers.dart';
 import '../../domain/charge_quote.dart';
 import '../../domain/charge_request.dart';
-import '../../domain/session_state.dart';
-import '../session_providers.dart';
 import 'amount_section.dart';
+import 'charge_launcher.dart';
 import 'connector_picker.dart';
 import 'payment_section.dart';
+import 'setup_header.dart';
+import 'start_button.dart';
 
 class ChargeSetupPage extends ConsumerStatefulWidget {
   const ChargeSetupPage({
@@ -72,33 +70,20 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
     }
     if (!_formKey.currentState!.validate()) return;
     submit(() async {
+      final request = ChargeRequest(
+        stationId: widget.stationId,
+        connectorId: connector,
+        amountMinor: int.parse(_amount.text),
+        attemptKey: _attempt,
+        payment: _quote.needsPayment
+            ? ChargePayment(operator: _operator, msisdn: _phone.text.trim())
+            : null,
+      );
       try {
-        final session = await ref
-            .read(startChargeProvider)
-            .call(
-              ChargeRequest(
-                stationId: widget.stationId,
-                connectorId: connector,
-                amountMinor: int.parse(_amount.text),
-                attemptKey: _attempt,
-                payment: _quote.needsPayment
-                    ? ChargePayment(
-                        operator: _operator,
-                        msisdn: _phone.text.trim(),
-                      )
-                    : null,
-              ),
-            );
-        ref.invalidate(walletProvider);
-        ref.invalidate(activeSessionProvider);
-        if (!mounted) return;
-        if (session.state == SessionState.failed) {
-          throw ApiError.fromCode(session.failureCode);
-        }
-        context.pushReplacement(Routes.chargingPath(session.id));
+        final session = await ChargeLauncher(ref).launch(request);
+        if (mounted) context.pushReplacement(Routes.chargingPath(session.id));
       } on ApiError {
         _attempt = _newAttempt();
-        ref.invalidate(walletProvider);
         rethrow;
       }
     });
@@ -125,47 +110,37 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
       child: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          Text(
-            station.id,
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+          SetupHeader(title: station.id, errorMessage: errorMessage),
+          LabeledSection(
+            title: Strings.setupAmountQuestion,
+            child: AmountSection(
+              controller: _amount,
+              currency: currency,
+              onChanged: () => setState(() {}),
+            ),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          if (errorMessage != null) ...[
-            ErrorBanner(message: errorMessage!),
-            const SizedBox(height: AppSpacing.md),
-          ],
-          const SectionTitle(title: Strings.setupAmountQuestion),
-          const SizedBox(height: AppSpacing.md),
-          AmountSection(
-            controller: _amount,
-            currency: currency,
-            onChanged: () => setState(() {}),
+          LabeledSection(
+            title: Strings.chooseConnector,
+            child: ConnectorPicker(
+              connectors: station.connectors,
+              selected: _connector,
+              onSelected: (value) => setState(() => _connector = value),
+            ),
           ),
-          const SizedBox(height: AppSpacing.lg),
-          const SectionTitle(title: Strings.chooseConnector),
-          const SizedBox(height: AppSpacing.md),
-          ConnectorPicker(
-            connectors: station.connectors,
-            selected: _connector,
-            onSelected: (value) => setState(() => _connector = value),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          const SectionTitle(title: Strings.payment),
-          const SizedBox(height: AppSpacing.md),
-          PaymentSection(
-            quote: quote,
-            currency: currency,
-            operator: _operator,
-            phone: _phone,
-            onOperator: (value) => setState(() => _operator = value),
+          LabeledSection(
+            title: Strings.payment,
+            child: PaymentSection(
+              quote: quote,
+              currency: currency,
+              operator: _operator,
+              phone: _phone,
+              onOperator: (value) => setState(() => _operator = value),
+            ),
           ),
           const SizedBox(height: AppSpacing.xl),
-          PrimaryButton(
-            label: quote.needsPayment
-                ? '${Strings.startAndPay} · ${MoneyFormat.format(quote.amountMinor, currency, 0)}'
-                : Strings.startOnly,
+          StartButton(
+            quote: quote,
+            currency: currency,
             loading: loading,
             onPressed: _start,
           ),

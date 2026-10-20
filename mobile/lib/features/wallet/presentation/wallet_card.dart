@@ -35,9 +35,7 @@ class WalletCard extends ConsumerWidget {
                 ),
                 Text(
                   wallet?.availableText ?? '--',
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
+                  style: theme.textTheme.titleLarge,
                 ),
                 if (wallet != null && wallet.reservedMinor > 0)
                   Text(
@@ -51,6 +49,10 @@ class WalletCard extends ConsumerWidget {
           ),
           FilledButton(
             onPressed: () => context.push(Routes.topup),
+            style: FilledButton.styleFrom(
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
+              textStyle: theme.textTheme.labelLarge,
+            ),
             child: const Text(Strings.topUp),
           ),
         ],

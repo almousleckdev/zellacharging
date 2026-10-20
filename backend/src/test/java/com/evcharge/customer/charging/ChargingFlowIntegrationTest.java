@@ -86,11 +86,13 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
                 + "\"status\":\"ACTIVE\",\"startedAt\":\"" + Instant.now() + "\",\"idTag\":\"" + idTag + "\"}]}";
         OCPP.route("GET", "/api/v1/sessions", 200, running)
                 .route("GET", "/api/v1/sessions/7/metering", 200,
-                        "{\"totalKwh\":1.5,\"currentPowerKw\":30.0,\"stateOfChargePercent\":40,\"durationSeconds\":90}");
+                        "{\"totalKwh\":1.5,\"currentPowerKw\":30.0,\"stateOfChargePercent\":40,\"durationSeconds\":90,\"voltage\":402.1,\"currentAmpere\":74.6}");
 
         getAs(customer, "/v1/sessions/active").andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("ACTIVE"))
-                .andExpect(jsonPath("$.metering.totalKwh").value(1.5));
+                .andExpect(jsonPath("$.metering.totalKwh").value(1.5))
+                .andExpect(jsonPath("$.metering.voltage").value(402.1))
+                .andExpect(jsonPath("$.metering.currentAmpere").value(74.6));
 
         postAs(customer, "/v1/sessions/" + sessionId + "/stop", "{}").andExpect(status().isOk())
                 .andExpect(jsonPath("$.state").value("STOPPING"));

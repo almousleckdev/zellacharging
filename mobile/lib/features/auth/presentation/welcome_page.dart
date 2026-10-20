@@ -17,38 +17,43 @@ class WelcomePage extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              const Spacer(flex: 2),
-              const Center(child: AppLogo(size: 104)),
-              const Spacer(flex: 3),
-              Text(
-                Strings.welcomeTitle,
-                style: theme.textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+        child: LayoutBuilder(
+          builder: (context, constraints) => SingleChildScrollView(
+            padding: const EdgeInsets.all(AppSpacing.lg),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: constraints.maxHeight - AppSpacing.lg * 2,
               ),
-              const SizedBox(height: AppSpacing.md),
-              Text(
-                Strings.welcomeBody,
-                style: theme.textTheme.bodyLarge?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  const SizedBox(height: AppSpacing.xl),
+                  const Center(child: AppLogo(size: 88)),
+                  const SizedBox(height: AppSpacing.xl * 2),
+                  Text(
+                    Strings.welcomeTitle,
+                    style: theme.textTheme.headlineLarge,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  Text(
+                    Strings.welcomeBody,
+                    style: theme.textTheme.bodyLarge?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                  const SizedBox(height: AppSpacing.xl),
+                  PrimaryButton(
+                    label: Strings.getStarted,
+                    onPressed: () => context.push(Routes.onboarding),
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                  SecondaryButton(
+                    label: Strings.signIn,
+                    onPressed: () => context.go(Routes.login),
+                  ),
+                ],
               ),
-              const SizedBox(height: AppSpacing.xl),
-              PrimaryButton(
-                label: Strings.getStarted,
-                onPressed: () => context.push(Routes.onboarding),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              SecondaryButton(
-                label: Strings.signIn,
-                onPressed: () => context.go(Routes.login),
-              ),
-            ],
+            ),
           ),
         ),
       ),

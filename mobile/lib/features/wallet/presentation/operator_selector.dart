@@ -45,7 +45,6 @@ class OperatorSelector extends StatelessWidget {
         child: Text(
           operator.label,
           style: TextStyle(
-            fontWeight: FontWeight.w600,
             color: active ? AppColors.primary : AppColors.textPrimary,
           ),
         ),

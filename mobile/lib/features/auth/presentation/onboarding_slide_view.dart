@@ -18,9 +18,7 @@ class OnboardingSlideView extends StatelessWidget {
         Text(
           slide.title,
           textAlign: TextAlign.center,
-          style: theme.textTheme.titleLarge?.copyWith(
-            fontWeight: FontWeight.w800,
-          ),
+          style: theme.textTheme.titleLarge,
         ),
         const SizedBox(height: AppSpacing.sm),
         Text(

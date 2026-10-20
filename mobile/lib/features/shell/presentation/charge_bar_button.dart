@@ -40,11 +40,7 @@ class ChargeBarButton extends StatelessWidget {
               offset: const Offset(0, -14),
               child: const Text(
                 Strings.charge,
-                style: TextStyle(
-                  fontSize: 11,
-                  color: AppColors.primary,
-                  fontWeight: FontWeight.w700,
-                ),
+                style: TextStyle(fontSize: 11, color: AppColors.primary),
               ),
             ),
           ],

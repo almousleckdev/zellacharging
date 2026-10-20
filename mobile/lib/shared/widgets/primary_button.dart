@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
+import 'button_label.dart';
 
 class PrimaryButton extends StatelessWidget {
   const PrimaryButton({
@@ -27,49 +28,21 @@ class PrimaryButton extends StatelessWidget {
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primary,
           disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
         ),
-        child: loading ? const _Spinner() : _Label(label: label, icon: icon),
+        child: loading
+            ? const SizedBox.square(
+                dimension: 20,
+                child: CircularProgressIndicator(
+                  strokeWidth: 2.2,
+                  color: Colors.white,
+                ),
+              )
+            : ButtonLabel(label: label, color: Colors.white, icon: icon),
       ),
-    );
-  }
-}
-
-class _Spinner extends StatelessWidget {
-  const _Spinner();
-
-  @override
-  Widget build(BuildContext context) {
-    return const SizedBox.square(
-      dimension: 22,
-      child: CircularProgressIndicator(strokeWidth: 2.5, color: Colors.white),
-    );
-  }
-}
-
-class _Label extends StatelessWidget {
-  const _Label({required this.label, this.icon});
-
-  final String label;
-  final IconData? icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final style = Theme.of(context).textTheme.titleMedium?.copyWith(
-      color: Colors.white,
-      fontWeight: FontWeight.w600,
-    );
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        if (icon != null) ...[
-          Icon(icon, color: Colors.white, size: 20),
-          const SizedBox(width: AppSpacing.sm),
-        ],
-        Text(label, style: style),
-      ],
     );
   }
 }

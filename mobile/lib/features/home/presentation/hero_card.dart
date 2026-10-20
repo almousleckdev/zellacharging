@@ -24,12 +24,7 @@ class HeroCard extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(
-                  Strings.readyToCharge,
-                  style: theme.textTheme.titleLarge?.copyWith(
-                    fontWeight: FontWeight.w800,
-                  ),
-                ),
+                Text(Strings.readyToCharge, style: theme.textTheme.titleLarge),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
                   Strings.readyToChargeBody,

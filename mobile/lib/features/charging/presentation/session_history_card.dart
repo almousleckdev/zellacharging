@@ -43,9 +43,9 @@ class SessionHistoryCard extends StatelessWidget {
               children: [
                 Text(
                   session.stationId,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
-                  ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                  style: theme.textTheme.titleSmall,
                 ),
                 Text(
                   session.createdAt.toLocal().toString().substring(0, 16),
@@ -54,6 +54,7 @@ class SessionHistoryCard extends StatelessWidget {
               ],
             ),
           ),
+          const SizedBox(width: AppSpacing.sm),
           Column(
             crossAxisAlignment: CrossAxisAlignment.end,
             children: [
@@ -61,9 +62,7 @@ class SessionHistoryCard extends StatelessWidget {
                 session.costMinor == null
                     ? session.energyText
                     : session.costText,
-                style: theme.textTheme.titleSmall?.copyWith(
-                  fontWeight: FontWeight.w800,
-                ),
+                style: theme.textTheme.titleSmall,
               ),
               const SizedBox(height: AppSpacing.xs),
               StatusChip(label: session.stateLabel, color: _color),

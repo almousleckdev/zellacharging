@@ -74,14 +74,13 @@ class _Option extends StatelessWidget {
                 child: Text(
                   '${Strings.connector} ${connector.connectorId}'
                   '${power == null ? '' : ' · ${power.toStringAsFixed(0)} ${Strings.powerUnit}'}',
-                  style: const TextStyle(fontWeight: FontWeight.w600),
+                  style: const TextStyle(),
                 ),
               ),
               Text(
                 ConnectorStatusStyle.label(connector.status),
                 style: TextStyle(
                   color: ConnectorStatusStyle.color(connector.status),
-                  fontWeight: FontWeight.w600,
                 ),
               ),
             ],

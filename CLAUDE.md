@@ -30,7 +30,7 @@ The OCPP platform in `../backend` belongs to another developer: never modify it.
 - Reusable widget first: check `lib/shared/widgets` before writing any new UI.
 - No business logic in widgets. Server is authoritative for session and payment state.
 - Reference UI in `mobile/assets/design/` is an example only, not a pixel spec.
-- API base URL: `--dart-define=API_BASE_URL=http://10.0.2.2:8090` on the Android emulator.
+- API base URL defaults to the deployed backend `https://apicharging.up.railway.app`. For a local backend use `--dart-define=API_BASE_URL=http://10.0.2.2:8090` (Android emulator) or `http://<Mac LAN IP>:8090` (physical phone).
 
 ## Local development
 

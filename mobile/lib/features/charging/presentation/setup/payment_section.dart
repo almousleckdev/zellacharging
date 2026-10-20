@@ -40,7 +40,7 @@ class PaymentSection extends StatelessWidget {
         Text(
           '${Strings.toPayByMobileMoney}: '
           '${MoneyFormat.format(quote.shortfallMinor, currency, 0)}',
-          style: const TextStyle(fontWeight: FontWeight.w700),
+          style: const TextStyle(),
         ),
         const SizedBox(height: AppSpacing.md),
         OperatorSelector(selected: operator, onSelected: onOperator),

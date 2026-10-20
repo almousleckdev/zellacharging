@@ -30,7 +30,7 @@ abstract final class Strings {
   static const exploreLocations = 'Explore Locations';
   static const searchStations = 'Search location, charger id';
   static const viewAll = 'View All';
-  static const findStation = 'Find Station';
+  static const findStation = 'Find station';
   static const recentSessions = 'Recent Sessions';
   static const chargingHistory = 'Charging History';
   static const totalSessions = 'Sessions';
@@ -90,7 +90,7 @@ abstract final class Strings {
   static const chargingStatus = 'Charging';
   static const readyToCharge = 'Ready to charge?';
   static const readyToChargeBody = 'Scan a charger or pick a station nearby.';
-  static const scanToCharge = 'Scan to Charge';
+  static const scanToCharge = 'Scan QR';
   static const nearbyStations = 'Nearby Stations';
   static const historyEmpty = 'Your charging sessions will appear here.';
   static const heroTitle = 'One app for every charge';
@@ -143,6 +143,17 @@ abstract final class Strings {
   static const battery = 'Battery';
   static const duration = 'Duration';
   static const cost = 'Cost';
+  static const price = 'Price';
+  static const priceEstimated = 'Price (est.)';
+  static const elapsed = 'Time elapsed';
+  static const voltage = 'Voltage';
+  static const current = 'Current';
+  static const voltageUnit = 'V';
+  static const currentUnit = 'A';
+  static const stopConfirmTitle = 'Stop charging?';
+  static const stopConfirmBody =
+      'The session will end and the final amount is paid automatically from your wallet.';
+  static const keepCharging = 'Keep charging';
   static const kwhUnit = 'kWh';
   static const activeSession = 'Charge in progress';
   static const viewSession = 'View';

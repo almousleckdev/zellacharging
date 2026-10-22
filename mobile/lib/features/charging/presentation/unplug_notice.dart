@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_icons.dart';
 
 class UnplugNotice extends StatelessWidget {
   const UnplugNotice({super.key});
@@ -18,15 +19,11 @@ class UnplugNotice extends StatelessWidget {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Icon(
-            Icons.info_outline_rounded,
-            size: 20,
-            color: AppColors.chargeDeep,
-          ),
+          const Icon(AppIcons.info, size: 20, color: AppColors.chargeDeep),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(
-              Strings.unplugNotice,
+              ChargeText.unplugNotice,
               style: Theme.of(
                 context,
               ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),

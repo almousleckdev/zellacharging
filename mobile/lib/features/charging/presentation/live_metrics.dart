@@ -8,6 +8,7 @@ import 'panel_metric.dart';
 import 'price_card.dart';
 import 'session_formatting.dart';
 import 'unplug_notice.dart';
+import '../../../core/theme/app_icons.dart';
 
 class LiveMetrics extends StatelessWidget {
   const LiveMetrics({super.key, required this.session});
@@ -23,18 +24,18 @@ class LiveMetrics extends StatelessWidget {
         MetricPanel(
           metrics: [
             PanelMetric(
-              icon: Icons.electrical_services_rounded,
-              label: Strings.current,
+              icon: AppIcons.plugs,
+              label: ChargeText.current,
               value: session.currentText,
             ),
             PanelMetric(
-              icon: Icons.electric_meter_outlined,
-              label: Strings.voltage,
+              icon: AppIcons.gauge,
+              label: ChargeText.voltage,
               value: session.voltageText,
             ),
             PanelMetric(
-              icon: Icons.bolt_rounded,
-              label: Strings.energy,
+              icon: AppIcons.lightning,
+              label: ChargeText.energy,
               value: session.energyText,
             ),
           ],

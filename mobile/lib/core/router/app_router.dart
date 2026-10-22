@@ -11,6 +11,12 @@ import '../../features/auth/presentation/verify_page.dart';
 import '../../features/history/presentation/history_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/stations/presentation/locations_page.dart';
+import '../../features/coupons/presentation/coupons_page.dart';
+import '../../features/profile/presentation/change_password_page.dart';
+import '../../features/profile/presentation/delete_account_page.dart';
+import '../../features/profile/presentation/edit_profile_page.dart';
+import '../../features/profile/presentation/settings_page.dart';
+import '../../features/support/presentation/contact_page.dart';
 import '../../features/profile/presentation/profile_page.dart';
 import '../../features/shell/presentation/shell_page.dart';
 import '../../features/scan/presentation/scan_page.dart';
@@ -64,6 +70,21 @@ final routerProvider = Provider<GoRouter>((ref) {
         builder: (_, state) =>
             ChargingPage(sessionId: state.pathParameters['id']!),
       ),
+      GoRoute(
+        path: Routes.editProfile,
+        builder: (_, _) => const EditProfilePage(),
+      ),
+      GoRoute(path: Routes.settings, builder: (_, _) => const SettingsPage()),
+      GoRoute(
+        path: Routes.changePassword,
+        builder: (_, _) => const ChangePasswordPage(),
+      ),
+      GoRoute(
+        path: Routes.deleteAccount,
+        builder: (_, _) => const DeleteAccountPage(),
+      ),
+      GoRoute(path: Routes.contact, builder: (_, _) => const ContactPage()),
+      GoRoute(path: Routes.coupons, builder: (_, _) => const CouponsPage()),
       GoRoute(path: Routes.scan, builder: (_, _) => const ScanPage()),
       GoRoute(path: Routes.topup, builder: (_, _) => const TopupPage()),
       GoRoute(

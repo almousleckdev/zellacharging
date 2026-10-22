@@ -32,12 +32,12 @@ class StationDetailPage extends ConsumerWidget {
           padding: const EdgeInsets.all(AppSpacing.md),
           children: [
             Text(
-              Strings.plugInFirst,
+              StationText.plugInFirst,
               style: const TextStyle(color: AppColors.textSecondary),
             ),
             const SizedBox(height: AppSpacing.md),
             Text(
-              Strings.connectors,
+              StationText.connectors,
               style: Theme.of(context).textTheme.titleMedium,
             ),
             const SizedBox(height: AppSpacing.md),

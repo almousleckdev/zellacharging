@@ -4,6 +4,7 @@ import '../../../core/theme/app_colors.dart';
 import '../domain/charging_session.dart';
 import '../domain/session_state.dart';
 import 'session_formatting.dart';
+import '../../../core/theme/app_icons.dart';
 
 class ChargeHero extends StatelessWidget {
   const ChargeHero({super.key, required this.session});
@@ -11,9 +12,9 @@ class ChargeHero extends StatelessWidget {
   final ChargingSession session;
 
   IconData get _icon => switch (session.state) {
-    SessionState.completed => Icons.check_rounded,
-    SessionState.failed || SessionState.abandoned => Icons.close_rounded,
-    _ => Icons.bolt_rounded,
+    SessionState.completed => AppIcons.check,
+    SessionState.failed || SessionState.abandoned => AppIcons.close,
+    _ => AppIcons.lightning,
   };
 
   @override

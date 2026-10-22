@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/l10n/strings.dart';
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_icons.dart';
 
 class AppLogo extends StatelessWidget {
   const AppLogo({super.key, this.size = 72, this.showName = true});
@@ -25,7 +26,11 @@ class AppLogo extends StatelessWidget {
           ),
         ],
       ),
-      child: Icon(Icons.bolt_rounded, color: Colors.white, size: size * 0.62),
+      child: Icon(
+        AppIcons.lightning,
+        color: AppColors.onPrimary,
+        size: size * 0.62,
+      ),
     );
     if (!showName) return mark;
     return Column(

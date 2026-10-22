@@ -24,12 +24,12 @@ abstract final class Validators {
   static String? mobileMoneyNumber(String? value) =>
       value != null && RegExp(r'^\+[1-9]\d{7,14}$').hasMatch(value.trim())
       ? null
-      : Strings.invalidMobileMoney;
+      : WalletText.invalidMobileMoney;
 
   static String? chargeAmount(String? value) {
     final amount = int.tryParse(value?.trim() ?? '');
-    return amount != null && amount >= Strings.minimumChargeMinor
+    return amount != null && amount >= ChargeText.minimumChargeMinor
         ? null
-        : Strings.invalidAmount;
+        : ChargeText.invalidAmount;
   }
 }

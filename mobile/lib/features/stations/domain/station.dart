@@ -8,6 +8,8 @@ class Station {
     required this.totalConnectors,
     required this.connectors,
     this.distanceKm,
+    this.latitude,
+    this.longitude,
   });
 
   final String id;
@@ -15,6 +17,8 @@ class Station {
   final int availableConnectors;
   final int totalConnectors;
   final double? distanceKm;
+  final double? latitude;
+  final double? longitude;
   final List<StationConnector> connectors;
 
   double? get maxPowerKw => connectors

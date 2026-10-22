@@ -1,11 +1,12 @@
-import 'package:flutter/material.dart';
+import 'package:flutter/painting.dart';
 
 abstract final class AppColors {
   static const primary = Color(0xFFF97316);
   static const primaryLight = Color(0xFFFDBA74);
   static const primarySoft = Color(0xFFFFF3E8);
-  static const background = Colors.white;
-  static const surface = Colors.white;
+  static const onPrimary = Color(0xFFFFFFFF);
+  static const background = Color(0xFFFFFFFF);
+  static const surface = Color(0xFFFFFFFF);
   static const surfaceMuted = Color(0xFFF8FAFC);
   static const textPrimary = Color(0xFF0F172A);
   static const textSecondary = Color(0xFF64748B);

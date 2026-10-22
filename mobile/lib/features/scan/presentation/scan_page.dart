@@ -8,7 +8,7 @@ import '../../../core/network/api_error.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../shared/widgets/error_banner.dart';
+import '../../../shared/app_toast.dart';
 import '../../stations/presentation/station_providers.dart';
 
 class ScanPage extends ConsumerStatefulWidget {
@@ -23,7 +23,6 @@ class _ScanPageState extends ConsumerState<ScanPage> {
     formats: const [BarcodeFormat.qrCode],
   );
   bool _resolving = false;
-  String? _error;
 
   @override
   void dispose() {
@@ -36,7 +35,6 @@ class _ScanPageState extends ConsumerState<ScanPage> {
     if (_resolving || content == null) return;
     setState(() {
       _resolving = true;
-      _error = null;
     });
     try {
       final resolved = await ref
@@ -50,7 +48,7 @@ class _ScanPageState extends ConsumerState<ScanPage> {
         ),
       );
     } on ApiError catch (error) {
-      if (mounted) setState(() => _error = error.message);
+      if (mounted) AppToast.error(context, error.message);
       await Future<void>.delayed(const Duration(seconds: 2));
       if (mounted) setState(() => _resolving = false);
     }
@@ -59,17 +57,20 @@ class _ScanPageState extends ConsumerState<ScanPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: const Text(Strings.scanTitle)),
+      appBar: AppBar(title: Text(StationText.scanTitle)),
       body: Stack(
         fit: StackFit.expand,
         children: [
           MobileScanner(
             controller: _controller,
             onDetect: _onDetect,
-            errorBuilder: (_, _) => const Center(
+            errorBuilder: (_, _) => Center(
               child: Padding(
                 padding: EdgeInsets.all(AppSpacing.lg),
-                child: Text(Strings.cameraDenied, textAlign: TextAlign.center),
+                child: Text(
+                  StationText.cameraDenied,
+                  textAlign: TextAlign.center,
+                ),
               ),
             ),
           ),
@@ -87,13 +88,11 @@ class _ScanPageState extends ConsumerState<ScanPage> {
             left: AppSpacing.md,
             right: AppSpacing.md,
             bottom: AppSpacing.xl,
-            child: _error != null
-                ? ErrorBanner(message: _error!)
-                : const Text(
-                    Strings.scanHint,
-                    textAlign: TextAlign.center,
-                    style: TextStyle(color: Colors.white),
-                  ),
+            child: Text(
+              StationText.scanHint,
+              textAlign: TextAlign.center,
+              style: TextStyle(color: AppColors.onPrimary),
+            ),
           ),
         ],
       ),

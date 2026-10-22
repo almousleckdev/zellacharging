@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 
 import '../../../../core/theme/app_spacing.dart';
-import '../../../../shared/widgets/error_banner.dart';
 
 class SetupHeader extends StatelessWidget {
-  const SetupHeader({super.key, required this.title, this.errorMessage});
+  const SetupHeader({super.key, required this.title});
 
   final String title;
-  final String? errorMessage;
 
   @override
   Widget build(BuildContext context) {
@@ -16,10 +14,6 @@ class SetupHeader extends StatelessWidget {
       children: [
         Text(title, style: Theme.of(context).textTheme.titleLarge),
         const SizedBox(height: AppSpacing.lg),
-        if (errorMessage != null) ...[
-          ErrorBanner(message: errorMessage!),
-          const SizedBox(height: AppSpacing.md),
-        ],
       ],
     );
   }

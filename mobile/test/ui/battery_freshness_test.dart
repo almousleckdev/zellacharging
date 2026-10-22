@@ -24,6 +24,8 @@ Future<void> _show(WidgetTester tester, ChargingSession session) =>
       ),
     );
 
+String _prefix(String Function(String) text) => text('|').split('|').first;
+
 void main() {
   testWidgets('a recent reading is shown as updated', (tester) async {
     await _show(
@@ -31,8 +33,11 @@ void main() {
       _session(SessionState.active, const Duration(seconds: 8)),
     );
 
-    expect(find.textContaining(Strings.updated), findsOneWidget);
-    expect(find.textContaining(Strings.lastReading), findsNothing);
+    expect(find.textContaining(_prefix(ChargeText.updatedAgo)), findsOneWidget);
+    expect(
+      find.textContaining(_prefix(ChargeText.lastReadingAgo)),
+      findsNothing,
+    );
   });
 
   testWidgets('an old reading is flagged as the last reading', (tester) async {
@@ -41,7 +46,10 @@ void main() {
       _session(SessionState.active, const Duration(minutes: 5)),
     );
 
-    expect(find.textContaining(Strings.lastReading), findsOneWidget);
+    expect(
+      find.textContaining(_prefix(ChargeText.lastReadingAgo)),
+      findsOneWidget,
+    );
     expect(find.textContaining('5m'), findsOneWidget);
   });
 

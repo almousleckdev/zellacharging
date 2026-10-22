@@ -8,6 +8,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/soft_card.dart';
 import 'session_providers.dart';
+import '../../../core/theme/app_icons.dart';
 
 class ActiveSessionBanner extends ConsumerWidget {
   const ActiveSessionBanner({super.key});
@@ -22,16 +23,16 @@ class ActiveSessionBanner extends ConsumerWidget {
         onTap: () => context.push(Routes.chargingPath(session.id)),
         child: Row(
           children: [
-            const Icon(Icons.bolt, color: AppColors.primary),
+            const Icon(AppIcons.lightning, color: AppColors.primary),
             const SizedBox(width: AppSpacing.sm),
             Expanded(
               child: Text(
-                '${Strings.activeSession} · ${session.stationId}',
+                '${ChargeText.activeSession} · ${session.stationId}',
                 style: const TextStyle(),
               ),
             ),
-            const Text(
-              Strings.viewSession,
+            Text(
+              ChargeText.viewSession,
               style: TextStyle(color: AppColors.primary),
             ),
           ],

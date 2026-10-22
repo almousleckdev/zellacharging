@@ -17,6 +17,8 @@ abstract final class StationMapper {
     availableConnectors: (json['availableConnectors'] as num).toInt(),
     totalConnectors: json['totalConnectors'] as int,
     distanceKm: (json['distanceKm'] as num?)?.toDouble(),
+    latitude: (json['latitude'] as num?)?.toDouble(),
+    longitude: (json['longitude'] as num?)?.toDouble(),
     connectors: (json['connectors'] as List<dynamic>)
         .map((c) => connector(c as Map<String, dynamic>))
         .toList(),

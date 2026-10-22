@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_icons.dart';
 import '../../core/theme/app_spacing.dart';
 
 class AppTextField extends StatefulWidget {
@@ -39,8 +40,9 @@ class _AppTextFieldState extends State<AppTextField> {
   Widget? get _suffix => widget.obscure
       ? IconButton(
           icon: Icon(
-            _hidden ? Icons.visibility_outlined : Icons.visibility_off_outlined,
-            color: AppColors.primary,
+            _hidden ? AppIcons.eye : AppIcons.eyeSlash,
+            color: AppColors.textSecondary,
+            size: 20,
           ),
           onPressed: () => setState(() => _hidden = !_hidden),
         )
@@ -48,10 +50,26 @@ class _AppTextFieldState extends State<AppTextField> {
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(widget.label, style: Theme.of(context).textTheme.bodyMedium),
+        Row(
+          children: [
+            if (widget.icon != null) ...[
+              Icon(widget.icon, size: 16, color: AppColors.textPrimary),
+              const SizedBox(width: AppSpacing.xs + 2),
+            ],
+            Flexible(
+              child: Text(
+                widget.label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        ),
         const SizedBox(height: AppSpacing.sm),
         TextFormField(
           controller: widget.controller,
@@ -64,9 +82,6 @@ class _AppTextFieldState extends State<AppTextField> {
           decoration: InputDecoration(
             hintText: widget.hint ?? widget.label,
             counterText: '',
-            prefixIcon: widget.icon == null
-                ? null
-                : Icon(widget.icon, color: AppColors.neutral),
             suffixIcon: _suffix,
           ),
         ),

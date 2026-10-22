@@ -8,13 +8,13 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/submit_mixin.dart';
 import '../../../shared/widgets/app_text_field.dart';
-import '../../../shared/widgets/error_banner.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../profile/presentation/profile_providers.dart';
 import '../domain/mobile_operator.dart';
 import 'amount_picker.dart';
 import 'operator_selector.dart';
 import 'wallet_providers.dart';
+import '../../../core/theme/app_icons.dart';
 
 class TopupPage extends ConsumerStatefulWidget {
   const TopupPage({super.key});
@@ -28,7 +28,7 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
   late final TextEditingController _phone = TextEditingController(
     text: ref.read(profileProvider).asData?.value.phone ?? '',
   );
-  int _amount = Strings.topUpAmounts[1];
+  int _amount = WalletText.topUpAmounts[1];
   MobileOperator _operator = MobileOperator.airtel;
   late String _attempt = _newAttempt();
 
@@ -53,7 +53,7 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
           );
       if (result.failed) {
         _attempt = _newAttempt();
-        setState(() => errorMessage = Strings.topUpFailed);
+        showError(WalletText.topUpFailed);
         return;
       }
       ref.invalidate(walletProvider);
@@ -61,7 +61,7 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            result.succeeded ? Strings.topUpDone : Strings.topUpPending,
+            result.succeeded ? WalletText.topUpDone : WalletText.topUpPending,
           ),
         ),
       );
@@ -74,30 +74,26 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
     final theme = Theme.of(context);
     final currency = ref.watch(walletProvider).asData?.value.currency ?? '';
     return Scaffold(
-      appBar: AppBar(title: const Text(Strings.topUpTitle)),
+      appBar: AppBar(title: Text(WalletText.topUpTitle)),
       body: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
           Text(
-            Strings.topUpBody,
+            WalletText.topUpBody,
             style: theme.textTheme.bodyMedium?.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
           const SizedBox(height: AppSpacing.lg),
-          if (errorMessage != null) ...[
-            ErrorBanner(message: errorMessage!),
-            const SizedBox(height: AppSpacing.md),
-          ],
-          _heading(Strings.chooseAmount),
+          _heading(WalletText.chooseAmount),
           AmountPicker(
-            amounts: Strings.topUpAmounts,
+            amounts: WalletText.topUpAmounts,
             selected: _amount,
             currency: currency,
             onSelected: (value) => setState(() => _amount = value),
           ),
           const SizedBox(height: AppSpacing.lg),
-          _heading(Strings.chooseOperator),
+          _heading(WalletText.chooseOperator),
           OperatorSelector(
             selected: _operator,
             onSelected: (value) => setState(() => _operator = value),
@@ -107,9 +103,9 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
             key: _formKey,
             child: AppTextField(
               controller: _phone,
-              label: Strings.mobileMoneyNumberLabel,
-              hint: Strings.mobileMoneyNumberHint,
-              icon: Icons.phone_outlined,
+              label: WalletText.mobileMoneyNumberLabel,
+              hint: WalletText.mobileMoneyNumberHint,
+              icon: AppIcons.phone,
               validator: Validators.mobileMoneyNumber,
               keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.done,
@@ -117,7 +113,7 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
           ),
           const SizedBox(height: AppSpacing.xl),
           PrimaryButton(
-            label: Strings.payNow,
+            label: WalletText.payNow,
             loading: loading,
             onPressed: _pay,
           ),

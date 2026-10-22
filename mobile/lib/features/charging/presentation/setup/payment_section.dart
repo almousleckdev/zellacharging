@@ -9,6 +9,7 @@ import '../../../../shared/widgets/app_text_field.dart';
 import '../../../wallet/domain/mobile_operator.dart';
 import '../../../wallet/presentation/operator_selector.dart';
 import '../../domain/charge_quote.dart';
+import '../../../../core/theme/app_icons.dart';
 
 class PaymentSection extends StatelessWidget {
   const PaymentSection({
@@ -32,13 +33,13 @@ class PaymentSection extends StatelessWidget {
       context,
     ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary);
     if (!quote.needsPayment) {
-      return Text(Strings.paidFromWallet, style: muted);
+      return Text(ChargeText.paidFromWallet, style: muted);
     }
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          '${Strings.toPayByMobileMoney}: '
+          '${ChargeText.toPayByMobileMoney}: '
           '${MoneyFormat.format(quote.shortfallMinor, currency, 0)}',
           style: const TextStyle(),
         ),
@@ -47,14 +48,14 @@ class PaymentSection extends StatelessWidget {
         const SizedBox(height: AppSpacing.md),
         AppTextField(
           controller: phone,
-          label: Strings.mobileMoneyNumberLabel,
-          hint: Strings.mobileMoneyNumberHint,
-          icon: Icons.phone_outlined,
+          label: WalletText.mobileMoneyNumberLabel,
+          hint: WalletText.mobileMoneyNumberHint,
+          icon: AppIcons.phone,
           validator: Validators.mobileMoneyNumber,
           keyboardType: TextInputType.phone,
         ),
         const SizedBox(height: AppSpacing.sm),
-        Text(Strings.unusedReturned, style: muted),
+        Text(ChargeText.unusedReturned, style: muted),
       ],
     );
   }

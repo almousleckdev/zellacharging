@@ -52,12 +52,17 @@ class _OnboardingPageState extends State<OnboardingPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  const AppLogo(size: 36, showName: false),
+                  const AppLogo(size: 34, showName: false),
                   TextButton(
                     onPressed: () => context.go(Routes.register),
-                    child: const Text(
-                      Strings.skip,
-                      style: TextStyle(color: AppColors.primary),
+                    child: Text(
+                      AuthText.skip,
+                      style: TextStyle(
+                        color: AppColors.primary,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w800,
+                        letterSpacing: 0.6,
+                      ),
                     ),
                   ),
                 ],

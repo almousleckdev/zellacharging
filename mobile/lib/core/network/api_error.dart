@@ -10,7 +10,7 @@ class ApiError implements Exception {
 
   factory ApiError.fromCode(String? code) => ApiError(
     code: code ?? 'UNKNOWN',
-    message: Strings.errorsByCode[code] ?? Strings.unknownError,
+    message: ErrorText.byCode[code] ?? Strings.unknownError,
   );
 
   factory ApiError.fromDio(DioException error) {
@@ -19,7 +19,7 @@ class ApiError implements Exception {
       final code = data['code'] as String;
       return ApiError(
         code: code,
-        message: Strings.errorsByCode[code] ?? Strings.unknownError,
+        message: ErrorText.byCode[code] ?? Strings.unknownError,
       );
     }
     final unreachable = error.response == null;

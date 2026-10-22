@@ -24,8 +24,8 @@ class PriceCard extends StatelessWidget {
               children: [
                 Text(
                   session.state.isLive
-                      ? Strings.amountSoFar
-                      : Strings.amountPaid,
+                      ? ChargeText.amountSoFar
+                      : ChargeText.amountPaid,
                   style: theme.textTheme.bodyMedium?.copyWith(
                     color: AppColors.textSecondary,
                   ),
@@ -45,8 +45,8 @@ class PriceCard extends StatelessWidget {
             ),
           ),
           if (session.priceIsEstimate)
-            const StatusChip(
-              label: Strings.estimated,
+            StatusChip(
+              label: ChargeText.estimated,
               color: AppColors.chargeDeep,
             ),
         ],

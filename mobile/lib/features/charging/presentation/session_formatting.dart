@@ -12,9 +12,13 @@ extension SessionFormatting on ChargingSession {
       ? '--'
       : '${shownEnergyKwh!.toStringAsFixed(2)} ${Strings.kwhUnit}';
 
-  String get powerText => metering?.powerKw == null
+  double? get shownPowerKw => metering?.powerKw ?? lastPowerKw;
+
+  double? get shownVoltage => metering?.voltage ?? lastVoltage;
+
+  String get powerText => shownPowerKw == null
       ? '--'
-      : '${metering!.powerKw!.toStringAsFixed(1)} ${Strings.powerUnit}';
+      : '${shownPowerKw!.toStringAsFixed(1)} ${Strings.powerUnit}';
 
   String get batteryText =>
       batteryPercent == null ? '--' : '${batteryPercent!.toStringAsFixed(0)} %';
@@ -30,17 +34,27 @@ extension SessionFormatting on ChargingSession {
       ? '--'
       : DurationFormat.compact(shownDurationSeconds!);
 
-  String get voltageText => metering?.voltage == null
+  String get voltageText => shownVoltage == null
       ? '--'
-      : '${metering!.voltage!.toStringAsFixed(0)} ${Strings.voltageUnit}';
+      : '${shownVoltage!.toStringAsFixed(0)} ${Strings.voltageUnit}';
 
   String get currentText => metering?.currentAmpere == null
       ? '--'
       : '${metering!.currentAmpere!.toStringAsFixed(1)} ${Strings.currentUnit}';
 
-  String get costText => costMinor == null || currency == null
-      ? '--'
-      : MoneyFormat.format(costMinor!, currency!, currencyDecimals ?? 0);
+  String get costText {
+    final total = fees;
+    if (total != null) {
+      return MoneyFormat.format(
+        total.totalMinor,
+        total.currency,
+        total.decimals,
+      );
+    }
+    return costMinor == null || currency == null
+        ? '--'
+        : MoneyFormat.format(costMinor!, currency!, currencyDecimals ?? 0);
+  }
 
   String get priceText {
     final estimate = estimatedCost;
@@ -56,7 +70,7 @@ extension SessionFormatting on ChargingSession {
 
   double get chargeLevel => ((batteryPercent ?? 0) / 100).clamp(0.0, 1.0);
 
-  String get stateLabel => Strings.sessionStates[state.name] ?? state.name;
+  String get stateLabel => ChargeText.sessionStates[state.name] ?? state.name;
 
   Color get stateColor => switch (state) {
     SessionState.completed => AppColors.success,
@@ -67,9 +81,9 @@ extension SessionFormatting on ChargingSession {
 
   String? get statusMessage => switch (state) {
     SessionState.requested ||
-    SessionState.startAccepted => Strings.waitingForPlug,
-    SessionState.stopping => Strings.finishing,
-    SessionState.failed => Strings.sessionFailed,
+    SessionState.startAccepted => ChargeText.waitingForPlug,
+    SessionState.stopping => ChargeText.finishing,
+    SessionState.failed => ChargeText.sessionFailed,
     _ => null,
   };
 }

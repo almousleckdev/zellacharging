@@ -5,6 +5,7 @@ import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../domain/charging_session.dart';
+import '../../../core/theme/app_icons.dart';
 
 class BatteryFreshness extends StatelessWidget {
   const BatteryFreshness({super.key, required this.session});
@@ -21,15 +22,17 @@ class BatteryFreshness extends StatelessWidget {
     }
     final age = DateTime.now().difference(sampled);
     final stale = age > _staleAfter;
+    final ageText = DurationFormat.compact(age.inSeconds.clamp(0, 86400));
     final color = stale ? AppColors.primary : AppColors.chargeDeep;
-    final label = stale ? Strings.lastReading : Strings.updated;
     return Row(
       mainAxisSize: MainAxisSize.min,
       children: [
-        Icon(Icons.circle, size: 8, color: color),
+        Icon(AppIcons.dot, size: 8, color: color),
         const SizedBox(width: AppSpacing.xs + 2),
         Text(
-          '$label ${DurationFormat.compact(age.inSeconds.clamp(0, 86400))} ${Strings.ago}',
+          stale
+              ? ChargeText.lastReadingAgo(ageText)
+              : ChargeText.updatedAgo(ageText),
           style: Theme.of(context).textTheme.bodySmall?.copyWith(color: color),
         ),
       ],

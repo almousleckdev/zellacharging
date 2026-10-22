@@ -6,6 +6,7 @@ import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import 'bottom_bar_item.dart';
 import 'charge_bar_button.dart';
+import '../../../core/theme/app_icons.dart';
 
 class ShellPage extends StatelessWidget {
   const ShellPage({super.key, required this.navigationShell});
@@ -27,6 +28,7 @@ class ShellPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.surfaceMuted,
       body: navigationShell,
       bottomNavigationBar: DecoratedBox(
         decoration: const BoxDecoration(
@@ -36,11 +38,11 @@ class ShellPage extends StatelessWidget {
         child: SafeArea(
           child: Row(
             children: [
-              _item(0, Icons.home_outlined, Strings.home),
-              _item(1, Icons.location_on_outlined, Strings.locations),
+              _item(0, AppIcons.house, Strings.home),
+              _item(1, AppIcons.mapPin, Strings.locations),
               ChargeBarButton(onTap: () => context.push(Routes.scan)),
-              _item(2, Icons.bar_chart_rounded, Strings.history),
-              _item(3, Icons.settings_outlined, Strings.profile),
+              _item(2, AppIcons.chart, Strings.history),
+              _item(3, AppIcons.user, Strings.profile),
             ],
           ),
         ),

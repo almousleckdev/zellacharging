@@ -13,6 +13,8 @@ import '../../../shared/widgets/form_page.dart';
 import '../../../shared/widgets/primary_button.dart';
 import 'auth_providers.dart';
 import 'auth_switch_link.dart';
+import 'social_buttons.dart';
+import '../../../core/theme/app_icons.dart';
 
 class LoginPage extends ConsumerStatefulWidget {
   const LoginPage({super.key});
@@ -46,9 +48,8 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
   @override
   Widget build(BuildContext context) {
     return FormPage(
-      title: Strings.signInTitle,
-      subtitle: Strings.signInSubtitle,
-      errorMessage: errorMessage,
+      title: AuthText.signInTitle,
+      subtitle: AuthText.signInSubtitle,
       children: [
         Form(
           key: _formKey,
@@ -56,16 +57,16 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
             children: [
               AppTextField(
                 controller: _identifier,
-                label: Strings.identifierLabel,
-                icon: Icons.mail_outline,
+                label: AuthText.identifierLabel,
+                icon: AppIcons.envelope,
                 validator: Validators.required,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 controller: _password,
-                label: Strings.passwordLabel,
-                icon: Icons.lock_outline,
+                label: AuthText.passwordLabel,
+                icon: AppIcons.lock,
                 validator: Validators.required,
                 obscure: true,
                 textInputAction: TextInputAction.done,
@@ -75,14 +76,16 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          label: Strings.signIn,
+          label: AuthText.signIn,
           loading: loading,
           onPressed: _submit,
         ),
+        const SizedBox(height: AppSpacing.lg),
+        const SocialButtons(),
         const SizedBox(height: AppSpacing.md),
         AuthSwitchLink(
-          prompt: Strings.noAccount,
-          action: Strings.signUp,
+          prompt: AuthText.noAccount,
+          action: AuthText.signUp,
           onTap: () => context.go(Routes.register),
         ),
       ],

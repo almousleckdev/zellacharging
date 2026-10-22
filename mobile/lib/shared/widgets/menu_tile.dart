@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
 import 'icon_badge.dart';
+import '../../core/theme/app_icons.dart';
 
 class MenuTile extends StatelessWidget {
   const MenuTile({
@@ -50,7 +51,7 @@ class MenuTile extends StatelessWidget {
             if (trailing != null)
               trailing!
             else
-              const Icon(Icons.chevron_right, color: AppColors.neutral),
+              const Icon(AppIcons.caretRight, color: AppColors.neutral),
           ],
         ),
       ),

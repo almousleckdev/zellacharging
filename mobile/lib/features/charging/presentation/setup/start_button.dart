@@ -23,8 +23,8 @@ class StartButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return PrimaryButton(
       label: quote.needsPayment
-          ? '${Strings.startAndPay} · ${MoneyFormat.format(quote.amountMinor, currency, 0)}'
-          : Strings.startOnly,
+          ? '${ChargeText.startAndPay} · ${MoneyFormat.format(quote.amountMinor, currency, 0)}'
+          : ChargeText.startOnly,
       loading: loading,
       onPressed: onPressed,
     );

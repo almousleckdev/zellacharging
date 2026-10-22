@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/theme/app_icons.dart';
 
 class SessionMessageCard extends StatelessWidget {
   const SessionMessageCard({
@@ -23,7 +24,7 @@ class SessionMessageCard extends StatelessWidget {
       ),
       child: Row(
         children: [
-          Icon(Icons.info_outline_rounded, size: 20, color: color),
+          Icon(AppIcons.info, size: 20, color: color),
           const SizedBox(width: AppSpacing.sm),
           Expanded(
             child: Text(

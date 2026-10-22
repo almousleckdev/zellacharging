@@ -5,6 +5,7 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../domain/charging_session.dart';
 import 'session_formatting.dart';
+import '../../../core/theme/app_icons.dart';
 
 class ChargedPill extends StatelessWidget {
   const ChargedPill({super.key, required this.session});
@@ -26,11 +27,11 @@ class ChargedPill extends StatelessWidget {
       child: Row(
         mainAxisSize: MainAxisSize.min,
         children: [
-          const Icon(Icons.bolt_rounded, size: 18, color: AppColors.chargeDeep),
+          const Icon(AppIcons.lightning, size: 18, color: AppColors.chargeDeep),
           const SizedBox(width: AppSpacing.xs),
           Flexible(
             child: Text(
-              '${Strings.charged} ${session.durationText} · ${session.powerText}',
+              '${ChargeText.charged} ${session.durationText} · ${session.powerText}',
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
               style: Theme.of(context).textTheme.bodyMedium,

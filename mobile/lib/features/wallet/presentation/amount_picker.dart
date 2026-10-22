@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import '../../../core/format/money_format.dart';
+
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 
@@ -25,7 +27,7 @@ class AmountPicker extends StatelessWidget {
       children: [
         for (final amount in amounts)
           ChoiceChip(
-            label: Text('$amount $currency'),
+            label: Text(MoneyFormat.format(amount, currency, 0)),
             selected: amount == selected,
             onSelected: (_) => onSelected(amount),
             showCheckmark: false,
@@ -35,7 +37,9 @@ class AmountPicker extends StatelessWidget {
               color: amount == selected ? AppColors.primary : AppColors.border,
             ),
             labelStyle: TextStyle(
-              color: amount == selected ? Colors.white : AppColors.textPrimary,
+              color: amount == selected
+                  ? AppColors.onPrimary
+                  : AppColors.textPrimary,
             ),
           ),
       ],

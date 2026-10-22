@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:ndzela/core/theme/app_colors.dart';
 import 'package:ndzela/core/theme/app_theme.dart';
 
+import 'package:ndzela/features/charging/domain/session_state.dart';
 import 'screens.dart';
 import 'test_fonts.dart';
 
@@ -22,23 +24,38 @@ void main() {
       final key = GlobalKey();
       await tester.pumpWidget(
         ProviderScope(
-          overrides: overrides(),
+          overrides: overrides(screenStates[entry.key] ?? SessionState.active),
           child: RepaintBoundary(
             key: key,
             child: MaterialApp(
               debugShowCheckedModeBanner: false,
               theme: AppTheme.light(),
-              home: Scaffold(body: entry.value()),
+              home: Scaffold(
+                backgroundColor:
+                    const {'home', 'history', 'settings'}.contains(entry.key)
+                    ? AppColors.surfaceMuted
+                    : null,
+                body: entry.value(),
+              ),
             ),
           ),
         ),
       );
-      await tester.runAsync(
-        () => precacheImage(
-          const AssetImage('assets/images/charging_scene.png'),
-          tester.element(find.byType(Scaffold).first),
-        ),
-      );
+      await tester.runAsync(() async {
+        final context = tester.element(find.byType(Scaffold).first);
+        for (final name in const [
+          'charging_scene',
+          'onboarding_find',
+          'onboarding_scan',
+          'track_every_charge',
+        ]) {
+          await precacheImage(AssetImage('assets/images/$name.png'), context);
+        }
+        await precacheImage(
+          const AssetImage('assets/images/auth_background.jpg'),
+          context,
+        );
+      });
       for (var i = 0; i < 8; i++) {
         await tester.pump(const Duration(milliseconds: 150));
       }

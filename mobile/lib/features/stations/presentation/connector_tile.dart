@@ -48,12 +48,12 @@ class ConnectorTile extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  connector.connectorType ?? Strings.connector,
+                  connector.connectorType ?? StationText.connector,
                   style: theme.textTheme.titleSmall,
                 ),
                 if (power != null)
                   Text(
-                    '${Strings.maxPower}: ${power.toStringAsFixed(0)} ${Strings.powerUnit}',
+                    '${StationText.maxPower}: ${power.toStringAsFixed(0)} ${Strings.powerUnit}',
                     style: theme.textTheme.bodySmall?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -64,7 +64,7 @@ class ConnectorTile extends StatelessWidget {
           if (connector.available && onStart != null)
             FilledButton(
               onPressed: onStart,
-              child: const Text(Strings.startCharging),
+              child: Text(StationText.startCharging),
             )
           else
             StatusChip(

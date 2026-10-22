@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 
 class ChargeBarButton extends StatelessWidget {
   const ChargeBarButton({super.key, required this.onTap});
@@ -24,7 +25,7 @@ class ChargeBarButton extends StatelessWidget {
                 decoration: BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
-                  border: Border.all(color: Colors.white, width: 4),
+                  border: Border.all(color: AppColors.onPrimary, width: 4),
                   boxShadow: [
                     BoxShadow(
                       color: AppColors.primary.withValues(alpha: 0.4),
@@ -33,12 +34,15 @@ class ChargeBarButton extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: const Icon(Icons.bolt_rounded, color: Colors.white),
+                child: const Icon(
+                  AppIcons.lightning,
+                  color: AppColors.onPrimary,
+                ),
               ),
             ),
             Transform.translate(
               offset: const Offset(0, -14),
-              child: const Text(
+              child: Text(
                 Strings.charge,
                 style: TextStyle(fontSize: 11, color: AppColors.primary),
               ),

@@ -8,6 +8,12 @@ abstract final class Routes {
   static const locations = '/locations';
   static const history = '/history';
   static const profile = '/profile';
+  static const editProfile = '/profile/edit';
+  static const settings = '/profile/settings';
+  static const changePassword = '/profile/settings/password';
+  static const deleteAccount = '/profile/settings/delete';
+  static const contact = '/profile/contact';
+  static const coupons = '/profile/coupons';
   static const scan = '/scan';
   static const topup = '/wallet/topup';
   static const station = '/stations/:id';

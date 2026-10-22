@@ -8,6 +8,7 @@ import '../../../shared/widgets/page_header.dart';
 import '../domain/station_filter.dart';
 import 'station_list.dart';
 import 'station_providers.dart';
+import '../../../core/theme/app_icons.dart';
 
 class LocationsPage extends ConsumerStatefulWidget {
   const LocationsPage({super.key});
@@ -25,14 +26,14 @@ class _LocationsPageState extends ConsumerState<LocationsPage> {
     return SafeArea(
       child: Column(
         children: [
-          const PageHeader(title: Strings.exploreLocations),
+          PageHeader(title: StationText.exploreLocations),
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
             child: TextField(
               onChanged: (value) => setState(() => _query = value),
-              decoration: const InputDecoration(
-                hintText: Strings.searchStations,
-                prefixIcon: Icon(Icons.search),
+              decoration: InputDecoration(
+                hintText: StationText.searchStations,
+                prefixIcon: Icon(AppIcons.search),
               ),
             ),
           ),

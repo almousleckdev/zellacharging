@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:ndzela/core/theme/app_theme.dart';
 
+import 'package:ndzela/features/charging/domain/session_state.dart';
 import 'test_fonts.dart';
 import 'screens.dart';
 
@@ -11,6 +12,7 @@ const _scales = [1.0, 1.3, 1.6];
 
 Future<void> _show(
   WidgetTester tester,
+  String name,
   Widget screen,
   Size size,
   double scale,
@@ -19,7 +21,7 @@ Future<void> _show(
   tester.view.devicePixelRatio = 1;
   await tester.pumpWidget(
     ProviderScope(
-      overrides: overrides(),
+      overrides: overrides(screenStates[name] ?? SessionState.active),
       child: MaterialApp(
         theme: AppTheme.light(),
         builder: (context, child) => MediaQuery(
@@ -47,7 +49,7 @@ void main() {
           '${entry.key} ${size.width.toInt()}x${size.height.toInt()} x$scale',
           (tester) async {
             addTearDown(tester.view.reset);
-            await _show(tester, entry.value(), size, scale);
+            await _show(tester, entry.key, entry.value(), size, scale);
             final error = tester.takeException();
             await tester.pumpWidget(const SizedBox());
             await tester.pump(const Duration(seconds: 6));

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../profile/presentation/user_avatar.dart';
 import '../../profile/domain/profile.dart';
 
 class HomeHeader extends StatelessWidget {
@@ -15,14 +16,7 @@ class HomeHeader extends StatelessWidget {
     final theme = Theme.of(context);
     return Row(
       children: [
-        CircleAvatar(
-          radius: 22,
-          backgroundColor: AppColors.primarySoft,
-          child: Text(
-            profile?.initials ?? '',
-            style: const TextStyle(color: AppColors.primary),
-          ),
-        ),
+        UserAvatar(initials: profile?.initials ?? '', size: 46),
         const SizedBox(width: AppSpacing.md),
         Expanded(
           child: Column(
@@ -32,7 +26,9 @@ class HomeHeader extends StatelessWidget {
                 profile == null
                     ? Strings.appName
                     : '${Strings.greeting}, ${profile!.firstName}',
-                style: theme.textTheme.titleMedium,
+                style: theme.textTheme.titleMedium?.copyWith(
+                  fontWeight: FontWeight.w800,
+                ),
               ),
               Text(
                 Strings.tagline,

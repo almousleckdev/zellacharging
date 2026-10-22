@@ -12,7 +12,12 @@ class PageHeader extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.md),
       child: Center(
-        child: Text(title, style: Theme.of(context).textTheme.titleLarge),
+        child: Text(
+          title,
+          style: Theme.of(
+            context,
+          ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.w800),
+        ),
       ),
     );
   }

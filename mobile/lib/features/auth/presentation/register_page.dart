@@ -13,6 +13,7 @@ import '../../../shared/widgets/primary_button.dart';
 import '../domain/registration_data.dart';
 import 'auth_providers.dart';
 import 'auth_switch_link.dart';
+import '../../../core/theme/app_icons.dart';
 
 class RegisterPage extends ConsumerStatefulWidget {
   const RegisterPage({super.key});
@@ -51,7 +52,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
     final email = _nullIfBlank(_email.text);
     final phone = _nullIfBlank(_phone.text);
     if (email == null && phone == null) {
-      setState(() => errorMessage = Strings.contactRequired);
+      showError(Strings.contactRequired);
       return;
     }
     submit(() async {
@@ -73,9 +74,8 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
   @override
   Widget build(BuildContext context) {
     return FormPage(
-      title: Strings.createAccount,
-      subtitle: Strings.registerSubtitle,
-      errorMessage: errorMessage,
+      title: AuthText.createAccount,
+      subtitle: AuthText.registerSubtitle,
       children: [
         Form(
           key: _formKey,
@@ -83,37 +83,37 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
             children: [
               AppTextField(
                 controller: _firstName,
-                label: Strings.firstNameLabel,
-                icon: Icons.person_outline,
+                label: AuthText.firstNameLabel,
+                icon: AppIcons.user,
                 validator: Validators.required,
               ),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 controller: _lastName,
-                label: Strings.lastNameLabel,
-                icon: Icons.person_outline,
+                label: AuthText.lastNameLabel,
+                icon: AppIcons.user,
                 validator: Validators.required,
               ),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 controller: _email,
-                label: Strings.emailLabel,
-                icon: Icons.mail_outline,
+                label: AuthText.emailLabel,
+                icon: AppIcons.envelope,
                 validator: Validators.optionalEmail,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 controller: _phone,
-                label: Strings.phoneLabel,
-                icon: Icons.phone_outlined,
+                label: AuthText.phoneLabel,
+                icon: AppIcons.phone,
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: AppSpacing.md),
               AppTextField(
                 controller: _password,
-                label: Strings.passwordLabel,
-                icon: Icons.lock_outline,
+                label: AuthText.passwordLabel,
+                icon: AppIcons.lock,
                 validator: Validators.password,
                 obscure: true,
                 textInputAction: TextInputAction.done,
@@ -123,14 +123,14 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          label: Strings.createAccount,
+          label: AuthText.createAccount,
           loading: loading,
           onPressed: _submit,
         ),
         const SizedBox(height: AppSpacing.md),
         AuthSwitchLink(
-          prompt: Strings.haveAccount,
-          action: Strings.signIn,
+          prompt: AuthText.haveAccount,
+          action: AuthText.signIn,
           onTap: () => context.go(Routes.login),
         ),
       ],

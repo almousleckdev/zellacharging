@@ -1,5 +1,6 @@
 import 'estimated_cost.dart';
 import 'metering.dart';
+import 'session_fees.dart';
 import 'session_state.dart';
 
 class ChargingSession {
@@ -18,6 +19,9 @@ class ChargingSession {
     this.currencyDecimals,
     this.metering,
     this.batteryPercent,
+    this.lastVoltage,
+    this.lastPowerKw,
+    this.fees,
     this.estimatedCost,
   });
 
@@ -35,6 +39,9 @@ class ChargingSession {
   final int? currencyDecimals;
   final Metering? metering;
   final double? batteryPercent;
+  final double? lastVoltage;
+  final double? lastPowerKw;
+  final SessionFees? fees;
   final EstimatedCost? estimatedCost;
 
   double? get shownEnergyKwh => metering?.totalKwh ?? energyKwh;

@@ -53,6 +53,9 @@ class _FakeSessions implements SessionRepository {
   final started = <int>[];
 
   @override
+  Future<void> delete(String sessionId) => throw UnimplementedError();
+
+  @override
   Future<ChargingSession> start(String stationId, int connectorId, int amount) {
     started.add(amount);
     return Future.value(

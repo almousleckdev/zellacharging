@@ -7,6 +7,7 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/empty_state.dart';
 import '../domain/station.dart';
 import 'station_card.dart';
+import '../../../core/theme/app_icons.dart';
 
 class StationList extends StatelessWidget {
   const StationList({super.key, required this.stations});
@@ -16,9 +17,9 @@ class StationList extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     if (stations.isEmpty) {
-      return const EmptyState(
-        icon: Icons.location_searching,
-        message: Strings.noStations,
+      return EmptyState(
+        icon: AppIcons.crosshair,
+        message: StationText.noStations,
       );
     }
     return Column(

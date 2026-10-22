@@ -27,7 +27,9 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>NSCameraUsageDescription</key>
-	<string>The camera is used to scan charger QR codes.</string>
+	<string>The camera is used to scan charger QR codes and to take your profile picture.</string>
+	<key>NSPhotoLibraryUsageDescription</key>
+	<string>Your photo library is used to choose your profile picture.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location is used to find charging stations near you.</string>
 	<key>UIApplicationSceneManifest</key>

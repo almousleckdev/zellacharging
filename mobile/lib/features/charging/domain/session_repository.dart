@@ -10,4 +10,5 @@ abstract class SessionRepository {
   Future<ChargingSession> get(String sessionId);
   Future<ChargingSession?> active();
   Future<List<ChargingSession>> history();
+  Future<void> delete(String sessionId);
 }

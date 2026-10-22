@@ -8,6 +8,7 @@ import '../../../shared/widgets/soft_card.dart';
 import '../../../shared/widgets/status_chip.dart';
 import '../domain/charging_session.dart';
 import 'session_formatting.dart';
+import '../../../core/theme/app_icons.dart';
 
 class SessionStationCard extends StatelessWidget {
   const SessionStationCard({super.key, required this.session});
@@ -21,7 +22,7 @@ class SessionStationCard extends StatelessWidget {
       child: Row(
         children: [
           const IconBadge(
-            icon: Icons.ev_station_rounded,
+            icon: AppIcons.chargingStation,
             color: AppColors.chargeDeep,
           ),
           const SizedBox(width: AppSpacing.md),
@@ -36,7 +37,7 @@ class SessionStationCard extends StatelessWidget {
                   style: theme.textTheme.titleSmall,
                 ),
                 Text(
-                  '${Strings.connectorLabel} ${session.connectorId}',
+                  '${StationText.connector} ${session.connectorId}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
                   ),

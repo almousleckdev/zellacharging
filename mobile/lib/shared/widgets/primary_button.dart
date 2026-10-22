@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_spacing.dart';
+import 'adaptive_spinner.dart';
 import 'button_label.dart';
 
 class PrimaryButton extends StatelessWidget {
@@ -11,12 +12,16 @@ class PrimaryButton extends StatelessWidget {
     required this.onPressed,
     this.loading = false,
     this.icon,
+    this.destructive = false,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final bool loading;
   final IconData? icon;
+  final bool destructive;
+
+  Color get color => destructive ? AppColors.danger : AppColors.primary;
 
   @override
   Widget build(BuildContext context) {
@@ -26,22 +31,16 @@ class PrimaryButton extends StatelessWidget {
       child: FilledButton(
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
-          backgroundColor: AppColors.primary,
-          disabledBackgroundColor: AppColors.primary.withValues(alpha: 0.5),
+          backgroundColor: color,
+          disabledBackgroundColor: color.withValues(alpha: 0.5),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
         ),
         child: loading
-            ? const SizedBox.square(
-                dimension: 20,
-                child: CircularProgressIndicator(
-                  strokeWidth: 2.2,
-                  color: Colors.white,
-                ),
-              )
-            : ButtonLabel(label: label, color: Colors.white, icon: icon),
+            ? const AdaptiveSpinner(color: AppColors.onPrimary, size: 20)
+            : ButtonLabel(label: label, color: AppColors.onPrimary, icon: icon),
       ),
     );
   }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
@@ -6,6 +8,7 @@ import '../../../../core/l10n/strings.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../core/network/api_error.dart';
 import '../../../../core/theme/app_spacing.dart';
+import '../../../../shared/app_toast.dart';
 import '../../../../shared/submit_mixin.dart';
 import '../../../../shared/widgets/async_body.dart';
 import '../../../../shared/widgets/labeled_section.dart';
@@ -47,11 +50,38 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   late int? _connector = widget.initialConnectorId;
   MobileOperator _operator = MobileOperator.airtel;
   late String _attempt = _newAttempt();
+  Timer? _refresh;
+
+  @override
+  void initState() {
+    super.initState();
+    _refresh = Timer.periodic(
+      const Duration(seconds: 5),
+      (_) => ref.invalidate(stationProvider(widget.stationId)),
+    );
+  }
+
+  void _syncSelection(Station station) {
+    final first = !_checked;
+    _checked = true;
+    final chosen = _connector;
+    if (chosen == null) return;
+    final current = station.connectors.where((c) => c.connectorId == chosen);
+    if (current.isNotEmpty && current.first.available) return;
+    setState(() => _connector = null);
+    AppToast.info(
+      context,
+      first ? StationText.connectorBusy : StationText.connectorTaken,
+    );
+  }
+
+  bool _checked = false;
 
   String _newAttempt() => DateTime.now().microsecondsSinceEpoch.toString();
 
   @override
   void dispose() {
+    _refresh?.cancel();
     _amount.dispose();
     _phone.dispose();
     super.dispose();
@@ -65,7 +95,7 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   void _start() {
     final connector = _connector;
     if (connector == null) {
-      setState(() => errorMessage = Strings.selectConnector);
+      showError(StationText.selectConnector);
       return;
     }
     if (!_formKey.currentState!.validate()) return;
@@ -91,10 +121,13 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
 
   @override
   Widget build(BuildContext context) {
+    ref.listen(stationProvider(widget.stationId), (_, next) {
+      next.whenData(_syncSelection);
+    });
     final station = ref.watch(stationProvider(widget.stationId));
     final currency = ref.watch(walletProvider).asData?.value.currency ?? '';
     return Scaffold(
-      appBar: AppBar(title: const Text(Strings.setupTitle)),
+      appBar: AppBar(title: Text(ChargeText.setupTitle)),
       body: AsyncBody(
         value: station,
         onRetry: () => ref.invalidate(stationProvider(widget.stationId)),
@@ -110,9 +143,9 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
       child: ListView(
         padding: const EdgeInsets.all(AppSpacing.lg),
         children: [
-          SetupHeader(title: station.id, errorMessage: errorMessage),
+          SetupHeader(title: station.id),
           LabeledSection(
-            title: Strings.setupAmountQuestion,
+            title: ChargeText.setupAmountQuestion,
             child: AmountSection(
               controller: _amount,
               currency: currency,
@@ -120,7 +153,7 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
             ),
           ),
           LabeledSection(
-            title: Strings.chooseConnector,
+            title: StationText.chooseConnector,
             child: ConnectorPicker(
               connectors: station.connectors,
               selected: _connector,
@@ -128,7 +161,7 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
             ),
           ),
           LabeledSection(
-            title: Strings.payment,
+            title: ChargeText.payment,
             child: PaymentSection(
               quote: quote,
               currency: currency,

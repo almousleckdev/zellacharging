@@ -21,7 +21,7 @@ class RecentSessions extends ConsumerWidget {
       children: [
         const SizedBox(height: AppSpacing.lg),
         SectionTitle(
-          title: Strings.recentSessions,
+          title: HistoryText.recentSessions,
           onViewAll: () => context.go(Routes.history),
         ),
         const SizedBox(height: AppSpacing.md),

@@ -28,7 +28,7 @@ class SecondaryButton extends StatelessWidget {
           side: const BorderSide(color: AppColors.primary),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
         ),
         child: ButtonLabel(label: label, color: AppColors.primary, icon: icon),

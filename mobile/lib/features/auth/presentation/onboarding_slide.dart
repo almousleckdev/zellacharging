@@ -1,35 +1,33 @@
-import 'package:flutter/material.dart';
-
 import '../../../core/l10n/strings.dart';
+
+enum OnboardingArt { find, scan, track }
 
 class OnboardingSlide {
   const OnboardingSlide({
     required this.title,
     required this.body,
-    this.icon,
-    this.image,
+    required this.art,
   });
 
   final String title;
   final String body;
-  final IconData? icon;
-  final String? image;
+  final OnboardingArt art;
 
-  static const all = [
+  static final all = [
     OnboardingSlide(
-      title: Strings.slideFindTitle,
-      body: Strings.slideFindBody,
-      icon: Icons.ev_station_rounded,
+      title: AuthText.slideFindTitle,
+      body: AuthText.slideFindBody,
+      art: OnboardingArt.find,
     ),
     OnboardingSlide(
-      title: Strings.slideScanTitle,
-      body: Strings.slideScanBody,
-      icon: Icons.qr_code_scanner_rounded,
+      title: AuthText.slideScanTitle,
+      body: AuthText.slideScanBody,
+      art: OnboardingArt.scan,
     ),
     OnboardingSlide(
-      title: Strings.slideTrackTitle,
-      body: Strings.slideTrackBody,
-      image: 'assets/images/track_every_charge.png',
+      title: AuthText.slideTrackTitle,
+      body: AuthText.slideTrackBody,
+      art: OnboardingArt.track,
     ),
   ];
 }

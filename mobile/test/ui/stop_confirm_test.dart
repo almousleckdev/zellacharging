@@ -22,7 +22,7 @@ Future<void> _openSheet(WidgetTester tester) async {
     ),
   );
   await tester.pump(const Duration(milliseconds: 300));
-  await tester.tap(find.text(Strings.stopCharging));
+  await tester.tap(find.text(ChargeText.stopCharging));
   await _settle(tester);
 }
 
@@ -42,18 +42,18 @@ void main() {
 
   testWidgets('stop asks for confirmation before stopping', (tester) async {
     await _openSheet(tester);
-    expect(find.text(Strings.stopConfirmTitle), findsOneWidget);
-    await tester.tap(find.text(Strings.keepCharging));
+    expect(find.text(ChargeText.stopConfirmTitle), findsOneWidget);
+    await tester.tap(find.text(Strings.cancel));
     await _settle(tester);
-    expect(find.text(Strings.stopConfirmTitle), findsNothing);
+    expect(find.text(ChargeText.stopConfirmTitle), findsNothing);
     await _close(tester);
   });
 
   testWidgets('confirming closes the sheet', (tester) async {
     await _openSheet(tester);
-    await tester.tap(find.text(Strings.stopCharging).last);
+    await tester.tap(find.text(ChargeText.stopCharging).last);
     await _settle(tester);
-    expect(find.text(Strings.stopConfirmTitle), findsNothing);
+    expect(find.text(ChargeText.stopConfirmTitle), findsNothing);
     await _close(tester);
   });
 }

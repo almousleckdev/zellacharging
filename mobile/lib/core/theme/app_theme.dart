@@ -42,7 +42,7 @@ abstract final class AppTheme {
         ),
       ),
       switchTheme: SwitchThemeData(
-        thumbColor: const WidgetStatePropertyAll(Colors.white),
+        thumbColor: const WidgetStatePropertyAll(AppColors.onPrimary),
         trackColor: WidgetStateProperty.resolveWith(
           (states) => states.contains(WidgetState.selected)
               ? AppColors.primary

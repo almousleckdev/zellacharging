@@ -16,7 +16,7 @@ class CarBatteryPainter extends CustomPainter {
   static const _nubShare = 0.035;
   static const _bars = 10;
   static const _gap = 3.0;
-  static const _glass = Color(0xFF14234F);
+  static const _glass = AppColors.textPrimary;
 
   Color get _accent => charging ? AppColors.chargeGreen : AppColors.chargeGlow;
 
@@ -32,7 +32,10 @@ class CarBatteryPainter extends CustomPainter {
     );
     _drawGlow(canvas, body);
     canvas.drawRRect(body, Paint()..color = _glass);
+    canvas.save();
+    canvas.clipRRect(body.deflate(3));
     _drawBars(canvas, body.deflate(5).outerRect);
+    canvas.restore();
     _drawBorder(canvas, body);
     _drawNub(canvas, size, nubWidth);
   }
@@ -66,21 +69,18 @@ class CarBatteryPainter extends CustomPainter {
       );
       final fill = i < full ? 1.0 : (i == full && partial > 0 ? partial : 0.0);
       final idle = Paint()..color = _idleColor(i - next, chasing);
-      _drawBar(canvas, rect, idle);
+      final bar = RRect.fromRectAndRadius(rect, const Radius.circular(3));
+      canvas.drawRRect(bar, idle);
       if (fill > 0) {
-        _drawBar(
-          canvas,
+        canvas.save();
+        canvas.clipRect(
           Rect.fromLTWH(rect.left, rect.top, rect.width * fill, rect.height),
-          solid,
         );
+        canvas.drawRRect(bar, solid);
+        canvas.restore();
       }
     }
   }
-
-  void _drawBar(Canvas canvas, Rect rect, Paint paint) => canvas.drawRRect(
-    RRect.fromRectAndRadius(rect, const Radius.circular(3)),
-    paint,
-  );
 
   int _chasingBars(int next) {
     final remaining = _bars - next;
@@ -89,7 +89,7 @@ class CarBatteryPainter extends CustomPainter {
 
   Color _idleColor(int offset, int chasing) => offset >= 0 && offset < chasing
       ? AppColors.chargeGreen.withValues(alpha: 0.85)
-      : Colors.white.withValues(alpha: 0.08);
+      : AppColors.onPrimary.withValues(alpha: 0.08);
 
   void _drawBorder(Canvas canvas, RRect body) {
     canvas.drawRRect(

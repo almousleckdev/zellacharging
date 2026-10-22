@@ -12,6 +12,7 @@ import '../../../shared/widgets/form_page.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../domain/verification_target.dart';
 import 'auth_providers.dart';
+import '../../../core/theme/app_icons.dart';
 
 class VerifyPage extends ConsumerStatefulWidget {
   const VerifyPage({super.key, required this.target});
@@ -48,24 +49,23 @@ class _VerifyPageState extends ConsumerState<VerifyPage> with SubmitMixin {
       if (!mounted) return;
       ScaffoldMessenger.of(
         context,
-      ).showSnackBar(const SnackBar(content: Text(Strings.codeResent)));
+      ).showSnackBar(SnackBar(content: Text(AuthText.codeResent)));
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return FormPage(
-      title: Strings.verifyTitle,
+      title: AuthText.verifyTitle,
       subtitle: widget.target.value,
-      errorMessage: errorMessage,
       showBack: true,
       children: [
         Form(
           key: _formKey,
           child: AppTextField(
             controller: _code,
-            label: Strings.codeLabel,
-            icon: Icons.pin_outlined,
+            label: AuthText.codeLabel,
+            icon: AppIcons.hash,
             validator: Validators.otp,
             keyboardType: TextInputType.number,
             textInputAction: TextInputAction.done,
@@ -75,7 +75,7 @@ class _VerifyPageState extends ConsumerState<VerifyPage> with SubmitMixin {
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          label: Strings.verify,
+          label: AuthText.verify,
           loading: loading,
           onPressed: _verify,
         ),
@@ -83,7 +83,7 @@ class _VerifyPageState extends ConsumerState<VerifyPage> with SubmitMixin {
         Center(
           child: TextButton(
             onPressed: loading ? null : _resend,
-            child: const Text(Strings.resendCode),
+            child: Text(AuthText.resendCode),
           ),
         ),
       ],

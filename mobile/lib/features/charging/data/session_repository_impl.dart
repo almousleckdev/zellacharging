@@ -63,4 +63,8 @@ class SessionRepositoryImpl implements SessionRepository {
         .map((s) => SessionMapper.session(s as Map<String, dynamic>))
         .toList();
   });
+
+  @override
+  Future<void> delete(String sessionId) =>
+      _guard(() => client.delete<void>('/v1/sessions/$sessionId'));
 }

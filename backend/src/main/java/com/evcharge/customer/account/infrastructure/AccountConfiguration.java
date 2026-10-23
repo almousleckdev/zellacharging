@@ -1,6 +1,7 @@
 package com.evcharge.customer.account.infrastructure;
 
 import com.evcharge.customer.account.application.AccountSettings;
+import com.evcharge.customer.account.application.SupportSettings;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -19,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 
 @Configuration
-@EnableConfigurationProperties(AccountSettings.class)
+@EnableConfigurationProperties({AccountSettings.class, SupportSettings.class})
 class AccountConfiguration {
 
     @Bean

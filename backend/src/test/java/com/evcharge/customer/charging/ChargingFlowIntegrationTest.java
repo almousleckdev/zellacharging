@@ -18,6 +18,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -31,6 +32,7 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
             .route("POST", "/api/v1/id-tags", 201, "{\"idTag\":\"x\"}")
             .route("POST", "/api/v1/charge-points/CP-1/connectors/1/start", 200, "{\"status\":\"PENDING\"}")
             .route("POST", "/api/v1/charge-points/CP-1/connectors/1/stop", 200, "{\"status\":\"PENDING\"}")
+            .route("POST", "/api/v1/charge-points/CP-7/connectors/1/start", 200, "{\"status\":\"PENDING\"}")
             .route("GET", "/api/v1/sessions", 200, "{\"items\":[]}");
 
     @DynamicPropertySource
@@ -108,7 +110,10 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
                 .andExpect(jsonPath("$.state").value("COMPLETED"))
                 .andExpect(jsonPath("$.costMinor").value(300))
                 .andExpect(jsonPath("$.currency").value("XOF"))
-                .andExpect(jsonPath("$.batteryPercent").value(40));
+                .andExpect(jsonPath("$.batteryPercent").value(40))
+                .andExpect(jsonPath("$.fees.electricMinor").value(300))
+                .andExpect(jsonPath("$.fees.vatMinor").value(0))
+                .andExpect(jsonPath("$.fees.totalMinor").value(300));
         getAs(customer, "/v1/sessions/active").andExpect(status().isNoContent());
     }
 
@@ -133,5 +138,49 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
                 postAs(owner, "/v1/sessions", "{\"stationId\":\"CP-2\",\"connectorId\":1,\"amountMinor\":2000}")
                         .andReturn().getResponse().getContentAsString(), "$.id");
         getAs(stranger, "/v1/sessions/" + id).andExpect(status().isNotFound());
+    }
+
+    private UUID finishedSession(UUID customer, String station) {
+        UUID id = UUID.randomUUID();
+        jdbc.update("insert into charging_session (id, customer_id, station_id, connector_id, id_tag, state, "
+                + "created_at, updated_at) values (?, ?, ?, 1, 'x', 'COMPLETED', now(), now())", id, customer, station);
+        return id;
+    }
+
+    private ResultActions deleteAs(UUID customer, String path) throws Exception {
+        return mvc.perform(delete(path).with(jwt().jwt(j -> j.subject(customer.toString()))));
+    }
+
+    @Test
+    void deletingAFinishedSessionRemovesItFromTheHistory() throws Exception {
+        UUID customer = newCustomer();
+        UUID id = finishedSession(customer, "CP-5");
+
+        getAs(customer, "/v1/sessions").andExpect(jsonPath("$[0].id").value(id.toString()));
+        deleteAs(customer, "/v1/sessions/" + id).andExpect(status().isNoContent());
+
+        getAs(customer, "/v1/sessions").andExpect(jsonPath("$").isEmpty());
+        getAs(customer, "/v1/sessions/" + id).andExpect(status().isNotFound());
+    }
+
+    @Test
+    void aSessionInProgressCannotBeDeleted() throws Exception {
+        UUID customer = newCustomer();
+        String start = "{\"stationId\":\"CP-7\",\"connectorId\":1,\"amountMinor\":2000}";
+        String id = com.jayway.jsonpath.JsonPath.read(postAs(customer, "/v1/sessions", start)
+                .andReturn().getResponse().getContentAsString(), "$.id");
+
+        deleteAs(customer, "/v1/sessions/" + id).andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("SESSION_STILL_ACTIVE"));
+    }
+
+    @Test
+    void aCustomerCannotDeleteSomeoneElsesSession() throws Exception {
+        UUID owner = newCustomer();
+        UUID stranger = newCustomer();
+        UUID id = finishedSession(owner, "CP-6");
+
+        deleteAs(stranger, "/v1/sessions/" + id).andExpect(status().isNotFound());
+        getAs(owner, "/v1/sessions/" + id).andExpect(status().isOk());
     }
 }

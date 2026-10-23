@@ -12,6 +12,16 @@ The OCPP platform in `../backend` belongs to another developer: never modify it.
 5. **Clean architecture.** Dependencies point inward: `web -> application -> domain`; `infrastructure` implements
    application ports. Domain has no framework imports. Business logic never lives in controllers or widgets.
 6. Never claim a feature works without running it (tests, curl, simulator).
+7. **NEVER use random colors.** Every color comes from the `AppColors` palette in `mobile/lib/core/theme/app_colors.dart`
+   (Orange-500 brand, neutrals, success/danger, and the charge greens). No inline `Color(0x...)`, no `Colors.*` shades
+   (only `AppColors.onPrimary`/`AppColors.surface` for white), no per-screen accent colors, no dark "black theme" cards
+   inside the app. A new color is added to `AppColors` first, with a purpose, or it is not used.
+8. **NEVER use an iOS widget on Android or an Android widget on iOS.** Use Flutter's adaptive widgets so each platform gets
+   its own native look: `showAdaptiveDialog` / `AlertDialog.adaptive`, `Switch.adaptive`, `Checkbox.adaptive`,
+   `CircularProgressIndicator.adaptive`, `Slider.adaptive`, platform page transitions. A `Cupertino*` widget is only
+   allowed behind a platform check with its Material counterpart for Android.
+9. **Languages: French and English, French is the default.** No user-facing text outside `core/l10n/strings.dart`, and
+   every string has both a French and an English version.
 
 ## Backend (`backend/`)
 
@@ -26,7 +36,7 @@ The OCPP platform in `../backend` belongs to another developer: never modify it.
 
 - Riverpod (no codegen), go_router, dio. Immutable plain classes, no freezed/build_runner.
 - Feature-first: `lib/features/<name>/{domain,data,presentation}`; shared code in `lib/core` and `lib/shared/widgets`.
-- Theme color is Orange-500 (`AppColors.primary`). All user-facing text lives in `core/l10n/strings.dart`.
+- Theme color is Orange-500 (`AppColors.primary`). All user-facing text lives in `core/l10n/strings.dart` (French default, English).
 - Reusable widget first: check `lib/shared/widgets` before writing any new UI.
 - No business logic in widgets. Server is authoritative for session and payment state.
 - Reference UI in `mobile/assets/design/` is an example only, not a pixel spec.

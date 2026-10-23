@@ -56,6 +56,14 @@ ndzela:
     stop-retry-after: 30s
     stop-threshold-percent: 95
     price-per-kwh-minor: ${NDZELA_PRICE_PER_KWH:}
+  fees:
+    vat-percent: ${NDZELA_VAT_PERCENT:0}
+    service-fee-percent: ${NDZELA_SERVICE_FEE_PERCENT:0}
+  support:
+    email: ${NDZELA_SUPPORT_EMAIL:}
+    phone: ${NDZELA_SUPPORT_PHONE:}
+    whatsapp: ${NDZELA_SUPPORT_WHATSAPP:}
+    agreement-url: ${NDZELA_AGREEMENT_URL:}
   wallet:
     currency: ${NDZELA_WALLET_CURRENCY:XAF}
     decimals: 0

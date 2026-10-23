@@ -18,10 +18,11 @@ record OcppSessionPayload(
         Long costMinor,
         String currency,
         Integer currencyDecimals,
-        String stopReason) {
+        String stopReason,
+        Long pricePerKwhMinor) {
 
     RemoteSession toDomain() {
         return new RemoteSession(transactionId, deviceId, connectorId, status, startedAt, stoppedAt,
-                energyKwh, costMinor, currency, currencyDecimals, stopReason);
+                energyKwh, costMinor, currency, currencyDecimals, stopReason, pricePerKwhMinor);
     }
 }

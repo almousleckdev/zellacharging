@@ -41,6 +41,7 @@ public class SessionReconciler {
         }
         Instant now = clock.instant();
         Optional<RemoteSession> remote = findRemote(session);
+        rememberPrice(session, remote);
         ChargingSession next = remote
                 .map(found -> priced(session.withRemote(found, nextState(session, found), now), now))
                 .orElseGet(() -> expireIfStale(session, now));
@@ -49,6 +50,11 @@ public class SessionReconciler {
             settlement.settle(next);
         }
         return next;
+    }
+
+    private void rememberPrice(ChargingSession session, Optional<RemoteSession> remote) {
+        remote.map(RemoteSession::pricePerKwhMinor).filter(price -> price > 0)
+                .ifPresent(price -> sessions.recordPrice(session.id(), price));
     }
 
     private ChargingSession priced(ChargingSession session, Instant now) {

@@ -56,4 +56,10 @@ class JdbcRefreshTokenRepository implements RefreshTokenRepository {
         jdbc.sql("update refresh_token set revoked_at = :at where family_id = :family and revoked_at is null")
                 .param("at", Timestamps.toDb(at)).param("family", familyId).update();
     }
+
+    @Override
+    public void revokeAllOf(UUID customerId, Instant at) {
+        jdbc.sql("update refresh_token set revoked_at = :at where customer_id = :customer and revoked_at is null")
+                .param("at", Timestamps.toDb(at)).param("customer", customerId).update();
+    }
 }

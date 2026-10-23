@@ -17,6 +17,6 @@ class ApplicationBootTest extends PostgresTestBase {
     void flywayAppliedAllMigrations() {
         Integer applied = jdbc.queryForObject(
                 "select count(*) from flyway_schema_history where success", Integer.class);
-        assertThat(applied).isEqualTo(5);
+        assertThat(applied).isEqualTo(8);
     }
 }

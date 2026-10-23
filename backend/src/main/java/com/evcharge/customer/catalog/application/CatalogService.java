@@ -1,6 +1,7 @@
 package com.evcharge.customer.catalog.application;
 
 import com.evcharge.customer.catalog.application.port.StationDirectory;
+import com.evcharge.customer.charging.ConnectorOccupancy;
 import com.evcharge.customer.catalog.domain.QrContent;
 import com.evcharge.customer.catalog.domain.Station;
 import com.evcharge.customer.shared.ApiException;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 @Service
 public class CatalogService {
@@ -17,9 +20,11 @@ public class CatalogService {
     private static final Logger log = LoggerFactory.getLogger(CatalogService.class);
 
     private final StationDirectory directory;
+    private final ConnectorOccupancy occupancy;
 
-    public CatalogService(StationDirectory directory) {
+    public CatalogService(StationDirectory directory, ConnectorOccupancy occupancy) {
         this.directory = directory;
+        this.occupancy = occupancy;
     }
 
     public List<Station> nearby(Double latitude, Double longitude, Double radiusKm) {
@@ -29,11 +34,13 @@ public class CatalogService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_LOCATION",
                     "latitude, longitude and radiusKm must be given together");
         }
-        return directory.list(latitude, longitude, latitude == null ? null : radiusKm);
+        Map<String, Set<Integer>> busy = occupancy.busyConnectors();
+        return directory.list(latitude, longitude, latitude == null ? null : radiusKm).stream()
+                .map(station -> station.occupying(busy.get(station.id()))).toList();
     }
 
     public Station station(String stationId) {
-        return directory.find(stationId).orElseThrow(CatalogService::notFound);
+        return occupied(directory.find(stationId).orElseThrow(CatalogService::notFound));
     }
 
     public ResolvedConnector resolveQr(String scanned) {
@@ -46,9 +53,13 @@ public class CatalogService {
             log.warn("QR token '{}' not found on the charging network", token);
             return invalidQr();
         });
-        Station station = directory.find(ref.stationId()).orElseThrow(CatalogService::invalidQr);
+        Station station = occupied(directory.find(ref.stationId()).orElseThrow(CatalogService::invalidQr));
         return new ResolvedConnector(station, station.connector(ref.connectorId())
                 .orElseThrow(CatalogService::invalidQr));
+    }
+
+    private Station occupied(Station station) {
+        return station.occupying(occupancy.busyConnectors().get(station.id()));
     }
 
     private static ApiException notFound() {

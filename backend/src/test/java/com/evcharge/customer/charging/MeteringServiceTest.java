@@ -4,6 +4,7 @@ import com.evcharge.customer.charging.application.MeteringService;
 import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionRepository;
 import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionState;
 import org.junit.jupiter.api.Test;
@@ -14,7 +15,6 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -40,22 +40,14 @@ class MeteringServiceTest {
     }
 
     @Test
-    void remembersTheBatteryLevelOfALiveReading() {
+    void remembersTheLiveReading() {
         ChargingSession live = session(SessionState.ACTIVE);
-        when(gateway.metering(7)).thenReturn(reading("62.5"));
+        Optional<Metering> found = reading("62.5");
+        when(gateway.metering(7)).thenReturn(found);
 
         service.of(live);
 
-        verify(sessions).recordBattery(live.id(), new BigDecimal("62.5"));
-    }
-
-    @Test
-    void doesNotRememberAReadingWithoutALevel() {
-        when(gateway.metering(7)).thenReturn(reading(null));
-
-        service.of(session(SessionState.ACTIVE));
-
-        verify(sessions, never()).recordBattery(any(), any());
+        verify(sessions).recordReading(live.id(), found.orElseThrow());
     }
 
     @Test
@@ -66,17 +58,26 @@ class MeteringServiceTest {
     }
 
     @Test
-    void fallsBackToTheRememberedLevelWhenThereIsNoReading() {
+    void fallsBackToTheRememberedReadingWhenThereIsNoLiveOne() {
         ChargingSession done = session(SessionState.COMPLETED);
-        when(sessions.batteryOf(done.id())).thenReturn(Optional.of(new BigDecimal("100")));
+        when(sessions.lastReadingOf(done.id()))
+                .thenReturn(new LastReading(new BigDecimal("100"), new BigDecimal("401"), new BigDecimal("22")));
 
-        assertThat(service.batteryOf(done, Optional.empty())).contains(new BigDecimal("100"));
+        LastReading last = service.lastReading(done, Optional.empty());
+
+        assertThat(last.batteryPercent()).isEqualByComparingTo("100");
+        assertThat(last.voltage()).isEqualByComparingTo("401");
     }
 
     @Test
-    void prefersTheLiveLevelOverTheRememberedOne() {
+    void prefersLiveValuesAndKeepsRememberedOnesForWhatIsMissing() {
         ChargingSession live = session(SessionState.ACTIVE);
+        when(sessions.lastReadingOf(live.id()))
+                .thenReturn(new LastReading(new BigDecimal("50"), new BigDecimal("399"), null));
 
-        assertThat(service.batteryOf(live, reading("71"))).contains(new BigDecimal("71"));
+        LastReading last = service.lastReading(live, reading("71"));
+
+        assertThat(last.batteryPercent()).isEqualByComparingTo("71");
+        assertThat(last.voltage()).isEqualByComparingTo("399");
     }
 }

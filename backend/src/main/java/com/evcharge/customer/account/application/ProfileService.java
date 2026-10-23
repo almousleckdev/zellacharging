@@ -2,6 +2,7 @@ package com.evcharge.customer.account.application;
 
 import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.domain.Customer;
+import com.evcharge.customer.account.domain.CustomerStatus;
 import com.evcharge.customer.shared.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,13 @@ public class ProfileService {
     }
 
     public Customer get(UUID customerId) {
-        return customers.findById(customerId)
+        return customers.findById(customerId).filter(customer -> customer.status() != CustomerStatus.DELETED)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "Customer not found"));
+    }
+
+    public Customer updateName(UUID customerId, String firstName, String lastName) {
+        get(customerId);
+        customers.updateName(customerId, firstName.trim(), lastName.trim());
+        return get(customerId);
     }
 }

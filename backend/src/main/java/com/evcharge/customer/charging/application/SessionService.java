@@ -113,4 +113,12 @@ public class SessionService {
         return sessions.findOwned(sessionId, customerId).orElseThrow(
                 () -> new ApiException(HttpStatus.NOT_FOUND, "SESSION_NOT_FOUND", "Session not found"));
     }
+
+    public void hide(UUID customerId, UUID sessionId) {
+        ChargingSession session = owned(customerId, sessionId);
+        if (session.state().isLive()) {
+            throw new ApiException(HttpStatus.CONFLICT, "SESSION_STILL_ACTIVE", "A charge in progress cannot be deleted");
+        }
+        sessions.hide(sessionId, customerId, clock.instant());
+    }
 }

@@ -7,4 +7,9 @@ public record StationConnector(int connectorId, String status, String connectorT
     public boolean isAvailable() {
         return "Available".equals(status);
     }
+
+    public StationConnector inUse() {
+        boolean free = isAvailable() || "Preparing".equals(status);
+        return free ? new StationConnector(connectorId, "Charging", connectorType, maxPowerKw) : this;
+    }
 }

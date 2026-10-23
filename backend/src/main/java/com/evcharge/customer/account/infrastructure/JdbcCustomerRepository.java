@@ -92,4 +92,28 @@ class JdbcCustomerRepository implements CustomerRepository {
     public void clearFailedLogins(UUID id) {
         recordFailedLogin(id, 0, null);
     }
+
+    @Override
+    public void updateName(UUID id, String firstName, String lastName) {
+        jdbc.sql("update customer set first_name = :first, last_name = :last where id = :id")
+                .param("first", firstName).param("last", lastName).param("id", id).update();
+    }
+
+    @Override
+    public void updatePasswordHash(UUID id, String passwordHash) {
+        jdbc.sql("update customer set password_hash = :hash, failed_login_attempts = 0, locked_until = null "
+                        + "where id = :id")
+                .param("hash", passwordHash).param("id", id).update();
+    }
+
+    @Override
+    public void markDeleted(UUID id, String unusablePasswordHash) {
+        jdbc.sql("""
+                update customer set status = 'DELETED', first_name = 'Deleted', last_name = 'Account',
+                    email = null, phone_e164 = null, email_verified_at = null, phone_verified_at = null,
+                    password_hash = :hash
+                where id = :id
+                """)
+                .param("hash", unusablePasswordHash).param("id", id).update();
+    }
 }

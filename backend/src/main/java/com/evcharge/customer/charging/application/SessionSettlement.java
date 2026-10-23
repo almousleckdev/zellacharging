@@ -12,9 +12,11 @@ public class SessionSettlement {
     private static final Logger log = LoggerFactory.getLogger(SessionSettlement.class);
 
     private final WalletFunding funding;
+    private final FeeCalculator fees;
 
-    public SessionSettlement(WalletFunding funding) {
+    public SessionSettlement(WalletFunding funding, FeeCalculator fees) {
         this.funding = funding;
+        this.fees = fees;
     }
 
     public void settle(ChargingSession session) {
@@ -30,6 +32,7 @@ public class SessionSettlement {
         if (session.costMinor() == null) {
             log.warn("Session {} finished without a cost: the hold is released without a charge", session.id());
         }
-        funding.settle(session.id(), session.costMinor(), session.currency());
+        Long total = session.costMinor() == null ? null : fees.of(session.costMinor()).totalMinor();
+        funding.settle(session.id(), total, session.currency());
     }
 }

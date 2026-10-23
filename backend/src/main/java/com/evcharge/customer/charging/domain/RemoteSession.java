@@ -14,7 +14,8 @@ public record RemoteSession(
         Long costMinor,
         String currency,
         Integer currencyDecimals,
-        String stopReason) {
+        String stopReason,
+        Long pricePerKwhMinor) {
 
     public SessionState toState() {
         return switch (status) {

@@ -1,6 +1,8 @@
 package com.evcharge.customer.charging.web;
 
 import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.FeeBreakdown;
+import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.shared.Money;
 
@@ -25,6 +27,9 @@ record SessionResponse(
         Instant createdAt,
         MeteringResponse metering,
         BigDecimal batteryPercent,
+        BigDecimal lastVoltage,
+        BigDecimal lastPowerKw,
+        FeesResponse fees,
         EstimatedCostResponse estimatedCost) {
 
     record MeteringResponse(BigDecimal totalKwh, BigDecimal powerKw, BigDecimal stateOfChargePercent,
@@ -45,11 +50,21 @@ record SessionResponse(
         }
     }
 
-    static SessionResponse from(ChargingSession s, Metering metering, BigDecimal batteryPercent,
-                                Optional<Money> estimate) {
+    record FeesResponse(long electricMinor, long vatMinor, long serviceMinor, long totalMinor, String currency,
+                        int decimals) {
+
+        static FeesResponse from(ChargingSession s, Optional<FeeBreakdown> fees) {
+            return fees.map(f -> new FeesResponse(f.electricMinor(), f.vatMinor(), f.serviceMinor(), f.totalMinor(),
+                    s.currency(), s.currencyDecimals() == null ? 0 : s.currencyDecimals())).orElse(null);
+        }
+    }
+
+    static SessionResponse from(ChargingSession s, Metering metering, LastReading last, Optional<Money> estimate,
+                                Optional<FeeBreakdown> fees) {
         return new SessionResponse(s.id(), s.stationId(), s.connectorId(), s.state().name(), s.failureCode(),
                 s.startedAt(), s.stoppedAt(), s.energyKwh(), s.costMinor(), s.currency(), s.currencyDecimals(),
                 s.stopReason(), s.createdAt(), MeteringResponse.from(metering),
-                batteryPercent, EstimatedCostResponse.from(estimate));
+                last.batteryPercent(), last.voltage(), last.powerKw(), FeesResponse.from(s, fees),
+                EstimatedCostResponse.from(estimate));
     }
 }

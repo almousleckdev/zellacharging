@@ -4,5 +4,6 @@ public enum CustomerStatus {
     PENDING_VERIFICATION,
     PENDING_PHONE,
     ACTIVE,
-    BLOCKED
+    BLOCKED,
+    DELETED
 }

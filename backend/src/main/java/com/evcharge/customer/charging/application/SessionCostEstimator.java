@@ -13,18 +13,22 @@ import java.util.Optional;
 public class SessionCostEstimator {
 
     private final WalletFunding funding;
-    private final SessionSettings settings;
+    private final SessionTariff tariff;
+    private final FeeCalculator fees;
 
-    public SessionCostEstimator(WalletFunding funding, SessionSettings settings) {
+    public SessionCostEstimator(WalletFunding funding, SessionTariff tariff, FeeCalculator fees) {
         this.funding = funding;
-        this.settings = settings;
+        this.tariff = tariff;
+        this.fees = fees;
     }
 
     public Optional<Money> estimate(ChargingSession session, Optional<Metering> metering) {
         if (session.costMinor() != null) {
             return Optional.empty();
         }
-        return metering.map(Metering::totalKwh).flatMap(kwh -> priced(session, kwh));
+        return metering.map(Metering::totalKwh).flatMap(kwh -> priced(session, kwh))
+                .map(electric -> new Money(fees.of(electric.minor()).totalMinor(), electric.currency(),
+                        electric.decimals()));
     }
 
     public Optional<Money> finalCost(ChargingSession session) {
@@ -35,11 +39,9 @@ public class SessionCostEstimator {
     }
 
     private Optional<Money> priced(ChargingSession session, BigDecimal kwh) {
-        if (settings.pricePerKwhMinor() == null) {
-            return Optional.empty();
-        }
-        Money reserved = funding.reserved(session.id());
-        return Optional.of(Money.forEnergy(kwh, settings.pricePerKwhMinor(), reserved.currency(),
-                reserved.decimals()));
+        return tariff.pricePerKwhMinor(session.id()).map(price -> {
+            Money reserved = funding.reserved(session.id());
+            return Money.forEnergy(kwh, price, reserved.currency(), reserved.decimals());
+        });
     }
 }

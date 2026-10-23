@@ -1,8 +1,12 @@
 package com.evcharge.customer.charging;
 
+import com.evcharge.customer.charging.application.FeeCalculator;
+import com.evcharge.customer.charging.application.FeeSettings;
 import com.evcharge.customer.charging.application.FundsGuard;
 import com.evcharge.customer.charging.application.MeteringService;
 import com.evcharge.customer.charging.application.SessionSettings;
+import com.evcharge.customer.charging.application.SessionTariff;
+import com.evcharge.customer.charging.application.port.SessionRepository;
 import com.evcharge.customer.charging.application.StopCommander;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.CommandOutcome;
@@ -34,13 +38,15 @@ class FundsGuardTest {
     private final WalletFunding funding = mock(WalletFunding.class);
     private final MeteringService metering = mock(MeteringService.class);
     private final StopCommander stopper = mock(StopCommander.class);
+    private final SessionRepository sessions = mock(SessionRepository.class);
     private final SessionSettings settings = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
             Duration.ofSeconds(30), 150L, 95);
     private FundsGuard guard;
 
     @BeforeEach
     void setUp() {
-        guard = new FundsGuard(funding, metering, stopper, settings, Clock.fixed(NOW, ZoneOffset.UTC));
+        guard = new FundsGuard(funding, metering, stopper, settings, new SessionTariff(sessions, settings),
+                new FeeCalculator(new FeeSettings(null, null)), Clock.fixed(NOW, ZoneOffset.UTC));
         when(funding.reserved(any())).thenReturn(new Money(5000, "XOF", 0));
         when(stopper.issue(any())).thenReturn(CommandOutcome.success());
     }

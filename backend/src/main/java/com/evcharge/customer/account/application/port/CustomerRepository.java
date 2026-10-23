@@ -20,4 +20,10 @@ public interface CustomerRepository {
     void recordFailedLogin(UUID id, int attempts, Instant lockedUntil);
 
     void clearFailedLogins(UUID id);
+
+    void updateName(UUID id, String firstName, String lastName);
+
+    void updatePasswordHash(UUID id, String passwordHash);
+
+    void markDeleted(UUID id, String unusablePasswordHash);
 }

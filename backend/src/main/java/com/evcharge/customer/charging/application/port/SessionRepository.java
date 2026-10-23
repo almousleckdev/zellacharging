@@ -1,10 +1,14 @@
 package com.evcharge.customer.charging.application.port;
 
 import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.LastReading;
+import com.evcharge.customer.charging.domain.Metering;
 
-import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 
 public interface SessionRepository {
@@ -19,9 +23,17 @@ public interface SessionRepository {
 
     Optional<ChargingSession> findLive(UUID customerId);
 
-    void recordBattery(UUID id, BigDecimal percent);
+    void recordReading(UUID id, Metering reading);
 
-    Optional<BigDecimal> batteryOf(UUID id);
+    LastReading lastReadingOf(UUID id);
+
+    boolean hide(UUID id, UUID customerId, Instant at);
+
+    void recordPrice(UUID id, long pricePerKwhMinor);
+
+    Optional<Long> priceOf(UUID id);
+
+    Map<String, Set<Integer>> liveConnectors();
 
     List<ChargingSession> history(UUID customerId, int limit);
 }

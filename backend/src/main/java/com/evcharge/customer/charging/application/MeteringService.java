@@ -3,10 +3,10 @@ package com.evcharge.customer.charging.application;
 import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionRepository;
 import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
 import java.util.Optional;
 
 @Service
@@ -25,11 +25,12 @@ public class MeteringService {
             return Optional.empty();
         }
         Optional<Metering> reading = gateway.metering(session.transactionId());
-        reading.map(Metering::stateOfChargePercent).ifPresent(level -> sessions.recordBattery(session.id(), level));
+        reading.ifPresent(found -> sessions.recordReading(session.id(), found));
         return reading;
     }
 
-    public Optional<BigDecimal> batteryOf(ChargingSession session, Optional<Metering> reading) {
-        return reading.map(Metering::stateOfChargePercent).or(() -> sessions.batteryOf(session.id()));
+    public LastReading lastReading(ChargingSession session, Optional<Metering> reading) {
+        LastReading remembered = sessions.lastReadingOf(session.id());
+        return reading.map(LastReading::of).map(live -> live.orElse(remembered)).orElse(remembered);
     }
 }

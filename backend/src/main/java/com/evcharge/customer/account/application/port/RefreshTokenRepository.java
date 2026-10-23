@@ -15,4 +15,6 @@ public interface RefreshTokenRepository {
     boolean markUsed(UUID id, Instant at);
 
     void revokeFamily(UUID familyId, Instant at);
+
+    void revokeAllOf(UUID customerId, Instant at);
 }

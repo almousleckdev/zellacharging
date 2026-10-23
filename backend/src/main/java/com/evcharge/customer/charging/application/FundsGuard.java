@@ -22,14 +22,18 @@ public class FundsGuard {
     private final MeteringService metering;
     private final StopCommander stopper;
     private final SessionSettings settings;
+    private final SessionTariff tariff;
+    private final FeeCalculator fees;
     private final Clock clock;
 
     public FundsGuard(WalletFunding funding, MeteringService metering, StopCommander stopper,
-                      SessionSettings settings, Clock clock) {
+                      SessionSettings settings, SessionTariff tariff, FeeCalculator fees, Clock clock) {
         this.funding = funding;
         this.metering = metering;
         this.stopper = stopper;
         this.settings = settings;
+        this.tariff = tariff;
+        this.fees = fees;
         this.clock = clock;
     }
 
@@ -59,11 +63,10 @@ public class FundsGuard {
         if (session.costMinor() != null) {
             return Optional.of(session.costMinor());
         }
-        if (settings.pricePerKwhMinor() == null) {
-            return Optional.empty();
-        }
-        return metering.of(session).map(Metering::totalKwh)
-                .map(kwh -> kwh.multiply(BigDecimal.valueOf(settings.pricePerKwhMinor()))
-                        .setScale(0, java.math.RoundingMode.CEILING).longValue());
+        return tariff.pricePerKwhMinor(session.id()).flatMap(price -> metering.of(session)
+                .map(Metering::totalKwh)
+                .map(kwh -> kwh.multiply(BigDecimal.valueOf(price))
+                        .setScale(0, java.math.RoundingMode.CEILING).longValue()))
+                .map(electric -> fees.of(electric).totalMinor());
     }
 }

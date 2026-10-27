@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/core/theme/app_icons.dart';
-import 'package:ndzela/core/theme/app_theme.dart';
-import 'package:ndzela/features/charging/presentation/setup/charge_setup_page.dart';
-import 'package:ndzela/features/stations/domain/station.dart';
-import 'package:ndzela/features/stations/domain/station_connector.dart';
-import 'package:ndzela/features/stations/presentation/station_providers.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/core/theme/app_icons.dart';
+import 'package:zella/core/theme/app_theme.dart';
+import 'package:zella/features/charging/presentation/setup/charge_setup_page.dart';
+import 'package:zella/features/stations/domain/station.dart';
+import 'package:zella/features/stations/domain/station_connector.dart';
+import 'package:zella/features/stations/presentation/station_providers.dart';
 
 import 'screens.dart';
 import 'test_fonts.dart';

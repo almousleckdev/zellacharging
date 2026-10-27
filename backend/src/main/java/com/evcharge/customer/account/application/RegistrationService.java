@@ -7,6 +7,7 @@ import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.CustomerStatus;
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.TenantContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -41,7 +42,7 @@ public class RegistrationService {
             throw new ApiException(HttpStatus.BAD_REQUEST, "CONTACT_REQUIRED", "Email or phone is required");
         }
         points.forEach(this::requireUnused);
-        Customer customer = new Customer(UUID.randomUUID(), command.firstName().trim(), command.lastName().trim(),
+        Customer customer = new Customer(UUID.randomUUID(), TenantContext.require(), command.firstName().trim(), command.lastName().trim(),
                 targetOf(points, Channel.EMAIL), targetOf(points, Channel.PHONE),
                 passwords.hash(command.password()), CustomerStatus.PENDING_VERIFICATION, 0, null, clock.instant());
         customers.save(customer);

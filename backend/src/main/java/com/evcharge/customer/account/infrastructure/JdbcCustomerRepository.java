@@ -21,6 +21,7 @@ class JdbcCustomerRepository implements CustomerRepository {
 
     private static final RowMapper<Customer> MAPPER = (rs, rowNum) -> new Customer(
             rs.getObject("id", UUID.class),
+            rs.getString("country_code"),
             rs.getString("first_name"),
             rs.getString("last_name"),
             rs.getString("email"),
@@ -41,11 +42,12 @@ class JdbcCustomerRepository implements CustomerRepository {
     public void save(Customer customer) {
         try {
             jdbc.sql("""
-                    insert into customer (id, first_name, last_name, email, phone_e164, password_hash,
+                    insert into customer (id, country_code, first_name, last_name, email, phone_e164, password_hash,
                                           status, failed_login_attempts, locked_until, created_at)
-                    values (:id, :firstName, :lastName, :email, :phone, :hash, :status, :attempts, :lockedUntil, :createdAt)
+                    values (:id, :country, :firstName, :lastName, :email, :phone, :hash, :status, :attempts, :lockedUntil, :createdAt)
                     """)
                     .param("id", customer.id())
+                    .param("country", customer.country())
                     .param("firstName", customer.firstName())
                     .param("lastName", customer.lastName())
                     .param("email", customer.email())
@@ -64,6 +66,13 @@ class JdbcCustomerRepository implements CustomerRepository {
     @Override
     public Optional<Customer> findById(UUID id) {
         return jdbc.sql("select * from customer where id = :id").param("id", id).query(MAPPER).optional();
+    }
+
+    @Override
+    public boolean isVerified(UUID id, Channel channel) {
+        String column = channel == Channel.EMAIL ? "email_verified_at" : "phone_verified_at";
+        return jdbc.sql("select " + column + " is not null from customer where id = :id")
+                .param("id", id).query(Boolean.class).optional().orElse(false);
     }
 
     @Override

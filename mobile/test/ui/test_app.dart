@@ -3,10 +3,10 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/app_language.dart';
-import 'package:ndzela/core/l10n/language_controller.dart';
-import 'package:ndzela/core/session/session_controller.dart';
-import 'package:ndzela/core/theme/app_theme.dart';
+import 'package:zella/core/l10n/app_language.dart';
+import 'package:zella/core/l10n/language_controller.dart';
+import 'package:zella/core/session/session_controller.dart';
+import 'package:zella/core/theme/app_theme.dart';
 
 import 'ui_fakes.dart';
 

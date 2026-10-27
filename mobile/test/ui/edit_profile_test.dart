@@ -1,10 +1,10 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/core/media/photo_source.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/profile/presentation/edit_profile_page.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/core/media/photo_source.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/profile/presentation/edit_profile_page.dart';
 
 import 'screens.dart';
 import 'test_app.dart';

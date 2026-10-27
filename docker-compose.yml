@@ -2,15 +2,15 @@ services:
   postgres:
     image: postgres:16
     environment:
-      POSTGRES_DB: ndzela
-      POSTGRES_USER: ndzela
+      POSTGRES_DB: zella
+      POSTGRES_USER: zella
       POSTGRES_PASSWORD: dev
     ports:
       - "127.0.0.1:5434:5432"
     volumes:
-      - ndzela-pg:/var/lib/postgresql/data
+      - zella-pg:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ndzela"]
+      test: ["CMD-SHELL", "pg_isready -U zella"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -22,4 +22,4 @@ services:
       - "127.0.0.1:1025:1025"
 
 volumes:
-  ndzela-pg:
+  zella-pg:

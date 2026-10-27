@@ -4,8 +4,8 @@ import com.evcharge.customer.wallet.application.TopupService;
 import com.evcharge.customer.wallet.application.WalletService;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.CustomerPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -31,30 +31,29 @@ class WalletController {
     }
 
     @GetMapping
-    WalletResponse balance(@AuthenticationPrincipal Jwt jwt) {
-        return WalletResponse.from(wallets.balance(customer(jwt)));
+    WalletResponse balance(CustomerPrincipal me) {
+        return WalletResponse.from(wallets.balance(me.id()));
     }
 
     @GetMapping("/transactions")
-    List<LedgerResponse> transactions(@AuthenticationPrincipal Jwt jwt) {
-        return wallets.transactions(customer(jwt)).stream().map(LedgerResponse::from).toList();
+    List<LedgerResponse> transactions(CustomerPrincipal me) {
+        return wallets.transactions(me.id()).stream().map(LedgerResponse::from).toList();
     }
 
     @PostMapping("/topups")
     @ResponseStatus(HttpStatus.CREATED)
-    TopupResponse topUp(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody TopupRequest request,
+    TopupResponse topUp(CustomerPrincipal me, @Valid @RequestBody TopupRequest request,
                         @RequestHeader(name = "Idempotency-Key", required = false) String key) {
-        String idempotencyKey = key == null || key.isBlank() ? UUID.randomUUID().toString() : key;
-        return TopupResponse.from(topups.create(customer(jwt), request.operator(), request.msisdn(),
-                request.amountMinor(), idempotencyKey));
+        if (key == null || key.isBlank()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "IDEMPOTENCY_KEY_REQUIRED",
+                    "An Idempotency-Key header is required");
+        }
+        return TopupResponse.from(topups.create(me.id(), request.operator(), request.msisdn(),
+                request.amountMinor(), key.trim()));
     }
 
     @GetMapping("/topups/{id}")
-    TopupResponse topup(@AuthenticationPrincipal Jwt jwt, @PathVariable UUID id) {
-        return TopupResponse.from(topups.get(customer(jwt), id));
-    }
-
-    private static UUID customer(Jwt jwt) {
-        return UUID.fromString(jwt.getSubject());
+    TopupResponse topup(CustomerPrincipal me, @PathVariable UUID id) {
+        return TopupResponse.from(topups.get(me.id(), id));
     }
 }

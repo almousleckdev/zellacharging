@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/features/stations/data/station_mapper.dart';
+import 'package:zella/features/stations/data/station_mapper.dart';
 
 void main() {
   test('maps a station payload with connectors', () {

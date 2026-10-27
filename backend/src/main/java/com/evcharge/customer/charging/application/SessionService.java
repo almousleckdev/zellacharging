@@ -1,11 +1,13 @@
 package com.evcharge.customer.charging.application;
 
+import com.evcharge.customer.charging.StartableConnectors;
 import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionRepository;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.CommandOutcome;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.AuditTrail;
 import com.evcharge.customer.wallet.WalletFunding;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -23,41 +25,57 @@ public class SessionService {
     private final SessionRepository sessions;
     private final ChargingGateway gateway;
     private final IdTagService idTags;
-    private final SessionReconciler reconciler;
+    private final SessionRefresher refresher;
+    private final StartableConnectors connectors;
+    private final IdempotentStarts starts;
     private final SessionSettlement settlement;
     private final StopCommander stopper;
     private final WalletFunding funding;
     private final Clock clock;
+    private final AuditTrail audit;
 
     public SessionService(SessionRepository sessions, ChargingGateway gateway, IdTagService idTags,
-                          SessionReconciler reconciler, SessionSettlement settlement, StopCommander stopper,
-                          WalletFunding funding, Clock clock) {
+                          SessionRefresher refresher, StartableConnectors connectors, IdempotentStarts starts,
+                          SessionSettlement settlement,
+                          StopCommander stopper, WalletFunding funding, Clock clock, AuditTrail audit) {
         this.sessions = sessions;
         this.gateway = gateway;
         this.idTags = idTags;
-        this.reconciler = reconciler;
+        this.refresher = refresher;
+        this.connectors = connectors;
+        this.starts = starts;
         this.settlement = settlement;
         this.stopper = stopper;
         this.funding = funding;
         this.clock = clock;
+        this.audit = audit;
     }
 
-    public ChargingSession start(UUID customerId, String stationId, int connectorId, long amountMinor) {
+    public ChargingSession start(UUID customerId, String stationId, int connectorId, long amountMinor,
+                                 String idempotencyKey) {
+        Optional<ChargingSession> earlier = starts.earlier(customerId, idempotencyKey, stationId, connectorId,
+                amountMinor);
+        if (earlier.isPresent()) {
+            return earlier.get();
+        }
         if (sessions.findLive(customerId).isPresent()) {
             throw new ApiException(HttpStatus.CONFLICT, "CONNECTOR_OR_SESSION_BUSY",
                     "A charge is already in progress");
         }
+        connectors.require(stationId, connectorId);
         String idTag = idTags.ensure(customerId);
         UUID sessionId = UUID.randomUUID();
         funding.reserve(customerId, sessionId, amountMinor);
         ChargingSession session = ChargingSession.requested(sessionId, customerId, stationId, connectorId, idTag,
                 clock.instant());
         try {
-            sessions.insert(session);
+            sessions.insert(session, idempotencyKey);
         } catch (RuntimeException e) {
             funding.release(sessionId);
             throw e;
         }
+        audit.record("SESSION_START_REQUESTED", customerId, sessionId.toString(), stationId + "#" + connectorId
+                + " budget=" + amountMinor);
         return dispatchStart(session);
     }
 
@@ -87,10 +105,11 @@ public class SessionService {
     }
 
     public ChargingSession stop(UUID customerId, UUID sessionId) {
-        ChargingSession session = reconciler.reconcile(owned(customerId, sessionId));
+        ChargingSession session = refresher.refresh(owned(customerId, sessionId));
         if (session.state() != SessionState.ACTIVE) {
             throw new ApiException(HttpStatus.CONFLICT, "SESSION_NOT_ACTIVE", "No active charge to stop");
         }
+        audit.record("SESSION_STOP_REQUESTED", customerId, sessionId.toString(), null);
         if (!stopper.issue(session).accepted()) {
             throw new ApiException(HttpStatus.CONFLICT, "STOP_REFUSED", "The charger refused to stop");
         }
@@ -98,15 +117,15 @@ public class SessionService {
     }
 
     public ChargingSession get(UUID customerId, UUID sessionId) {
-        return reconciler.reconcile(owned(customerId, sessionId));
+        return refresher.refresh(owned(customerId, sessionId));
     }
 
     public Optional<ChargingSession> active(UUID customerId) {
-        return sessions.findLive(customerId).map(reconciler::reconcile).filter(s -> s.state().isLive());
+        return sessions.findLive(customerId).map(refresher::refresh).filter(s -> s.state().isLive());
     }
 
     public List<ChargingSession> history(UUID customerId) {
-        return sessions.history(customerId, HISTORY_LIMIT).stream().map(reconciler::reconcile).toList();
+        return sessions.history(customerId, HISTORY_LIMIT).stream().map(refresher::refresh).toList();
     }
 
     private ChargingSession owned(UUID customerId, UUID sessionId) {

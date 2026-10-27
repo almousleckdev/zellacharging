@@ -1,4 +1,4 @@
-# Project Overview — Ndzela (customer charging platform)
+# Project Overview — Zella Charging (customer charging platform)
 
 Status: **DRAFT for architecture review — no implementation code exists yet.**
 
@@ -124,9 +124,9 @@ snapshot, one open session per connector, one ACTIVE session per idTag.
 | D5 | Connector hold is a real requirement. |
 | D6 | Refund policy, VAT/receipt rules and retention: proposals in the documents accepted as the working baseline (legal review still advised for holding customer funds in a wallet [U]). |
 | D7 | Java 21 (aligned with the OCPP repository). |
-| D8 | Product/app name: **Ndzela**. Mobile UI design will be supplied by the product owner when the mobile phase begins; no UI is built before it. |
+| D8 | Product/app name: **Zella Charging**. Mobile UI design will be supplied by the product owner when the mobile phase begins; no UI is built before it. |
 
-## 10. Registration and login (Ndzela) — confirmed requirements
+## 10. Registration and login (Zella) — confirmed requirements
 
 * **Email/password registration:** first name, last name, **email or phone number
   (at least one)**, password.

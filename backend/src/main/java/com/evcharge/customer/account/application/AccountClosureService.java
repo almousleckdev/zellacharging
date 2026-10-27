@@ -6,12 +6,14 @@ import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.PasswordHasher;
 import com.evcharge.customer.account.application.port.RefreshTokenRepository;
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.AuditTrail;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -24,10 +26,11 @@ public class AccountClosureService {
     private final AvatarRepository avatars;
     private final List<ClosureBlocker> blockers;
     private final Clock clock;
+    private final AuditTrail audit;
 
     public AccountClosureService(PasswordService passwords, PasswordHasher hasher, CustomerRepository customers,
                                  RefreshTokenRepository refreshTokens, AvatarRepository avatars,
-                                 List<ClosureBlocker> blockers, Clock clock) {
+                                 List<ClosureBlocker> blockers, Clock clock, AuditTrail audit) {
         this.passwords = passwords;
         this.hasher = hasher;
         this.customers = customers;
@@ -35,17 +38,19 @@ public class AccountClosureService {
         this.avatars = avatars;
         this.blockers = blockers;
         this.clock = clock;
+        this.audit = audit;
     }
 
     @Transactional
     public void close(UUID customerId, String password) {
         passwords.confirm(customerId, password);
-        blockers.stream().map(blocker -> blocker.blockingCode(customerId)).flatMap(java.util.Optional::stream)
+        blockers.stream().map(blocker -> blocker.blockingCode(customerId)).flatMap(Optional::stream)
                 .findFirst().ifPresent(code -> {
                     throw new ApiException(HttpStatus.CONFLICT, code, "The account cannot be closed yet");
                 });
         customers.markDeleted(customerId, hasher.hash(UUID.randomUUID().toString()));
         refreshTokens.revokeAllOf(customerId, clock.instant());
         avatars.delete(customerId);
+        audit.record("ACCOUNT_CLOSED", customerId, "customer", null);
     }
 }

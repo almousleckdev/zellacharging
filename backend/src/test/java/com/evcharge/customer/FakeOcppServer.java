@@ -15,6 +15,7 @@ public final class FakeOcppServer {
     }
 
     private final Map<String, Reply> routes = new ConcurrentHashMap<>();
+    private final Map<String, java.util.concurrent.atomic.AtomicInteger> hits = new ConcurrentHashMap<>();
     private final HttpServer server;
 
     public FakeOcppServer() {
@@ -32,6 +33,25 @@ public final class FakeOcppServer {
         return this;
     }
 
+    public FakeOcppServer station(String id) {
+        return station(id, "GA", true, "Available");
+    }
+
+    public FakeOcppServer station(String id, String country, boolean online, String connectorStatus) {
+        return route("GET", "/api/v1/charge-points/" + id, 200, "{\"id\":\"" + id + "\",\"isoCode\":\"" + country
+                + "\",\"online\":" + online + ",\"connectors\":[{\"connectorId\":1,\"status\":\""
+                + connectorStatus + "\",\"connectorType\":\"CCS2\",\"maxPowerKw\":60}]}");
+    }
+
+    public int hits(String method, String path) {
+        var counter = hits.get(method + " " + path);
+        return counter == null ? 0 : counter.get();
+    }
+
+    public void resetHits() {
+        hits.clear();
+    }
+
     public String baseUrl() {
         return "http://127.0.0.1:" + server.getAddress().getPort();
     }
@@ -42,6 +62,8 @@ public final class FakeOcppServer {
 
     private void handle(HttpExchange exchange) throws IOException {
         exchange.getRequestBody().readAllBytes();
+        hits.computeIfAbsent(exchange.getRequestMethod() + " " + exchange.getRequestURI().getPath(),
+                key -> new java.util.concurrent.atomic.AtomicInteger()).incrementAndGet();
         Reply reply = routes.getOrDefault(exchange.getRequestMethod() + " " + exchange.getRequestURI().getPath(),
                 new Reply(404, ""));
         byte[] bytes = reply.body().getBytes(StandardCharsets.UTF_8);

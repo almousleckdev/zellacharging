@@ -28,11 +28,12 @@ class JwtAccessTokenIssuer implements AccessTokenIssuer {
     }
 
     @Override
-    public String issue(UUID customerId) {
+    public String issue(UUID customerId, String country) {
         Instant now = clock.instant();
         JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer("ndzela")
+                .issuer("zella")
                 .subject(customerId.toString())
+                .claim("cty", country)
                 .issuedAt(now)
                 .expiresAt(now.plus(timeToLive()))
                 .build();

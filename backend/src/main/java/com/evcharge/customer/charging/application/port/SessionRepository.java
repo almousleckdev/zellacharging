@@ -1,8 +1,6 @@
 package com.evcharge.customer.charging.application.port;
 
 import com.evcharge.customer.charging.domain.ChargingSession;
-import com.evcharge.customer.charging.domain.LastReading;
-import com.evcharge.customer.charging.domain.Metering;
 
 import java.time.Instant;
 import java.util.List;
@@ -13,7 +11,13 @@ import java.util.UUID;
 
 public interface SessionRepository {
 
-    void insert(ChargingSession session);
+    default void insert(ChargingSession session) {
+        insert(session, null);
+    }
+
+    void insert(ChargingSession session, String idempotencyKey);
+
+    Optional<ChargingSession> findByIdempotencyKey(UUID customerId, String idempotencyKey);
 
     void update(ChargingSession session);
 
@@ -23,15 +27,7 @@ public interface SessionRepository {
 
     Optional<ChargingSession> findLive(UUID customerId);
 
-    void recordReading(UUID id, Metering reading);
-
-    LastReading lastReadingOf(UUID id);
-
     boolean hide(UUID id, UUID customerId, Instant at);
-
-    void recordPrice(UUID id, long pricePerKwhMinor);
-
-    Optional<Long> priceOf(UUID id);
 
     Map<String, Set<Integer>> liveConnectors();
 

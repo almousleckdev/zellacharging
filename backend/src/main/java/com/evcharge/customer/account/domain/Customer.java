@@ -5,6 +5,7 @@ import java.util.UUID;
 
 public record Customer(
         UUID id,
+        String country,
         String firstName,
         String lastName,
         String email,

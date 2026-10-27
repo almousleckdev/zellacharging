@@ -17,5 +17,9 @@ public interface ChargingGateway {
 
     List<RemoteSession> sessionsOf(String idTag);
 
+    List<RemoteSession> activeSessions();
+
+    Optional<RemoteSession> session(int transactionId);
+
     Optional<Metering> metering(int transactionId);
 }

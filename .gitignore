@@ -1,1 +1,4 @@
 /design/
+.env
+*.env
+!*.env.example

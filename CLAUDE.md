@@ -1,4 +1,4 @@
-# CLAUDE.md — Ndzela (customer platform)
+# CLAUDE.md — Zella Charging (customer platform)
 
 Mobile app (Flutter, `mobile/`) and customer backend (Spring Boot Modulith, `backend/`) for EV charging.
 The OCPP platform in `../backend` belongs to another developer: never modify it.

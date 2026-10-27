@@ -8,8 +8,8 @@ import 'core/l10n/strings.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 
-class NdzelaApp extends ConsumerWidget {
-  const NdzelaApp({super.key});
+class ZellaApp extends ConsumerWidget {
+  const ZellaApp({super.key});
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {

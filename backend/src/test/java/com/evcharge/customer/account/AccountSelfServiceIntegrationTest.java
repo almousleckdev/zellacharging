@@ -1,5 +1,6 @@
 package com.evcharge.customer.account;
 
+import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.account.application.port.PasswordHasher;
 import org.junit.jupiter.api.Test;
@@ -15,7 +16,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -49,7 +49,7 @@ class AccountSelfServiceIntegrationTest extends PostgresTestBase {
     }
 
     private ResultActions send(MockHttpServletRequestBuilder request, UUID id) throws Exception {
-        return mvc.perform(request.with(jwt().jwt(j -> j.subject(id.toString()))));
+        return mvc.perform(request.with(TestTenants.customer(id)));
     }
 
     private ResultActions json(MockHttpServletRequestBuilder request, UUID id, String body) throws Exception {

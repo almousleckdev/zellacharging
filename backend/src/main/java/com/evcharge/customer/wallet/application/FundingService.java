@@ -2,6 +2,7 @@ package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.Money;
+import com.evcharge.customer.wallet.StartLimits;
 import com.evcharge.customer.wallet.WalletFunding;
 import com.evcharge.customer.wallet.application.port.HoldRepository;
 import com.evcharge.customer.wallet.application.port.LedgerRepository;
@@ -51,8 +52,8 @@ public class FundingService implements WalletFunding {
         if (existing.isPresent()) {
             return money(existing.get().reservedMinor());
         }
-        if (amountMinor < settings.minimumStartMinor()) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_AMOUNT", "Amount is below the minimum");
+        if (amountMinor < settings.minimumStartMinor() || amountMinor > settings.maximumStartMinor()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_AMOUNT", "Amount is outside the allowed range");
         }
         if (wallet.availableMinor() < amountMinor) {
             throw new ApiException(HttpStatus.PAYMENT_REQUIRED, "INSUFFICIENT_FUNDS",
@@ -71,8 +72,13 @@ public class FundingService implements WalletFunding {
         if (hold.isEmpty()) {
             return;
         }
-        boolean comparable = costMinor == null || settings.currency().equals(currency);
-        long charge = costMinor == null || !comparable ? 0 : Math.min(costMinor, hold.get().reservedMinor());
+        if (costMinor == null) {
+            log.error("ALERT hold {} closed without a cost: nothing is charged, flagged for review", sessionId);
+            close(hold.get(), 0, HoldState.REVIEW);
+            return;
+        }
+        boolean comparable = settings.currency().equals(currency);
+        long charge = comparable ? Math.min(costMinor, hold.get().reservedMinor()) : 0;
         if (!comparable) {
             log.warn("Session {} priced in {} but wallet is {}: flagged for review", sessionId, currency,
                     settings.currency());
@@ -90,6 +96,19 @@ public class FundingService implements WalletFunding {
     @Override
     public List<UUID> openHoldSessions() {
         return holds.openSessionIds();
+    }
+
+    @Override
+    @Transactional
+    public Money available(UUID customerId) {
+        wallets.ensure(customerId, settings.currency(), settings.decimals());
+        return money(Math.max(0, wallets.read(customerId).availableMinor()));
+    }
+
+    @Override
+    public StartLimits startLimits() {
+        return new StartLimits(settings.minimumStartMinor(), settings.maximumStartMinor(), settings.currency(),
+                settings.decimals());
     }
 
     @Override

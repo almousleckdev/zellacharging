@@ -1,20 +1,28 @@
 server:
   port: ${PORT:${SERVER_PORT:8090}}
+  forward-headers-strategy: native
 
 spring:
   application:
-    name: ndzela-backend
+    name: zella-backend
   threads:
     virtual:
       enabled: true
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5434/ndzela}
-    username: ${DB_USER:ndzela}
+    url: ${DB_URL:jdbc:postgresql://localhost:5434/zella}
+    username: ${DB_USER:zella}
     password: ${DB_PASSWORD:dev}
     hikari:
       maximum-pool-size: ${DB_POOL_MAX:10}
   flyway:
     enabled: true
+    url: ${DB_URL:jdbc:postgresql://localhost:5434/zella}
+    user: ${DB_MIGRATION_USER:${DB_USER:zella}}
+    password: ${DB_MIGRATION_PASSWORD:${DB_PASSWORD:dev}}
+  messages:
+    basename: errors
+    encoding: UTF-8
+    fallback-to-system-locale: false
   mail:
     host: ${MAIL_HOST:localhost}
     port: ${MAIL_PORT:1025}
@@ -23,6 +31,10 @@ spring:
     properties:
       mail.smtp.auth: ${MAIL_SMTP_AUTH:false}
       mail.smtp.starttls.enable: ${MAIL_STARTTLS:false}
+
+logging:
+  pattern:
+    level: "%5p [%X{correlationId:-}]"
 
 management:
   health:
@@ -33,10 +45,24 @@ management:
       exposure:
         include: health,info
 
-ndzela:
+zella:
+  rate-limit:
+    login-per-ip-per-minute: 20
+    register-per-ip-per-hour: 10
+    resend-per-ip-per-hour: 10
+    verify-per-ip-per-minute: 30
+    refresh-per-ip-per-minute: 60
+    callback-per-ip-per-minute: 120
+    topup-per-customer-per-minute: 10
+    session-start-per-customer-per-minute: 10
+    withdrawal-per-customer-per-minute: 5
+  tenancy:
+    default-country: ${ZELLA_DEFAULT_COUNTRY:${NDZELA_DEFAULT_COUNTRY:GA}}
+    require-restricted-role: ${ZELLA_TENANCY_REQUIRE_RESTRICTED_ROLE:${NDZELA_TENANCY_REQUIRE_RESTRICTED_ROLE:true}}
+    country-cache-ttl: 1m
   security:
-    jwt-secret: ${NDZELA_JWT_SECRET}
-    code-pepper: ${NDZELA_CODE_PEPPER}
+    jwt-secret: ${ZELLA_JWT_SECRET:${NDZELA_JWT_SECRET}}
+    code-pepper: ${ZELLA_CODE_PEPPER:${NDZELA_CODE_PEPPER}}
     access-token-ttl: 15m
     refresh-token-ttl: 30d
     max-failed-logins: 5
@@ -45,28 +71,62 @@ ndzela:
     code-ttl: 5m
     resend-cooldown: 60s
     max-attempts: 5
-  mail-from: ${NDZELA_MAIL_FROM:no-reply@ndzela.local}
+  mail-from: ${ZELLA_MAIL_FROM:${NDZELA_MAIL_FROM:no-reply@zella.local}}
   ocpp:
-    base-url: ${NDZELA_OCPP_BASE_URL:http://localhost:8080}
-    api-key: ${NDZELA_OCPP_API_KEY}
-    signing-secret: ${NDZELA_OCPP_SIGNING_SECRET:}
+    base-url: ${ZELLA_OCPP_BASE_URL:${NDZELA_OCPP_BASE_URL:http://localhost:8080}}
+    api-key: ${ZELLA_OCPP_API_KEY:${NDZELA_OCPP_API_KEY}}
+    signing-secret: ${ZELLA_OCPP_SIGNING_SECRET:${NDZELA_OCPP_SIGNING_SECRET:}}
+    require-secure-channel: ${ZELLA_OCPP_REQUIRE_SECURE_CHANNEL:${NDZELA_OCPP_REQUIRE_SECURE_CHANNEL:true}}
+    requests-per-minute: ${ZELLA_OCPP_REQUESTS_PER_MINUTE:${NDZELA_OCPP_REQUESTS_PER_MINUTE:55}}
+    priority-reserve: 10
   charging:
     plug-in-timeout: 60s
     sweep-interval: 15s
     stop-retry-after: 30s
     stop-threshold-percent: 95
-    price-per-kwh-minor: ${NDZELA_PRICE_PER_KWH:}
+    stop-lead-time: 120s
+    user-refresh-interval: 5s
+    metering-interval: 30s
+    price-per-kwh-minor: ${ZELLA_PRICE_PER_KWH:${NDZELA_PRICE_PER_KWH:}}
   fees:
-    vat-percent: ${NDZELA_VAT_PERCENT:0}
-    service-fee-percent: ${NDZELA_SERVICE_FEE_PERCENT:0}
+    vat-percent: ${ZELLA_VAT_PERCENT:${NDZELA_VAT_PERCENT:0}}
+    service-fee-percent: ${ZELLA_SERVICE_FEE_PERCENT:${NDZELA_SERVICE_FEE_PERCENT:0}}
   support:
-    email: ${NDZELA_SUPPORT_EMAIL:}
-    phone: ${NDZELA_SUPPORT_PHONE:}
-    whatsapp: ${NDZELA_SUPPORT_WHATSAPP:}
-    agreement-url: ${NDZELA_AGREEMENT_URL:}
+    email: ${ZELLA_SUPPORT_EMAIL:${NDZELA_SUPPORT_EMAIL:}}
+    phone: ${ZELLA_SUPPORT_PHONE:${NDZELA_SUPPORT_PHONE:}}
+    whatsapp: ${ZELLA_SUPPORT_WHATSAPP:${NDZELA_SUPPORT_WHATSAPP:}}
+    agreement-url: ${ZELLA_AGREEMENT_URL:${NDZELA_AGREEMENT_URL:}}
+  payment:
+    provider: ${ZELLA_PAYMENT_PROVIDER:${NDZELA_PAYMENT_PROVIDER:pvit}}
+    allow-sandbox: ${ZELLA_PAYMENT_ALLOW_SANDBOX:${NDZELA_PAYMENT_ALLOW_SANDBOX:false}}
+    recheck-after: 3m
+    expire-after: 30m
+    late-window: 6h
+    reconcile-interval: 60s
+    pvit:
+      base-url: ${PVIT_BASE_URL:https://api.mypvit.pro}
+      operation-account-code: ${PVIT_OPERATION_ACCOUNT_CODE:}
+      secret-password: ${PVIT_SECRET_PASSWORD:}
+      code-url-secret: ${PVIT_CODE_URL_SECRET:}
+      code-url-payment: ${PVIT_CODE_URL_PAYMENT:}
+      code-url-status: ${PVIT_CODE_URL_STATUS:}
+      callback-url-code: ${PVIT_CALLBACK_URL_CODE:}
+      agent: ${PVIT_AGENT:}
+      product: ${PVIT_PRODUCT:}
+      owner-charge: ${PVIT_OWNER_CHARGE:CUSTOMER}
+      request-timeout: 20s
   wallet:
-    currency: ${NDZELA_WALLET_CURRENCY:XAF}
+    currency: ${ZELLA_WALLET_CURRENCY:${NDZELA_WALLET_CURRENCY:XAF}}
     decimals: 0
-    minimum-start-minor: ${NDZELA_WALLET_MIN_START:1000}
+    minimum-start-minor: ${ZELLA_WALLET_MIN_START:${NDZELA_WALLET_MIN_START:1000}}
+    maximum-start-minor: ${ZELLA_WALLET_MAX_START:${NDZELA_WALLET_MAX_START:200000}}
+    ledger-check-interval: 10m
+    withdrawal:
+      enabled: ${ZELLA_WITHDRAWALS_ENABLED:${NDZELA_WITHDRAWALS_ENABLED:false}}
+      minimum-minor: 1000
+      maximum-minor: 200000
+      daily-maximum-minor: 500000
+      recheck-after: 2m
+      review-after: 2h
     min-topup-minor: 500
     max-topup-minor: 500000

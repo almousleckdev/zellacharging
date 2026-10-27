@@ -5,6 +5,7 @@ import com.evcharge.customer.charging.ConnectorOccupancy;
 import com.evcharge.customer.catalog.domain.QrContent;
 import com.evcharge.customer.catalog.domain.Station;
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.TenantContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
@@ -36,11 +37,13 @@ public class CatalogService {
         }
         Map<String, Set<Integer>> busy = occupancy.busyConnectors();
         return directory.list(latitude, longitude, latitude == null ? null : radiusKm).stream()
+                .filter(CatalogService::inCurrentCountry)
                 .map(station -> station.occupying(busy.get(station.id()))).toList();
     }
 
     public Station station(String stationId) {
-        return occupied(directory.find(stationId).orElseThrow(CatalogService::notFound));
+        return occupied(directory.find(stationId).filter(CatalogService::inCurrentCountry)
+                .orElseThrow(CatalogService::notFound));
     }
 
     public ResolvedConnector resolveQr(String scanned) {
@@ -53,9 +56,14 @@ public class CatalogService {
             log.warn("QR token '{}' not found on the charging network", token);
             return invalidQr();
         });
-        Station station = occupied(directory.find(ref.stationId()).orElseThrow(CatalogService::invalidQr));
+        Station station = occupied(directory.find(ref.stationId()).filter(CatalogService::inCurrentCountry)
+                .orElseThrow(CatalogService::invalidQr));
         return new ResolvedConnector(station, station.connector(ref.connectorId())
                 .orElseThrow(CatalogService::invalidQr));
+    }
+
+    private static boolean inCurrentCountry(Station station) {
+        return TenantContext.current().filter(country -> country.equalsIgnoreCase(station.isoCode())).isPresent();
     }
 
     private Station occupied(Station station) {

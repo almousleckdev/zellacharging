@@ -1,12 +1,12 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/format/date_format.dart';
-import 'package:ndzela/core/format/money_format.dart';
-import 'package:ndzela/core/l10n/app_language.dart';
-import 'package:ndzela/core/l10n/language_controller.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/core/storage/preference_providers.dart';
-import 'package:ndzela/core/storage/preference_store.dart';
+import 'package:zella/core/format/date_format.dart';
+import 'package:zella/core/format/money_format.dart';
+import 'package:zella/core/l10n/app_language.dart';
+import 'package:zella/core/l10n/language_controller.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/core/storage/preference_providers.dart';
+import 'package:zella/core/storage/preference_store.dart';
 
 class _MemoryStore implements PreferenceStore {
   final saved = <String, String>{};

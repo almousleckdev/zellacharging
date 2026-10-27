@@ -1,5 +1,6 @@
 package com.evcharge.customer.coupon;
 
+import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.PostgresTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +11,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
@@ -47,7 +47,7 @@ class CouponIntegrationTest extends PostgresTestBase {
         coupon(mine, "Already used", "null", "now()");
         coupon(other, "Someone else's", "null", "null");
 
-        mvc.perform(get("/v1/coupons").with(jwt().jwt(j -> j.subject(mine.toString()))))
+        mvc.perform(get("/v1/coupons").with(TestTenants.customer(mine)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.length()").value(2))
                 .andExpect(jsonPath("$[?(@.title == 'Expired')]").isEmpty())
                 .andExpect(jsonPath("$[?(@.title == 'Already used')]").isEmpty())
@@ -56,7 +56,7 @@ class CouponIntegrationTest extends PostgresTestBase {
 
     @Test
     void aCustomerWithoutCouponsGetsAnEmptyList() throws Exception {
-        mvc.perform(get("/v1/coupons").with(jwt().jwt(j -> j.subject(customer().toString()))))
+        mvc.perform(get("/v1/coupons").with(TestTenants.customer(customer())))
                 .andExpect(status().isOk()).andExpect(jsonPath("$").isEmpty());
     }
 }

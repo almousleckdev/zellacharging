@@ -7,5 +7,5 @@ class TopupResult {
 
   bool get succeeded => state == 'SUCCEEDED';
 
-  bool get failed => state == 'FAILED';
+  bool get failed => state == 'FAILED' || state == 'EXPIRED';
 }

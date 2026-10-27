@@ -5,7 +5,7 @@ import com.evcharge.customer.charging.application.FeeSettings;
 import com.evcharge.customer.charging.application.SessionCostEstimator;
 import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.charging.application.SessionTariff;
-import com.evcharge.customer.charging.application.port.SessionRepository;
+import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionState;
@@ -29,12 +29,12 @@ class SessionCostEstimatorTest {
     private static final Instant NOW = Instant.parse("2026-10-16T12:00:00Z");
 
     private final WalletFunding funding = mock(WalletFunding.class);
-    private final SessionRepository sessions = mock(SessionRepository.class);
+    private final SessionTelemetry sessions = mock(SessionTelemetry.class);
 
     private SessionCostEstimator estimator(Long price) {
         when(funding.reserved(any())).thenReturn(new Money(5000, "XAF", 0));
         SessionSettings settings = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
-                Duration.ofSeconds(30), price, 95);
+                Duration.ofSeconds(30), price, 95, Duration.ofSeconds(90), Duration.ZERO, Duration.ZERO);
         return new SessionCostEstimator(funding, new SessionTariff(sessions, settings),
                 new FeeCalculator(new FeeSettings(null, null)));
     }

@@ -1,10 +1,12 @@
 package com.evcharge.customer.account.web;
 
+import com.evcharge.customer.account.application.AccountCountries;
 import com.evcharge.customer.account.application.LoginService;
 import com.evcharge.customer.account.application.RegisterCommand;
 import com.evcharge.customer.account.application.RegistrationService;
 import com.evcharge.customer.account.application.RefreshSessionService;
 import com.evcharge.customer.account.application.VerificationService;
+import com.evcharge.customer.shared.TenantContext;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -21,47 +23,55 @@ class AuthController {
     private final VerificationService verification;
     private final LoginService login;
     private final RefreshSessionService sessions;
+    private final AccountCountries countries;
 
     AuthController(RegistrationService registration, VerificationService verification,
-                   LoginService login, RefreshSessionService sessions) {
+                   LoginService login, RefreshSessionService sessions, AccountCountries countries) {
         this.registration = registration;
         this.verification = verification;
         this.login = login;
         this.sessions = sessions;
+        this.countries = countries;
     }
 
     @PostMapping("/register")
     @ResponseStatus(HttpStatus.CREATED)
     RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
-        return new RegisterResponse(registration.register(new RegisterCommand(request.firstName(),
-                request.lastName(), request.email(), request.phone(), request.password())));
+        return TenantContext.callAs(countries.forRegistration(request.email(), request.phone()),
+                () -> new RegisterResponse(registration.register(new RegisterCommand(request.firstName(),
+                        request.lastName(), request.email(), request.phone(), request.password()))));
     }
 
     @PostMapping("/verify")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void verify(@Valid @RequestBody VerifyRequest request) {
-        verification.verify(request.channel(), request.target(), request.code());
+        TenantContext.runAs(countries.forTarget(request.channel(), request.target()),
+                () -> verification.verify(request.channel(), request.target(), request.code()));
     }
 
     @PostMapping("/verify/resend")
     @ResponseStatus(HttpStatus.ACCEPTED)
     void resend(@Valid @RequestBody ResendRequest request) {
-        verification.resend(request.channel(), request.target());
+        TenantContext.runAs(countries.forTarget(request.channel(), request.target()),
+                () -> verification.resend(request.channel(), request.target()));
     }
 
     @PostMapping("/login")
     TokensResponse login(@Valid @RequestBody LoginRequest request) {
-        return TokensResponse.from(login.login(request.identifier(), request.password()));
+        return TenantContext.callAs(countries.forIdentifier(request.identifier()),
+                () -> TokensResponse.from(login.login(request.identifier(), request.password())));
     }
 
     @PostMapping("/refresh")
     TokensResponse refresh(@Valid @RequestBody RefreshRequest request) {
-        return TokensResponse.from(sessions.refresh(request.refreshToken()));
+        return TenantContext.callAs(countries.forRefreshToken(request.refreshToken()),
+                () -> TokensResponse.from(sessions.refresh(request.refreshToken())));
     }
 
     @PostMapping("/logout")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void logout(@Valid @RequestBody RefreshRequest request) {
-        sessions.logout(request.refreshToken());
+        TenantContext.runAs(countries.forRefreshToken(request.refreshToken()),
+                () -> sessions.logout(request.refreshToken()));
     }
 }

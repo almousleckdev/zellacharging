@@ -9,12 +9,8 @@ import java.util.UUID;
 public interface RefreshTokenRepository {
 
     void save(RefreshToken token);
-
     Optional<RefreshToken> findByHash(String tokenHash);
-
     boolean markUsed(UUID id, Instant at);
-
     void revokeFamily(UUID familyId, Instant at);
-
     void revokeAllOf(UUID customerId, Instant at);
 }

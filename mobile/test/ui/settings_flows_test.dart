@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/profile/presentation/change_password_page.dart';
-import 'package:ndzela/features/profile/presentation/delete_account_page.dart';
-import 'package:ndzela/features/profile/presentation/notifications_controller.dart';
-import 'package:ndzela/features/profile/presentation/settings_page.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/profile/presentation/change_password_page.dart';
+import 'package:zella/features/profile/presentation/delete_account_page.dart';
+import 'package:zella/features/profile/presentation/notifications_controller.dart';
+import 'package:zella/features/profile/presentation/settings_page.dart';
 
 import 'screens.dart';
 import 'test_app.dart';

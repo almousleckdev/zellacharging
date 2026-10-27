@@ -7,6 +7,5 @@ import java.util.List;
 import java.util.UUID;
 
 public interface CouponRepository {
-
     List<Coupon> findActive(UUID customerId, Instant now);
 }

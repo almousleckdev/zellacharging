@@ -1,9 +1,9 @@
 package com.evcharge.customer;
 
+import org.flywaydb.core.Flyway;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.jdbc.core.JdbcTemplate;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -11,12 +11,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 class ApplicationBootTest extends PostgresTestBase {
 
     @Autowired
-    JdbcTemplate jdbc;
+    Flyway flyway;
 
     @Test
     void flywayAppliedAllMigrations() {
-        Integer applied = jdbc.queryForObject(
-                "select count(*) from flyway_schema_history where success", Integer.class);
-        assertThat(applied).isEqualTo(8);
+        assertThat(flyway.info().applied()).hasSize(12);
+        assertThat(flyway.info().pending()).isEmpty();
     }
 }

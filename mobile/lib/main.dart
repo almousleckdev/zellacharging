@@ -11,5 +11,5 @@ Future<void> main() async {
   AppLanguage.current = AppLanguage.fromCode(
     await SecurePreferenceStore().read(LanguageController.storageKey),
   );
-  runApp(const ProviderScope(child: NdzelaApp()));
+  runApp(const ProviderScope(child: ZellaApp()));
 }

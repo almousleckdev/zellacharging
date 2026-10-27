@@ -16,10 +16,6 @@ record OcppStationPayload(
         BigDecimal longitude,
         List<OcppConnectorPayload> connectors) {
 
-    @JsonIgnoreProperties(ignoreUnknown = true)
-    record OcppConnectorPayload(int connectorId, String status, String connectorType, BigDecimal maxPowerKw) {
-    }
-
     Station toDomain() {
         List<StationConnector> mapped = connectors == null ? List.of() : connectors.stream()
                 .map(c -> new StationConnector(c.connectorId(), c.status(), c.connectorType(), c.maxPowerKw()))

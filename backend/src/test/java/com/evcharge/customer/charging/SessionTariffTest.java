@@ -2,7 +2,7 @@ package com.evcharge.customer.charging;
 
 import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.charging.application.SessionTariff;
-import com.evcharge.customer.charging.application.port.SessionRepository;
+import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import org.junit.jupiter.api.Test;
 
 import java.time.Duration;
@@ -15,12 +15,12 @@ import static org.mockito.Mockito.when;
 
 class SessionTariffTest {
 
-    private final SessionRepository sessions = mock(SessionRepository.class);
+    private final SessionTelemetry sessions = mock(SessionTelemetry.class);
     private final UUID session = UUID.randomUUID();
 
     private SessionTariff tariff(Long configured) {
         return new SessionTariff(sessions, new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
-                Duration.ofSeconds(30), configured, 95));
+                Duration.ofSeconds(30), configured, 95, Duration.ofSeconds(90), Duration.ZERO, Duration.ZERO));
     }
 
     @Test

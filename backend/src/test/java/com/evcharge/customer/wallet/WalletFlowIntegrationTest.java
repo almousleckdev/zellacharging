@@ -1,5 +1,6 @@
 package com.evcharge.customer.wallet;
 
+import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.FakeOcppServer;
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.charging.application.SessionSweeper;
@@ -19,7 +20,6 @@ import java.time.Instant;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -33,14 +33,15 @@ class WalletFlowIntegrationTest extends PostgresTestBase {
             .route("POST", "/api/v1/id-tags", 201, "{\"idTag\":\"x\"}")
             .route("POST", "/api/v1/charge-points/CP-W/connectors/1/start", 200, "{\"status\":\"PENDING\"}")
             .route("POST", "/api/v1/charge-points/CP-W/connectors/1/stop", 200, "{\"status\":\"PENDING\"}")
-            .route("GET", "/api/v1/sessions", 200, "{\"items\":[]}");
+            .route("GET", "/api/v1/sessions", 200, "{\"items\":[]}")
+            .station("CP-W").station("CP-R");
 
     private static final String START = "{\"stationId\":\"CP-W\",\"connectorId\":1,\"amountMinor\":2000}";
     private static final String TOPUP = "{\"amountMinor\":5000,\"msisdn\":\"+24177123456\",\"operator\":\"AIRTEL\"}";
 
     @DynamicPropertySource
     static void ocpp(DynamicPropertyRegistry registry) {
-        registry.add("ndzela.ocpp.base-url", OCPP::baseUrl);
+        registry.add("zella.ocpp.base-url", OCPP::baseUrl);
     }
 
     @AfterAll
@@ -65,13 +66,15 @@ class WalletFlowIntegrationTest extends PostgresTestBase {
     }
 
     private ResultActions postAs(UUID customer, String path, String body, String key) throws Exception {
-        var request = post(path).with(jwt().jwt(j -> j.subject(customer.toString())))
+        var request = post(path).with(TestTenants.customer(customer))
                 .contentType(MediaType.APPLICATION_JSON).content(body);
-        return mvc.perform(key == null ? request : request.header("Idempotency-Key", key));
+        boolean topUp = path.equals("/v1/wallet/topups");
+        String effective = key == null && topUp ? UUID.randomUUID().toString() : key;
+        return mvc.perform(effective == null ? request : request.header("Idempotency-Key", effective));
     }
 
     private ResultActions getAs(UUID customer, String path) throws Exception {
-        return mvc.perform(get(path).with(jwt().jwt(j -> j.subject(customer.toString()))));
+        return mvc.perform(get(path).with(TestTenants.customer(customer)));
     }
 
     @Test
@@ -133,7 +136,8 @@ class WalletFlowIntegrationTest extends PostgresTestBase {
                 sessionId)).isEqualTo("SETTLED");
         sweeper.sweep();
         getAs(customer, "/v1/wallet").andExpect(jsonPath("$.balanceMinor").value(4700));
-        OCPP.route("GET", "/api/v1/sessions", 200, "{\"items\":[]}");
+        OCPP.route("GET", "/api/v1/sessions", 200, "{\"items\":[]}")
+            .station("CP-W").station("CP-R");
     }
 
     @Test

@@ -32,33 +32,6 @@ record SessionResponse(
         FeesResponse fees,
         EstimatedCostResponse estimatedCost) {
 
-    record MeteringResponse(BigDecimal totalKwh, BigDecimal powerKw, BigDecimal stateOfChargePercent,
-                            Long durationSeconds, BigDecimal voltage, BigDecimal currentAmpere,
-                            Instant sampledAt) {
-
-        static MeteringResponse from(Metering metering) {
-            return metering == null ? null : new MeteringResponse(metering.totalKwh(), metering.powerKw(),
-                    metering.stateOfChargePercent(), metering.durationSeconds(), metering.voltage(),
-                    metering.currentAmpere(), metering.sampledAt());
-        }
-    }
-
-    record EstimatedCostResponse(long minor, String currency, int decimals) {
-
-        static EstimatedCostResponse from(Optional<Money> estimate) {
-            return estimate.map(m -> new EstimatedCostResponse(m.minor(), m.currency(), m.decimals())).orElse(null);
-        }
-    }
-
-    record FeesResponse(long electricMinor, long vatMinor, long serviceMinor, long totalMinor, String currency,
-                        int decimals) {
-
-        static FeesResponse from(ChargingSession s, Optional<FeeBreakdown> fees) {
-            return fees.map(f -> new FeesResponse(f.electricMinor(), f.vatMinor(), f.serviceMinor(), f.totalMinor(),
-                    s.currency(), s.currencyDecimals() == null ? 0 : s.currencyDecimals())).orElse(null);
-        }
-    }
-
     static SessionResponse from(ChargingSession s, Metering metering, LastReading last, Optional<Money> estimate,
                                 Optional<FeeBreakdown> fees) {
         return new SessionResponse(s.id(), s.stationId(), s.connectorId(), s.state().name(), s.failureCode(),

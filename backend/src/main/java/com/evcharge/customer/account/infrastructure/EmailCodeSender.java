@@ -25,8 +25,8 @@ class EmailCodeSender {
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(settings.mailFrom());
         message.setTo(address);
-        message.setSubject("Ndzela - verification code");
-        message.setText("Your Ndzela verification code is " + code + ". It expires in "
+        message.setSubject("Zella Charging - verification code");
+        message.setText("Your Zella Charging verification code is " + code + ". It expires in "
                 + settings.verification().codeTtl().toMinutes() + " minutes.");
         try {
             mail.send(message);

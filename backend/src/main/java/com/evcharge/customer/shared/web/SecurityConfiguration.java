@@ -1,0 +1,40 @@
+package com.evcharge.customer.shared.web;
+
+import com.evcharge.customer.shared.CountryDirectory;
+import com.evcharge.customer.shared.RateLimiter;
+import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
+import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.servlet.HandlerExceptionResolver;
+
+@Configuration
+@EnableConfigurationProperties(RateLimitSettings.class)
+class SecurityConfiguration {
+
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityProblemHandler problems,
+                                            CountryDirectory countries, RateLimiter limiter,
+                                            @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,
+                                            RateLimitSettings rateLimits) throws Exception {
+        return http
+                .csrf(csrf -> csrf.disable())
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
+                .authorizeHttpRequests(auth -> auth
+                        .requestMatchers("/v1/auth/**", "/v1/payments/callback").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
+                        .anyRequest().authenticated())
+                .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> { }).authenticationEntryPoint(problems)
+                        .accessDeniedHandler(problems))
+                .addFilterAfter(new TenantFilter(countries, problems), BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(new RateLimitFilter(limiter, resolver, rateLimits), TenantFilter.class)
+                .exceptionHandling(errors -> errors.authenticationEntryPoint(problems)
+                        .accessDeniedHandler(problems))
+                .build();
+    }
+}

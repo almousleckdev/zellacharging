@@ -1,6 +1,13 @@
+import 'charging_error_text.dart';
 import 'app_language.dart';
 
 abstract final class ErrorText {
+  static String withReference(String message, String? reference) {
+    if (reference == null || reference.isEmpty) return message;
+    final short = reference.length > 8 ? reference.substring(0, 8) : reference;
+    return '$message (${AppLanguage.pick(fr: 'réf.', en: 'ref.')} $short)';
+  }
+
   static Map<String, String> get byCode => {
     'INVALID_CREDENTIALS': AppLanguage.pick(
       fr: 'E-mail, téléphone ou mot de passe incorrect.',
@@ -38,61 +45,25 @@ abstract final class ErrorText {
       fr: 'Ce QR code n’est pas reconnu ou a expiré.',
       en: 'This QR code is not recognised or has expired.',
     ),
-    'STATION_NOT_FOUND': AppLanguage.pick(
-      fr: 'Cette station est introuvable.',
-      en: 'This station could not be found.',
+    'TOO_MANY_REQUESTS': AppLanguage.pick(
+      fr: 'Trop de requêtes. Réessayez dans un instant.',
+      en: 'Too many requests. Try again in a moment.',
     ),
-    'CATALOG_UNAVAILABLE': AppLanguage.pick(
-      fr: 'Le réseau de recharge est momentanément indisponible.',
-      en: 'The charging network is temporarily unavailable.',
+    'SERVICE_UNAVAILABLE': AppLanguage.pick(
+      fr: 'Le service est momentanément indisponible. Réessayez plus tard.',
+      en: 'The service is temporarily unavailable. Try again later.',
     ),
-    'CONNECTOR_OR_SESSION_BUSY': AppLanguage.pick(
-      fr: 'Une recharge est déjà en cours pour vous ou sur ce connecteur.',
-      en: 'A charge is already in progress for you or on this connector.',
+    'INTERNAL_ERROR': AppLanguage.pick(
+      fr: 'Une erreur inattendue est survenue. Réessayez ou contactez le support.',
+      en: 'An unexpected error occurred. Try again or contact support.',
     ),
-    'SESSION_NOT_ACTIVE': AppLanguage.pick(
-      fr: 'Aucune recharge en cours à arrêter.',
-      en: 'There is no active charge to stop.',
+    'UNSUPPORTED_COUNTRY': AppLanguage.pick(
+      fr: 'Ce pays n’est pas encore pris en charge.',
+      en: 'This country is not supported yet.',
     ),
-    'SESSION_NOT_FOUND': AppLanguage.pick(
-      fr: 'Cette recharge est introuvable.',
-      en: 'This charge could not be found.',
-    ),
-    'SESSION_STILL_ACTIVE': AppLanguage.pick(
-      fr: 'Une recharge en cours ne peut pas être supprimée.',
-      en: 'A charge in progress cannot be deleted.',
-    ),
-    'STOP_REFUSED': AppLanguage.pick(
-      fr: 'La borne a refusé l’arrêt. Veuillez réessayer.',
-      en: 'The charger refused to stop. Please try again.',
-    ),
-    'CHARGING_UNAVAILABLE': AppLanguage.pick(
-      fr: 'Le réseau de recharge est momentanément indisponible.',
-      en: 'The charging network is temporarily unavailable.',
-    ),
-    'ID_TAG_UNAVAILABLE': AppLanguage.pick(
-      fr: 'Impossible de préparer votre identité de recharge. Réessayez.',
-      en: 'Could not prepare your charging identity. Try again.',
-    ),
-    'TARIFF_NOT_CONFIGURED': AppLanguage.pick(
-      fr: 'Les tarifs ne sont pas encore configurés pour cette station.',
-      en: 'Pricing is not configured for this station yet.',
-    ),
-    'CHARGER_REFUSED': AppLanguage.pick(
-      fr: 'La borne a refusé de démarrer. Essayez un autre connecteur.',
-      en: 'The charger refused to start. Try another connector.',
-    ),
-    'CHARGER_TIMEOUT': AppLanguage.pick(
-      fr: 'La borne n’a pas répondu à temps. Réessayez.',
-      en: 'The charger did not answer in time. Try again.',
-    ),
-    'CHARGER_UNREACHABLE': AppLanguage.pick(
-      fr: 'La borne est hors ligne.',
-      en: 'The charger is offline.',
-    ),
-    'PAYMENT_NOT_COMPLETED': AppLanguage.pick(
-      fr: 'Le paiement n’a pas abouti. Rien n’a été débité.',
-      en: 'The payment was not completed. Nothing was charged.',
+    'UNAUTHENTICATED': AppLanguage.pick(
+      fr: 'Votre session a expiré. Veuillez vous reconnecter.',
+      en: 'Your session has expired. Please sign in again.',
     ),
     'INSUFFICIENT_FUNDS': AppLanguage.pick(
       fr: 'Créditez votre portefeuille pour démarrer la recharge.',
@@ -126,5 +97,6 @@ abstract final class ErrorText {
       fr: 'Vérifiez les champs signalés.',
       en: 'Please check the highlighted fields.',
     ),
+    ...ChargingErrorText.byCode,
   };
 }

@@ -2,6 +2,7 @@ package com.evcharge.customer.wallet.infrastructure;
 
 import com.evcharge.customer.shared.Timestamps;
 import com.evcharge.customer.wallet.application.port.LedgerRepository;
+import com.evcharge.customer.wallet.domain.LedgerDiscrepancy;
 import com.evcharge.customer.wallet.domain.LedgerEntry;
 import com.evcharge.customer.wallet.domain.LedgerType;
 import org.springframework.jdbc.core.RowMapper;
@@ -35,6 +36,29 @@ class JdbcLedgerRepository implements LedgerRepository {
                 .param("amount", entry.amountMinor()).param("session", entry.sessionId())
                 .param("topup", entry.topupId()).param("key", entry.idempotencyKey())
                 .param("at", Timestamps.toDb(entry.createdAt())).update() == 1;
+    }
+
+    @Override
+    public List<LedgerDiscrepancy> discrepancies() {
+        return jdbc.sql("""
+                select w.customer_id, w.balance_minor, w.reserved_minor,
+                    coalesce(sum(case l.type when 'TOPUP' then l.amount_minor
+                        when 'WITHDRAWAL_REVERSAL' then l.amount_minor when 'CAPTURE' then -l.amount_minor
+                        when 'WITHDRAWAL' then -l.amount_minor else 0 end), 0) as expected_balance,
+                    coalesce(sum(case l.type when 'RESERVE' then l.amount_minor
+                        when 'RELEASE' then -l.amount_minor when 'CAPTURE' then -l.amount_minor else 0 end), 0)
+                        as expected_reserved
+                from wallet w left join ledger_entry l on l.customer_id = w.customer_id
+                group by w.customer_id, w.balance_minor, w.reserved_minor
+                having w.balance_minor <> coalesce(sum(case l.type when 'TOPUP' then l.amount_minor
+                        when 'WITHDRAWAL_REVERSAL' then l.amount_minor when 'CAPTURE' then -l.amount_minor
+                        when 'WITHDRAWAL' then -l.amount_minor else 0 end), 0)
+                    or w.reserved_minor <> coalesce(sum(case l.type when 'RESERVE' then l.amount_minor
+                        when 'RELEASE' then -l.amount_minor when 'CAPTURE' then -l.amount_minor else 0 end), 0)
+                """)
+                .query((rs, rowNum) -> new LedgerDiscrepancy(rs.getObject("customer_id", UUID.class),
+                        rs.getLong("balance_minor"), rs.getLong("expected_balance"), rs.getLong("reserved_minor"),
+                        rs.getLong("expected_reserved"))).list();
     }
 
     @Override

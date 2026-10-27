@@ -7,10 +7,7 @@ import java.util.List;
 import java.util.Optional;
 
 public interface StationDirectory {
-
     List<Station> list(Double latitude, Double longitude, Double radiusKm);
-
     Optional<Station> find(String stationId);
-
     Optional<ConnectorRef> resolveQr(String token);
 }

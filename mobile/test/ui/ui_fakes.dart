@@ -1,34 +1,35 @@
 import 'dart:convert';
 import 'dart:typed_data';
 
-import 'package:ndzela/core/links/link_launcher.dart';
-import 'package:ndzela/core/location/coordinates.dart';
-import 'package:ndzela/core/media/photo_picker.dart';
-import 'package:ndzela/core/media/photo_source.dart';
-import 'package:ndzela/core/media/picked_photo.dart';
-import 'package:ndzela/core/network/api_error.dart';
-import 'package:ndzela/core/session/session_controller.dart';
-import 'package:ndzela/core/storage/preference_store.dart';
-import 'package:ndzela/features/coupons/domain/coupon.dart';
-import 'package:ndzela/features/coupons/domain/coupon_repository.dart';
-import 'package:ndzela/features/support/domain/support_info.dart';
-import 'package:ndzela/features/support/domain/support_repository.dart';
-import 'package:ndzela/core/location/location_service.dart';
-import 'package:ndzela/features/charging/domain/charging_session.dart';
-import 'package:ndzela/features/charging/domain/metering.dart';
-import 'package:ndzela/features/charging/domain/session_fees.dart';
-import 'package:ndzela/features/charging/domain/session_repository.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/profile/domain/profile.dart';
-import 'package:ndzela/features/profile/domain/profile_repository.dart';
-import 'package:ndzela/features/stations/domain/resolved_connector.dart';
-import 'package:ndzela/features/stations/domain/station.dart';
-import 'package:ndzela/features/stations/domain/station_connector.dart';
-import 'package:ndzela/features/stations/domain/station_repository.dart';
-import 'package:ndzela/features/wallet/domain/mobile_operator.dart';
-import 'package:ndzela/features/wallet/domain/topup_result.dart';
-import 'package:ndzela/features/wallet/domain/wallet.dart';
-import 'package:ndzela/features/wallet/domain/wallet_repository.dart';
+import 'package:zella/core/links/link_launcher.dart';
+import 'package:zella/core/location/coordinates.dart';
+import 'package:zella/core/media/photo_picker.dart';
+import 'package:zella/core/media/photo_source.dart';
+import 'package:zella/core/media/picked_photo.dart';
+import 'package:zella/core/network/api_error.dart';
+import 'package:zella/core/session/session_controller.dart';
+import 'package:zella/core/storage/preference_store.dart';
+import 'package:zella/features/coupons/domain/coupon.dart';
+import 'package:zella/features/coupons/domain/coupon_repository.dart';
+import 'package:zella/features/support/domain/support_info.dart';
+import 'package:zella/features/support/domain/support_repository.dart';
+import 'package:zella/core/location/location_service.dart';
+import 'package:zella/features/charging/domain/charging_session.dart';
+import 'package:zella/features/charging/domain/metering.dart';
+import 'package:zella/features/charging/domain/session_fees.dart';
+import 'package:zella/features/charging/domain/session_quote.dart';
+import 'package:zella/features/charging/domain/session_repository.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/profile/domain/profile.dart';
+import 'package:zella/features/profile/domain/profile_repository.dart';
+import 'package:zella/features/stations/domain/resolved_connector.dart';
+import 'package:zella/features/stations/domain/station.dart';
+import 'package:zella/features/stations/domain/station_connector.dart';
+import 'package:zella/features/stations/domain/station_repository.dart';
+import 'package:zella/features/wallet/domain/mobile_operator.dart';
+import 'package:zella/features/wallet/domain/topup_result.dart';
+import 'package:zella/features/wallet/domain/wallet.dart';
+import 'package:zella/features/wallet/domain/wallet_repository.dart';
 
 const connectors = [
   StationConnector(
@@ -112,7 +113,26 @@ class FakeSessions implements SessionRepository {
   Future<void> delete(String sessionId) async => deleted.add(sessionId);
 
   @override
-  Future<ChargingSession> start(String s, int c, int a) async => session(state);
+  Future<ChargingSession> start(
+    String s,
+    int c,
+    int a, {
+    required String idempotencyKey,
+  }) async => session(state);
+
+  @override
+  Future<SessionQuote> quote(String s, int c, int a) async => SessionQuote(
+    amountMinor: a,
+    currency: 'XAF',
+    decimals: 0,
+    availableMinor: 984567,
+    shortfallMinor: a > 984567 ? a - 984567 : 0,
+    minimumMinor: 1000,
+    maximumMinor: 200000,
+    vatPercent: 0,
+    serviceFeePercent: 0,
+    estimatedEnergyKwh: 13.3,
+  );
 
   @override
   Future<ChargingSession> stop(String id) async => session(state);

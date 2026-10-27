@@ -1,9 +1,9 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/coupons/presentation/coupons_page.dart';
-import 'package:ndzela/features/support/domain/support_info.dart';
-import 'package:ndzela/features/support/presentation/contact_page.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/coupons/presentation/coupons_page.dart';
+import 'package:zella/features/support/domain/support_info.dart';
+import 'package:zella/features/support/presentation/contact_page.dart';
 
 import 'screens.dart';
 import 'test_app.dart';
@@ -21,7 +21,7 @@ void main() {
       overrides: overrides(SessionState.active, null, null, links),
     );
 
-    await tester.tap(find.text('support@ndzela.example'));
+    await tester.tap(find.text('support@zella.example'));
     await settle(tester);
     await tester.tap(find.text('+24177000000'));
     await settle(tester);
@@ -29,7 +29,7 @@ void main() {
     await settle(tester);
 
     expect(links.opened.map((link) => link.toString()), [
-      'mailto:support@ndzela.example',
+      'mailto:support@zella.example',
       'tel:+24177000000',
       'https://wa.me/24177000001',
     ]);

@@ -7,6 +7,7 @@ abstract final class StationMapper {
         connectorId: json['connectorId'] as int,
         status: json['status'] as String? ?? 'Unknown',
         available: json['available'] as bool? ?? false,
+        startable: json['startable'] as bool?,
         connectorType: json['connectorType'] as String?,
         maxPowerKw: (json['maxPowerKw'] as num?)?.toDouble(),
       );

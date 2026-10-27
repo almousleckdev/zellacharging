@@ -5,6 +5,8 @@ import com.evcharge.customer.charging.domain.CommandOutcome;
 import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.RemoteSession;
 import com.evcharge.customer.shared.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -19,7 +21,9 @@ import java.util.Optional;
 @Component
 class OcppChargingGateway implements ChargingGateway {
 
+    private static final Logger log = LoggerFactory.getLogger(OcppChargingGateway.class);
     private static final String IDEMPOTENCY_HEADER = "Idempotency-Key";
+    private static final int ACTIVE_PAGE_SIZE = 100;
 
     private final RestClient client;
 
@@ -60,6 +64,27 @@ class OcppChargingGateway implements ChargingGateway {
     }
 
     @Override
+    public List<RemoteSession> activeSessions() {
+        OcppSessionPage page = call(() -> client.get()
+                .uri(uri -> uri.path("/api/v1/sessions").queryParam("status", "ACTIVE")
+                        .queryParam("size", ACTIVE_PAGE_SIZE).build())
+                .retrieve().body(OcppSessionPage.class));
+        return page == null || page.items() == null ? List.of()
+                : page.items().stream().map(OcppSessionPayload::toDomain).toList();
+    }
+
+    @Override
+    public Optional<RemoteSession> session(int transactionId) {
+        try {
+            OcppSessionPayload payload = call(() -> client.get().uri("/api/v1/sessions/{id}", transactionId)
+                    .retrieve().body(OcppSessionPayload.class));
+            return Optional.ofNullable(payload).map(OcppSessionPayload::toDomain);
+        } catch (HttpClientErrorException.NotFound e) {
+            return Optional.empty();
+        }
+    }
+
+    @Override
     public Optional<Metering> metering(int transactionId) {
         try {
             OcppMeteringPayload payload = call(() -> client.get()
@@ -95,6 +120,7 @@ class OcppChargingGateway implements ChargingGateway {
         } catch (HttpClientErrorException.NotFound e) {
             throw e;
         } catch (RestClientException e) {
+            log.warn("Charging platform call failed: {}", e.getMessage());
             throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "CHARGING_UNAVAILABLE",
                     "Charging network is temporarily unavailable");
         }

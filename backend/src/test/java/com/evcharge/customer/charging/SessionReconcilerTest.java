@@ -3,12 +3,14 @@ package com.evcharge.customer.charging;
 import com.evcharge.customer.charging.application.FeeCalculator;
 import com.evcharge.customer.charging.application.FeeSettings;
 import com.evcharge.customer.charging.application.SessionCostEstimator;
+import com.evcharge.customer.charging.application.RemoteSessionLookup;
 import com.evcharge.customer.charging.application.SessionReconciler;
 import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.charging.application.SessionSettlement;
 import com.evcharge.customer.charging.application.SessionTariff;
 import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionRepository;
+import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.RemoteSession;
 import com.evcharge.customer.charging.domain.SessionState;
@@ -36,15 +38,17 @@ class SessionReconcilerTest {
 
     private final ChargingGateway gateway = mock(ChargingGateway.class);
     private final SessionRepository sessions = mock(SessionRepository.class);
+    private final SessionTelemetry telemetry = mock(SessionTelemetry.class);
     private final SessionSettlement settlement = mock(SessionSettlement.class);
     private final WalletFunding funding = mock(WalletFunding.class);
 
     private SessionReconciler reconciler(Long price) {
         when(funding.reserved(any())).thenReturn(new Money(5000, "XAF", 0));
         SessionSettings settings = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
-                Duration.ofSeconds(30), price, 95);
-        return new SessionReconciler(gateway, sessions, settings, settlement,
-                new SessionCostEstimator(funding, new SessionTariff(sessions, settings),
+                Duration.ofSeconds(30), price, 95, Duration.ofSeconds(90), Duration.ZERO, Duration.ZERO);
+        return new SessionReconciler(new RemoteSessionLookup(gateway, settings, Clock.fixed(NOW, ZoneOffset.UTC)),
+                sessions, telemetry, settings, settlement,
+                new SessionCostEstimator(funding, new SessionTariff(telemetry, settings),
                         new FeeCalculator(new FeeSettings(null, null))),
                 Clock.fixed(NOW, ZoneOffset.UTC));
     }
@@ -62,7 +66,7 @@ class SessionReconcilerTest {
     private void platformReports(Long costMinor, Long platformPrice) {
         RemoteSession done = new RemoteSession(7, "CP-1", 1, "COMPLETED", NOW.minusSeconds(600), NOW,
                 new BigDecimal("2.5"), costMinor, costMinor == null ? null : "XAF", costMinor == null ? null : 0,
-                "Remote", platformPrice);
+                "Remote", platformPrice, "Z-X");
         when(gateway.sessionsOf("Z-X")).thenReturn(List.of(done));
     }
 
@@ -100,6 +104,6 @@ class SessionReconcilerTest {
 
         reconciler(150L).reconcile(live);
 
-        verify(sessions).recordPrice(live.id(), 350L);
+        verify(telemetry).recordPrice(live.id(), 350L);
     }
 }

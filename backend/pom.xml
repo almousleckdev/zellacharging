@@ -12,9 +12,9 @@
     </parent>
 
     <groupId>com.evcharge</groupId>
-    <artifactId>ndzela-backend</artifactId>
+    <artifactId>backend</artifactId>
     <version>0.1.0</version>
-    <name>ndzela-backend</name>
+    <name>zella-backend</name>
 
     <properties>
         <!-- Java 21 for virtual threads. Thousands of mostly-idle WebSocket

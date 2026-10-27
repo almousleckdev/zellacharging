@@ -21,7 +21,8 @@ class JdbcRefreshTokenRepository implements RefreshTokenRepository {
             rs.getString("token_hash"),
             Timestamps.read(rs, "expires_at"),
             Timestamps.read(rs, "used_at"),
-            Timestamps.read(rs, "revoked_at"));
+            Timestamps.read(rs, "revoked_at")
+    );
 
     private final JdbcClient jdbc;
 

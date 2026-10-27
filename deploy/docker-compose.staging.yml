@@ -3,13 +3,13 @@ services:
     image: postgres:16
     restart: unless-stopped
     environment:
-      POSTGRES_DB: ndzela
-      POSTGRES_USER: ndzela
+      POSTGRES_DB: zella
+      POSTGRES_USER: zella
       POSTGRES_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD is required}
     volumes:
-      - ndzela-pg:/var/lib/postgresql/data
+      - zella-pg:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U ndzela"]
+      test: ["CMD-SHELL", "pg_isready -U zella"]
       interval: 5s
       timeout: 3s
       retries: 10
@@ -28,18 +28,21 @@ services:
       postgres:
         condition: service_healthy
     environment:
-      DB_URL: jdbc:postgresql://postgres:5432/ndzela
-      DB_USER: ndzela
+      DB_URL: jdbc:postgresql://postgres:5432/zella
+      DB_USER: zella
       DB_PASSWORD: ${DB_PASSWORD}
       MAIL_HOST: maildev
       MAIL_PORT: 1025
-      NDZELA_JWT_SECRET: ${NDZELA_JWT_SECRET:?NDZELA_JWT_SECRET is required}
-      NDZELA_CODE_PEPPER: ${NDZELA_CODE_PEPPER:?NDZELA_CODE_PEPPER is required}
-      NDZELA_OCPP_BASE_URL: ${NDZELA_OCPP_BASE_URL:?NDZELA_OCPP_BASE_URL is required}
-      NDZELA_OCPP_API_KEY: ${NDZELA_OCPP_API_KEY:?NDZELA_OCPP_API_KEY is required}
-      NDZELA_WALLET_CURRENCY: ${NDZELA_WALLET_CURRENCY:-XAF}
-      NDZELA_PRICE_PER_KWH: ${NDZELA_PRICE_PER_KWH:-}
-      NDZELA_PAYMENT_PROVIDER: sandbox
+      ZELLA_JWT_SECRET: ${ZELLA_JWT_SECRET:?ZELLA_JWT_SECRET is required}
+      ZELLA_CODE_PEPPER: ${ZELLA_CODE_PEPPER:?ZELLA_CODE_PEPPER is required}
+      ZELLA_OCPP_BASE_URL: ${ZELLA_OCPP_BASE_URL:?ZELLA_OCPP_BASE_URL is required}
+      ZELLA_OCPP_API_KEY: ${ZELLA_OCPP_API_KEY:?ZELLA_OCPP_API_KEY is required}
+      ZELLA_OCPP_SIGNING_SECRET: ${ZELLA_OCPP_SIGNING_SECRET:-}
+      ZELLA_OCPP_REQUIRE_SECURE_CHANNEL: ${ZELLA_OCPP_REQUIRE_SECURE_CHANNEL:-false}
+      ZELLA_PAYMENT_ALLOW_SANDBOX: ${ZELLA_PAYMENT_ALLOW_SANDBOX:-true}
+      ZELLA_WALLET_CURRENCY: ${ZELLA_WALLET_CURRENCY:-XAF}
+      ZELLA_PRICE_PER_KWH: ${ZELLA_PRICE_PER_KWH:-}
+      ZELLA_PAYMENT_PROVIDER: sandbox
       SERVER_FORWARD_HEADERS_STRATEGY: framework
 
   caddy:
@@ -57,5 +60,5 @@ services:
       - caddy-data:/data
 
 volumes:
-  ndzela-pg:
+  zella-pg:
   caddy-data:

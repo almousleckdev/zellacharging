@@ -44,4 +44,11 @@ abstract final class WalletText {
   );
 
   static const topUpAmounts = [1000, 2000, 5000, 10000, 20000];
+
+  static const minimumTopupMinor = 500;
+
+  static String get invalidTopupAmount => AppLanguage.pick(
+    fr: 'Saisissez un montant d\'au moins 500',
+    en: 'Enter an amount of at least 500',
+  );
 }

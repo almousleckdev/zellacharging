@@ -4,8 +4,6 @@ import java.time.Duration;
 import java.util.UUID;
 
 public interface AccessTokenIssuer {
-
-    String issue(UUID customerId);
-
+    String issue(UUID customerId, String country);
     Duration timeToLive();
 }

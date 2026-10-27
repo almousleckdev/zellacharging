@@ -4,7 +4,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 
 import java.math.BigDecimal;
 
-@ConfigurationProperties("ndzela.fees")
+@ConfigurationProperties("zella.fees")
 public record FeeSettings(BigDecimal vatPercent, BigDecimal serviceFeePercent) {
 
     public FeeSettings {

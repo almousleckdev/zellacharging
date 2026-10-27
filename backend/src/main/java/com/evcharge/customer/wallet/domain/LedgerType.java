@@ -4,5 +4,7 @@ public enum LedgerType {
     TOPUP,
     RESERVE,
     RELEASE,
-    CAPTURE
+    CAPTURE,
+    WITHDRAWAL,
+    WITHDRAWAL_REVERSAL
 }

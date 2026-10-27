@@ -10,6 +10,7 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -20,7 +21,7 @@ class JdbcTopupRepository implements TopupRepository {
             rs.getObject("id", UUID.class), rs.getObject("customer_id", UUID.class),
             MobileOperator.valueOf(rs.getString("operator")), rs.getString("msisdn"),
             rs.getLong("amount_minor"), TopupState.valueOf(rs.getString("state")),
-            rs.getString("provider_ref"), rs.getString("failure_code"), rs.getString("idempotency_key"),
+            rs.getString("provider_ref"), rs.getString("failure_code"), rs.getString("idempotency_key"), rs.getString("reference"),
             Timestamps.read(rs, "created_at"), Timestamps.read(rs, "updated_at"));
 
     private final JdbcClient jdbc;
@@ -32,12 +33,12 @@ class JdbcTopupRepository implements TopupRepository {
     @Override
     public Optional<Topup> insertIfNew(Topup topup) {
         int inserted = jdbc.sql("insert into topup (id, customer_id, operator, msisdn, amount_minor, state, "
-                        + "idempotency_key, created_at, updated_at) values (:id, :customer, :operator, :msisdn, "
-                        + ":amount, :state, :key, :created, :updated) on conflict do nothing")
+                        + "idempotency_key, reference, created_at, updated_at) values (:id, :customer, :operator, :msisdn, "
+                        + ":amount, :state, :key, :reference, :created, :updated) on conflict do nothing")
                 .param("id", topup.id()).param("customer", topup.customerId())
                 .param("operator", topup.operator().name()).param("msisdn", topup.msisdn())
                 .param("amount", topup.amountMinor()).param("state", topup.state().name())
-                .param("key", topup.idempotencyKey()).param("created", Timestamps.toDb(topup.createdAt()))
+                .param("key", topup.idempotencyKey()).param("reference", topup.reference()).param("created", Timestamps.toDb(topup.createdAt()))
                 .param("updated", Timestamps.toDb(topup.updatedAt())).update();
         return inserted == 1 ? Optional.of(topup) : Optional.empty();
     }
@@ -54,9 +55,25 @@ class JdbcTopupRepository implements TopupRepository {
     }
 
     @Override
-    public Optional<Topup> findByProviderRef(String providerRef) {
-        return jdbc.sql("select * from topup where provider_ref = :ref")
-                .param("ref", providerRef).query(MAPPER).optional();
+    public Optional<Topup> findByReference(String reference) {
+        return jdbc.sql("select * from topup where reference = :ref")
+                .param("ref", reference).query(MAPPER).optional();
+    }
+
+    @Override
+    public boolean hasPending(UUID customerId, Instant createdAfter) {
+        return jdbc.sql("select exists (select 1 from topup where customer_id = :customer and state = 'PENDING' "
+                        + "and created_at > :after)")
+                .param("customer", customerId).param("after", Timestamps.toDb(createdAfter))
+                .query(Boolean.class).single();
+    }
+
+    @Override
+    public List<Topup> findUnsettled(Instant createdAfter, Instant createdBefore) {
+        return jdbc.sql("select * from topup where state in ('PENDING', 'EXPIRED') and created_at > :after "
+                        + "and created_at < :before order by created_at limit 200")
+                .param("after", Timestamps.toDb(createdAfter)).param("before", Timestamps.toDb(createdBefore))
+                .query(MAPPER).list();
     }
 
     @Override

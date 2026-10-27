@@ -1,6 +1,6 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/features/charging/data/session_mapper.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
+import 'package:zella/features/charging/data/session_mapper.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
 
 Map<String, dynamic> _json({Object? battery, Map<String, dynamic>? metering}) =>
     {

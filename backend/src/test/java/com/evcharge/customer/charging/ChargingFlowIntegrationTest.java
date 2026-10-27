@@ -1,5 +1,6 @@
 package com.evcharge.customer.charging;
 
+import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.FakeOcppServer;
 import com.evcharge.customer.PostgresTestBase;
 import org.junit.jupiter.api.AfterAll;
@@ -17,7 +18,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import java.time.Instant;
 import java.util.UUID;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -33,11 +33,12 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
             .route("POST", "/api/v1/charge-points/CP-1/connectors/1/start", 200, "{\"status\":\"PENDING\"}")
             .route("POST", "/api/v1/charge-points/CP-1/connectors/1/stop", 200, "{\"status\":\"PENDING\"}")
             .route("POST", "/api/v1/charge-points/CP-7/connectors/1/start", 200, "{\"status\":\"PENDING\"}")
-            .route("GET", "/api/v1/sessions", 200, "{\"items\":[]}");
+            .route("GET", "/api/v1/sessions", 200, "{\"items\":[]}")
+            .station("CP-1").station("CP-2").station("CP-7").station("CP-9");
 
     @DynamicPropertySource
     static void ocpp(DynamicPropertyRegistry registry) {
-        registry.add("ndzela.ocpp.base-url", OCPP::baseUrl);
+        registry.add("zella.ocpp.base-url", OCPP::baseUrl);
     }
 
     @AfterAll
@@ -61,12 +62,12 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
     }
 
     private ResultActions postAs(UUID customer, String path, String body) throws Exception {
-        return mvc.perform(post(path).with(jwt().jwt(j -> j.subject(customer.toString())))
+        return mvc.perform(post(path).with(TestTenants.customer(customer))
                 .contentType(MediaType.APPLICATION_JSON).content(body));
     }
 
     private ResultActions getAs(UUID customer, String path) throws Exception {
-        return mvc.perform(get(path).with(jwt().jwt(j -> j.subject(customer.toString()))));
+        return mvc.perform(get(path).with(TestTenants.customer(customer)));
     }
 
     @Test
@@ -148,7 +149,7 @@ class ChargingFlowIntegrationTest extends PostgresTestBase {
     }
 
     private ResultActions deleteAs(UUID customer, String path) throws Exception {
-        return mvc.perform(delete(path).with(jwt().jwt(j -> j.subject(customer.toString()))));
+        return mvc.perform(delete(path).with(TestTenants.customer(customer)));
     }
 
     @Test

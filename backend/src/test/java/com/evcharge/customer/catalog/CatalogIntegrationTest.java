@@ -1,5 +1,6 @@
 package com.evcharge.customer.catalog;
 
+import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.FakeOcppServer;
 import org.junit.jupiter.api.AfterAll;
@@ -12,7 +13,6 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.springframework.test.web.servlet.MockMvc;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -37,7 +37,7 @@ class CatalogIntegrationTest extends PostgresTestBase {
 
     @DynamicPropertySource
     static void ocpp(DynamicPropertyRegistry registry) {
-        registry.add("ndzela.ocpp.base-url", OCPP::baseUrl);
+        registry.add("zella.ocpp.base-url", OCPP::baseUrl);
     }
 
     @AfterAll
@@ -56,7 +56,7 @@ class CatalogIntegrationTest extends PostgresTestBase {
     @Test
     void listsStationsWithAvailabilityAndDistance() throws Exception {
         mvc.perform(get("/v1/stations").param("lat", "0.39").param("lng", "9.45").param("radiusKm", "10")
-                        .with(jwt()))
+                        .with(TestTenants.anyCustomer()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$[0].id").value("CP-1"))
                 .andExpect(jsonPath("$[0].availableConnectors").value(1))
@@ -66,7 +66,7 @@ class CatalogIntegrationTest extends PostgresTestBase {
 
     @Test
     void rejectsPartialLocation() throws Exception {
-        mvc.perform(get("/v1/stations").param("lat", "0.39").with(jwt()))
+        mvc.perform(get("/v1/stations").param("lat", "0.39").with(TestTenants.anyCustomer()))
                 .andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_LOCATION"));
     }
@@ -74,7 +74,7 @@ class CatalogIntegrationTest extends PostgresTestBase {
     @Test
     void resolvesScannedUrlAndPlainToken() throws Exception {
         for (String content : new String[] {"https://api.example.com/c/good-token", "good-token"}) {
-            mvc.perform(post("/v1/qr/resolve").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+            mvc.perform(post("/v1/qr/resolve").with(TestTenants.anyCustomer()).contentType(MediaType.APPLICATION_JSON)
                             .content("{\"content\":\"" + content + "\"}"))
                     .andExpect(status().isOk())
                     .andExpect(jsonPath("$.station.id").value("CP-1"))
@@ -85,7 +85,7 @@ class CatalogIntegrationTest extends PostgresTestBase {
 
     @Test
     void unknownQrIsNotFoundWithStableCode() throws Exception {
-        mvc.perform(post("/v1/qr/resolve").with(jwt()).contentType(MediaType.APPLICATION_JSON)
+        mvc.perform(post("/v1/qr/resolve").with(TestTenants.anyCustomer()).contentType(MediaType.APPLICATION_JSON)
                         .content("{\"content\":\"https://x/c/bad\"}"))
                 .andExpect(status().isNotFound())
                 .andExpect(jsonPath("$.code").value("INVALID_QR"));

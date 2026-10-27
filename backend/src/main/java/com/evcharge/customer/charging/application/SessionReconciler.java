@@ -1,34 +1,35 @@
 package com.evcharge.customer.charging.application;
 
-import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionRepository;
+import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.RemoteSession;
 import com.evcharge.customer.charging.domain.SessionState;
+import com.evcharge.customer.shared.ApiException;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.Instant;
-import java.util.Comparator;
 import java.util.Optional;
 
 @Component
 public class SessionReconciler {
 
-    private static final long CLOCK_SKEW_SECONDS = 120;
-
-    private final ChargingGateway gateway;
+    private final RemoteSessionLookup lookup;
     private final SessionRepository sessions;
+    private final SessionTelemetry telemetry;
     private final SessionSettings settings;
     private final SessionSettlement settlement;
     private final SessionCostEstimator estimator;
     private final Clock clock;
 
-    public SessionReconciler(ChargingGateway gateway, SessionRepository sessions,
-                             SessionSettings settings, SessionSettlement settlement,
+    public SessionReconciler(RemoteSessionLookup lookup, SessionRepository sessions,
+                             SessionTelemetry telemetry, SessionSettings settings, SessionSettlement settlement,
                              SessionCostEstimator estimator, Clock clock) {
-        this.gateway = gateway;
+        this.lookup = lookup;
         this.sessions = sessions;
+        this.telemetry = telemetry;
         this.settings = settings;
         this.settlement = settlement;
         this.estimator = estimator;
@@ -40,7 +41,15 @@ public class SessionReconciler {
             return session;
         }
         Instant now = clock.instant();
-        Optional<RemoteSession> remote = findRemote(session);
+        Optional<RemoteSession> remote;
+        try {
+            remote = lookup.find(session);
+        } catch (ApiException e) {
+            if (e.status() == HttpStatus.SERVICE_UNAVAILABLE) {
+                return session;
+            }
+            throw e;
+        }
         rememberPrice(session, remote);
         ChargingSession next = remote
                 .map(found -> priced(session.withRemote(found, nextState(session, found), now), now))
@@ -54,7 +63,7 @@ public class SessionReconciler {
 
     private void rememberPrice(ChargingSession session, Optional<RemoteSession> remote) {
         remote.map(RemoteSession::pricePerKwhMinor).filter(price -> price > 0)
-                .ifPresent(price -> sessions.recordPrice(session.id(), price));
+                .ifPresent(price -> telemetry.recordPrice(session.id(), price));
     }
 
     private ChargingSession priced(ChargingSession session, Instant now) {
@@ -65,15 +74,6 @@ public class SessionReconciler {
         return estimator.finalCost(session)
                 .map(cost -> session.withCost(cost.minor(), cost.currency(), cost.decimals(), now))
                 .orElse(session);
-    }
-
-    private Optional<RemoteSession> findRemote(ChargingSession session) {
-        Instant earliest = session.createdAt().minusSeconds(CLOCK_SKEW_SECONDS);
-        return gateway.sessionsOf(session.idTag()).stream()
-                .filter(remote -> remote.stationId().equals(session.stationId())
-                        && remote.connectorId() == session.connectorId())
-                .filter(remote -> remote.startedAt() != null && !remote.startedAt().isBefore(earliest))
-                .max(Comparator.comparing(RemoteSession::startedAt));
     }
 
     private SessionState nextState(ChargingSession session, RemoteSession remote) {

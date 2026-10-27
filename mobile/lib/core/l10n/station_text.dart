@@ -85,7 +85,7 @@ abstract final class StationText {
 
   static Map<String, String> get statusLabels => {
     'Available': available,
-    'Preparing': AppLanguage.pick(fr: 'En préparation', en: 'Preparing'),
+    'Preparing': AppLanguage.pick(fr: 'Câble branché', en: 'Plugged in'),
     'Charging': busy,
     'SuspendedEV': busy,
     'SuspendedEVSE': busy,

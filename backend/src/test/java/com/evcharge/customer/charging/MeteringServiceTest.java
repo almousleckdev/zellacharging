@@ -1,8 +1,9 @@
 package com.evcharge.customer.charging;
 
 import com.evcharge.customer.charging.application.MeteringService;
+import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.charging.application.port.ChargingGateway;
-import com.evcharge.customer.charging.application.port.SessionRepository;
+import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
@@ -10,7 +11,10 @@ import com.evcharge.customer.charging.domain.SessionState;
 import org.junit.jupiter.api.Test;
 
 import java.math.BigDecimal;
+import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneOffset;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -26,8 +30,11 @@ class MeteringServiceTest {
     private static final Instant NOW = Instant.parse("2026-10-16T12:00:00Z");
 
     private final ChargingGateway gateway = mock(ChargingGateway.class);
-    private final SessionRepository sessions = mock(SessionRepository.class);
-    private final MeteringService service = new MeteringService(gateway, sessions);
+    private final SessionTelemetry sessions = mock(SessionTelemetry.class);
+    private final MeteringService service = new MeteringService(gateway, sessions,
+            new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15), Duration.ofSeconds(30), 150L, 95,
+                    Duration.ofSeconds(90), Duration.ofSeconds(5), Duration.ofSeconds(30)),
+            Clock.fixed(NOW, ZoneOffset.UTC));
 
     private ChargingSession session(SessionState state) {
         return new ChargingSession(UUID.randomUUID(), UUID.randomUUID(), "CP-1", 1, "Z-X", state, null, 7, NOW,
@@ -79,5 +86,17 @@ class MeteringServiceTest {
 
         assertThat(last.batteryPercent()).isEqualByComparingTo("71");
         assertThat(last.voltage()).isEqualByComparingTo("399");
+    }
+
+    @Test
+    void aRecentReadingIsServedFromMemoryInsteadOfAskingTheChargerAgain() {
+        ChargingSession active = session(SessionState.ACTIVE);
+        when(gateway.metering(7)).thenReturn(reading("40"));
+
+        service.of(active);
+        service.of(active);
+        service.of(active);
+
+        verify(gateway, org.mockito.Mockito.times(1)).metering(7);
     }
 }

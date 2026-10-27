@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/features/charging/domain/charging_session.dart';
-import 'package:ndzela/features/charging/domain/metering.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/charging/presentation/battery_freshness.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/features/charging/domain/charging_session.dart';
+import 'package:zella/features/charging/domain/metering.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/charging/presentation/battery_freshness.dart';
 
 ChargingSession _session(SessionState state, Duration? age) => ChargingSession(
   id: 'a',

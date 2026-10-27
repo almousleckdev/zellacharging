@@ -5,6 +5,7 @@ import com.evcharge.customer.account.application.port.PasswordHasher;
 import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.AuditTrail;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,15 +23,17 @@ public class LoginService {
     private final SessionIssuer sessions;
     private final AccountSettings settings;
     private final Clock clock;
+    private final AuditTrail audit;
 
     public LoginService(CustomerRepository customers, PasswordHasher passwords, ContactNormalizer contacts,
-                        SessionIssuer sessions, AccountSettings settings, Clock clock) {
+                        SessionIssuer sessions, AccountSettings settings, Clock clock, AuditTrail audit) {
         this.customers = customers;
         this.passwords = passwords;
         this.contacts = contacts;
         this.sessions = sessions;
         this.settings = settings;
         this.clock = clock;
+        this.audit = audit;
     }
 
     @Transactional(noRollbackFor = ApiException.class)
@@ -44,13 +47,15 @@ public class LoginService {
         }
         if (!passwords.matches(password, customer.passwordHash())) {
             registerFailure(customer, now);
+            audit.record("LOGIN_FAILED", customer.id(), "customer", null);
             throw invalidCredentials();
         }
         if (!customer.canAuthenticate()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "ACCOUNT_NOT_VERIFIED", "Account is not verified");
         }
         customers.clearFailedLogins(customer.id());
-        return sessions.issue(customer.id(), UUID.randomUUID());
+        audit.record("LOGIN_SUCCEEDED", customer.id(), "customer", null);
+        return sessions.issue(customer.id(), customer.country(), UUID.randomUUID());
     }
 
     private void registerFailure(Customer customer, Instant now) {

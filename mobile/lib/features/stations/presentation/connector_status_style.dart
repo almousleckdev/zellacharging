@@ -8,7 +8,7 @@ abstract final class ConnectorStatusStyle {
       StationText.statusLabels[status] ?? status;
 
   static Color color(String status) => switch (status) {
-    'Available' => AppColors.success,
+    'Available' || 'Preparing' => AppColors.success,
     'Faulted' => AppColors.danger,
     'Unavailable' => AppColors.neutral,
     _ => AppColors.primary,

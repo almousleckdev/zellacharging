@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/core/theme/app_theme.dart';
-import 'package:ndzela/shared/adaptive_dialog.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/core/theme/app_theme.dart';
+import 'package:zella/shared/adaptive_dialog.dart';
 
 import 'test_fonts.dart';
 

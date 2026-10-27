@@ -3,8 +3,6 @@ package com.evcharge.customer.charging.infrastructure;
 import com.evcharge.customer.shared.Timestamps;
 import com.evcharge.customer.charging.application.port.SessionRepository;
 import com.evcharge.customer.charging.domain.ChargingSession;
-import com.evcharge.customer.charging.domain.LastReading;
-import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.ApiException;
 import org.springframework.dao.DuplicateKeyException;
@@ -52,16 +50,16 @@ class JdbcSessionRepository implements SessionRepository {
     }
 
     @Override
-    public void insert(ChargingSession s) {
+    public void insert(ChargingSession s, String idempotencyKey) {
         try {
             jdbc.sql("""
                     insert into charging_session (id, customer_id, station_id, connector_id, id_tag, state,
-                                                  created_at, updated_at)
-                    values (:id, :customerId, :stationId, :connectorId, :idTag, :state, :createdAt, :updatedAt)
+                                                  idempotency_key, created_at, updated_at)
+                    values (:id, :customerId, :stationId, :connectorId, :idTag, :state, :key, :createdAt, :updatedAt)
                     """)
                     .param("id", s.id()).param("customerId", s.customerId()).param("stationId", s.stationId())
                     .param("connectorId", s.connectorId()).param("idTag", s.idTag())
-                    .param("state", s.state().name()).param("createdAt", Timestamps.toDb(s.createdAt()))
+                    .param("state", s.state().name()).param("key", idempotencyKey).param("createdAt", Timestamps.toDb(s.createdAt()))
                     .param("updatedAt", Timestamps.toDb(s.updatedAt())).update();
         } catch (DuplicateKeyException e) {
             throw new ApiException(HttpStatus.CONFLICT, "CONNECTOR_OR_SESSION_BUSY",
@@ -87,43 +85,10 @@ class JdbcSessionRepository implements SessionRepository {
     }
 
     @Override
-    public void recordReading(UUID id, Metering reading) {
-        jdbc.sql("""
-                update charging_session set battery_percent = coalesce(:battery, battery_percent),
-                    last_voltage = coalesce(:voltage, last_voltage),
-                    last_power_kw = coalesce(:power, last_power_kw)
-                where id = :id
-                """)
-                .param("battery", reading.stateOfChargePercent()).param("voltage", reading.voltage())
-                .param("power", reading.powerKw()).param("id", id).update();
-    }
-
-    @Override
-    public LastReading lastReadingOf(UUID id) {
-        return jdbc.sql("select battery_percent, last_voltage, last_power_kw from charging_session where id = :id")
-                .param("id", id)
-                .query((rs, rowNum) -> new LastReading(rs.getBigDecimal("battery_percent"),
-                        rs.getBigDecimal("last_voltage"), rs.getBigDecimal("last_power_kw")))
-                .optional().orElse(LastReading.empty());
-    }
-
-    @Override
     public boolean hide(UUID id, UUID customerId, Instant at) {
         return jdbc.sql("update charging_session set hidden_at = :at where id = :id and customer_id = :customer "
                         + "and hidden_at is null and state not in " + LIVE)
                 .param("at", Timestamps.toDb(at)).param("id", id).param("customer", customerId).update() > 0;
-    }
-
-    @Override
-    public void recordPrice(UUID id, long pricePerKwhMinor) {
-        jdbc.sql("update charging_session set price_per_kwh_minor = :price where id = :id")
-                .param("price", pricePerKwhMinor).param("id", id).update();
-    }
-
-    @Override
-    public Optional<Long> priceOf(UUID id) {
-        return jdbc.sql("select price_per_kwh_minor from charging_session where id = :id")
-                .param("id", id).query(Long.class).optional();
     }
 
     @Override
@@ -138,6 +103,13 @@ class JdbcSessionRepository implements SessionRepository {
     public Optional<ChargingSession> findOwned(UUID id, UUID customerId) {
         return jdbc.sql("select * from charging_session where id = :id and customer_id = :customerId and hidden_at is null")
                 .param("id", id).param("customerId", customerId).query(MAPPER).optional();
+    }
+
+    @Override
+    public Optional<ChargingSession> findByIdempotencyKey(UUID customerId, String idempotencyKey) {
+        return jdbc.sql("select * from charging_session where customer_id = :customerId "
+                        + "and idempotency_key = :key")
+                .param("customerId", customerId).param("key", idempotencyKey).query(MAPPER).optional();
     }
 
     @Override

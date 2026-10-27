@@ -2,6 +2,7 @@ package com.evcharge.customer.account.application;
 
 import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.RefreshTokenRepository;
+import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.RefreshToken;
 import com.evcharge.customer.account.domain.Sha256;
 import com.evcharge.customer.shared.ApiException;
@@ -39,9 +40,9 @@ public class RefreshSessionService {
         if (token.isExpiredAt(now) || !refreshTokens.markUsed(token.id(), now)) {
             throw invalid();
         }
-        customers.findById(token.customerId()).filter(customer -> customer.canAuthenticate())
+        Customer customer = customers.findById(token.customerId()).filter(Customer::canAuthenticate)
                 .orElseThrow(RefreshSessionService::invalid);
-        return sessions.issue(token.customerId(), token.familyId());
+        return sessions.issue(customer.id(), customer.country(), token.familyId());
     }
 
     @Transactional

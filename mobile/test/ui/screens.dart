@@ -1,36 +1,43 @@
 import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter/widgets.dart';
-import 'package:ndzela/core/location/location_providers.dart';
-import 'package:ndzela/features/auth/presentation/login_page.dart';
-import 'package:ndzela/features/auth/presentation/onboarding_page.dart';
-import 'package:ndzela/features/auth/presentation/register_page.dart';
-import 'package:ndzela/features/auth/presentation/welcome_page.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/charging/presentation/charging_page.dart';
-import 'package:ndzela/features/charging/presentation/session_providers.dart';
-import 'package:ndzela/features/charging/presentation/setup/charge_setup_page.dart';
-import 'package:ndzela/features/history/presentation/history_page.dart';
-import 'package:ndzela/features/home/presentation/home_page.dart';
-import 'package:ndzela/core/links/link_providers.dart';
-import 'package:ndzela/core/media/media_providers.dart';
-import 'package:ndzela/core/storage/preference_providers.dart';
-import 'package:ndzela/features/coupons/domain/coupon.dart';
-import 'package:ndzela/features/coupons/presentation/coupon_providers.dart';
-import 'package:ndzela/features/coupons/presentation/coupons_page.dart';
-import 'package:ndzela/features/profile/presentation/change_password_page.dart';
-import 'package:ndzela/features/profile/presentation/delete_account_page.dart';
-import 'package:ndzela/features/profile/presentation/edit_profile_page.dart';
-import 'package:ndzela/features/profile/presentation/settings_page.dart';
-import 'package:ndzela/features/support/domain/support_info.dart';
-import 'package:ndzela/features/support/presentation/contact_page.dart';
-import 'package:ndzela/features/support/presentation/support_providers.dart';
-import 'package:ndzela/features/profile/presentation/profile_page.dart';
-import 'package:ndzela/features/profile/presentation/profile_providers.dart';
-import 'package:ndzela/features/stations/presentation/locations_page.dart';
-import 'package:ndzela/features/stations/presentation/station_detail_page.dart';
-import 'package:ndzela/features/stations/presentation/station_providers.dart';
-import 'package:ndzela/features/wallet/presentation/topup_page.dart';
-import 'package:ndzela/features/wallet/presentation/wallet_providers.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/features/charging/domain/session_repository.dart';
+import 'package:zella/features/stations/domain/station_repository.dart';
+import 'package:zella/features/wallet/domain/wallet_repository.dart';
+import 'package:zella/core/network/api_error.dart';
+import 'package:zella/shared/widgets/pay/flow_panel.dart';
+import 'package:zella/shared/widgets/pay/payment_step.dart';
+import 'package:zella/core/location/location_providers.dart';
+import 'package:zella/features/auth/presentation/login_page.dart';
+import 'package:zella/features/auth/presentation/onboarding_page.dart';
+import 'package:zella/features/auth/presentation/register_page.dart';
+import 'package:zella/features/auth/presentation/welcome_page.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/charging/presentation/charging_page.dart';
+import 'package:zella/features/charging/presentation/session_providers.dart';
+import 'package:zella/features/charging/presentation/setup/charge_setup_page.dart';
+import 'package:zella/features/history/presentation/history_page.dart';
+import 'package:zella/features/home/presentation/home_page.dart';
+import 'package:zella/core/links/link_providers.dart';
+import 'package:zella/core/media/media_providers.dart';
+import 'package:zella/core/storage/preference_providers.dart';
+import 'package:zella/features/coupons/domain/coupon.dart';
+import 'package:zella/features/coupons/presentation/coupon_providers.dart';
+import 'package:zella/features/coupons/presentation/coupons_page.dart';
+import 'package:zella/features/profile/presentation/change_password_page.dart';
+import 'package:zella/features/profile/presentation/delete_account_page.dart';
+import 'package:zella/features/profile/presentation/edit_profile_page.dart';
+import 'package:zella/features/profile/presentation/settings_page.dart';
+import 'package:zella/features/support/domain/support_info.dart';
+import 'package:zella/features/support/presentation/contact_page.dart';
+import 'package:zella/features/support/presentation/support_providers.dart';
+import 'package:zella/features/profile/presentation/profile_page.dart';
+import 'package:zella/features/profile/presentation/profile_providers.dart';
+import 'package:zella/features/stations/presentation/locations_page.dart';
+import 'package:zella/features/stations/presentation/station_detail_page.dart';
+import 'package:zella/features/stations/presentation/station_providers.dart';
+import 'package:zella/features/wallet/presentation/topup_page.dart';
+import 'package:zella/features/wallet/presentation/wallet_providers.dart';
 import 'ui_fakes.dart';
 
 final screens = <String, Widget Function()>{
@@ -58,6 +65,40 @@ final screens = <String, Widget Function()>{
   'charging-active': () => const ChargingPage(sessionId: 'a'),
   'details': () => const ChargingPage(sessionId: 'a'),
   'edit-profile': () => const EditProfilePage(),
+  'pay-progress': () => FlowPanel(
+    kind: FlowKind.progress,
+    title: PayFlowText.approveTitle,
+    message: PayFlowText.approveBody('Airtel Money', '+24177123456'),
+    steps: [
+      PaymentStep(PayFlowText.stepRequest, StepStatus.done),
+      PaymentStep(PayFlowText.stepApprove, StepStatus.active),
+      PaymentStep(PayFlowText.stepConfirm, StepStatus.pending),
+      PaymentStep(PayFlowText.stepStart, StepStatus.pending),
+    ],
+  ),
+  'pay-success': () => FlowPanel(
+    kind: FlowKind.success,
+    title: PayFlowText.topupDoneTitle,
+    message: PayFlowText.topupDoneBody('5 000 FCFA'),
+    primaryLabel: PayFlowText.done,
+    onPrimary: () {},
+  ),
+  'pay-failed': () => FlowPanel(
+    kind: FlowKind.failed,
+    title: PayFlowText.failedTitle,
+    message: ApiError.fromCode('PAYMENT_NOT_COMPLETED').message,
+    primaryLabel: PayFlowText.retry,
+    onPrimary: () {},
+    secondaryLabel: PayFlowText.done,
+    onSecondary: () {},
+  ),
+  'pay-verifying': () => FlowPanel(
+    kind: FlowKind.verifying,
+    title: PayFlowText.verifyingTitle,
+    message: ApiError.fromCode('PAYMENT_VERIFYING').message,
+    primaryLabel: PayFlowText.done,
+    onPrimary: () {},
+  ),
 };
 
 final coupons = [
@@ -71,10 +112,10 @@ final coupons = [
 ];
 
 const supportInfo = SupportInfo(
-  email: 'support@ndzela.example',
+  email: 'support@zella.example',
   phone: '+24177000000',
   whatsapp: '+24177000001',
-  agreementUrl: 'https://ndzela.example/terms',
+  agreementUrl: 'https://zella.example/terms',
 );
 
 final screenStates = <String, SessionState>{'details': SessionState.completed};
@@ -87,10 +128,34 @@ List<Override> overrides([
   MemoryPreferences? preferences,
   FakeSupport? support,
   FakeCoupons? couponList,
-]) => [
-  stationRepositoryProvider.overrideWithValue(FakeStations()),
-  sessionRepositoryProvider.overrideWithValue(FakeSessions(state)),
-  walletRepositoryProvider.overrideWithValue(FakeWallet()),
+]) => overridesWith(
+  state: state,
+  profile: profile,
+  picker: picker,
+  links: links,
+  preferences: preferences,
+  support: support,
+  couponList: couponList,
+);
+
+List<Override> overridesWith({
+  SessionState state = SessionState.active,
+  FakeProfile? profile,
+  FakePhotoPicker? picker,
+  FakeLinks? links,
+  MemoryPreferences? preferences,
+  FakeSupport? support,
+  FakeCoupons? couponList,
+  WalletRepository? wallet,
+  StationRepository? stationRepo,
+  SessionRepository? sessionRepo,
+  List<Override> extra = const [],
+}) => [
+  stationRepositoryProvider.overrideWithValue(stationRepo ?? FakeStations()),
+  sessionRepositoryProvider.overrideWithValue(
+    sessionRepo ?? FakeSessions(state),
+  ),
+  walletRepositoryProvider.overrideWithValue(wallet ?? FakeWallet()),
   profileRepositoryProvider.overrideWithValue(profile ?? FakeProfile()),
   locationServiceProvider.overrideWithValue(NoLocation()),
   couponRepositoryProvider.overrideWithValue(
@@ -102,4 +167,5 @@ List<Override> overrides([
   preferenceStoreProvider.overrideWithValue(preferences ?? MemoryPreferences()),
   photoPickerProvider.overrideWithValue(picker ?? FakePhotoPicker()),
   linkLauncherProvider.overrideWithValue(links ?? FakeLinks()),
+  ...extra,
 ];

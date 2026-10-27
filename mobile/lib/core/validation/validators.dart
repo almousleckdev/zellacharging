@@ -1,3 +1,4 @@
+import '../format/amount_input.dart';
 import '../l10n/strings.dart';
 
 abstract final class Validators {
@@ -27,9 +28,16 @@ abstract final class Validators {
       : WalletText.invalidMobileMoney;
 
   static String? chargeAmount(String? value) {
-    final amount = int.tryParse(value?.trim() ?? '');
+    final amount = AmountInput.parse(value);
     return amount != null && amount >= ChargeText.minimumChargeMinor
         ? null
         : ChargeText.invalidAmount;
+  }
+
+  static String? topupAmount(String? value) {
+    final amount = AmountInput.parse(value);
+    return amount != null && amount >= WalletText.minimumTopupMinor
+        ? null
+        : WalletText.invalidTopupAmount;
   }
 }

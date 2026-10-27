@@ -1,5 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/validation/validators.dart';
+import 'package:zella/core/validation/validators.dart';
 
 void main() {
   test('otp accepts exactly six digits', () {

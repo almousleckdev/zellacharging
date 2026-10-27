@@ -28,12 +28,13 @@ public class SessionIssuer {
         this.clock = clock;
     }
 
-    public AuthTokens issue(UUID customerId, UUID familyId) {
+    public AuthTokens issue(UUID customerId, String country, UUID familyId) {
         byte[] bytes = new byte[32];
         random.nextBytes(bytes);
-        String raw = Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
+        String raw = country + RefreshTokenFormat.SEPARATOR
+                + Base64.getUrlEncoder().withoutPadding().encodeToString(bytes);
         refreshTokens.save(new RefreshToken(UUID.randomUUID(), customerId, familyId, Sha256.hex(raw),
                 clock.instant().plus(settings.security().refreshTokenTtl()), null, null));
-        return new AuthTokens(accessTokens.issue(customerId), raw, accessTokens.timeToLive().toSeconds());
+        return new AuthTokens(accessTokens.issue(customerId, country), raw, accessTokens.timeToLive().toSeconds());
     }
 }

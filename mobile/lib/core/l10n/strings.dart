@@ -2,6 +2,8 @@ export 'auth_text.dart';
 export 'charge_text.dart';
 export 'error_text.dart';
 export 'history_text.dart';
+export 'pay_flow_text.dart';
+export 'payment_text.dart';
 export 'profile_text.dart';
 export 'station_text.dart';
 export 'wallet_text.dart';
@@ -9,7 +11,8 @@ export 'wallet_text.dart';
 import 'app_language.dart';
 
 abstract final class Strings {
-  static String get appName => AppLanguage.pick(fr: 'Ndzela', en: 'Ndzela');
+  static String get appName =>
+      AppLanguage.pick(fr: 'Zella Charging', en: 'Zella Charging');
 
   static String get tagline => AppLanguage.pick(
     fr: 'Rechargez partout, sans souci',

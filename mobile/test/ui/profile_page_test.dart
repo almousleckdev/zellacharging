@@ -1,12 +1,12 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/l10n/app_language.dart';
-import 'package:ndzela/core/l10n/language_controller.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/profile/presentation/profile_page.dart';
-import 'package:ndzela/features/support/domain/support_info.dart';
+import 'package:zella/core/l10n/app_language.dart';
+import 'package:zella/core/l10n/language_controller.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/profile/presentation/profile_page.dart';
+import 'package:zella/features/support/domain/support_info.dart';
 
 import 'screens.dart';
 import 'test_app.dart';
@@ -119,7 +119,7 @@ void main() {
     await tester.tap(find.text(ProfileText.agreement));
     await settle(tester);
 
-    expect(links.opened.single.toString(), 'https://ndzela.example/terms');
+    expect(links.opened.single.toString(), 'https://zella.example/terms');
     await closeApp(tester);
   });
 

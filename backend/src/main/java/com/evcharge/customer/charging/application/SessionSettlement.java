@@ -13,10 +13,12 @@ public class SessionSettlement {
 
     private final WalletFunding funding;
     private final FeeCalculator fees;
+    private final ChargingMetrics metrics;
 
-    public SessionSettlement(WalletFunding funding, FeeCalculator fees) {
+    public SessionSettlement(WalletFunding funding, FeeCalculator fees, ChargingMetrics metrics) {
         this.funding = funding;
         this.fees = fees;
+        this.metrics = metrics;
     }
 
     public void settle(ChargingSession session) {
@@ -30,9 +32,19 @@ public class SessionSettlement {
 
     private void settleFinished(ChargingSession session) {
         if (session.costMinor() == null) {
-            log.warn("Session {} finished without a cost: the hold is released without a charge", session.id());
+            metrics.settlementReview();
+            log.error("ALERT session {} finished without a cost: nothing is charged, flagged for review",
+                    session.id());
+            funding.settle(session.id(), null, session.currency());
+            return;
         }
-        Long total = session.costMinor() == null ? null : fees.of(session.costMinor()).totalMinor();
+        long total = fees.of(session.costMinor()).totalMinor();
+        long authorized = funding.reserved(session.id()).minor();
+        if (total > authorized) {
+            metrics.overshoot(total - authorized);
+            log.warn("Session {} cost {} exceeds the authorized {}: charging the authorized amount only",
+                    session.id(), total, authorized);
+        }
         funding.settle(session.id(), total, session.currency());
     }
 }

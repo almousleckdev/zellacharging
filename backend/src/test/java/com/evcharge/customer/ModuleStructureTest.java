@@ -5,7 +5,7 @@ import org.springframework.modulith.core.ApplicationModules;
 
 class ModuleStructureTest {
 
-    static final ApplicationModules modules = ApplicationModules.of(NdzelaApplication.class);
+    static final ApplicationModules modules = ApplicationModules.of(Application.class);
 
     @Test
     void modulesRespectBoundaries() {

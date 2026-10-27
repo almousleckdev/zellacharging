@@ -5,10 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/rendering.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/theme/app_colors.dart';
-import 'package:ndzela/core/theme/app_theme.dart';
+import 'package:zella/core/theme/app_colors.dart';
+import 'package:zella/core/theme/app_theme.dart';
 
-import 'package:ndzela/features/charging/domain/session_state.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
 import 'screens.dart';
 import 'test_fonts.dart';
 

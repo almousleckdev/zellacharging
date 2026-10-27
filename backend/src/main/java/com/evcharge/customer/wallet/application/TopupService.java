@@ -1,18 +1,18 @@
 package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.shared.ApiException;
-import com.evcharge.customer.wallet.application.port.PaymentProvider;
 import com.evcharge.customer.wallet.application.port.TopupRepository;
+import com.evcharge.customer.wallet.domain.CollectionRequest;
 import com.evcharge.customer.wallet.domain.MobileOperator;
 import com.evcharge.customer.wallet.domain.PaymentOutcome;
 import com.evcharge.customer.wallet.domain.Topup;
-import com.evcharge.customer.wallet.domain.TopupState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -22,19 +22,23 @@ public class TopupService {
 
     private static final Logger log = LoggerFactory.getLogger(TopupService.class);
     private static final Pattern MSISDN = Pattern.compile("^\\+[1-9]\\d{7,14}$");
+    private static final Duration REFRESH_AFTER = Duration.ofSeconds(5);
 
     private final WalletSettings settings;
     private final TopupRepository topups;
-    private final PaymentProvider provider;
-    private final TopupCredit credit;
+    private final PaymentGateways gateways;
+    private final TopupSettlement settlement;
+    private final PaymentSettings payments;
     private final Clock clock;
 
-    public TopupService(WalletSettings settings, TopupRepository topups, PaymentProvider provider,
-                        TopupCredit credit, Clock clock) {
+    public TopupService(WalletSettings settings, TopupRepository topups, PaymentGateways gateways,
+                        TopupSettlement settlement, PaymentSettings payments,
+                        Clock clock) {
         this.settings = settings;
         this.topups = topups;
-        this.provider = provider;
-        this.credit = credit;
+        this.gateways = gateways;
+        this.settlement = settlement;
+        this.payments = payments;
         this.clock = clock;
     }
 
@@ -44,43 +48,35 @@ public class TopupService {
         if (previous.isPresent()) {
             return previous.get();
         }
+        gateways.forOperator(operator);
+        if (topups.hasPending(customerId, clock.instant().minus(payments.expireAfter()))) {
+            throw new ApiException(HttpStatus.CONFLICT, "TOPUP_PENDING",
+                    "A payment is still being verified");
+        }
         Topup pending = Topup.pending(customerId, operator, msisdn, amountMinor, key, clock.instant());
         if (topups.insertIfNew(pending).isEmpty()) {
             return topups.findByIdempotencyKey(customerId, key).orElseThrow();
         }
-        return apply(pending, collect(pending));
-    }
-
-    public Topup confirm(String providerRef, boolean success, String failureCode) {
-        Topup topup = topups.findByProviderRef(providerRef).orElseThrow(
-                () -> new ApiException(HttpStatus.NOT_FOUND, "TOPUP_NOT_FOUND", "Unknown payment reference"));
-        PaymentOutcome outcome = success ? PaymentOutcome.succeeded(providerRef) : PaymentOutcome.failed(failureCode);
-        return apply(topup, outcome);
+        collect(pending).ifPresent(outcome -> settlement.apply(pending, outcome));
+        return topups.find(pending.id()).orElseThrow();
     }
 
     public Topup get(UUID customerId, UUID id) {
-        return topups.find(id).filter(topup -> topup.customerId().equals(customerId)).orElseThrow(
+        Topup topup = topups.find(id).filter(found -> found.customerId().equals(customerId)).orElseThrow(
                 () -> new ApiException(HttpStatus.NOT_FOUND, "TOPUP_NOT_FOUND", "Top-up not found"));
+        boolean stale = topup.updatedAt().plus(REFRESH_AFTER).isBefore(clock.instant());
+        return topup.state().isUnsettled() && stale ? settlement.settle(topup) : topup;
     }
 
-    private PaymentOutcome collect(Topup topup) {
+    private Optional<PaymentOutcome> collect(Topup topup) {
+        CollectionRequest request = new CollectionRequest(topup.reference(), topup.amountMinor(),
+                settings.currency(), topup.operator(), topup.msisdn());
         try {
-            return provider.collect(topup, settings.currency());
+            return Optional.of(gateways.forOperator(topup.operator()).collect(request));
         } catch (RuntimeException e) {
-            log.warn("Payment provider failed for top-up {}", topup.id(), e);
-            return PaymentOutcome.failed("PROVIDER_UNAVAILABLE");
+            log.warn("Payment {} was sent but its outcome is unknown: {}", topup.reference(), e.getMessage());
+            return Optional.empty();
         }
-    }
-
-    private Topup apply(Topup topup, PaymentOutcome outcome) {
-        switch (outcome.state()) {
-            case SUCCEEDED -> credit.succeed(topup, outcome.providerRef());
-            case FAILED -> topups.transition(topup.id(), TopupState.PENDING, TopupState.FAILED, null,
-                    outcome.failureCode());
-            case PENDING -> topups.transition(topup.id(), TopupState.PENDING, TopupState.PENDING,
-                    outcome.providerRef(), null);
-        }
-        return topups.find(topup.id()).orElseThrow();
     }
 
     private void validate(String msisdn, long amountMinor) {

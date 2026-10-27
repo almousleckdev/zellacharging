@@ -2,19 +2,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/format/amount_input.dart';
+import '../../../core/format/money_format.dart';
 import '../../../core/l10n/strings.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../../../core/validation/validators.dart';
-import '../../../shared/submit_mixin.dart';
-import '../../../shared/widgets/app_text_field.dart';
-import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/pay/action_bar.dart';
 import '../../profile/presentation/profile_providers.dart';
 import '../domain/mobile_operator.dart';
-import 'amount_picker.dart';
-import 'operator_selector.dart';
+import 'topup_flow_controller.dart';
+import 'topup_flow_state.dart';
+import 'topup_flow_view.dart';
+import 'topup_form.dart';
 import 'wallet_providers.dart';
-import '../../../core/theme/app_icons.dart';
 
 class TopupPage extends ConsumerStatefulWidget {
   const TopupPage({super.key});
@@ -23,12 +21,12 @@ class TopupPage extends ConsumerStatefulWidget {
   ConsumerState<TopupPage> createState() => _TopupPageState();
 }
 
-class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
+class _TopupPageState extends ConsumerState<TopupPage> {
   final _formKey = GlobalKey<FormState>();
-  late final TextEditingController _phone = TextEditingController(
+  final _amount = TextEditingController(text: AmountInput.format(5000));
+  late final _phone = TextEditingController(
     text: ref.read(profileProvider).asData?.value.phone ?? '',
   );
-  int _amount = WalletText.topUpAmounts[1];
   MobileOperator _operator = MobileOperator.airtel;
   late String _attempt = _newAttempt();
 
@@ -36,94 +34,68 @@ class _TopupPageState extends ConsumerState<TopupPage> with SubmitMixin {
 
   @override
   void dispose() {
+    _amount.dispose();
     _phone.dispose();
     super.dispose();
   }
 
   void _pay() {
     if (!_formKey.currentState!.validate()) return;
-    submit(() async {
-      final result = await ref
-          .read(walletRepositoryProvider)
-          .topUp(
-            amountMinor: _amount,
-            msisdn: _phone.text.trim(),
-            operator: _operator,
-            idempotencyKey: _attempt,
-          );
-      if (result.failed) {
-        _attempt = _newAttempt();
-        showError(WalletText.topUpFailed);
-        return;
-      }
-      ref.invalidate(walletProvider);
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text(
-            result.succeeded ? WalletText.topUpDone : WalletText.topUpPending,
-          ),
-        ),
-      );
-      context.pop();
-    });
+    ref
+        .read(topupFlowProvider.notifier)
+        .pay(
+          amountMinor: AmountInput.parse(_amount.text) ?? 0,
+          msisdn: _phone.text.trim(),
+          operator: _operator,
+          idempotencyKey: _attempt,
+        );
+  }
+
+  void _retry() {
+    final error = ref.read(topupFlowProvider).error;
+    if (error != null && !error.isUncertain) _attempt = _newAttempt();
+    ref.read(topupFlowProvider.notifier).reset();
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    final currency = ref.watch(walletProvider).asData?.value.currency ?? '';
+    final flow = ref.watch(topupFlowProvider);
+    final wallet = ref.watch(walletProvider).asData?.value;
+    final currency = wallet?.currency ?? '';
+    final idle = flow.phase == TopupPhase.idle;
     return Scaffold(
       appBar: AppBar(title: Text(WalletText.topUpTitle)),
-      body: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          Text(
-            WalletText.topUpBody,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
+      body: idle
+          ? TopupForm(
+              formKey: _formKey,
+              wallet: wallet,
+              currency: currency,
+              amount: _amount,
+              phone: _phone,
+              operator: _operator,
+              onOperator: (value) => setState(() => _operator = value),
+              onAmountChanged: () => setState(() {}),
+            )
+          : TopupFlowView(
+              flow: flow,
+              currency: currency,
+              operator: _operator,
+              phone: _phone.text.trim(),
+              onRetry: _retry,
+              onClose: () => context.pop(),
             ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _heading(WalletText.chooseAmount),
-          AmountPicker(
-            amounts: WalletText.topUpAmounts,
-            selected: _amount,
-            currency: currency,
-            onSelected: (value) => setState(() => _amount = value),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          _heading(WalletText.chooseOperator),
-          OperatorSelector(
-            selected: _operator,
-            onSelected: (value) => setState(() => _operator = value),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          Form(
-            key: _formKey,
-            child: AppTextField(
-              controller: _phone,
-              label: WalletText.mobileMoneyNumberLabel,
-              hint: WalletText.mobileMoneyNumberHint,
-              icon: AppIcons.phone,
-              validator: Validators.mobileMoneyNumber,
-              keyboardType: TextInputType.phone,
-              textInputAction: TextInputAction.done,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.xl),
-          PrimaryButton(
-            label: WalletText.payNow,
-            loading: loading,
-            onPressed: _pay,
-          ),
-        ],
-      ),
+      bottomNavigationBar: idle
+          ? ActionBar(
+              label: PayText.payAmount(
+                MoneyFormat.format(
+                  AmountInput.parse(_amount.text) ?? 0,
+                  currency,
+                  0,
+                ),
+              ),
+              onPressed: _pay,
+            )
+          : null,
     );
   }
-
-  Widget _heading(String text) => Padding(
-    padding: const EdgeInsets.only(bottom: AppSpacing.sm),
-    child: Text(text, style: Theme.of(context).textTheme.titleSmall),
-  );
 }

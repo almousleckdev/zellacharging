@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/shared/widgets/adaptive_spinner.dart';
+import 'package:zella/shared/widgets/adaptive_spinner.dart';
 
 Future<void> _show(WidgetTester tester, TargetPlatform platform) =>
     tester.pumpWidget(

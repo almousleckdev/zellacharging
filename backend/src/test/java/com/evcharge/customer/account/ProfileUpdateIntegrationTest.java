@@ -1,5 +1,6 @@
 package com.evcharge.customer.account;
 
+import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.PostgresTestBase;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,7 +12,6 @@ import org.springframework.test.web.servlet.MockMvc;
 
 import java.util.UUID;
 
-import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.patch;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
@@ -38,14 +38,14 @@ class ProfileUpdateIntegrationTest extends PostgresTestBase {
     void aCustomerCanChangeTheirName() throws Exception {
         UUID id = customer();
 
-        mvc.perform(patch("/v1/me").with(jwt().jwt(j -> j.subject(id.toString())))
+        mvc.perform(patch("/v1/me").with(TestTenants.customer(id))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"firstName\":\"  Marie \",\"lastName\":\"Obame\"}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.firstName").value("Marie"))
                 .andExpect(jsonPath("$.lastName").value("Obame"));
 
-        mvc.perform(get("/v1/me").with(jwt().jwt(j -> j.subject(id.toString()))))
+        mvc.perform(get("/v1/me").with(TestTenants.customer(id)))
                 .andExpect(jsonPath("$.firstName").value("Marie"));
     }
 
@@ -53,7 +53,7 @@ class ProfileUpdateIntegrationTest extends PostgresTestBase {
     void aBlankNameIsRefused() throws Exception {
         UUID id = customer();
 
-        mvc.perform(patch("/v1/me").with(jwt().jwt(j -> j.subject(id.toString())))
+        mvc.perform(patch("/v1/me").with(TestTenants.customer(id))
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{\"firstName\":\" \",\"lastName\":\"Obame\"}"))
                 .andExpect(status().isBadRequest());

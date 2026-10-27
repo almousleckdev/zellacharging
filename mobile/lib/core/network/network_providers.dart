@@ -5,6 +5,7 @@ import '../session/session_controller.dart';
 import '../storage/secure_token_store.dart';
 import '../storage/token_store.dart';
 import 'auth_interceptor.dart';
+import 'language_interceptor.dart';
 import 'token_refresher.dart';
 
 const _baseUrl = String.fromEnvironment(
@@ -27,6 +28,7 @@ final dioProvider = Provider<Dio>((ref) {
   final store = ref.watch(tokenStoreProvider);
   final client = _newClient();
   final refresher = TokenRefresher(plainClient: _newClient(), store: store);
+  client.interceptors.add(LanguageInterceptor());
   client.interceptors.add(
     AuthInterceptor(
       store: store,

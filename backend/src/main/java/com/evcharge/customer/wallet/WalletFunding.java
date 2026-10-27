@@ -16,4 +16,8 @@ public interface WalletFunding {
     List<UUID> openHoldSessions();
 
     Money reserved(UUID sessionId);
+
+    Money available(UUID customerId);
+
+    StartLimits startLimits();
 }

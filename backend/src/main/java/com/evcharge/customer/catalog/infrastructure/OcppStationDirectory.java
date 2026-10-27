@@ -4,6 +4,8 @@ import com.evcharge.customer.catalog.application.port.StationDirectory;
 import com.evcharge.customer.catalog.domain.ConnectorRef;
 import com.evcharge.customer.catalog.domain.Station;
 import com.evcharge.customer.shared.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
@@ -18,8 +20,7 @@ import java.util.function.Supplier;
 @Component
 class OcppStationDirectory implements StationDirectory {
 
-    private record QrMapping(String deviceId, int connectorId) {
-    }
+    private static final Logger log = LoggerFactory.getLogger(OcppStationDirectory.class);
 
     private final RestClient client;
 
@@ -57,7 +58,7 @@ class OcppStationDirectory implements StationDirectory {
         return notFoundAsEmpty(() -> client.get()
                 .uri("/c/{token}", token)
                 .retrieve()
-                .body(QrMapping.class)).map(mapping -> new ConnectorRef(mapping.deviceId(), mapping.connectorId()));
+                .body(OcppQrMapping.class)).map(mapping -> new ConnectorRef(mapping.deviceId(), mapping.connectorId()));
     }
 
     private <T> Optional<T> notFoundAsEmpty(Supplier<T> request) {
@@ -74,6 +75,7 @@ class OcppStationDirectory implements StationDirectory {
         } catch (HttpClientErrorException.NotFound e) {
             throw e;
         } catch (RestClientException e) {
+            log.warn("Charging platform call failed: {}", e.getMessage());
             throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "CATALOG_UNAVAILABLE",
                     "Charging network is temporarily unavailable");
         }

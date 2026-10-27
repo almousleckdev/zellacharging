@@ -1,15 +1,16 @@
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/network/api_error.dart';
-import 'package:ndzela/features/charging/domain/charge_quote.dart';
-import 'package:ndzela/features/charging/domain/charge_request.dart';
-import 'package:ndzela/features/charging/domain/charging_session.dart';
-import 'package:ndzela/features/charging/domain/session_repository.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/charging/domain/start_charge.dart';
-import 'package:ndzela/features/wallet/domain/mobile_operator.dart';
-import 'package:ndzela/features/wallet/domain/topup_result.dart';
-import 'package:ndzela/features/wallet/domain/wallet.dart';
-import 'package:ndzela/features/wallet/domain/wallet_repository.dart';
+import 'package:zella/core/network/api_error.dart';
+import 'package:zella/features/charging/domain/charge_quote.dart';
+import 'package:zella/features/charging/domain/charge_request.dart';
+import 'package:zella/features/charging/domain/charging_session.dart';
+import 'package:zella/features/charging/domain/session_quote.dart';
+import 'package:zella/features/charging/domain/session_repository.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/charging/domain/start_charge.dart';
+import 'package:zella/features/wallet/domain/mobile_operator.dart';
+import 'package:zella/features/wallet/domain/topup_result.dart';
+import 'package:zella/features/wallet/domain/wallet.dart';
+import 'package:zella/features/wallet/domain/wallet_repository.dart';
 
 class _FakeWallets implements WalletRepository {
   _FakeWallets(this.available, {this.states = const ['SUCCEEDED']});
@@ -51,13 +52,20 @@ class _FakeWallets implements WalletRepository {
 
 class _FakeSessions implements SessionRepository {
   final started = <int>[];
+  final keys = <String>[];
 
   @override
   Future<void> delete(String sessionId) => throw UnimplementedError();
 
   @override
-  Future<ChargingSession> start(String stationId, int connectorId, int amount) {
+  Future<ChargingSession> start(
+    String stationId,
+    int connectorId,
+    int amount, {
+    required String idempotencyKey,
+  }) {
     started.add(amount);
+    keys.add(idempotencyKey);
     return Future.value(
       ChargingSession(
         id: 's1',
@@ -68,6 +76,10 @@ class _FakeSessions implements SessionRepository {
       ),
     );
   }
+
+  @override
+  Future<SessionQuote> quote(String stationId, int connectorId, int amount) =>
+      throw UnimplementedError();
 
   @override
   Future<ChargingSession> stop(String sessionId) => throw UnimplementedError();
@@ -156,4 +168,48 @@ void main() {
     );
     expect(sessions.started, isEmpty);
   });
+
+  test(
+    'a payment still pending is reported as uncertain, never as failed',
+    () async {
+      final wallets = _FakeWallets(0, states: ['PENDING']);
+      final sessions = _FakeSessions();
+      await expectLater(
+        _useCase(wallets, sessions).call(_request()),
+        throwsA(
+          isA<ApiError>()
+              .having((e) => e.code, 'code', 'PAYMENT_VERIFYING')
+              .having((e) => e.isUncertain, 'uncertain', isTrue),
+        ),
+      );
+      expect(sessions.started, isEmpty);
+    },
+  );
+
+  test('a failed or expired payment is a definite failure', () async {
+    for (final state in ['FAILED', 'EXPIRED']) {
+      final sessions = _FakeSessions();
+      await expectLater(
+        _useCase(_FakeWallets(0, states: [state]), sessions).call(_request()),
+        throwsA(
+          isA<ApiError>()
+              .having((e) => e.code, 'code', 'PAYMENT_NOT_COMPLETED')
+              .having((e) => e.isUncertain, 'uncertain', isFalse),
+        ),
+      );
+      expect(sessions.started, isEmpty);
+    }
+  });
+
+  test(
+    'the session start carries the attempt key so a retry cannot start twice',
+    () async {
+      final sessions = _FakeSessions();
+      await _useCase(
+        _FakeWallets(5000),
+        sessions,
+      ).call(_request(withPayment: false));
+      expect(sessions.keys, ['k']);
+    },
+  );
 }

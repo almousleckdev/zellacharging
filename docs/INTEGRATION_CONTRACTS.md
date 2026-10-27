@@ -143,7 +143,7 @@ pin the OpenAPI document hash in CI contract tests, and subscribe to platform ch
 Source: written reply to our 22 questions. Items marked **[supplier]** are not
 answered by the platform and need the charger supplier.
 
-| Topic | Answer | Consequence for Ndzela |
+| Topic | Answer | Consequence for Zella |
 |---|---|---|
 | Tariff | One flat per-kWh tariff per country; no time, idle, connection or fixed fees; no per-site or per-station tariff; no dates | Quote = price/kWh x energy only. Tariff read endpoint (G3) was not answered and stays a blocker for pre-start prices |
 | Tariff timing | Frozen at `StartTransaction`; later changes never touch a running session; `MISSING_AT_START` leaves `costMinor` null | Debit the wallet from the session snapshot; a null cost must never be guessed |

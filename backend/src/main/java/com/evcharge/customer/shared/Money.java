@@ -25,7 +25,7 @@ public record Money(long minor, String currency, int decimals) {
         return new Money(0, currency, decimals);
     }
 
-        public static Money forEnergy(BigDecimal kwh, long pricePerKwhMinor, String currency, int decimals) {
+    public static Money forEnergy(BigDecimal kwh, long pricePerKwhMinor, String currency, int decimals) {
         if (kwh.signum() < 0 || pricePerKwhMinor < 0) {
             throw new IllegalArgumentException("energy and price must not be negative");
         }
@@ -35,7 +35,7 @@ public record Money(long minor, String currency, int decimals) {
         return new Money(minor, currency, decimals);
     }
 
-        public BigDecimal energyAt(long pricePerKwhMinor) {
+    public BigDecimal energyAt(long pricePerKwhMinor) {
         if (pricePerKwhMinor <= 0) {
             throw new IllegalArgumentException("price per kWh must be positive");
         }
@@ -61,7 +61,7 @@ public record Money(long minor, String currency, int decimals) {
         return minor == 0;
     }
 
-        public BigDecimal toMajor() {
+    public BigDecimal toMajor() {
         return BigDecimal.valueOf(minor, decimals);
     }
 

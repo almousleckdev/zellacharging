@@ -1,12 +1,13 @@
 package com.evcharge.customer.charging;
 
+import com.evcharge.customer.charging.application.ChargingMetrics;
 import com.evcharge.customer.charging.application.FeeCalculator;
 import com.evcharge.customer.charging.application.FeeSettings;
 import com.evcharge.customer.charging.application.FundsGuard;
 import com.evcharge.customer.charging.application.MeteringService;
 import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.charging.application.SessionTariff;
-import com.evcharge.customer.charging.application.port.SessionRepository;
+import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.application.StopCommander;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.CommandOutcome;
@@ -14,6 +15,7 @@ import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.Money;
 import com.evcharge.customer.wallet.WalletFunding;
+import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -38,15 +40,16 @@ class FundsGuardTest {
     private final WalletFunding funding = mock(WalletFunding.class);
     private final MeteringService metering = mock(MeteringService.class);
     private final StopCommander stopper = mock(StopCommander.class);
-    private final SessionRepository sessions = mock(SessionRepository.class);
+    private final SessionTelemetry sessions = mock(SessionTelemetry.class);
     private final SessionSettings settings = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
-            Duration.ofSeconds(30), 150L, 95);
+            Duration.ofSeconds(30), 150L, 95, Duration.ofSeconds(90), Duration.ZERO, Duration.ZERO);
     private FundsGuard guard;
 
     @BeforeEach
     void setUp() {
         guard = new FundsGuard(funding, metering, stopper, settings, new SessionTariff(sessions, settings),
-                new FeeCalculator(new FeeSettings(null, null)), Clock.fixed(NOW, ZoneOffset.UTC));
+                new FeeCalculator(new FeeSettings(null, null)), new ChargingMetrics(new SimpleMeterRegistry()),
+                Clock.fixed(NOW, ZoneOffset.UTC));
         when(funding.reserved(any())).thenReturn(new Money(5000, "XOF", 0));
         when(stopper.issue(any())).thenReturn(CommandOutcome.success());
     }
@@ -90,6 +93,49 @@ class FundsGuardTest {
     @Test
     void leavesAFreshStopAlone() {
         guard.enforce(session(SessionState.STOPPING, NOW.minusSeconds(5)));
+        verify(stopper, never()).issue(any());
+    }
+
+    private void movingAt(String kwh, String powerKw) {
+        when(metering.of(any())).thenReturn(Optional.of(new Metering(new BigDecimal(kwh), new BigDecimal(powerKw),
+                null, 10L, null, null, NOW)));
+    }
+
+    @Test
+    void stopsEarlyWhenTheChargerWillConsumeTheRestOfTheBudgetBeforeAStopCanLand() {
+        movingAt("30.5", "60");
+        guard.enforce(session(SessionState.ACTIVE, NOW));
+        verify(stopper).issue(any());
+    }
+
+    @Test
+    void doesNotStopEarlyWhenThePowerIsLow() {
+        movingAt("30.5", "5");
+        guard.enforce(session(SessionState.ACTIVE, NOW));
+        verify(stopper, never()).issue(any());
+    }
+
+    @Test
+    void stopsASessionWhoseTariffIsUnknownBecauseTheBudgetCannotBeEnforced() {
+        SessionSettings noPrice = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
+                Duration.ofSeconds(30), null, 95, Duration.ofSeconds(90), Duration.ZERO, Duration.ZERO);
+        FundsGuard unpriced = new FundsGuard(funding, metering, stopper, noPrice, new SessionTariff(sessions, noPrice),
+                new FeeCalculator(new FeeSettings(null, null)), new ChargingMetrics(new SimpleMeterRegistry()),
+                Clock.fixed(NOW, ZoneOffset.UTC));
+        energy("1.0");
+        unpriced.enforce(session(SessionState.ACTIVE, NOW));
+        verify(stopper).issue(any());
+    }
+
+    @Test
+    void doesNotStopAnUnpricedSessionBeforeAnyEnergyIsReported() {
+        SessionSettings noPrice = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
+                Duration.ofSeconds(30), null, 95, Duration.ofSeconds(90), Duration.ZERO, Duration.ZERO);
+        FundsGuard unpriced = new FundsGuard(funding, metering, stopper, noPrice, new SessionTariff(sessions, noPrice),
+                new FeeCalculator(new FeeSettings(null, null)), new ChargingMetrics(new SimpleMeterRegistry()),
+                Clock.fixed(NOW, ZoneOffset.UTC));
+        when(metering.of(any())).thenReturn(Optional.empty());
+        unpriced.enforce(session(SessionState.ACTIVE, NOW));
         verify(stopper, never()).issue(any());
     }
 }

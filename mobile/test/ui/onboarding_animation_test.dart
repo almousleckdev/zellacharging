@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/features/auth/presentation/animated_illustration.dart';
+import 'package:zella/features/auth/presentation/animated_illustration.dart';
 
 const _asset = 'assets/images/onboarding_find.png';
 

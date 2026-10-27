@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/format/money_format.dart';
-import 'package:ndzela/core/l10n/strings.dart';
-import 'package:ndzela/core/theme/app_theme.dart';
-import 'package:ndzela/features/charging/domain/charging_session.dart';
-import 'package:ndzela/features/charging/domain/session_fees.dart';
-import 'package:ndzela/features/charging/domain/session_state.dart';
-import 'package:ndzela/features/charging/presentation/charging_page.dart';
-import 'package:ndzela/features/charging/presentation/session_providers.dart';
+import 'package:zella/core/format/money_format.dart';
+import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/core/theme/app_theme.dart';
+import 'package:zella/features/charging/domain/charging_session.dart';
+import 'package:zella/features/charging/domain/session_fees.dart';
+import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/charging/presentation/charging_page.dart';
+import 'package:zella/features/charging/presentation/session_providers.dart';
 
 import 'screens.dart';
 import 'test_fonts.dart';

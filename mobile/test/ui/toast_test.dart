@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:ndzela/core/theme/app_theme.dart';
-import 'package:ndzela/shared/app_toast.dart';
+import 'package:zella/core/theme/app_theme.dart';
+import 'package:zella/shared/app_toast.dart';
 
 import 'test_fonts.dart';
 

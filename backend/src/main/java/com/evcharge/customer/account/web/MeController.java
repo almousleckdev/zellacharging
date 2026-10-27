@@ -3,8 +3,7 @@ package com.evcharge.customer.account.web;
 import com.evcharge.customer.account.application.AccountClosureService;
 import com.evcharge.customer.account.application.PasswordService;
 import com.evcharge.customer.account.application.ProfileService;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.security.oauth2.jwt.Jwt;
+import com.evcharge.customer.shared.CustomerPrincipal;
 import jakarta.validation.Valid;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.http.HttpStatus;
@@ -15,7 +14,6 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/v1/me")
@@ -32,25 +30,25 @@ class MeController {
     }
 
     @GetMapping
-    ProfileResponse me(@AuthenticationPrincipal Jwt jwt) {
-        return ProfileResponse.from(profiles.get(UUID.fromString(jwt.getSubject())));
+    ProfileResponse me(CustomerPrincipal me) {
+        return ProfileResponse.from(profiles.get(me.id()));
     }
 
     @PatchMapping
-    ProfileResponse update(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody UpdateProfileRequest request) {
-        return ProfileResponse.from(profiles.updateName(UUID.fromString(jwt.getSubject()), request.firstName(),
+    ProfileResponse update(CustomerPrincipal me, @Valid @RequestBody UpdateProfileRequest request) {
+        return ProfileResponse.from(profiles.updateName(me.id(), request.firstName(),
                 request.lastName()));
     }
 
     @PostMapping("/password")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void changePassword(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody ChangePasswordRequest request) {
-        passwords.change(UUID.fromString(jwt.getSubject()), request.currentPassword(), request.newPassword());
+    void changePassword(CustomerPrincipal me, @Valid @RequestBody ChangePasswordRequest request) {
+        passwords.change(me.id(), request.currentPassword(), request.newPassword());
     }
 
     @PostMapping("/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteAccount(@AuthenticationPrincipal Jwt jwt, @Valid @RequestBody DeleteAccountRequest request) {
-        closure.close(UUID.fromString(jwt.getSubject()), request.password());
+    void deleteAccount(CustomerPrincipal me, @Valid @RequestBody DeleteAccountRequest request) {
+        closure.close(me.id(), request.password());
     }
 }

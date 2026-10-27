@@ -2,7 +2,9 @@ import 'package:dio/dio.dart';
 
 import '../../../core/network/api_error.dart';
 import '../domain/charging_session.dart';
+import '../domain/session_quote.dart';
 import '../domain/session_repository.dart';
+import 'session_quote_mapper.dart';
 import 'session_mapper.dart';
 
 class SessionRepositoryImpl implements SessionRepository {
@@ -26,8 +28,9 @@ class SessionRepositoryImpl implements SessionRepository {
   Future<ChargingSession> start(
     String stationId,
     int connectorId,
-    int amountMinor,
-  ) => _session(
+    int amountMinor, {
+    required String idempotencyKey,
+  }) => _session(
     client.post<Map<String, dynamic>>(
       '/v1/sessions',
       data: {
@@ -35,8 +38,30 @@ class SessionRepositoryImpl implements SessionRepository {
         'connectorId': connectorId,
         'amountMinor': amountMinor,
       },
+      options: Options(headers: {'Idempotency-Key': idempotencyKey}),
     ),
   );
+
+  @override
+  Future<SessionQuote> quote(
+    String stationId,
+    int connectorId,
+    int amountMinor,
+  ) async {
+    try {
+      final response = await client.post<Map<String, dynamic>>(
+        '/v1/sessions/quote',
+        data: {
+          'stationId': stationId,
+          'connectorId': connectorId,
+          'amountMinor': amountMinor,
+        },
+      );
+      return SessionQuoteMapper.fromJson(response.data!);
+    } on DioException catch (error) {
+      throw ApiError.fromDio(error);
+    }
+  }
 
   @override
   Future<ChargingSession> stop(String sessionId) => _session(

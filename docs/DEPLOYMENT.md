@@ -2,7 +2,7 @@
 
 ## Railway (in use)
 
-Project `ndzela-staging`, environment `production`, three services:
+Project `zella-staging`, environment `production`, three services:
 
 | Service | What it is | Public |
 |---|---|---|
@@ -16,7 +16,7 @@ Variables live in Railway, not in the repository: `railway variables -s backend`
 To connect the OCPP platform once they reply, set both and redeploy:
 
 ```bash
-railway variables set -s backend NDZELA_OCPP_BASE_URL=https://... NDZELA_OCPP_API_KEY=...
+railway variables set -s backend ZELLA_OCPP_BASE_URL=https://... ZELLA_OCPP_API_KEY=...
 ```
 
 Outbound IP: Railway services share changing outbound addresses unless the project has the
@@ -26,7 +26,7 @@ key without an allowlist while request signing stays on.
 
 The VPS instructions below are the alternative and were not used.
 
-Goal: give the OCPP team a public HTTPS URL for the Ndzela backend so they can issue our
+Goal: give the OCPP team a public HTTPS URL for the Zella backend so they can issue our
 partner access (API key, IP allowlist, station ownership). Everything below was built and
 the container was run locally; **it has not been deployed to a real server yet**.
 
@@ -35,7 +35,7 @@ the container was run locally; **it has not been deployed to a real server yet**
 | Item | Notes |
 |---|---|
 | A Linux VPS (2 GB RAM is enough) | Docker and the compose plugin installed, ports 80 and 443 open |
-| A domain or subdomain | An `A` record pointing at the VPS, for example `api.ndzela.example` |
+| A domain or subdomain | An `A` record pointing at the VPS, for example `api.zella.example` |
 | OCPP base URL and API key | Given by the OCPP team after they receive our URL |
 
 ## Deploy
@@ -46,8 +46,8 @@ cp staging.env.example staging.env
 ```
 
 Fill `staging.env`. Generate the secrets with `openssl rand -hex 32` (JWT secret,
-code pepper, database password). Until the OCPP team has replied, `NDZELA_OCPP_BASE_URL`
-and `NDZELA_OCPP_API_KEY` can hold placeholders: the backend starts, and catalog and
+code pepper, database password). Until the OCPP team has replied, `ZELLA_OCPP_BASE_URL`
+and `ZELLA_OCPP_API_KEY` can hold placeholders: the backend starts, and catalog and
 charging calls fail with `CATALOG_UNAVAILABLE` or `CHARGING_UNAVAILABLE` until real values
 are set.
 
@@ -80,9 +80,9 @@ needed for now.
 * Verification emails go to a Maildev inbox that is only reachable from the server:
   `ssh -L 1080:localhost:1080 user@server`, then open `http://localhost:1080`.
   Phone OTP codes are written to the backend log: `docker compose logs backend`.
-* The price per kWh used for the charge limit is empty unless `NDZELA_PRICE_PER_KWH` is set.
+* The price per kWh used for the charge limit is empty unless `ZELLA_PRICE_PER_KWH` is set.
   Without it, a charge is not stopped when the held amount is consumed.
-* The database lives in the `ndzela-pg` volume. Back it up before any rebuild that you
+* The database lives in the `zella-pg` volume. Back it up before any rebuild that you
   are not sure about.
 
 ## Before real customers

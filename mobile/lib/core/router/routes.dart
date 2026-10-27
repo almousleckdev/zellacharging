@@ -7,6 +7,7 @@ abstract final class Routes {
   static const home = '/home';
   static const locations = '/locations';
   static const history = '/history';
+  static const activityStats = '/history/stats/:metric';
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
   static const settings = '/profile/settings';
@@ -18,11 +19,16 @@ abstract final class Routes {
   static const wallet = '/wallet';
   static const topup = '/wallet/topup';
   static const withdraw = '/wallet/withdraw';
+  static const walletEntry = '/wallet/entries/:id';
   static const station = '/stations/:id';
   static const charging = '/charging/:id';
   static const chargeSetup = '/stations/:id/charge';
 
+  static String walletEntryPath(String id) => '/wallet/entries/$id';
+
   static String chargingPath(String id) => '/charging/$id';
+
+  static String activityStatsPath(String metric) => '/history/stats/$metric';
 
   static String chargeSetupPath(String id, {int? connectorId}) {
     final path = '/stations/${Uri.encodeComponent(id)}/charge';

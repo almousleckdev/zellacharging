@@ -69,6 +69,17 @@ class PvitGatewayTest {
     }
 
     @Test
+    void anInvalidCustomerNumberFailsWithItsOwnCodeAndKeepsTheKey() {
+        server.expect(requestTo("http://pvit.test/v2/PAYCODE/rest")).andRespond(withStatus(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{\"status_code\":3024,\"error\":\"INVALID_CLIENT_ACCOUNT_NUMBER\"}"));
+        PaymentOutcome outcome = gateway.collect(request());
+        assertThat(outcome.state()).isEqualTo(TopupState.FAILED);
+        assertThat(outcome.failureCode()).isEqualTo("INVALID_ACCOUNT_NUMBER");
+        server.verify();
+    }
+
+    @Test
     void aServerErrorLeavesTheOutcomeUnknown() {
         server.expect(requestTo("http://pvit.test/v2/PAYCODE/rest")).andRespond(withStatus(HttpStatus.BAD_GATEWAY));
         assertThatThrownBy(() -> gateway.collect(request())).isInstanceOf(PvitException.class);

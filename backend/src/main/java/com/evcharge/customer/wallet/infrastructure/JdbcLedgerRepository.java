@@ -9,7 +9,9 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -62,9 +64,35 @@ class JdbcLedgerRepository implements LedgerRepository {
     }
 
     @Override
+    public Optional<LedgerEntry> find(UUID customerId, UUID id) {
+        return jdbc.sql("select l.* from ledger_entry l where l.customer_id = :customer and l.id = :id and not exists "
+                        + "(select 1 from ledger_hidden h where h.entry_id = l.id)")
+                .param("customer", customerId).param("id", id).query(MAPPER).optional();
+    }
+
+    @Override
+    public long balanceAfter(UUID customerId, Instant at) {
+        return jdbc.sql("""
+                select coalesce(sum(case type when 'TOPUP' then amount_minor
+                    when 'WITHDRAWAL_REVERSAL' then amount_minor when 'CAPTURE' then -amount_minor
+                    when 'WITHDRAWAL' then -amount_minor else 0 end), 0)
+                from ledger_entry where customer_id = :customer and created_at <= :at
+                """).param("customer", customerId).param("at", Timestamps.toDb(at)).query(Long.class).single();
+    }
+
+    @Override
+    public boolean hide(UUID customerId, UUID id, Instant at) {
+        return jdbc.sql("insert into ledger_hidden (entry_id, customer_id, hidden_at) select l.id, l.customer_id, :at "
+                        + "from ledger_entry l where l.id = :id and l.customer_id = :customer "
+                        + "on conflict (entry_id) do nothing")
+                .param("id", id).param("customer", customerId).param("at", Timestamps.toDb(at)).update() == 1;
+    }
+
+    @Override
     public List<LedgerEntry> recent(UUID customerId, int limit) {
-        return jdbc.sql("select * from ledger_entry where customer_id = :id "
-                        + "order by created_at desc limit :limit")
+        return jdbc.sql("select l.* from ledger_entry l where l.customer_id = :id and not exists "
+                        + "(select 1 from ledger_hidden h where h.entry_id = l.id) "
+                        + "order by l.created_at desc limit :limit")
                 .param("id", customerId).param("limit", limit).query(MAPPER).list();
     }
 }

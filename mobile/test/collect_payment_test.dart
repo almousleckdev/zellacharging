@@ -6,14 +6,17 @@ import 'package:zella/features/wallet/domain/payment_stage.dart';
 import 'package:zella/features/wallet/domain/topup_result.dart';
 import 'package:zella/features/wallet/domain/wallet.dart';
 import 'package:zella/features/wallet/domain/wallet_entry.dart';
+import 'package:zella/features/wallet/domain/wallet_entry_detail.dart';
+
 import 'package:zella/features/wallet/domain/withdrawal_result.dart';
 
 import 'package:zella/features/wallet/domain/wallet_repository.dart';
 
 class _Wallets implements WalletRepository {
-  _Wallets(this.states);
+  _Wallets(this.states, {this.failureCode});
 
   final List<String> states;
+  final String? failureCode;
   var created = 0;
   var polls = 0;
 
@@ -28,7 +31,7 @@ class _Wallets implements WalletRepository {
     required String idempotencyKey,
   }) async {
     created++;
-    return TopupResult(id: 't', state: states.first);
+    return TopupResult(id: 't', state: states.first, failureCode: failureCode);
   }
 
   @override
@@ -54,6 +57,13 @@ class _Wallets implements WalletRepository {
 
   @override
   Future<List<WalletEntry>> entries() async => const [];
+
+  @override
+  Future<WalletEntryDetail> entryDetail(String id) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> hideEntry(String id) => throw UnimplementedError();
 }
 
 Future<List<PaymentStage>> _run(_Wallets wallets) async {
@@ -107,6 +117,26 @@ void main() {
         ),
       );
     }
+  });
+
+  test('an invalid mobile money number gets its own clear message', () async {
+    await expectLater(
+      _run(_Wallets(['FAILED'], failureCode: 'INVALID_ACCOUNT_NUMBER')),
+      throwsA(
+        isA<ApiError>()
+            .having((e) => e.code, 'code', 'INVALID_ACCOUNT_NUMBER')
+            .having((e) => e.message, 'message', contains('Moov Money')),
+      ),
+    );
+  });
+
+  test('an unknown failure code falls back to the generic message', () async {
+    await expectLater(
+      _run(_Wallets(['FAILED'], failureCode: 'SOMETHING_ELSE')),
+      throwsA(
+        isA<ApiError>().having((e) => e.code, 'code', 'PAYMENT_NOT_COMPLETED'),
+      ),
+    );
   });
 
   test('only one payment is ever created for one attempt', () async {

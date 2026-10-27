@@ -19,6 +19,21 @@ void main() {
     expect(OperatorHint.forNumber(null), isNull);
   });
 
+  test('the number decides the operator, the choice is the fallback', () {
+    expect(
+      OperatorHint.resolve('+24162820745', MobileOperator.airtel),
+      MobileOperator.moov,
+    );
+    expect(
+      OperatorHint.resolve('+24177123456', MobileOperator.moov),
+      MobileOperator.airtel,
+    );
+    expect(
+      OperatorHint.resolve('+2416', MobileOperator.moov),
+      MobileOperator.moov,
+    );
+  });
+
   test('a phone number is masked in the middle', () {
     expect(PhoneMask.of('+24162820745'), '+24162••••45');
     expect(PhoneMask.of('123'), '123');

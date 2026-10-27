@@ -1,6 +1,7 @@
 import 'mobile_operator.dart';
 import 'topup_result.dart';
 import 'wallet_entry.dart';
+import 'wallet_entry_detail.dart';
 import 'withdrawal_result.dart';
 import 'wallet.dart';
 
@@ -26,4 +27,8 @@ abstract class WalletRepository {
   Future<WithdrawalResult> withdrawalStatus(String id);
 
   Future<List<WalletEntry>> entries();
+
+  Future<WalletEntryDetail> entryDetail(String id);
+
+  Future<void> hideEntry(String id);
 }

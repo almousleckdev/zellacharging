@@ -75,7 +75,11 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
         const SizedBox(height: AppSpacing.md),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
-          child: HistorySummaryRow(summary: HistorySummary.of(visible)),
+          child: HistorySummaryRow(
+            summary: HistorySummary.of(visible),
+            onMetric: (metric) =>
+                context.push(Routes.activityStatsPath(metric.name)),
+          ),
         ),
         const SizedBox(height: AppSpacing.md),
         FilterChips(

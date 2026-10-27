@@ -5,7 +5,9 @@ export 'history_text.dart';
 export 'pay_flow_text.dart';
 export 'payment_text.dart';
 export 'profile_text.dart';
+export 'stat_text.dart';
 export 'station_text.dart';
+export 'wallet_history_text.dart';
 export 'wallet_text.dart';
 export 'withdraw_text.dart';
 

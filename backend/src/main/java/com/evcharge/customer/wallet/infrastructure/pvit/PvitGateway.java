@@ -37,7 +37,7 @@ class PvitGateway implements PaymentGateway {
         } catch (PvitException e) {
             if (e.refused()) {
                 log.warn("PVit refused payment {}: {}", request.reference(), e.getMessage());
-                return PaymentOutcome.failed("PROVIDER_REFUSED");
+                return PaymentOutcome.failed(e.failureCode() == null ? "PROVIDER_REFUSED" : e.failureCode());
             }
             throw e;
         }

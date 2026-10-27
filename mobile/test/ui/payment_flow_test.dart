@@ -12,6 +12,8 @@ import 'package:zella/features/wallet/domain/mobile_operator.dart';
 import 'package:zella/features/wallet/domain/topup_result.dart';
 import 'package:zella/features/wallet/domain/wallet.dart';
 import 'package:zella/features/wallet/domain/wallet_entry.dart';
+import 'package:zella/features/wallet/domain/wallet_entry_detail.dart';
+
 import 'package:zella/features/wallet/domain/withdrawal_result.dart';
 
 import 'package:zella/features/wallet/domain/wallet_repository.dart';
@@ -74,6 +76,13 @@ class _ScriptedWallet implements WalletRepository {
 
   @override
   Future<List<WalletEntry>> entries() async => const [];
+
+  @override
+  Future<WalletEntryDetail> entryDetail(String id) =>
+      throw UnimplementedError();
+
+  @override
+  Future<void> hideEntry(String id) => throw UnimplementedError();
 }
 
 class _ShortSessions extends FakeSessions {

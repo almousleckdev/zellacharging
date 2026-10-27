@@ -8,12 +8,12 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/async_body.dart';
-import '../../../shared/widgets/pay/pay_card.dart';
+import '../../../shared/widgets/section_title.dart';
 import '../../../shared/widgets/pay/wallet_balance_card.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/secondary_button.dart';
 import '../domain/wallet.dart';
-import 'wallet_entry_tile.dart';
+import 'wallet_history_card.dart';
 import 'wallet_providers.dart';
 
 class WalletPage extends ConsumerWidget {
@@ -72,37 +72,25 @@ class WalletPage extends ConsumerWidget {
 
   Widget _history(BuildContext context, WidgetRef ref, Wallet wallet) {
     final entries = ref.watch(walletEntriesProvider);
-    return PayCard(
-      title: WithdrawText.historyTitle,
-      child: entries.when(
-        loading: () => const Padding(
-          padding: EdgeInsets.all(AppSpacing.md),
-          child: Center(child: CircularProgressIndicator.adaptive()),
-        ),
-        error: (_, _) => Text(
-          Strings.networkError,
-          style: const TextStyle(color: AppColors.textSecondary),
-        ),
-        data: (items) {
-          final visible = items.where((entry) => entry.visible).toList();
-          if (visible.isEmpty) {
-            return Text(
-              WithdrawText.emptyHistory,
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        SectionTitle(title: WithdrawText.historyTitle),
+        entries.when(
+          loading: () => const Padding(
+            padding: EdgeInsets.all(AppSpacing.lg),
+            child: Center(child: CircularProgressIndicator.adaptive()),
+          ),
+          error: (_, _) => Padding(
+            padding: const EdgeInsets.all(AppSpacing.md),
+            child: Text(
+              Strings.networkError,
               style: const TextStyle(color: AppColors.textSecondary),
-            );
-          }
-          return Column(
-            children: [
-              for (final entry in visible)
-                WalletEntryTile(
-                  entry: entry,
-                  currency: wallet.currency,
-                  decimals: wallet.decimals,
-                ),
-            ],
-          );
-        },
-      ),
+            ),
+          ),
+          data: (items) => WalletHistoryCard(wallet: wallet, entries: items),
+        ),
+      ],
     );
   }
 }

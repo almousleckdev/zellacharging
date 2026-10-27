@@ -41,7 +41,7 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
   }
 
   MobileOperator _chosen(String phone) =>
-      _operator ?? OperatorHint.forNumber(phone) ?? MobileOperator.airtel;
+      OperatorHint.resolve(phone, _operator ?? MobileOperator.airtel);
 
   void _submit(String phone) {
     if (!_formKey.currentState!.validate()) return;

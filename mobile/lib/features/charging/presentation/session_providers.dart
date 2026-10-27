@@ -42,6 +42,11 @@ final historyProvider = FutureProvider.autoDispose<List<ChargingSession>>(
   (ref) => ref.watch(sessionRepositoryProvider).history(),
 );
 
+final sessionByIdProvider = FutureProvider.autoDispose
+    .family<ChargingSession, String>(
+      (ref, id) => ref.watch(sessionRepositoryProvider).get(id),
+    );
+
 final liveSessionProvider = StreamProvider.autoDispose
     .family<ChargingSession, String>((ref, id) async* {
       final repository = ref.watch(sessionRepositoryProvider);

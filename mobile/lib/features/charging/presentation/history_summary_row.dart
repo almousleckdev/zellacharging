@@ -5,13 +5,19 @@ import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/metric_tile.dart';
+import '../../history/domain/stat_metric.dart';
 import '../domain/history_summary.dart';
 import '../../../core/theme/app_icons.dart';
 
 class HistorySummaryRow extends StatelessWidget {
-  const HistorySummaryRow({super.key, required this.summary});
+  const HistorySummaryRow({
+    super.key,
+    required this.summary,
+    required this.onMetric,
+  });
 
   final HistorySummary summary;
+  final ValueChanged<StatMetric> onMetric;
 
   String get _spent => summary.currency == null
       ? '--'
@@ -32,6 +38,7 @@ class HistorySummaryRow extends StatelessWidget {
               label: HistoryText.totalSessions,
               color: AppColors.primary,
               value: '${summary.sessions}',
+              onTap: () => onMetric(StatMetric.charges),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -41,6 +48,7 @@ class HistorySummaryRow extends StatelessWidget {
               label: HistoryText.totalEnergy,
               color: AppColors.chargeDeep,
               value: summary.energyKwh.toStringAsFixed(1),
+              onTap: () => onMetric(StatMetric.energy),
             ),
           ),
           const SizedBox(width: AppSpacing.sm),
@@ -50,6 +58,7 @@ class HistorySummaryRow extends StatelessWidget {
               label: HistoryText.totalSpent,
               color: AppColors.chargeGlow,
               value: _spent,
+              onTap: () => onMetric(StatMetric.spent),
             ),
           ),
         ],

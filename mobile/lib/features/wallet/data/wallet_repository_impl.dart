@@ -5,6 +5,7 @@ import '../domain/mobile_operator.dart';
 import '../domain/topup_result.dart';
 import '../domain/wallet.dart';
 import '../domain/wallet_entry.dart';
+import '../domain/wallet_entry_detail.dart';
 import '../domain/withdrawal_result.dart';
 import '../domain/wallet_repository.dart';
 
@@ -95,6 +96,34 @@ class WalletRepositoryImpl implements WalletRepository {
           createdAt: DateTime.parse(item['createdAt'] as String),
         ),
     ];
+  });
+
+  @override
+  Future<WalletEntryDetail> entryDetail(String id) => _guard(() async {
+    final response = await _client.get<Map<String, dynamic>>(
+      '/v1/wallet/transactions/$id',
+    );
+    final json = response.data!;
+    return WalletEntryDetail(
+      entry: WalletEntry(
+        id: json['id'] as String,
+        type: json['type'] as String,
+        amountMinor: (json['amountMinor'] as num).toInt(),
+        createdAt: DateTime.parse(json['createdAt'] as String),
+      ),
+      balanceAfterMinor: (json['balanceAfterMinor'] as num).toInt(),
+      sessionId: json['sessionId'] as String?,
+      operator: json['operator'] as String?,
+      msisdn: json['msisdn'] as String?,
+      state: json['state'] as String?,
+      reference: json['reference'] as String?,
+      providerReference: json['providerReference'] as String?,
+    );
+  });
+
+  @override
+  Future<void> hideEntry(String id) => _guard(() async {
+    await _client.delete<void>('/v1/wallet/transactions/$id');
   });
 
   WithdrawalResult _withdrawal(Map<String, dynamic> json) => WithdrawalResult(

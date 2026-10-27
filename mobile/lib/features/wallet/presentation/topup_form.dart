@@ -8,7 +8,6 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/pay/amount_hero.dart';
-import '../../../shared/widgets/pay/operator_hint_note.dart';
 import '../../../shared/widgets/pay/operator_tiles.dart';
 import '../../../shared/widgets/pay/pay_card.dart';
 import '../../../shared/widgets/pay/secure_note.dart';
@@ -69,7 +68,14 @@ class TopupForm extends StatelessWidget {
             title: PayText.methodTitle,
             child: Column(
               children: [
-                OperatorTiles(selected: operator, onSelected: onOperator),
+                ListenableBuilder(
+                  listenable: phone,
+                  builder: (context, _) => OperatorTiles(
+                    selected: operator,
+                    phone: phone.text,
+                    onSelected: onOperator,
+                  ),
+                ),
                 const SizedBox(height: AppSpacing.md),
                 AppTextField(
                   controller: phone,
@@ -79,14 +85,6 @@ class TopupForm extends StatelessWidget {
                   validator: Validators.mobileMoneyNumber,
                   keyboardType: TextInputType.phone,
                   textInputAction: TextInputAction.done,
-                ),
-                ListenableBuilder(
-                  listenable: phone,
-                  builder: (context, _) => OperatorHintNote(
-                    msisdn: phone.text,
-                    selected: operator,
-                    onUse: onOperator,
-                  ),
                 ),
               ],
             ),

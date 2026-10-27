@@ -10,6 +10,7 @@ import tools.jackson.databind.ObjectMapper;
 import tools.jackson.databind.node.ObjectNode;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.function.Function;
 
 class PvitApi {
@@ -86,7 +87,7 @@ class PvitApi {
         try {
             return mapper.readTree(call.apply(secrets.current()));
         } catch (RestClientResponseException e) {
-            if (isRejectedKey(e.getStatusCode())) {
+            if (isRejectedKey(e.getStatusCode()) && customerError(e).isEmpty()) {
                 secrets.invalidate();
                 return attempt(call);
             }
@@ -110,10 +111,21 @@ class PvitApi {
         return status.value() == 401 || status.value() == 403;
     }
 
-    private static PvitException failure(RestClientResponseException e) {
+    private PvitException failure(RestClientResponseException e) {
         int status = e.getStatusCode().value();
-        return new PvitException("The provider answered " + status + ": " + excerpt(e),
-                status == 400 || status == 422, status == 404);
+        Optional<String> customerCode = customerError(e);
+        boolean refused = status == 400 || status == 422 || customerCode.isPresent();
+        return new PvitException("The provider answered " + status + ": " + excerpt(e), refused, status == 404,
+                customerCode.orElse(null));
+    }
+
+    private Optional<String> customerError(RestClientResponseException e) {
+        try {
+            return PvitCustomerErrors.failureCodeOf(
+                    mapper.readTree(e.getResponseBodyAsString()).path("error").asString(null));
+        } catch (RuntimeException unreadable) {
+            return Optional.empty();
+        }
     }
 
     private static String excerpt(RestClientResponseException e) {

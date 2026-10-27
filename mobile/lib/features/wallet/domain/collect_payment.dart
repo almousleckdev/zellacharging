@@ -15,6 +15,18 @@ class CollectPayment {
   final Duration pollInterval;
   final int maxPolls;
 
+  static const _explained = {
+    'INVALID_ACCOUNT_NUMBER',
+    'PROVIDER_REFUSED',
+    'PAYMENT_DECLINED',
+    'EXPIRED',
+  };
+
+  String _failureCode(TopupResult result) =>
+      _explained.contains(result.failureCode)
+      ? result.failureCode!
+      : 'PAYMENT_NOT_COMPLETED';
+
   Future<TopupResult> call({
     required int amountMinor,
     required String msisdn,
@@ -39,7 +51,7 @@ class CollectPayment {
     }
     if (!result.succeeded) {
       throw ApiError.fromCode(
-        result.failed ? 'PAYMENT_NOT_COMPLETED' : 'PAYMENT_VERIFYING',
+        result.failed ? _failureCode(result) : 'PAYMENT_VERIFYING',
       );
     }
     onStage?.call(PaymentStage.confirmed);

@@ -10,7 +10,6 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/pay/amount_hero.dart';
-import '../../../shared/widgets/pay/operator_hint_note.dart';
 import '../../../shared/widgets/pay/operator_tiles.dart';
 import '../../../shared/widgets/pay/pay_card.dart';
 import '../../../shared/widgets/pay/secure_note.dart';
@@ -83,11 +82,10 @@ class WithdrawForm extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                OperatorTiles(selected: operator, onSelected: onOperator),
-                OperatorHintNote(
-                  msisdn: phone,
+                OperatorTiles(
                   selected: operator,
-                  onUse: onOperator,
+                  phone: phone,
+                  onSelected: onOperator,
                 ),
                 const SizedBox(height: AppSpacing.md),
                 Row(

@@ -12,6 +12,7 @@ import '../../../../shared/widgets/async_body.dart';
 import '../../../profile/presentation/profile_providers.dart';
 import '../../../stations/presentation/station_providers.dart';
 import '../../../wallet/domain/mobile_operator.dart';
+import '../../../wallet/domain/operator_hint.dart';
 import '../../domain/charge_plan.dart';
 import '../../domain/charge_request.dart';
 import '../charge_flow_controller.dart';
@@ -83,7 +84,10 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
             amountMinor: plan.amountMinor,
             attemptKey: _attempt,
             payment: plan.needsPayment
-                ? ChargePayment(operator: _operator, msisdn: _phone.text.trim())
+                ? ChargePayment(
+                    operator: OperatorHint.resolve(_phone.text, _operator),
+                    msisdn: _phone.text.trim(),
+                  )
                 : null,
           ),
         );
@@ -133,7 +137,7 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
           : ChargeFlowView(
               flow: flow,
               paying: plan.needsPayment,
-              operator: _operator,
+              operator: OperatorHint.resolve(_phone.text, _operator),
               phone: _phone.text.trim(),
               onRetry: _retry,
               onClose: () => context.pop(),

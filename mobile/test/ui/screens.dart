@@ -36,7 +36,10 @@ import 'package:zella/features/profile/presentation/profile_providers.dart';
 import 'package:zella/features/stations/presentation/locations_page.dart';
 import 'package:zella/features/stations/presentation/station_detail_page.dart';
 import 'package:zella/features/stations/presentation/station_providers.dart';
+import 'package:zella/features/history/domain/stat_metric.dart';
+import 'package:zella/features/history/presentation/activity_stats_page.dart';
 import 'package:zella/features/wallet/presentation/topup_page.dart';
+import 'package:zella/features/wallet/presentation/wallet_entry_page.dart';
 import 'package:zella/features/wallet/presentation/wallet_page.dart';
 import 'package:zella/features/wallet/presentation/withdraw_page.dart';
 import 'package:zella/features/wallet/presentation/wallet_providers.dart';
@@ -58,6 +61,10 @@ final screens = <String, Widget Function()>{
   'delete-account': () => const DeleteAccountPage(),
   'topup': () => const TopupPage(),
   'wallet': () => const WalletPage(),
+  'wallet-entry': () => const WalletEntryPage(entryId: '1'),
+  'stats-charges': () => const ActivityStatsPage(metric: StatMetric.charges),
+  'stats-energy': () => const ActivityStatsPage(metric: StatMetric.energy),
+  'stats-spent': () => const ActivityStatsPage(metric: StatMetric.spent),
   'withdraw': () => const WithdrawPage(),
   'station': () => const StationDetailPage(
     stationId: 'DY202609110007-VERY-LONG-STATION-IDENTIFIER',

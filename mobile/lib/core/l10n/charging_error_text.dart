@@ -74,6 +74,22 @@ abstract final class ChargingErrorText {
       fr: 'La borne est hors ligne.',
       en: 'The charger is offline.',
     ),
+    'INVALID_ACCOUNT_NUMBER': AppLanguage.pick(
+      fr: 'Ce numéro n’est pas valide ou n’a pas de compte Airtel Money ou Moov Money. Vérifiez le numéro et l’opérateur, puis réessayez.',
+      en: 'This number is not valid or has no Airtel Money or Moov Money account. Check the number and the operator, then try again.',
+    ),
+    'PROVIDER_REFUSED': AppLanguage.pick(
+      fr: 'Votre opérateur a refusé la demande de paiement. Aucun montant n’a été débité. Vérifiez votre numéro et réessayez.',
+      en: 'Your operator refused the payment request. Nothing was charged. Check your number and try again.',
+    ),
+    'PAYMENT_DECLINED': AppLanguage.pick(
+      fr: 'Le paiement a été refusé ou annulé. Aucun montant n’a été débité. Vérifiez votre solde Mobile Money et réessayez.',
+      en: 'The payment was declined or cancelled. Nothing was charged. Check your mobile money balance and try again.',
+    ),
+    'EXPIRED': AppLanguage.pick(
+      fr: 'Le paiement n’a pas été validé à temps sur votre téléphone. Aucun montant n’a été débité. Vous pouvez réessayer.',
+      en: 'The payment was not approved on your phone in time. Nothing was charged. You can try again.',
+    ),
     'PAYMENT_NOT_COMPLETED': AppLanguage.pick(
       fr: 'Le paiement n’a pas pu être confirmé. Votre session de recharge n’a pas démarré. Veuillez vérifier votre paiement ou réessayer.',
       en: 'Your payment could not be confirmed. Your charging session has not started. Please check your payment or try again.',

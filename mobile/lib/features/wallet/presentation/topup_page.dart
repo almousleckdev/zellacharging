@@ -8,6 +8,7 @@ import '../../../core/l10n/strings.dart';
 import '../../../shared/widgets/pay/action_bar.dart';
 import '../../profile/presentation/profile_providers.dart';
 import '../domain/mobile_operator.dart';
+import '../domain/operator_hint.dart';
 import 'topup_flow_controller.dart';
 import 'topup_flow_state.dart';
 import 'topup_flow_view.dart';
@@ -46,7 +47,7 @@ class _TopupPageState extends ConsumerState<TopupPage> {
         .pay(
           amountMinor: AmountInput.parse(_amount.text) ?? 0,
           msisdn: _phone.text.trim(),
-          operator: _operator,
+          operator: OperatorHint.resolve(_phone.text, _operator),
           idempotencyKey: _attempt,
         );
   }
@@ -72,14 +73,14 @@ class _TopupPageState extends ConsumerState<TopupPage> {
               currency: currency,
               amount: _amount,
               phone: _phone,
-              operator: _operator,
+              operator: OperatorHint.resolve(_phone.text, _operator),
               onOperator: (value) => setState(() => _operator = value),
               onAmountChanged: () => setState(() {}),
             )
           : TopupFlowView(
               flow: flow,
               currency: currency,
-              operator: _operator,
+              operator: OperatorHint.resolve(_phone.text, _operator),
               phone: _phone.text.trim(),
               onRetry: _retry,
               onClose: () => context.pop(),

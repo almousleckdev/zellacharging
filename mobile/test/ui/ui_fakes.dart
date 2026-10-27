@@ -30,6 +30,8 @@ import 'package:zella/features/wallet/domain/mobile_operator.dart';
 import 'package:zella/features/wallet/domain/topup_result.dart';
 import 'package:zella/features/wallet/domain/wallet.dart';
 import 'package:zella/features/wallet/domain/wallet_entry.dart';
+import 'package:zella/features/wallet/domain/wallet_entry_detail.dart';
+
 import 'package:zella/features/wallet/domain/withdrawal_result.dart';
 
 import 'package:zella/features/wallet/domain/wallet_repository.dart';
@@ -210,6 +212,27 @@ class FakeWallet implements WalletRepository {
       createdAt: DateTime(2026, 10, 27, 9, 15),
     ),
   ];
+
+  @override
+  Future<WalletEntryDetail> entryDetail(String id) async => WalletEntryDetail(
+    entry: WalletEntry(
+      id: id,
+      type: 'TOPUP',
+      amountMinor: 5000,
+      createdAt: DateTime(2026, 10, 26, 22, 2),
+    ),
+    balanceAfterMinor: 984567,
+    operator: 'MOOV',
+    msisdn: '+24162820745',
+    state: 'SUCCEEDED',
+    reference: 'GAA2FPSPEONV7JHFFMGU',
+    providerReference: 'MP26102600123',
+  );
+
+  final hidden = <String>[];
+
+  @override
+  Future<void> hideEntry(String id) async => hidden.add(id);
 }
 
 class FakeProfile implements ProfileRepository {

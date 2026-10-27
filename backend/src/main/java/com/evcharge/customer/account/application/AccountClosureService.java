@@ -19,7 +19,7 @@ import java.util.UUID;
 @Service
 public class AccountClosureService {
 
-    private final PasswordService passwords;
+    private final PasswordConfirmation passwords;
     private final PasswordHasher hasher;
     private final CustomerRepository customers;
     private final RefreshTokenRepository refreshTokens;
@@ -28,7 +28,7 @@ public class AccountClosureService {
     private final Clock clock;
     private final AuditTrail audit;
 
-    public AccountClosureService(PasswordService passwords, PasswordHasher hasher, CustomerRepository customers,
+    public AccountClosureService(PasswordConfirmation passwords, PasswordHasher hasher, CustomerRepository customers,
                                  RefreshTokenRepository refreshTokens, AvatarRepository avatars,
                                  List<ClosureBlocker> blockers, Clock clock, AuditTrail audit) {
         this.passwords = passwords;
@@ -41,7 +41,7 @@ public class AccountClosureService {
         this.audit = audit;
     }
 
-    @Transactional
+    @Transactional(noRollbackFor = ApiException.class)
     public void close(UUID customerId, String password) {
         passwords.confirm(customerId, password);
         blockers.stream().map(blocker -> blocker.blockingCode(customerId)).flatMap(Optional::stream)

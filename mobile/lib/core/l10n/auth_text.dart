@@ -26,8 +26,10 @@ abstract final class AuthText {
 
   static String get emailLabel => AppLanguage.pick(fr: 'E-mail', en: 'Email');
 
-  static String get phoneLabel =>
-      AppLanguage.pick(fr: 'Numéro de téléphone', en: 'Phone number');
+  static String get phoneLabel => AppLanguage.pick(
+    fr: 'Numéro de téléphone (facultatif)',
+    en: 'Phone number (optional)',
+  );
 
   static String get passwordLabel =>
       AppLanguage.pick(fr: 'Mot de passe', en: 'Password');

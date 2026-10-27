@@ -10,13 +10,17 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
@@ -29,6 +33,9 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
 
     @Autowired
     MockMvc mvc;
+
+    @Autowired
+    JdbcTemplate jdbc;
 
     @MockitoBean
     VerificationSender sender;
@@ -87,25 +94,51 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void phoneRegistrationUsesSixDigitCodeAndNormalizesNumber() throws Exception {
+    void registrationNeedsAnEmail() throws Exception {
         postJson("/v1/auth/register", """
-                {"firstName":"Jean","lastName":"Mba","phone":"123","password":"Secret123!"}
-                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_PHONE"));
+                {"firstName":"No","lastName":"Email","password":"Secret123!"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("EMAIL_REQUIRED"));
+        postJson("/v1/auth/register", """
+                {"firstName":"No","lastName":"Email","email":"  ","password":"Secret123!"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("EMAIL_REQUIRED"));
         postJson("/v1/auth/register", """
                 {"firstName":"Jean","lastName":"Mba","phone":"+24177123456","password":"Secret123!"}
-                """).andExpect(status().isCreated());
-        String code = lastCode(Channel.PHONE, "+24177123456");
-        assertThat(code).matches("\\d{6}");
-        postJson("/v1/auth/verify", """
-                {"channel":"PHONE","target":"077123456","code":"000000x"}
-                """).andExpect(status().isBadRequest());
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("EMAIL_REQUIRED"));
     }
 
     @Test
-    void registrationRequiresContactAndRejectsDuplicates() throws Exception {
+    void aPhoneNumberIsStoredNormalizedButNeverGetsACode() throws Exception {
         postJson("/v1/auth/register", """
-                {"firstName":"No","lastName":"Contact","password":"Secret123!"}
-                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CONTACT_REQUIRED"));
+                {"firstName":"Jean","lastName":"Mba","email":"jean@example.com","phone":"123","password":"Secret123!"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_PHONE"));
+
+        postJson("/v1/auth/register", """
+                {"firstName":"Jean","lastName":"Mba","email":"jean@example.com","phone":"077123456",
+                 "password":"Secret123!"}
+                """).andExpect(status().isCreated());
+
+        assertThat(lastCode(Channel.EMAIL, "jean@example.com")).matches("\\d{6}");
+        verify(sender, never()).send(eq(Channel.PHONE), anyString(), anyString());
+        assertThat(jdbc.queryForObject("select phone_e164 from customer where email = ?", String.class,
+                "jean@example.com")).isEqualTo("+24177123456");
+        assertThat(jdbc.queryForObject("select phone_verified_at from customer where email = ?",
+                java.sql.Timestamp.class, "jean@example.com")).isNull();
+    }
+
+    @Test
+    void codesAreOnlyVerifiedAndResentForEmail() throws Exception {
+        postJson("/v1/auth/verify", """
+                {"channel":"PHONE","target":"077123456","code":"123456"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CHANNEL_NOT_SUPPORTED"));
+        postJson("/v1/auth/verify/resend", """
+                {"channel":"PHONE","target":"077123456"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CHANNEL_NOT_SUPPORTED"));
+
+        verify(sender, never()).send(any(), anyString(), anyString());
+    }
+
+    @Test
+    void duplicateEmailsAreRejected() throws Exception {
         registerAndVerifyEmail("dup@example.com");
         postJson("/v1/auth/register", """
                 {"firstName":"B","lastName":"B","email":"DUP@example.com","password":"Secret123!"}

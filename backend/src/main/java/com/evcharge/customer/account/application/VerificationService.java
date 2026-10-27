@@ -10,6 +10,7 @@ import com.evcharge.customer.account.domain.CustomerStatus;
 import com.evcharge.customer.shared.Sha256;
 import com.evcharge.customer.account.domain.VerificationCode;
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.ConstantTime;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -53,6 +54,7 @@ public class VerificationService {
 
     @Transactional
     public void resend(Channel channel, String target) {
+        requireEmail(channel);
         ContactPoint contact = contacts.of(channel, target);
         customers.findByContact(contact.channel(), contact.target())
                 .filter(customer -> customer.status() != CustomerStatus.BLOCKED)
@@ -61,13 +63,14 @@ public class VerificationService {
 
     @Transactional(noRollbackFor = ApiException.class)
     public void verify(Channel channel, String target, String submitted) {
+        requireEmail(channel);
         ContactPoint contact = contacts.of(channel, target);
         Customer customer = customers.findByContact(contact.channel(), contact.target())
                 .orElseThrow(VerificationService::invalidCode);
         VerificationCode code = codes.findLatest(customer.id(), channel)
                 .filter(candidate -> candidate.isUsableAt(clock.instant(), settings.verification().maxAttempts()))
                 .orElseThrow(VerificationService::invalidCode);
-        if (!code.codeHash().equals(hash(customer.id(), channel, submitted))) {
+        if (!ConstantTime.equal(code.codeHash(), hash(customer.id(), channel, submitted))) {
             codes.incrementAttempts(code.id());
             throw invalidCode();
         }
@@ -89,6 +92,12 @@ public class VerificationService {
 
     private String hash(UUID customerId, Channel channel, String code) {
         return Sha256.hex(settings.security().codePepper() + ":" + customerId + ":" + channel + ":" + code);
+    }
+
+    private static void requireEmail(Channel channel) {
+        if (channel != Channel.EMAIL) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "CHANNEL_NOT_SUPPORTED", "Only email verification is available");
+        }
     }
 
     private static ApiException invalidCode() {

@@ -3,10 +3,14 @@ package com.evcharge.customer.account.infrastructure;
 import com.evcharge.customer.account.application.AccountSettings;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.MessageSource;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.mail.MailException;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Component;
+
+import java.util.Locale;
 
 @Component
 class EmailCodeSender {
@@ -14,20 +18,23 @@ class EmailCodeSender {
     private static final Logger log = LoggerFactory.getLogger(EmailCodeSender.class);
 
     private final JavaMailSender mail;
+    private final MessageSource messages;
     private final AccountSettings settings;
 
-    EmailCodeSender(JavaMailSender mail, AccountSettings settings) {
+    EmailCodeSender(JavaMailSender mail, MessageSource messages, AccountSettings settings) {
         this.mail = mail;
+        this.messages = messages;
         this.settings = settings;
     }
 
     void send(String address, String code) {
+        Locale locale = LocaleContextHolder.getLocale();
+        Object[] arguments = {code, settings.verification().codeTtl().toMinutes()};
         SimpleMailMessage message = new SimpleMailMessage();
         message.setFrom(settings.mailFrom());
         message.setTo(address);
-        message.setSubject("Zella Charging - verification code");
-        message.setText("Your Zella Charging verification code is " + code + ". It expires in "
-                + settings.verification().codeTtl().toMinutes() + " minutes.");
+        message.setSubject(messages.getMessage("email.verification.subject", null, locale));
+        message.setText(messages.getMessage("email.verification.body", arguments, locale));
         try {
             mail.send(message);
         } catch (MailException e) {

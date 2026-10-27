@@ -91,8 +91,10 @@ abstract final class ProfileText {
   static String get newPassword =>
       AppLanguage.pick(fr: 'Nouveau mot de passe', en: 'New password');
 
-  static String get passwordChanged =>
-      AppLanguage.pick(fr: 'Mot de passe modifié', en: 'Password changed');
+  static String get passwordChanged => AppLanguage.pick(
+    fr: 'Mot de passe modifié. Reconnectez-vous.',
+    en: 'Password changed. Please sign in again.',
+  );
 
   static String get dangerSection =>
       AppLanguage.pick(fr: 'Compte', en: 'Account');

@@ -7,7 +7,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
-import java.time.Instant;
 
 @Component
 class AdminFailures {
@@ -29,10 +28,7 @@ class AdminFailures {
     }
 
     void register(AdminUser admin) {
-        Instant now = clock.instant();
-        int attempts = admin.failedAttempts() + 1;
-        boolean lock = attempts >= settings.maxFailedLogins();
-        admins.recordFailure(admin.id(), lock ? 0 : attempts, lock ? now.plus(settings.lockout()) : null);
+        admins.registerFailure(admin.id(), settings.maxFailedLogins(), clock.instant().plus(settings.lockout()));
     }
 
     static ApiException invalidCredentials() {

@@ -15,7 +15,7 @@ automated test that passed in this repository; nothing here has been run against
 | No double charging from duplicates, delays, failures | Verified for top-up callbacks, retries, expiry and late confirmation, start retries, withdrawal retries. |
 | Errors central, FR/EN | Verified on the backend (codes, localized detail, correlation id) and mobile (code-keyed texts, uncertain vs failed). |
 | Country isolation | Verified at database level (row-level security, composite keys) and API level. Requires a restricted database role in production. |
-| Automated tests and recovery docs | Backend 153, mobile 321 tests; see `OPERATIONS_RUNBOOK.md`. |
+| Automated tests and recovery docs | Backend 290, mobile 516 tests; see `OPERATIONS_RUNBOOK.md`. |
 
 ## Known gaps before production
 
@@ -24,9 +24,11 @@ automated test that passed in this repository; nothing here has been run against
 3. Real-charger validation of connector numbering, MeterValues interval, stop latency.
 4. Access tokens are HS256 with one shared secret, no key rotation, and are not revoked: a blocked customer keeps
    access up to 15 minutes. Move to asymmetric keys with `kid` when a rotation process exists.
-5. Rate limits are in memory per instance. With more than one instance the limits multiply; add a shared store then.
+5. Rate limits are shared through Redis when `ZELLA_RATE_LIMIT_STORE=redis` and `REDIS_URL` are set (add the Redis plugin first). Without them they stay in memory per instance. If Redis fails the service falls back to the in-memory limiter for ten seconds at a time.
 6. Email-only sign-up resolves to the default country. Mali needs an explicit country at sign-up.
 7. Cross-country platform administration and its audit are not built.
 8. The database role must be created and the app pointed at it before the next deploy (`TENANCY.md`).
 9. `application.yml` environment variables were renamed from `NDZELA_*` to `ZELLA_*`; update the deployed service.
 10. Mobile: the withdrawal screen is not built (withdrawals are disabled on the server). The charge and top-up screens were redesigned, use the backend quote, show real payment progress, and treat an unconfirmed payment as "being verified" rather than failed.
+11. **Verification is by email only.** Registration requires an email and the 6-digit code is sent to it (localized French or English from the request language). The phone number is optional, stored normalized and never verified; `verify` and `resend` refuse the `PHONE` channel (`CHANNEL_NOT_SUPPORTED`). Consequences: withdrawals need a verified phone (`PHONE_NOT_VERIFIED`) and stay unavailable until phone verification exists, and a phone number is not proof of ownership. Phone-only accounts created before this change cannot be verified; they exist only in dev and staging.
+12. Changing a password signs the customer out of every device (all refresh tokens are revoked) and the app returns to the login screen with an explanatory message.

@@ -14,7 +14,7 @@ public interface CustomerRepository {
     boolean isVerified(UUID id, Channel channel);
     Optional<Customer> findByContact(Channel channel, String target);
     void markContactVerified(UUID id, Channel channel, Instant at);
-    void recordFailedLogin(UUID id, int attempts, Instant lockedUntil);
+    void registerFailedLogin(UUID id, int maxFailures, Instant lockedUntil);
     void clearFailedLogins(UUID id);
     void updateName(UUID id, String firstName, String lastName);
     void updatePasswordHash(UUID id, String passwordHash);

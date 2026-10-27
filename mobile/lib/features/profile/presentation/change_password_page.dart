@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
+import '../../../core/session/session_controller.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
@@ -40,7 +40,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage>
           .changePassword(_current.text, _next.text);
       if (!mounted) return;
       AppToast.info(context, ProfileText.passwordChanged);
-      context.pop();
+      await ref.read(sessionControllerProvider.notifier).signOut();
     });
   }
 

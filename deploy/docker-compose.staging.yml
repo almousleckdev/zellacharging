@@ -14,6 +14,19 @@ services:
       timeout: 3s
       retries: 10
 
+  redis:
+    image: redis:7-alpine
+    restart: unless-stopped
+    command: ["redis-server", "--requirepass", "${REDIS_PASSWORD:?REDIS_PASSWORD is required}",
+              "--save", "", "--appendonly", "no", "--maxmemory", "64mb", "--maxmemory-policy", "allkeys-lru"]
+    environment:
+      REDISCLI_AUTH: ${REDIS_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "redis-cli ping | grep -q PONG"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
   maildev:
     image: maildev/maildev
     restart: unless-stopped
@@ -27,7 +40,11 @@ services:
     depends_on:
       postgres:
         condition: service_healthy
+      redis:
+        condition: service_healthy
     environment:
+      ZELLA_RATE_LIMIT_STORE: redis
+      REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379
       DB_URL: jdbc:postgresql://postgres:5432/zella
       DB_USER: zella
       DB_PASSWORD: ${DB_PASSWORD}

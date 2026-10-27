@@ -10,8 +10,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
-import java.time.Instant;
 import java.util.UUID;
 
 @Service
@@ -21,18 +19,16 @@ public class LoginService {
     private final PasswordHasher passwords;
     private final ContactNormalizer contacts;
     private final SessionIssuer sessions;
-    private final AccountSettings settings;
-    private final Clock clock;
+    private final FailedLoginPolicy failures;
     private final AuditTrail audit;
 
     public LoginService(CustomerRepository customers, PasswordHasher passwords, ContactNormalizer contacts,
-                        SessionIssuer sessions, AccountSettings settings, Clock clock, AuditTrail audit) {
+                        SessionIssuer sessions, FailedLoginPolicy failures, AuditTrail audit) {
         this.customers = customers;
         this.passwords = passwords;
         this.contacts = contacts;
         this.sessions = sessions;
-        this.settings = settings;
-        this.clock = clock;
+        this.failures = failures;
         this.audit = audit;
     }
 
@@ -41,28 +37,18 @@ public class LoginService {
         ContactPoint contact = contacts.resolve(identifier);
         Customer customer = customers.findByContact(contact.channel(), contact.target())
                 .orElseThrow(LoginService::invalidCredentials);
-        Instant now = clock.instant();
-        if (customer.isLockedAt(now)) {
-            throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "ACCOUNT_LOCKED", "Too many failed attempts");
-        }
+        failures.requireNotLocked(customer);
         if (!passwords.matches(password, customer.passwordHash())) {
-            registerFailure(customer, now);
+            failures.registerFailure(customer.id());
             audit.record("LOGIN_FAILED", customer.id(), "customer", null);
             throw invalidCredentials();
         }
         if (!customer.canAuthenticate()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "ACCOUNT_NOT_VERIFIED", "Account is not verified");
         }
-        customers.clearFailedLogins(customer.id());
+        failures.clear(customer.id());
         audit.record("LOGIN_SUCCEEDED", customer.id(), "customer", null);
         return sessions.issue(customer.id(), customer.country(), UUID.randomUUID());
-    }
-
-    private void registerFailure(Customer customer, Instant now) {
-        int attempts = customer.failedLoginAttempts() + 1;
-        boolean lock = attempts >= settings.security().maxFailedLogins();
-        customers.recordFailedLogin(customer.id(), lock ? 0 : attempts,
-                lock ? now.plus(settings.security().lockout()) : null);
     }
 
     private static ApiException invalidCredentials() {

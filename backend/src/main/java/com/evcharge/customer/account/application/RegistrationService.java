@@ -13,8 +13,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -37,39 +36,26 @@ public class RegistrationService {
 
     @Transactional
     public UUID register(RegisterCommand command) {
-        List<ContactPoint> points = contactPoints(command);
-        if (points.isEmpty()) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "CONTACT_REQUIRED", "Email or phone is required");
+        if (!hasText(command.email())) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "EMAIL_REQUIRED", "Email is required");
         }
-        points.forEach(this::requireUnused);
-        Customer customer = new Customer(UUID.randomUUID(), TenantContext.require(), command.firstName().trim(), command.lastName().trim(),
-                targetOf(points, Channel.EMAIL), targetOf(points, Channel.PHONE),
+        ContactPoint email = new ContactPoint(Channel.EMAIL, contacts.email(command.email()));
+        Optional<ContactPoint> phone = Optional.ofNullable(command.phone()).filter(RegistrationService::hasText)
+                .map(raw -> new ContactPoint(Channel.PHONE, contacts.phone(raw)));
+        requireUnused(email);
+        phone.ifPresent(this::requireUnused);
+        Customer customer = new Customer(UUID.randomUUID(), TenantContext.require(), command.firstName().trim(),
+                command.lastName().trim(), email.target(), phone.map(ContactPoint::target).orElse(null),
                 passwords.hash(command.password()), CustomerStatus.PENDING_VERIFICATION, 0, null, clock.instant());
         customers.save(customer);
-        points.forEach(point -> verification.issue(customer, point));
+        verification.issue(customer, email);
         return customer.id();
-    }
-
-    private List<ContactPoint> contactPoints(RegisterCommand command) {
-        List<ContactPoint> points = new ArrayList<>();
-        if (hasText(command.email())) {
-            points.add(new ContactPoint(Channel.EMAIL, contacts.email(command.email())));
-        }
-        if (hasText(command.phone())) {
-            points.add(new ContactPoint(Channel.PHONE, contacts.phone(command.phone())));
-        }
-        return points;
     }
 
     private void requireUnused(ContactPoint point) {
         if (customers.findByContact(point.channel(), point.target()).isPresent()) {
             throw new ApiException(HttpStatus.CONFLICT, "CONTACT_ALREADY_USED", "Contact already registered");
         }
-    }
-
-    private static String targetOf(List<ContactPoint> points, Channel channel) {
-        return points.stream().filter(point -> point.channel() == channel)
-                .map(ContactPoint::target).findFirst().orElse(null);
     }
 
     private static boolean hasText(String value) {

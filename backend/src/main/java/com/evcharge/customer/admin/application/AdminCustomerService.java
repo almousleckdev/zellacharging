@@ -21,7 +21,6 @@ import java.util.UUID;
 @Service
 public class AdminCustomerService {
 
-    public static final int MAX_PAGE_SIZE = 100;
     private static final Comparator<CountryCustomer> NEWEST_FIRST = Comparator
             .comparing((CountryCustomer entry) -> entry.customer().createdAt()).reversed()
             .thenComparing(entry -> entry.customer().id());
@@ -43,10 +42,8 @@ public class AdminCustomerService {
 
     public CustomerListing list(AdminAccess admin, String country, String text, String status, int page, int size) {
         List<String> scope = access.scope(admin, Permission.CUSTOMERS_READ, country);
-        int pageSize = Math.max(1, Math.min(size, MAX_PAGE_SIZE));
-        int pageIndex = Math.max(0, page);
-        int offset = pageIndex * pageSize;
-        CustomerQuery query = new CustomerQuery(blankToNull(text), blankToNull(status), offset + pageSize, 0);
+        PageWindow window = PageWindow.of(page, size);
+        CustomerQuery query = new CustomerQuery(blankToNull(text), blankToNull(status), window.end(), 0);
         long total = 0;
         List<CountryCustomer> merged = new ArrayList<>();
         for (String code : scope) {
@@ -55,9 +52,9 @@ public class AdminCustomerService {
             found.items().forEach(item -> merged.add(new CountryCustomer(code, item)));
         }
         merged.sort(NEWEST_FIRST);
-        int from = Math.min(offset, merged.size());
-        int to = Math.min(offset + pageSize, merged.size());
-        return new CustomerListing(total, pageIndex, pageSize, List.copyOf(merged.subList(from, to)));
+        int from = Math.min(window.offset(), merged.size());
+        int to = Math.min(window.end(), merged.size());
+        return new CustomerListing(total, window.index(), window.size(), List.copyOf(merged.subList(from, to)));
     }
 
     public CustomerDetail detail(AdminAccess admin, String country, UUID id) {

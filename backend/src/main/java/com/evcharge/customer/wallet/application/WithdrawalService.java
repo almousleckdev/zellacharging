@@ -24,7 +24,6 @@ import java.util.UUID;
 public class WithdrawalService {
 
     private static final Logger log = LoggerFactory.getLogger(WithdrawalService.class);
-    private static final Duration DAY = Duration.ofHours(24);
     private static final Duration REFRESH_AFTER = Duration.ofSeconds(5);
     private static final int RECENT_LIMIT = 20;
 
@@ -61,7 +60,7 @@ public class WithdrawalService {
             return earlier.get();
         }
         verification.confirmPassword(customerId, password);
-        validate(customerId, amountMinor);
+        requireAllowedAmount(amountMinor);
         PayoutGateway gateway = gateways.forOperator(operator);
         Withdrawal pending = Withdrawal.requested(customerId, operator, verification.verifiedPhone(customerId),
                 amountMinor, key, clock.instant());
@@ -99,14 +98,9 @@ public class WithdrawalService {
         }
     }
 
-    private void validate(UUID customerId, long amountMinor) {
+    private void requireAllowedAmount(long amountMinor) {
         if (amountMinor < settings.minimumMinor() || amountMinor > settings.maximumMinor()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_AMOUNT", "Amount is outside the allowed range");
-        }
-        long today = withdrawals.requestedSince(customerId, clock.instant().minus(DAY));
-        if (today + amountMinor > settings.dailyMaximumMinor()) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "WITHDRAWAL_LIMIT_REACHED",
-                    "The daily withdrawal limit is reached");
         }
     }
 }

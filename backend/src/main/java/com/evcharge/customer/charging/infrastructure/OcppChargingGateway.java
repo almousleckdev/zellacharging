@@ -24,6 +24,7 @@ class OcppChargingGateway implements ChargingGateway {
     private static final Logger log = LoggerFactory.getLogger(OcppChargingGateway.class);
     private static final String IDEMPOTENCY_HEADER = "Idempotency-Key";
     private static final int ACTIVE_PAGE_SIZE = 100;
+    private static final int MAX_ACTIVE_PAGES = 20;
 
     private final RestClient client;
 
@@ -59,18 +60,15 @@ class OcppChargingGateway implements ChargingGateway {
                 .uri(uri -> uri.path("/api/v1/sessions").queryParam("idTag", idTag)
                         .queryParam("size", 20).build())
                 .retrieve().body(OcppSessionPage.class));
-        return page == null || page.items() == null ? List.of()
-                : page.items().stream().map(OcppSessionPayload::toDomain).toList();
+        return page == null ? List.of() : page.sessions();
     }
 
     @Override
     public List<RemoteSession> activeSessions() {
-        OcppSessionPage page = call(() -> client.get()
+        return OcppPageReader.readAll(MAX_ACTIVE_PAGES, index -> call(() -> client.get()
                 .uri(uri -> uri.path("/api/v1/sessions").queryParam("status", "ACTIVE")
-                        .queryParam("size", ACTIVE_PAGE_SIZE).build())
-                .retrieve().body(OcppSessionPage.class));
-        return page == null || page.items() == null ? List.of()
-                : page.items().stream().map(OcppSessionPayload::toDomain).toList();
+                        .queryParam("size", ACTIVE_PAGE_SIZE).queryParam("page", index).build())
+                .retrieve().body(OcppSessionPage.class)));
     }
 
     @Override

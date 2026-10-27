@@ -3,13 +3,19 @@ import '../l10n/strings.dart';
 
 abstract final class Validators {
   static final _email = RegExp(r'^[^@\s]+@[^@\s]+\.[^@\s]+$');
+  static final _phone = RegExp(r'^\+?[0-9][0-9 ().-]{5,19}$');
 
   static String? required(String? value) =>
       value == null || value.trim().isEmpty ? Strings.required : null;
 
-  static String? optionalEmail(String? value) {
-    if (value == null || value.trim().isEmpty) return null;
+  static String? email(String? value) {
+    if (value == null || value.trim().isEmpty) return Strings.required;
     return _email.hasMatch(value.trim()) ? null : Strings.invalidEmail;
+  }
+
+  static String? optionalPhone(String? value) {
+    if (value == null || value.trim().isEmpty) return null;
+    return _phone.hasMatch(value.trim()) ? null : Strings.invalidPhone;
   }
 
   static String? password(String? value) {

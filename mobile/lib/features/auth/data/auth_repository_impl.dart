@@ -22,23 +22,23 @@ class AuthRepositoryImpl implements AuthRepository {
   }
 
   @override
-  Future<VerificationTarget> register(
-    RegistrationData data,
-  ) => _guard(() async {
-    await client.post<void>(
-      '/v1/auth/register',
-      data: {
-        'firstName': data.firstName,
-        'lastName': data.lastName,
-        'password': data.password,
-        if (data.email != null) 'email': data.email,
-        if (data.phone != null) 'phone': data.phone,
-      },
-    );
-    return data.email != null
-        ? VerificationTarget(channel: ContactChannel.email, value: data.email!)
-        : VerificationTarget(channel: ContactChannel.phone, value: data.phone!);
-  });
+  Future<VerificationTarget> register(RegistrationData data) =>
+      _guard(() async {
+        await client.post<void>(
+          '/v1/auth/register',
+          data: {
+            'firstName': data.firstName,
+            'lastName': data.lastName,
+            'password': data.password,
+            'email': data.email,
+            if (data.phone != null) 'phone': data.phone,
+          },
+        );
+        return VerificationTarget(
+          channel: ContactChannel.email,
+          value: data.email,
+        );
+      });
 
   @override
   Future<void> verify(VerificationTarget target, String code) => _guard(

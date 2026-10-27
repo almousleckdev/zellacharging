@@ -25,9 +25,9 @@ abstract final class ErrorText {
       fr: 'Cet e-mail ou ce téléphone est déjà enregistré.',
       en: 'This email or phone is already registered.',
     ),
-    'CONTACT_REQUIRED': AppLanguage.pick(
-      fr: 'Saisissez un e-mail ou un numéro de téléphone.',
-      en: 'Enter an email or a phone number.',
+    'EMAIL_REQUIRED': AppLanguage.pick(
+      fr: 'Saisissez votre adresse e-mail.',
+      en: 'Enter your email address.',
     ),
     'INVALID_PHONE': AppLanguage.pick(
       fr: 'Ce numéro de téléphone n’est pas valide.',

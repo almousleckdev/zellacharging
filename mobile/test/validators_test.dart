@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zella/core/l10n/strings.dart';
 import 'package:zella/core/validation/validators.dart';
 
 void main() {
@@ -8,10 +9,20 @@ void main() {
     expect(Validators.otp('12345a'), isNotNull);
   });
 
-  test('optional email is valid when blank or well formed', () {
-    expect(Validators.optionalEmail(''), isNull);
-    expect(Validators.optionalEmail('a@b.co'), isNull);
-    expect(Validators.optionalEmail('nope'), isNotNull);
+  test('email is required and must be well formed', () {
+    expect(Validators.email(null), Strings.required);
+    expect(Validators.email('  '), Strings.required);
+    expect(Validators.email('nope'), Strings.invalidEmail);
+    expect(Validators.email('a@b.co'), isNull);
+    expect(Validators.email(' a@b.co '), isNull);
+  });
+
+  test('optional phone accepts blank and rejects letters', () {
+    expect(Validators.optionalPhone(null), isNull);
+    expect(Validators.optionalPhone(''), isNull);
+    expect(Validators.optionalPhone('+241 77 12 34 56'), isNull);
+    expect(Validators.optionalPhone('077123456'), isNull);
+    expect(Validators.optionalPhone('abc'), Strings.invalidPhone);
   });
 
   test('password needs eight characters', () {

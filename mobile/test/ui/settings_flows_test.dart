@@ -80,6 +80,7 @@ void main() {
 
     expect(find.text(ErrorText.byCode['WRONG_PASSWORD']!), findsOneWidget);
     expect(profile.passwordChanges, isEmpty);
+    expect(FakeSession.signOuts, 0);
     await tester.pump(const Duration(seconds: 5));
     await closeApp(tester);
   });
@@ -105,6 +106,8 @@ void main() {
     await tester.tap(find.text(ProfileText.saveChanges));
     await settle(tester);
     expect(profile.passwordChanges, ['NewPass456']);
+    expect(find.text(ProfileText.passwordChanged), findsOneWidget);
+    expect(FakeSession.signOuts, 1);
     await tester.pump(const Duration(seconds: 5));
     await closeApp(tester);
   });

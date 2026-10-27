@@ -12,7 +12,7 @@ public interface AdminRepository {
     Optional<AdminUser> findById(UUID id);
     boolean existsSuperAdmin();
     void create(AdminUser admin, Instant at);
-    void recordFailure(UUID id, int attempts, Instant lockedUntil);
+    void registerFailure(UUID id, int maxFailures, Instant lockedUntil);
     void clearFailures(UUID id);
     void updatePassword(UUID id, String passwordHash);
     void recordLogin(UUID id, Instant at);

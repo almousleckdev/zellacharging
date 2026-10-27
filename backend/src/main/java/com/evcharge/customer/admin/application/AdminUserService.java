@@ -20,7 +20,6 @@ import java.util.UUID;
 @Service
 public class AdminUserService {
 
-    private static final int MAX_PAGE_SIZE = 100;
 
     private final AdminAccessService access;
     private final AdminAccessRules rules;
@@ -49,10 +48,9 @@ public class AdminUserService {
 
     public ManagedAdminPage list(AdminAccess actor, String text, String status, int page, int size) {
         access.require(actor, Permission.ADMINS_MANAGE);
-        int pageSize = Math.max(1, Math.min(size, MAX_PAGE_SIZE));
-        int pageIndex = Math.max(0, page);
-        AdminPage found = accounts.search(blankToNull(text), parseStatus(status), pageSize, pageIndex * pageSize);
-        return new ManagedAdminPage(found.total(), pageIndex, pageSize,
+        PageWindow window = PageWindow.of(page, size);
+        AdminPage found = accounts.search(blankToNull(text), parseStatus(status), window.size(), window.offset());
+        return new ManagedAdminPage(found.total(), window.index(), window.size(),
                 found.items().stream().map(targets::managed).toList());
     }
 

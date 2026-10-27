@@ -5,22 +5,19 @@ import com.evcharge.customer.account.domain.Channel;
 import org.springframework.stereotype.Component;
 
 @Component
-class ChannelVerificationSender implements VerificationSender {
+class EmailVerificationSender implements VerificationSender {
 
     private final EmailCodeSender email;
-    private final LogPhoneCodeSender phone;
 
-    ChannelVerificationSender(EmailCodeSender email, LogPhoneCodeSender phone) {
+    EmailVerificationSender(EmailCodeSender email) {
         this.email = email;
-        this.phone = phone;
     }
 
     @Override
     public void send(Channel channel, String target, String code) {
-        if (channel == Channel.EMAIL) {
-            email.send(target, code);
-            return;
+        if (channel != Channel.EMAIL) {
+            throw new IllegalArgumentException("Verification codes are only sent by email");
         }
-        phone.send(target, code);
+        email.send(target, code);
     }
 }

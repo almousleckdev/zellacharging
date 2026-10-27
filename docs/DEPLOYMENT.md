@@ -8,10 +8,22 @@ Project `zella-staging`, environment `production`, three services:
 |---|---|---|
 | `backend` | Built from `users/backend/Dockerfile`, configured by `users/backend/railway.json` | `https://backend-production-d2d1.up.railway.app` |
 | `Postgres` | Railway Postgres plugin, reached over the private network | no |
+| `Redis` | Railway Redis plugin, shared rate-limit counters, reached over the private network | no |
 | `maildev` | Inbox for verification emails, basic auth (`MAILDEV_WEB_USER`, `MAILDEV_WEB_PASS`) | yes, port 1080 |
 
 Redeploy after a code change: `cd users/backend && railway up -s backend --ci`.
 Variables live in Railway, not in the repository: `railway variables -s backend`.
+
+Rate limiting is per instance (in memory) until Redis is selected. After adding the Redis
+plugin, switch the backend to the shared store and redeploy:
+
+```bash
+railway variables set -s backend ZELLA_RATE_LIMIT_STORE=redis 'REDIS_URL=${{Redis.REDIS_URL}}'
+```
+
+If Redis becomes unreachable the backend falls back to the in-memory limiter for ten seconds
+at a time and logs `Shared rate limiter unavailable`; Redis is deliberately excluded from
+`/actuator/health`, so an outage degrades limits to per instance instead of taking the API down.
 
 To connect the OCPP platform once they reply, set both and redeploy:
 

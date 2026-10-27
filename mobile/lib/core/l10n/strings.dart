@@ -66,9 +66,9 @@ abstract final class Strings {
     en: 'At least 8 characters',
   );
 
-  static String get contactRequired => AppLanguage.pick(
-    fr: 'Saisissez un e-mail ou un numéro de téléphone',
-    en: 'Enter an email or a phone number',
+  static String get invalidPhone => AppLanguage.pick(
+    fr: 'Saisissez un numéro de téléphone valide',
+    en: 'Enter a valid phone number',
   );
 
   static String get unknownError => AppLanguage.pick(

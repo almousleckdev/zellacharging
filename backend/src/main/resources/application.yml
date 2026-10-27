@@ -5,6 +5,11 @@ server:
 spring:
   application:
     name: zella-backend
+  data:
+    redis:
+      url: ${REDIS_URL:redis://localhost:6379}
+      timeout: 250ms
+      connect-timeout: 500ms
   threads:
     virtual:
       enabled: true
@@ -40,6 +45,8 @@ management:
   health:
     mail:
       enabled: false
+    redis:
+      enabled: false
   endpoints:
     web:
       exposure:
@@ -47,6 +54,7 @@ management:
 
 zella:
   rate-limit:
+    store: ${ZELLA_RATE_LIMIT_STORE:memory}
     login-per-ip-per-minute: 20
     register-per-ip-per-hour: 10
     resend-per-ip-per-hour: 10

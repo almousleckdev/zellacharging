@@ -11,6 +11,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.Locale;
+import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class AdminLoginService {
@@ -22,6 +24,7 @@ public class AdminLoginService {
     private final SecretCipher cipher;
     private final AdminFailures failures;
     private final AdminSettings settings;
+    private final String unknownAdminHash;
 
     public AdminLoginService(AdminRepository admins, AdminPasswordHasher passwords, AdminTokenIssuer tokens,
                              TotpAuthenticator totp, SecretCipher cipher, AdminFailures failures,
@@ -33,12 +36,18 @@ public class AdminLoginService {
         this.cipher = cipher;
         this.failures = failures;
         this.settings = settings;
+        this.unknownAdminHash = passwords.hash(UUID.randomUUID().toString());
     }
 
     @Transactional(noRollbackFor = ApiException.class)
     public AdminLoginStep login(String email, String password) {
-        AdminUser admin = admins.findByEmail(email.trim().toLowerCase(Locale.ROOT))
-                .filter(AdminUser::active).orElseThrow(AdminFailures::invalidCredentials);
+        Optional<AdminUser> known = admins.findByEmail(email.trim().toLowerCase(Locale.ROOT))
+                .filter(AdminUser::active);
+        if (known.isEmpty()) {
+            passwords.matches(password, unknownAdminHash);
+            throw AdminFailures.invalidCredentials();
+        }
+        AdminUser admin = known.get();
         failures.requireNotLocked(admin);
         if (!passwords.matches(password, admin.passwordHash())) {
             failures.register(admin);

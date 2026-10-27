@@ -14,9 +14,9 @@ import java.util.UUID;
 class CustomerVerificationService implements CustomerVerification {
 
     private final CustomerRepository customers;
-    private final PasswordService passwords;
+    private final PasswordConfirmation passwords;
 
-    CustomerVerificationService(CustomerRepository customers, PasswordService passwords) {
+    CustomerVerificationService(CustomerRepository customers, PasswordConfirmation passwords) {
         this.customers = customers;
         this.passwords = passwords;
     }

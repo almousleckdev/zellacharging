@@ -58,14 +58,19 @@ class JdbcAdminRepository implements AdminRepository {
     }
 
     @Override
-    public void recordFailure(UUID id, int attempts, Instant lockedUntil) {
-        jdbc.sql("update admin_user set failed_attempts = :attempts, locked_until = :locked where id = :id")
-                .param("attempts", attempts).param("locked", Timestamps.toDb(lockedUntil)).param("id", id).update();
+    public void registerFailure(UUID id, int maxFailures, Instant lockedUntil) {
+        jdbc.sql("""
+                        update admin_user set
+                            failed_attempts = case when failed_attempts + 1 >= :max then 0 else failed_attempts + 1 end,
+                            locked_until = case when failed_attempts + 1 >= :max then :locked else locked_until end
+                        where id = :id""")
+                .param("max", maxFailures).param("locked", Timestamps.toDb(lockedUntil)).param("id", id).update();
     }
 
     @Override
     public void clearFailures(UUID id) {
-        recordFailure(id, 0, null);
+        jdbc.sql("update admin_user set failed_attempts = 0, locked_until = null where id = :id")
+                .param("id", id).update();
     }
 
     @Override

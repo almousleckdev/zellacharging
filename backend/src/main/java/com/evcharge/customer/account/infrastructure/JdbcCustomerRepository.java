@@ -91,15 +91,22 @@ class JdbcCustomerRepository implements CustomerRepository {
     }
 
     @Override
-    public void recordFailedLogin(UUID id, int attempts, Instant lockedUntil) {
-        jdbc.sql("update customer set failed_login_attempts = :attempts, locked_until = :lockedUntil where id = :id")
-                .param("attempts", attempts).param("lockedUntil", Timestamps.toDb(lockedUntil))
+    public void registerFailedLogin(UUID id, int maxFailures, Instant lockedUntil) {
+        jdbc.sql("""
+                        update customer set
+                            failed_login_attempts = case when failed_login_attempts + 1 >= :max
+                                then 0 else failed_login_attempts + 1 end,
+                            locked_until = case when failed_login_attempts + 1 >= :max
+                                then :lockedUntil else locked_until end
+                        where id = :id""")
+                .param("max", maxFailures).param("lockedUntil", Timestamps.toDb(lockedUntil))
                 .param("id", id).update();
     }
 
     @Override
     public void clearFailedLogins(UUID id) {
-        recordFailedLogin(id, 0, null);
+        jdbc.sql("update customer set failed_login_attempts = 0, locked_until = null where id = :id")
+                .param("id", id).update();
     }
 
     @Override

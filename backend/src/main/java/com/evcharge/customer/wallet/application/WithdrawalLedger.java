@@ -26,15 +26,17 @@ class WithdrawalLedger {
     private final LedgerRepository ledger;
     private final AuditTrail audit;
     private final WalletSettings settings;
+    private final DailyWithdrawalLimit dailyLimit;
     private final Clock clock;
 
     WithdrawalLedger(WithdrawalRepository withdrawals, WalletRepository wallets, LedgerRepository ledger,
-                     AuditTrail audit, WalletSettings settings, Clock clock) {
+                     AuditTrail audit, WalletSettings settings, DailyWithdrawalLimit dailyLimit, Clock clock) {
         this.withdrawals = withdrawals;
         this.wallets = wallets;
         this.ledger = ledger;
         this.audit = audit;
         this.settings = settings;
+        this.dailyLimit = dailyLimit;
         this.clock = clock;
     }
 
@@ -48,6 +50,7 @@ class WithdrawalLedger {
         }
         Optional<Withdrawal> inserted = withdrawals.insertIfNew(withdrawal);
         if (inserted.isPresent()) {
+            dailyLimit.requireNotExceeded(withdrawal.customerId());
             wallets.apply(withdrawal.customerId(), -withdrawal.amountMinor(), 0);
             ledger.append(entry(withdrawal, LedgerType.WITHDRAWAL, "withdrawal:" + withdrawal.id()));
             audit.record("WITHDRAWAL_REQUESTED", withdrawal.customerId(), withdrawal.reference(),

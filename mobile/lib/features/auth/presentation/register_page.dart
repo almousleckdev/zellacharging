@@ -49,12 +49,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
 
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
-    final email = _nullIfBlank(_email.text);
     final phone = _nullIfBlank(_phone.text);
-    if (email == null && phone == null) {
-      showError(Strings.contactRequired);
-      return;
-    }
     submit(() async {
       final target = await ref
           .read(authRepositoryProvider)
@@ -63,7 +58,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
               firstName: _firstName.text.trim(),
               lastName: _lastName.text.trim(),
               password: _password.text,
-              email: email,
+              email: _email.text.trim(),
               phone: phone,
             ),
           );
@@ -99,7 +94,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
                 controller: _email,
                 label: AuthText.emailLabel,
                 icon: AppIcons.envelope,
-                validator: Validators.optionalEmail,
+                validator: Validators.email,
                 keyboardType: TextInputType.emailAddress,
               ),
               const SizedBox(height: AppSpacing.md),
@@ -107,6 +102,7 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
                 controller: _phone,
                 label: AuthText.phoneLabel,
                 icon: AppIcons.phone,
+                validator: Validators.optionalPhone,
                 keyboardType: TextInputType.phone,
               ),
               const SizedBox(height: AppSpacing.md),

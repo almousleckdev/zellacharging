@@ -1,6 +1,5 @@
 enum ContactChannel {
-  email('EMAIL'),
-  phone('PHONE');
+  email('EMAIL');
 
   const ContactChannel(this.apiName);
 

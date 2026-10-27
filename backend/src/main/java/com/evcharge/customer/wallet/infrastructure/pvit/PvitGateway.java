@@ -57,6 +57,7 @@ class PvitGateway implements PaymentGateway {
         if (!reference.equals(transaction.merchantReference())) {
             return PaymentOutcome.pending(null);
         }
+        log.info("PVit payment {} status {} amount {}", reference, transaction.status(), transaction.amount());
         return switch (transaction.status()) {
             case SUCCESS -> confirmed(transaction);
             case FAILED -> PaymentOutcome.failed("PAYMENT_DECLINED");

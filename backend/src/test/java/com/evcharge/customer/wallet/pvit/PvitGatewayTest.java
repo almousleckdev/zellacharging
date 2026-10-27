@@ -34,7 +34,7 @@ class PvitGatewayTest {
     @BeforeEach
     void wire() {
         PvitProperties properties = new PvitProperties("http://pvit.test", "ACC-1", "pw", "SECRETCODE",
-                "PAYCODE", "STATUSCODE", "CALLBACK", "ZELLA", "CHARGING", "CUSTOMER", Duration.ofSeconds(5));
+                "PAYCODE", "STATUSCODE", "PAYOUTCODE", "CALLBACK", "ZELLA", "CHARGING", "CUSTOMER", Duration.ofSeconds(5));
         RestClient.Builder builder = RestClient.builder().baseUrl(properties.baseUrl());
         server = MockRestServiceServer.bindTo(builder).build();
         RestClient client = builder.build();

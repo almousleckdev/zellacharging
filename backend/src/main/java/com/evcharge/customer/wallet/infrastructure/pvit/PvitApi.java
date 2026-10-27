@@ -15,6 +15,8 @@ import java.util.function.Function;
 class PvitApi {
 
     private static final int EXCERPT_LIMIT = 400;
+    private static final String PAYMENT = "PAYMENT";
+    private static final String PAYOUT = "GIVE_CHANGE";
 
     private final RestClient client;
     private final PvitSecretProvider secrets;
@@ -30,6 +32,18 @@ class PvitApi {
 
     PvitStatus startPayment(String reference, BigDecimal amount, String operatorCode, String customerNumber,
                             String description) {
+        return start(properties.codeUrlPayment(), PAYMENT, reference, amount, operatorCode, customerNumber,
+                description);
+    }
+
+    PvitStatus startPayout(String reference, BigDecimal amount, String operatorCode, String customerNumber,
+                           String description) {
+        return start(properties.codeUrlPayout(), PAYOUT, reference, amount, operatorCode, customerNumber,
+                description);
+    }
+
+    private PvitStatus start(String codeUrl, String operation, String reference, BigDecimal amount,
+                             String operatorCode, String customerNumber, String description) {
         ObjectNode body = mapper.createObjectNode();
         body.put("agent", properties.agent());
         body.put("amount", amount);
@@ -39,21 +53,29 @@ class PvitApi {
         body.put("callback_url_code", properties.callbackUrlCode());
         body.put("customer_account_number", customerNumber);
         body.put("merchant_operation_account_code", properties.operationAccountCode());
-        body.put("transaction_type", "PAYMENT");
+        body.put("transaction_type", operation);
         body.put("owner_charge", properties.ownerCharge());
         body.put("owner_charge_operator", "CUSTOMER");
         body.put("free_info", description);
         body.put("operator_code", operatorCode);
-        JsonNode json = withSecret(secret -> client.post().uri("/v2/{code}/rest", properties.codeUrlPayment())
+        JsonNode json = withSecret(secret -> client.post().uri("/v2/{code}/rest", codeUrl)
                 .header("X-Secret", secret).header("X-Callback-MediaType", MediaType.APPLICATION_JSON_VALUE)
                 .contentType(MediaType.APPLICATION_JSON).body(body.toString()).retrieve().body(String.class));
         return PvitStatus.from(json.path("status").asString(null));
     }
 
     PvitTransaction transaction(String reference) {
+        return transaction(reference, PAYMENT);
+    }
+
+    PvitTransaction payout(String reference) {
+        return transaction(reference, PAYOUT);
+    }
+
+    private PvitTransaction transaction(String reference, String operation) {
         JsonNode json = withSecret(secret -> client.get()
-                .uri("/{code}/status?transactionId={id}&accountOperationCode={account}&transactionOperation=PAYMENT",
-                        properties.codeUrlStatus(), reference, properties.operationAccountCode())
+                .uri("/{code}/status?transactionId={id}&accountOperationCode={account}&transactionOperation={op}",
+                        properties.codeUrlStatus(), reference, properties.operationAccountCode(), operation)
                 .header("X-Secret", secret).retrieve().body(String.class));
         return new PvitTransaction(PvitStatus.from(json.path("status").asString(null)),
                 json.path("merchant_reference_id").asString(null), json.path("reference_id").asString(null),

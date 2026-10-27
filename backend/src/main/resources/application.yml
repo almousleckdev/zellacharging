@@ -90,7 +90,7 @@ zella:
     price-per-kwh-minor: ${ZELLA_PRICE_PER_KWH:${NDZELA_PRICE_PER_KWH:}}
   fees:
     vat-percent: ${ZELLA_VAT_PERCENT:${NDZELA_VAT_PERCENT:0}}
-    service-fee-percent: ${ZELLA_SERVICE_FEE_PERCENT:${NDZELA_SERVICE_FEE_PERCENT:0}}
+    service-fee-percent: ${ZELLA_SERVICE_FEE_PERCENT:${NDZELA_SERVICE_FEE_PERCENT:2}}
   support:
     email: ${ZELLA_SUPPORT_EMAIL:${NDZELA_SUPPORT_EMAIL:}}
     phone: ${ZELLA_SUPPORT_PHONE:${NDZELA_SUPPORT_PHONE:}}
@@ -110,6 +110,7 @@ zella:
       code-url-secret: ${PVIT_CODE_URL_SECRET:}
       code-url-payment: ${PVIT_CODE_URL_PAYMENT:}
       code-url-status: ${PVIT_CODE_URL_STATUS:}
+      code-url-payout: ${PVIT_CODE_URL_PAYOUT:}
       callback-url-code: ${PVIT_CALLBACK_URL_CODE:}
       agent: ${PVIT_AGENT:}
       product: ${PVIT_PRODUCT:}

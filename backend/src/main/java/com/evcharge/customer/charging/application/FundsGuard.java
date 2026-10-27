@@ -80,7 +80,7 @@ public class FundsGuard {
         if (session.costMinor() != null) {
             return session.costMinor();
         }
-        return totalFor(reading.totalKwh(), price);
+        return reading.totalKwh() == null ? 0 : totalFor(reading.totalKwh(), price);
     }
 
     private long costAhead(Metering reading, long price) {

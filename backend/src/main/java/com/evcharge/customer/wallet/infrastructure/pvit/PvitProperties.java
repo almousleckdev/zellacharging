@@ -12,6 +12,7 @@ record PvitProperties(
         String codeUrlSecret,
         String codeUrlPayment,
         String codeUrlStatus,
+        String codeUrlPayout,
         String callbackUrlCode,
         String agent,
         String product,

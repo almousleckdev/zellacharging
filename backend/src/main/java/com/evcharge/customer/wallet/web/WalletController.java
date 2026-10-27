@@ -2,6 +2,7 @@ package com.evcharge.customer.wallet.web;
 
 import com.evcharge.customer.wallet.application.TopupService;
 import com.evcharge.customer.wallet.application.WalletService;
+import com.evcharge.customer.wallet.application.WithdrawalSettings;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import com.evcharge.customer.shared.ApiException;
@@ -24,15 +25,17 @@ class WalletController {
 
     private final WalletService wallets;
     private final TopupService topups;
+    private final WithdrawalSettings withdrawals;
 
-    WalletController(WalletService wallets, TopupService topups) {
+    WalletController(WalletService wallets, TopupService topups, WithdrawalSettings withdrawals) {
         this.wallets = wallets;
         this.topups = topups;
+        this.withdrawals = withdrawals;
     }
 
     @GetMapping
     WalletResponse balance(CustomerPrincipal me) {
-        return WalletResponse.from(wallets.balance(me.id()));
+        return WalletResponse.from(wallets.balance(me.id()), withdrawals.enabled());
     }
 
     @GetMapping("/transactions")

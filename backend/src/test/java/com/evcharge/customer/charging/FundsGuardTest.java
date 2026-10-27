@@ -138,4 +138,24 @@ class FundsGuardTest {
         unpriced.enforce(session(SessionState.ACTIVE, NOW));
         verify(stopper, never()).issue(any());
     }
+
+    private void noEnergyYet(String powerKw) {
+        BigDecimal power = powerKw == null ? null : new BigDecimal(powerKw);
+        when(metering.of(any())).thenReturn(Optional.of(new Metering(null, power, null, 10L, null, null, NOW)));
+    }
+
+    @Test
+    void aReadingWithoutAnEnergyValueNeverBreaksTheCheck() {
+        noEnergyYet(null);
+        guard.enforce(session(SessionState.ACTIVE, NOW));
+        verify(stopper, never()).issue(any());
+    }
+
+    @Test
+    void aReadingWithOnlyPowerStillStopsWhenTheNextMinutesWouldExhaustTheBudget() {
+        when(funding.reserved(any())).thenReturn(new Money(200, "XOF", 0));
+        noEnergyYet("60");
+        guard.enforce(session(SessionState.ACTIVE, NOW));
+        verify(stopper).issue(any());
+    }
 }

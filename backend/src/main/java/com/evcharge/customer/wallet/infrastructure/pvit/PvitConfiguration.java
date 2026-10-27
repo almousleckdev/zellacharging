@@ -1,5 +1,6 @@
 package com.evcharge.customer.wallet.infrastructure.pvit;
 
+import org.springframework.boot.autoconfigure.condition.ConditionalOnExpression;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -18,14 +19,24 @@ import java.util.Map;
 class PvitConfiguration {
 
     @Bean
-    PvitGateway pvitGateway(PvitProperties properties, ObjectMapper mapper) {
+    PvitApi pvitApi(PvitProperties properties, ObjectMapper mapper) {
         requireComplete(properties);
         JdkClientHttpRequestFactory factory = new JdkClientHttpRequestFactory(
                 HttpClient.newBuilder().connectTimeout(properties.requestTimeout()).build());
         factory.setReadTimeout(properties.requestTimeout());
         RestClient client = RestClient.builder().baseUrl(properties.baseUrl()).requestFactory(factory).build();
-        PvitSecretProvider secrets = new PvitSecretProvider(client, properties, mapper);
-        return new PvitGateway(new PvitApi(client, secrets, properties, mapper));
+        return new PvitApi(client, new PvitSecretProvider(client, properties, mapper), properties, mapper);
+    }
+
+    @Bean
+    PvitGateway pvitGateway(PvitApi api) {
+        return new PvitGateway(api);
+    }
+
+    @Bean
+    @ConditionalOnExpression("!'${zella.payment.pvit.code-url-payout:}'.isEmpty()")
+    PvitPayoutGateway pvitPayoutGateway(PvitApi api) {
+        return new PvitPayoutGateway(api);
     }
 
     private static void requireComplete(PvitProperties properties) {

@@ -40,4 +40,18 @@ class FeeCalculatorTest {
         assertThat(fees.serviceMinor()).isZero();
         assertThat(fees.totalMinor()).isEqualTo(300);
     }
+
+    @Test
+    void theTwoPercentZellaServiceFeeIsEarnedOnTheElectricFeeOnly() {
+        FeeBreakdown fees = calculator("0", "2").of(10000);
+
+        assertThat(fees.serviceMinor()).isEqualTo(200);
+        assertThat(fees.totalMinor()).isEqualTo(10200);
+    }
+
+    @Test
+    void theServiceFeeRoundsToTheNearestFranc() {
+        assertThat(calculator("0", "2").of(125).serviceMinor()).isEqualTo(3);
+        assertThat(calculator("0", "2").of(124).serviceMinor()).isEqualTo(2);
+    }
 }

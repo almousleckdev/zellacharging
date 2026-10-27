@@ -51,6 +51,7 @@ public abstract class PostgresTestBase {
         registry.add("zella.tenancy.require-restricted-role", () -> "true");
         registry.add("zella.tenancy.country-cache-ttl", () -> "0s");
         registry.add("zella.charging.sweep-interval", () -> "1h");
+        registry.add("zella.fees.service-fee-percent", () -> "0");
     }
 
     @BeforeEach

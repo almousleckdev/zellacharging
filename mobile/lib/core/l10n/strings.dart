@@ -7,6 +7,7 @@ export 'payment_text.dart';
 export 'profile_text.dart';
 export 'station_text.dart';
 export 'wallet_text.dart';
+export 'withdraw_text.dart';
 
 import 'app_language.dart';
 

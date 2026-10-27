@@ -1,15 +1,19 @@
 import 'package:flutter/material.dart';
 
 import 'car_battery_painter.dart';
-
-const _imageAspect = 955 / 360;
-const _slot = Rect.fromLTWH(0.3173, 0.4333, 0.2691, 0.2139);
+import 'car_scene_spec.dart';
 
 class CarScene extends StatefulWidget {
-  const CarScene({super.key, required this.level, required this.charging});
+  const CarScene({
+    super.key,
+    required this.level,
+    required this.charging,
+    this.spec = CarSceneSpec.current,
+  });
 
   final double level;
   final bool charging;
+  final CarSceneSpec spec;
 
   @override
   State<CarScene> createState() => _CarSceneState();
@@ -51,25 +55,23 @@ class _CarSceneState extends State<CarScene>
   @override
   Widget build(BuildContext context) {
     return AspectRatio(
-      aspectRatio: _imageAspect,
+      aspectRatio: widget.spec.aspect,
       child: LayoutBuilder(builder: (context, box) => _scene(box)),
     );
   }
 
   Widget _scene(BoxConstraints box) {
+    final fraction = widget.spec.slot;
     final slot = Rect.fromLTWH(
-      box.maxWidth * _slot.left,
-      box.maxHeight * _slot.top,
-      box.maxWidth * _slot.width,
-      box.maxHeight * _slot.height,
+      box.maxWidth * fraction.left,
+      box.maxHeight * fraction.top,
+      box.maxWidth * fraction.width,
+      box.maxHeight * fraction.height,
     );
     return Stack(
       children: [
         Positioned.fill(
-          child: Image.asset(
-            'assets/images/charging_scene.png',
-            fit: BoxFit.fill,
-          ),
+          child: Image.asset(widget.spec.asset, fit: BoxFit.fill),
         ),
         Positioned.fromRect(
           rect: slot,

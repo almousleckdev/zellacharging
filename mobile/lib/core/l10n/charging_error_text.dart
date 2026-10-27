@@ -2,6 +2,26 @@ import 'app_language.dart';
 
 abstract final class ChargingErrorText {
   static Map<String, String> get byCode => {
+    'WITHDRAWAL_FAILED': AppLanguage.pick(
+      fr: 'Le retrait n’a pas pu être effectué. Votre argent est resté dans votre portefeuille.',
+      en: 'The withdrawal could not be completed. Your money stayed in your wallet.',
+    ),
+    'WITHDRAWAL_VERIFYING': AppLanguage.pick(
+      fr: 'Votre retrait est en cours de vérification. Ne refaites pas la demande : le résultat sera visible dans votre historique.',
+      en: 'Your withdrawal is being verified. Please do not request it again: the result will appear in your history.',
+    ),
+    'WITHDRAWALS_UNAVAILABLE': AppLanguage.pick(
+      fr: 'Les retraits ne sont pas encore disponibles.',
+      en: 'Withdrawals are not available yet.',
+    ),
+    'WITHDRAWAL_LIMIT_REACHED': AppLanguage.pick(
+      fr: 'La limite de retrait quotidienne est atteinte.',
+      en: 'The daily withdrawal limit has been reached.',
+    ),
+    'PHONE_NOT_VERIFIED': AppLanguage.pick(
+      fr: 'Vérifiez d’abord votre numéro de téléphone.',
+      en: 'Please verify your phone number first.',
+    ),
     'STATION_NOT_FOUND': AppLanguage.pick(
       fr: 'Cette station est introuvable.',
       en: 'This station could not be found.',

@@ -4,7 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../stations/presentation/station_providers.dart';
 import '../../domain/charging_session.dart';
-import '../car_scene.dart';
+import '../car_stage.dart';
 import '../session_formatting.dart';
 import '../session_message_card.dart';
 import 'details_summary.dart';
@@ -24,11 +24,8 @@ class SessionDetailsView extends ConsumerWidget {
     return ListView(
       padding: const EdgeInsets.all(AppSpacing.md),
       children: [
-        FractionallySizedBox(
-          widthFactor: 0.8,
-          child: CarScene(level: session.chargeLevel, charging: false),
-        ),
-        const SizedBox(height: AppSpacing.md),
+        CarStage(level: session.chargeLevel, charging: false),
+        const SizedBox(height: AppSpacing.lg),
         if (message != null) ...[
           SessionMessageCard(message: message, color: session.stateColor),
           const SizedBox(height: AppSpacing.md),

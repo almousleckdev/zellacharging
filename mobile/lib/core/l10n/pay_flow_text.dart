@@ -55,4 +55,12 @@ abstract final class PayFlowText {
 
   static String get backToWallet =>
       AppLanguage.pick(fr: 'Retour au portefeuille', en: 'Back to wallet');
+
+  static String operatorMismatch(String operator) => AppLanguage.pick(
+    fr: 'Ce numéro ressemble à un numéro $operator.',
+    en: 'This number looks like a $operator number.',
+  );
+
+  static String useOperator(String operator) =>
+      AppLanguage.pick(fr: 'Utiliser $operator', en: 'Use $operator');
 }

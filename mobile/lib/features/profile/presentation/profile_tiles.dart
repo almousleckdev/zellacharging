@@ -37,7 +37,7 @@ class ProfileTiles extends ConsumerWidget {
             value: wallet?.availableText ?? '--',
             icon: AppIcons.walletFill,
             colors: [AppColors.primary, AppColors.primaryLight],
-            onTap: () => context.push(Routes.topup),
+            onTap: () => context.push(Routes.wallet),
           ),
         ),
       ],

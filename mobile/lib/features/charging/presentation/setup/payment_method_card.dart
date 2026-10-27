@@ -7,6 +7,7 @@ import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../core/validation/validators.dart';
 import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/pay/operator_hint_note.dart';
 import '../../../../shared/widgets/pay/operator_tiles.dart';
 import '../../../../shared/widgets/pay/pay_card.dart';
 import '../../../wallet/domain/mobile_operator.dart';
@@ -79,6 +80,14 @@ class PaymentMethodCard extends StatelessWidget {
               validator: Validators.mobileMoneyNumber,
               keyboardType: TextInputType.phone,
               textInputAction: TextInputAction.done,
+            ),
+            ListenableBuilder(
+              listenable: phone,
+              builder: (context, _) => OperatorHintNote(
+                msisdn: phone.text,
+                selected: operator,
+                onUse: onOperator,
+              ),
             ),
           ],
         ],

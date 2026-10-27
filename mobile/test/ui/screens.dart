@@ -37,6 +37,8 @@ import 'package:zella/features/stations/presentation/locations_page.dart';
 import 'package:zella/features/stations/presentation/station_detail_page.dart';
 import 'package:zella/features/stations/presentation/station_providers.dart';
 import 'package:zella/features/wallet/presentation/topup_page.dart';
+import 'package:zella/features/wallet/presentation/wallet_page.dart';
+import 'package:zella/features/wallet/presentation/withdraw_page.dart';
 import 'package:zella/features/wallet/presentation/wallet_providers.dart';
 import 'ui_fakes.dart';
 
@@ -55,6 +57,8 @@ final screens = <String, Widget Function()>{
   'change-password': () => const ChangePasswordPage(),
   'delete-account': () => const DeleteAccountPage(),
   'topup': () => const TopupPage(),
+  'wallet': () => const WalletPage(),
+  'withdraw': () => const WithdrawPage(),
   'station': () => const StationDetailPage(
     stationId: 'DY202609110007-VERY-LONG-STATION-IDENTIFIER',
   ),

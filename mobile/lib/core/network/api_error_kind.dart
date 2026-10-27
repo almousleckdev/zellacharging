@@ -3,7 +3,11 @@ enum ApiErrorKind {
   uncertain,
   terminal;
 
-  static const _uncertain = {'PAYMENT_VERIFYING', 'TOPUP_PENDING'};
+  static const _uncertain = {
+    'PAYMENT_VERIFYING',
+    'TOPUP_PENDING',
+    'WITHDRAWAL_VERIFYING',
+  };
 
   static const _recoverable = {
     'NETWORK',

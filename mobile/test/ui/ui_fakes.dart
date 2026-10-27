@@ -29,6 +29,9 @@ import 'package:zella/features/stations/domain/station_repository.dart';
 import 'package:zella/features/wallet/domain/mobile_operator.dart';
 import 'package:zella/features/wallet/domain/topup_result.dart';
 import 'package:zella/features/wallet/domain/wallet.dart';
+import 'package:zella/features/wallet/domain/wallet_entry.dart';
+import 'package:zella/features/wallet/domain/withdrawal_result.dart';
+
 import 'package:zella/features/wallet/domain/wallet_repository.dart';
 
 const connectors = [
@@ -159,6 +162,7 @@ class FakeWallet implements WalletRepository {
     availableMinor: 984567,
     currency: 'XAF',
     decimals: 0,
+    withdrawalsEnabled: true,
   );
 
   @override
@@ -172,6 +176,40 @@ class FakeWallet implements WalletRepository {
   @override
   Future<TopupResult> topupStatus(String id) async =>
       const TopupResult(id: 't', state: 'SUCCEEDED');
+
+  @override
+  Future<WithdrawalResult> withdraw({
+    required int amountMinor,
+    required MobileOperator operator,
+    required String password,
+    required String idempotencyKey,
+  }) async => const WithdrawalResult(id: 'w', state: 'PAID');
+
+  @override
+  Future<WithdrawalResult> withdrawalStatus(String id) async =>
+      const WithdrawalResult(id: 'w', state: 'PAID');
+
+  @override
+  Future<List<WalletEntry>> entries() async => [
+    WalletEntry(
+      id: '1',
+      type: 'TOPUP',
+      amountMinor: 5000,
+      createdAt: DateTime(2026, 10, 26, 22, 2),
+    ),
+    WalletEntry(
+      id: '2',
+      type: 'CAPTURE',
+      amountMinor: 2040,
+      createdAt: DateTime(2026, 10, 26, 22, 40),
+    ),
+    WalletEntry(
+      id: '3',
+      type: 'WITHDRAWAL',
+      amountMinor: 1000,
+      createdAt: DateTime(2026, 10, 27, 9, 15),
+    ),
+  ];
 }
 
 class FakeProfile implements ProfileRepository {

@@ -21,6 +21,8 @@ import '../../features/profile/presentation/profile_page.dart';
 import '../../features/shell/presentation/shell_page.dart';
 import '../../features/scan/presentation/scan_page.dart';
 import '../../features/wallet/presentation/topup_page.dart';
+import '../../features/wallet/presentation/wallet_page.dart';
+import '../../features/wallet/presentation/withdraw_page.dart';
 import '../../features/stations/presentation/station_detail_page.dart';
 import '../../features/charging/presentation/charging_page.dart';
 import '../../features/charging/presentation/setup/charge_setup_page.dart';
@@ -86,7 +88,9 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.contact, builder: (_, _) => const ContactPage()),
       GoRoute(path: Routes.coupons, builder: (_, _) => const CouponsPage()),
       GoRoute(path: Routes.scan, builder: (_, _) => const ScanPage()),
+      GoRoute(path: Routes.wallet, builder: (_, _) => const WalletPage()),
       GoRoute(path: Routes.topup, builder: (_, _) => const TopupPage()),
+      GoRoute(path: Routes.withdraw, builder: (_, _) => const WithdrawPage()),
       GoRoute(
         path: Routes.chargeSetup,
         builder: (_, state) => ChargeSetupPage(

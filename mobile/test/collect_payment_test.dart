@@ -5,6 +5,9 @@ import 'package:zella/features/wallet/domain/mobile_operator.dart';
 import 'package:zella/features/wallet/domain/payment_stage.dart';
 import 'package:zella/features/wallet/domain/topup_result.dart';
 import 'package:zella/features/wallet/domain/wallet.dart';
+import 'package:zella/features/wallet/domain/wallet_entry.dart';
+import 'package:zella/features/wallet/domain/withdrawal_result.dart';
+
 import 'package:zella/features/wallet/domain/wallet_repository.dart';
 
 class _Wallets implements WalletRepository {
@@ -36,6 +39,21 @@ class _Wallets implements WalletRepository {
       state: states[polls.clamp(0, states.length - 1)],
     );
   }
+
+  @override
+  Future<WithdrawalResult> withdraw({
+    required int amountMinor,
+    required MobileOperator operator,
+    required String password,
+    required String idempotencyKey,
+  }) => throw UnimplementedError();
+
+  @override
+  Future<WithdrawalResult> withdrawalStatus(String id) =>
+      throw UnimplementedError();
+
+  @override
+  Future<List<WalletEntry>> entries() async => const [];
 }
 
 Future<List<PaymentStage>> _run(_Wallets wallets) async {

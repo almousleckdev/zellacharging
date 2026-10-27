@@ -5,6 +5,7 @@ class Wallet {
     required this.availableMinor,
     required this.currency,
     required this.decimals,
+    this.withdrawalsEnabled = false,
   });
 
   final int balanceMinor;
@@ -12,4 +13,5 @@ class Wallet {
   final int availableMinor;
   final String currency;
   final int decimals;
+  final bool withdrawalsEnabled;
 }

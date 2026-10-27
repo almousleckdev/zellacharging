@@ -15,7 +15,9 @@ abstract final class Routes {
   static const contact = '/profile/contact';
   static const coupons = '/profile/coupons';
   static const scan = '/scan';
+  static const wallet = '/wallet';
   static const topup = '/wallet/topup';
+  static const withdraw = '/wallet/withdraw';
   static const station = '/stations/:id';
   static const charging = '/charging/:id';
   static const chargeSetup = '/stations/:id/charge';

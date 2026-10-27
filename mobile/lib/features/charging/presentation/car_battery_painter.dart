@@ -13,103 +13,120 @@ class CarBatteryPainter extends CustomPainter {
   final double progress;
   final bool charging;
 
-  static const _nubShare = 0.035;
-  static const _bars = 10;
-  static const _gap = 3.0;
-  static const _glass = AppColors.textPrimary;
+  static const _cells = 14;
+  static const _gap = 2.4;
+  static const _inset = 4.0;
 
   Color get _accent => charging ? AppColors.chargeGreen : AppColors.chargeGlow;
 
   @override
   void paint(Canvas canvas, Size size) {
-    final nubWidth = size.width * _nubShare;
-    final body = RRect.fromLTRBR(
-      0,
-      0,
-      size.width - nubWidth,
-      size.height,
-      Radius.circular(size.height * 0.2),
+    final tray = RRect.fromRectAndRadius(
+      Offset.zero & size,
+      Radius.circular(size.height * 0.3),
     );
-    _drawGlow(canvas, body);
-    canvas.drawRRect(body, Paint()..color = _glass);
+    _drawGlow(canvas, tray);
+    _drawTray(canvas, tray, size);
     canvas.save();
-    canvas.clipRRect(body.deflate(3));
-    _drawBars(canvas, body.deflate(5).outerRect);
+    canvas.clipRRect(tray.deflate(_inset - 1));
+    _drawCells(canvas, tray.deflate(_inset).outerRect);
     canvas.restore();
-    _drawBorder(canvas, body);
-    _drawNub(canvas, size, nubWidth);
+    _drawGloss(canvas, tray, size);
+    _drawBorder(canvas, tray);
   }
 
-  void _drawGlow(Canvas canvas, RRect body) {
+  void _drawGlow(Canvas canvas, RRect tray) {
     canvas.drawRRect(
-      body,
+      tray,
       Paint()
-        ..color = _accent.withValues(alpha: 0.5)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 8),
+        ..color = _accent.withValues(alpha: charging ? 0.55 : 0.35)
+        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 9),
     );
   }
 
-  void _drawBars(Canvas canvas, Rect inner) {
-    final barWidth = (inner.width - _gap * (_bars - 1)) / _bars;
+  void _drawTray(Canvas canvas, RRect tray, Size size) {
+    canvas.drawRRect(
+      tray,
+      Paint()
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.textPrimary.withValues(alpha: 0.88),
+            AppColors.textPrimary,
+          ],
+        ).createShader(Offset.zero & size),
+    );
+  }
+
+  void _drawCells(Canvas canvas, Rect inner) {
+    final width = (inner.width - _gap * (_cells - 1)) / _cells;
     final solid = Paint()
       ..shader = const LinearGradient(
         colors: [AppColors.chargeDeep, AppColors.chargeGreen],
       ).createShader(inner);
-    final exact = level * _bars;
+    final exact = level * _cells;
     final full = exact.floor();
     final partial = exact - full;
     final next = partial > 0 ? full + 1 : full;
-    final chasing = charging ? _chasingBars(next) : 0;
-    for (var i = 0; i < _bars; i++) {
+    final chasing = charging ? _chasingCells(next) : 0;
+    for (var i = 0; i < _cells; i++) {
       final rect = Rect.fromLTWH(
-        inner.left + i * (barWidth + _gap),
+        inner.left + i * (width + _gap),
         inner.top,
-        barWidth,
+        width,
         inner.height,
       );
+      final cell = RRect.fromRectAndRadius(rect, const Radius.circular(2.5));
+      canvas.drawRRect(cell, Paint()..color = _idle(i - next, chasing));
       final fill = i < full ? 1.0 : (i == full && partial > 0 ? partial : 0.0);
-      final idle = Paint()..color = _idleColor(i - next, chasing);
-      final bar = RRect.fromRectAndRadius(rect, const Radius.circular(3));
-      canvas.drawRRect(bar, idle);
       if (fill > 0) {
         canvas.save();
         canvas.clipRect(
           Rect.fromLTWH(rect.left, rect.top, rect.width * fill, rect.height),
         );
-        canvas.drawRRect(bar, solid);
+        canvas.drawRRect(cell, solid);
         canvas.restore();
       }
     }
   }
 
-  int _chasingBars(int next) {
-    final remaining = _bars - next;
+  int _chasingCells(int next) {
+    final remaining = _cells - next;
     return (progress * (remaining + 1)).floor().clamp(0, remaining);
   }
 
-  Color _idleColor(int offset, int chasing) => offset >= 0 && offset < chasing
+  Color _idle(int offset, int chasing) => offset >= 0 && offset < chasing
       ? AppColors.chargeGreen.withValues(alpha: 0.85)
       : AppColors.onPrimary.withValues(alpha: 0.08);
 
-  void _drawBorder(Canvas canvas, RRect body) {
-    canvas.drawRRect(
-      body.deflate(1),
+  void _drawGloss(Canvas canvas, RRect tray, Size size) {
+    final upper = Rect.fromLTWH(0, 0, size.width, size.height * 0.45);
+    canvas.save();
+    canvas.clipRRect(tray);
+    canvas.drawRect(
+      upper,
       Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 2.5
-        ..color = _accent,
+        ..shader = LinearGradient(
+          begin: Alignment.topCenter,
+          end: Alignment.bottomCenter,
+          colors: [
+            AppColors.onPrimary.withValues(alpha: 0.22),
+            AppColors.onPrimary.withValues(alpha: 0),
+          ],
+        ).createShader(upper),
     );
+    canvas.restore();
   }
 
-  void _drawNub(Canvas canvas, Size size, double nubWidth) {
-    final nub = RRect.fromLTRBR(
-      size.width - nubWidth - 1,
-      size.height * 0.3,
-      size.width,
-      size.height * 0.7,
-      Radius.circular(nubWidth * 0.4),
+  void _drawBorder(Canvas canvas, RRect tray) {
+    canvas.drawRRect(
+      tray.deflate(0.9),
+      Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 1.8
+        ..color = _accent,
     );
-    canvas.drawRRect(nub, Paint()..color = _accent);
   }
 
   @override

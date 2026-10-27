@@ -7,7 +7,7 @@ import com.evcharge.customer.account.domain.Channel;
 import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.CustomerStatus;
-import com.evcharge.customer.account.domain.Sha256;
+import com.evcharge.customer.shared.Sha256;
 import com.evcharge.customer.account.domain.VerificationCode;
 import com.evcharge.customer.shared.ApiException;
 import org.springframework.http.HttpStatus;

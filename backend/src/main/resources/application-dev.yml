@@ -17,6 +17,8 @@ zella:
   security:
     jwt-secret: dev-only-secret-change-me-0123456789abcdef0123456789
     code-pepper: dev-only-pepper
+  admin:
+    totp-key: dev-only-totp-passphrase-change-me-0123456789
   ocpp:
     require-secure-channel: false
     api-key: ${ZELLA_OCPP_API_KEY:${NDZELA_OCPP_API_KEY:dev-mobile-key-never-use-in-prod}}

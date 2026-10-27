@@ -67,6 +67,19 @@ zella:
     refresh-token-ttl: 30d
     max-failed-logins: 5
     lockout: 15m
+  admin:
+    bootstrap-email: ${ZELLA_ADMIN_EMAIL:}
+    bootstrap-password: ${ZELLA_ADMIN_PASSWORD:}
+    totp-key: ${ZELLA_ADMIN_TOTP_KEY}
+    totp-issuer: Zella Charging
+    mail-from: ${ZELLA_MAIL_FROM:${NDZELA_MAIL_FROM:no-reply@zella.local}}
+    dashboard-url: ${ZELLA_ADMIN_DASHBOARD_URL:http://localhost:3000}
+    invitation-ttl: 72h
+    challenge-ttl: 5m
+    access-token-ttl: 10m
+    refresh-token-ttl: 12h
+    max-failed-logins: 5
+    lockout: 15m
   verification:
     code-ttl: 5m
     resend-cooldown: 60s
@@ -83,10 +96,10 @@ zella:
     plug-in-timeout: 60s
     sweep-interval: 15s
     stop-retry-after: 30s
-    stop-threshold-percent: 95
-    stop-lead-time: 120s
+    stop-threshold-percent: 100
+    stop-lead-time: 15s
     user-refresh-interval: 5s
-    metering-interval: 30s
+    metering-interval: 10s
     price-per-kwh-minor: ${ZELLA_PRICE_PER_KWH:${NDZELA_PRICE_PER_KWH:}}
   fees:
     vat-percent: ${ZELLA_VAT_PERCENT:${NDZELA_VAT_PERCENT:0}}

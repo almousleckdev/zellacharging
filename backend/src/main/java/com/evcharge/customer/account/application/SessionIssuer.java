@@ -3,7 +3,7 @@ package com.evcharge.customer.account.application;
 import com.evcharge.customer.account.application.port.AccessTokenIssuer;
 import com.evcharge.customer.account.application.port.RefreshTokenRepository;
 import com.evcharge.customer.account.domain.RefreshToken;
-import com.evcharge.customer.account.domain.Sha256;
+import com.evcharge.customer.shared.Sha256;
 import org.springframework.stereotype.Component;
 
 import java.security.SecureRandom;

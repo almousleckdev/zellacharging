@@ -1,0 +1,57 @@
+import type { Dictionary } from "../types";
+
+export const enProfile: Pick<Dictionary, "profile"> = {
+  profile: {
+    title: "My profile",
+    subtitle: "Your account details and security settings.",
+    details: {
+      title: "Personal information",
+      subtitle: "This information is visible to administrators.",
+      firstName: "First name",
+      lastName: "Last name",
+      phone: "Phone",
+      phoneHint: "Optional. A Gabon (+241) or Mali (+223) number.",
+      dialCode: "Dial code",
+      save: "Save",
+      saving: "Saving…",
+      saved: "Profile updated.",
+    },
+    avatar: {
+      title: "Profile picture",
+      change: "Change picture",
+      remove: "Remove picture",
+      hint: "JPEG, PNG or WebP, 1 MB maximum.",
+      updated: "Picture updated.",
+      removed: "Picture removed.",
+    },
+    account: { title: "Account", email: "Email address", role: "Role", status: "Status", active: "Active" },
+    countries: { title: "Authorized countries", subtitle: "The data you can access.", empty: "No country assigned." },
+    permissions: { title: "Permissions", subtitle: "What your role allows you to do." },
+    preferences: { title: "Preferences", language: "Interface language" },
+    security: {
+      title: "Security",
+      twoFactor: "Two-factor authentication",
+      twoFactorHint: "A 6-digit code is required at every sign-in.",
+      enabled: "Enabled",
+    },
+    password: {
+      title: "Change password",
+      hint: "At least 10 characters, with letters and digits. You will be signed out of all your devices.",
+      current: "Current password",
+      next: "New password",
+      confirm: "Confirm new password",
+      submit: "Update password",
+      submitting: "Updating…",
+      success: "Password changed. You will be signed out so you can sign in again.",
+    },
+    permissionLabels: {
+      OVERVIEW_READ: "View the overview",
+      STATIONS_READ: "View stations",
+      SESSIONS_READ: "View charging sessions",
+      CUSTOMERS_READ: "View customers",
+      PAYMENTS_READ: "View payments",
+      AUDIT_READ: "View the audit log",
+      ADMINS_MANAGE: "Manage administrators",
+    },
+  },
+};

@@ -4,7 +4,7 @@ import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.RefreshTokenRepository;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.RefreshToken;
-import com.evcharge.customer.account.domain.Sha256;
+import com.evcharge.customer.shared.Sha256;
 import com.evcharge.customer.shared.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;

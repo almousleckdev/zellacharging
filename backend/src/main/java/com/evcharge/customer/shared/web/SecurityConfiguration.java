@@ -26,7 +26,7 @@ class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/v1/auth/**", "/v1/payments/callback").permitAll()
+                        .requestMatchers("/v1/auth/**", "/v1/admin/auth/**", "/v1/payments/callback").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> { }).authenticationEntryPoint(problems)

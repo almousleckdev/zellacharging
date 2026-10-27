@@ -70,7 +70,9 @@ cached on `wallet` and derived from the ledger:
   `Available` or `Preparing`, not in use), the amount range, then reserves atomically. `Idempotency-Key`
   makes a retry return the same session.
 * The backend stops the charge. `FundsGuard` runs every 15 s: estimated cost plus the cost of the next
-  `stop-lead-time` (90 s) of charging at the current power, against 95% of the reservation. A stop that is not
+  `stop-lead-time` (15 s) of charging at the current power, against 100% of the reservation, so the chosen
+  amount is consumed. Any energy delivered after the stop command is capped at the reservation, and an unused
+  remainder (battery full first) is released back to the wallet. A stop that is not
   confirmed is re-issued every 30 s while the session is `STOPPING`. A session is never marked stopped because a
   command was sent; only the OCPP platform's report moves it.
 * A session charging with no known tariff is stopped (`zella.charging.stop.without_tariff`), since the budget
@@ -92,8 +94,8 @@ The platform allows 60 requests/minute for all customers together. What a sweep 
 
 * one `GET /api/v1/sessions?status=ACTIVE` for every live session of every customer (`RemoteSessionLookup`),
   shared by the sweeper and by user reads for 5 s;
-* one metering call per ACTIVE session, at most every 30 s (`metering-interval`), which matches the charger's own
-  30-60 s sampling; the stop prediction (`stop-lead-time`, 120 s) covers the extra staleness;
+* one metering call per ACTIVE session, at most every 10 s (`metering-interval`); the battery level shown can never
+  be fresher than the charger's own `MeterValueSampleInterval`; the stop prediction (`stop-lead-time`, 15 s) covers a little of the extra staleness;
 * one lookup by transaction when a session leaves the active list, once;
 * a lookup by idTag only for a session still waiting for its transaction, at most every 20 s (always when it is
   about to time out).

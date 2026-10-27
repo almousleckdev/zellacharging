@@ -1,0 +1,36 @@
+export const frOverview = {
+  overview: {
+    title: "Vue d'ensemble",
+    subtitle: "Indicateurs consolidés de la plateforme.",
+    viewing: "Périmètre affiché",
+    loadError: "Impossible de charger les indicateurs.",
+    metrics: {
+      customers: "Clients",
+      liveSessions: "Sessions en cours",
+      energy: "Énergie délivrée",
+      revenue: "Chiffre d'affaires",
+      walletBalance: "Soldes des portefeuilles",
+      topups: "Recharges encaissées",
+      withdrawals: "Retraits versés",
+    },
+    hints: {
+      customers: "{active} actifs · {recent} nouveaux sur 30 jours",
+      liveSessions: "{count} démarrées sur 24 h",
+      energy: "{count} sessions terminées",
+      revenue: "Sessions de charge terminées",
+      walletBalance: "dont {reserved} réservés",
+      topups: "{count} en attente",
+      withdrawals: "{count} en attente",
+    },
+    table: {
+      title: "Détail par pays",
+      country: "Pays",
+      customers: "Clients",
+      liveSessions: "Sessions en cours",
+      energy: "Énergie",
+      revenue: "Chiffre d'affaires",
+      balance: "Soldes",
+    },
+    unitKwh: "kWh",
+  },
+} as const;

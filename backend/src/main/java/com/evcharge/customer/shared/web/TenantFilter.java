@@ -1,5 +1,6 @@
 package com.evcharge.customer.shared.web;
 
+import com.evcharge.customer.shared.AdminAudience;
 import com.evcharge.customer.shared.CountryDirectory;
 import com.evcharge.customer.shared.TenantContext;
 import jakarta.servlet.FilterChain;
@@ -32,6 +33,16 @@ class TenantFilter extends OncePerRequestFilter {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (!(authentication != null && authentication.getPrincipal() instanceof Jwt jwt)) {
             chain.doFilter(request, response);
+            return;
+        }
+        boolean adminToken = AdminAudience.isAccessToken(jwt);
+        boolean adminPath = request.getRequestURI().startsWith(AdminAudience.PATH_PREFIX);
+        if (adminToken || adminPath) {
+            if (adminToken && adminPath) {
+                chain.doFilter(request, response);
+            } else {
+                problems.commence(request, response, new BadCredentialsException("Token does not match the endpoint"));
+            }
             return;
         }
         String country = jwt.getClaimAsString(CLAIM);

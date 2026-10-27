@@ -1,0 +1,20 @@
+export const frOnboarding = {
+  onboarding: {
+    checking: "Vérification de l'invitation…",
+    title: "Bienvenue sur Zella Charging",
+    subtitle: "Créez votre mot de passe pour activer votre accès à la console.",
+    account: "Compte",
+    invalidTitle: "Invitation invalide",
+    invalidText: "Ce lien a expiré ou a déjà été utilisé. Demandez une nouvelle invitation à votre administrateur.",
+    backToLogin: "Aller à la connexion",
+    password: "Mot de passe",
+    passwordHint: "Au moins 10 caractères, avec des lettres et des chiffres.",
+    confirm: "Confirmer le mot de passe",
+    submit: "Créer mon mot de passe",
+    submitting: "Création…",
+    completeTitle: "Complétez votre profil",
+    completeSubtitle: "Ces informations sont nécessaires avant d'accéder à la console.",
+    steps: { password: "Mot de passe", security: "Sécurité", profile: "Profil" },
+    stepLabel: "Étape {current} sur {total}",
+  },
+} as const;

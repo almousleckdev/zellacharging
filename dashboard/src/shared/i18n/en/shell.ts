@@ -1,0 +1,49 @@
+import type { Dictionary } from "../types";
+
+export const enShell: Pick<Dictionary, "shell" | "nav" | "dialogs"> = {
+  shell: {
+    breadcrumb: "Breadcrumb",
+    mainNavigation: "Main navigation",
+    openMenu: "Open menu",
+    closeMenu: "Close menu",
+    profileLink: "My profile",
+    breadcrumbRoot: "Console",
+    comingSoon: "Soon",
+    loadError: "We couldn't load your session.",
+    country: { label: "Country", all: "All countries" },
+    logout: "Sign out",
+    roles: {
+      SUPER_ADMIN: "Super administrator",
+      ADMIN: "Administrator",
+      SUPPORT: "Support",
+      FINANCE: "Finance",
+      OPERATIONS: "Operations",
+    },
+  },
+  nav: {
+    groups: {
+      operations: "Operations",
+      customersFinance: "Customers and finance",
+      insights: "Insights",
+      administration: "Administration",
+    },
+    overview: "Overview",
+    stations: "Stations",
+    sessions: "Sessions",
+    incidents: "Incidents",
+    customers: "Customers",
+    payments: "Payments",
+    tariffs: "Tariffs",
+    reports: "Reports",
+    countries: "Countries",
+    users: "Users and roles",
+    audit: "Audit log",
+    system: "System",
+  },
+  dialogs: {
+    logoutTitle: "Sign out?",
+    logoutMessage: "Your session will be closed on this device. You will need to sign in again with your verification code.",
+    cancel: "Cancel",
+    close: "Close",
+  },
+};

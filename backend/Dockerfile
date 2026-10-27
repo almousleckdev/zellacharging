@@ -4,7 +4,7 @@ COPY .mvn .mvn
 COPY mvnw pom.xml ./
 RUN ./mvnw -q -B dependency:go-offline
 COPY src src
-RUN ./mvnw -q -B -DskipTests package && cp target/zella-backend-*.jar app.jar
+RUN ./mvnw -q -B -DskipTests package && cp target/app.jar app.jar
 
 FROM eclipse-temurin:21-jre
 RUN useradd --system --uid 10001 zella

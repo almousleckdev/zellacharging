@@ -99,4 +99,26 @@ class AdminPaymentsAndSessionsIntegrationTest extends PostgresTestBase {
         call(support, "/v1/admin/payments?country=GA").andExpect(status().isForbidden());
         call(support, "/v1/admin/sessions?country=GA").andExpect(status().isOk());
     }
+
+    @Test
+    void sandboxTopupsNeverAppearInPayments() throws Exception {
+        UUID customer = data.customer("GA", "ACTIVE", marker, "Test", null, Instant.now());
+        data.wallet("GA", customer, "XAF", 0, 0);
+        data.topup("GA", customer, "SUCCEEDED", 19151);
+        TenantContext.runAs("GA", () -> jdbc.update(
+                "update topup set provider_ref = 'sandbox-GAXXXX' where customer_id = ?", customer));
+
+        call(root, "/v1/admin/payments?country=GA&q=" + marker).andExpect(jsonPath("$.total").value(0));
+    }
+
+    @Test
+    void commissionsListTheServiceFeeOfEveryBilledSession() throws Exception {
+        UUID customer = data.customer("GA", "ACTIVE", marker, "Fee", null, Instant.now());
+        data.session("GA", customer, 1, "COMPLETED", "0.385", 1000L);
+
+        call(root, "/v1/admin/commissions?country=GA")
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.summaries[0].sessions").isNumber())
+                .andExpect(jsonPath("$.items[?(@.customerName=='" + marker + " Fee')].electricMinor").value(1000));
+    }
 }

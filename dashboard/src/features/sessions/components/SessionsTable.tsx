@@ -57,15 +57,8 @@ export function SessionsTable({ items }: { items: SessionItem[] }) {
       align: "right",
       cell: (row) => (row.energyKwh === null ? "–" : `${format.number(row.energyKwh, 2)} ${t.sessions.unitKwh}`),
     },
-    {
-      key: "battery",
-      header: labels.battery,
-      align: "right",
-      cell: (row) =>
-        row.startBatteryPercent === null && row.endBatteryPercent === null
-          ? "–"
-          : `${percent(row.startBatteryPercent)} → ${percent(row.endBatteryPercent)}`,
-    },
+    { key: "batteryStart", header: labels.batteryStart, align: "right", cell: (row) => percent(row.startBatteryPercent) },
+    { key: "batteryEnd", header: labels.batteryEnd, align: "right", cell: (row) => percent(row.endBatteryPercent) },
     { key: "cost", header: labels.cost, align: "right", cell: (row) => <span className="figure font-semibold">{cost(row)}</span> },
     { key: "date", header: labels.date, align: "right", cell: (row) => format.dateTime(row.startedAt ?? row.createdAt) },
   ];

@@ -3,6 +3,7 @@ package com.evcharge.customer.charging.infrastructure;
 import com.evcharge.customer.charging.CustomerSessions;
 import com.evcharge.customer.charging.SessionFigures;
 import com.evcharge.customer.charging.SessionStatistics;
+import com.evcharge.customer.shared.ReportingWindow;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import com.evcharge.customer.shared.Timestamps;
 import org.springframework.stereotype.Repository;
@@ -13,9 +14,11 @@ import java.util.UUID;
 class JdbcSessionStatistics implements SessionStatistics {
 
     private final JdbcClient jdbc;
+    private final ReportingWindow reporting;
 
-    JdbcSessionStatistics(JdbcClient jdbc) {
+    JdbcSessionStatistics(JdbcClient jdbc, ReportingWindow reporting) {
         this.jdbc = jdbc;
+        this.reporting = reporting;
     }
 
     @Override
@@ -28,7 +31,8 @@ class JdbcSessionStatistics implements SessionStatistics {
                         + "coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) as energy, "
                         + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED'), 0)::bigint as revenue "
                         + "from charging_session "
-                        + "where country_code = current_setting('app.country', true)")
+                        + "where country_code = current_setting('app.country', true) and created_at >= :since")
+                .param("since", reporting.since())
                 .query((rs, rowNum) -> new SessionFigures(rs.getLong("live"), rs.getLong("completed"),
                         rs.getLong("recent"), rs.getBigDecimal("energy"), rs.getLong("revenue"))).single();
     }

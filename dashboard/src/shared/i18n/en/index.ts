@@ -9,6 +9,7 @@ import { enUsers } from "./users";
 import { enOnboarding } from "./onboarding";
 import { enPayments } from "./payments";
 import { enSessions } from "./sessions";
+import { enCommissions } from "./commissions";
 
 export const en: Dictionary = {
   ...enCommon,
@@ -21,4 +22,5 @@ export const en: Dictionary = {
   ...enOnboarding,
   ...enPayments,
   ...enSessions,
+  ...enCommissions,
 };

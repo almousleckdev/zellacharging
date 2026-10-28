@@ -31,6 +31,7 @@ export const frShell = {
     incidents: "Incidents",
     customers: "Clients",
     payments: "Paiements",
+    commissions: "Commissions",
     tariffs: "Tarifs",
     reports: "Rapports",
     countries: "Pays",

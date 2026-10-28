@@ -1,5 +1,6 @@
 package com.evcharge.customer.wallet.infrastructure;
 
+import com.evcharge.customer.shared.ReportingWindow;
 import com.evcharge.customer.shared.Timestamps;
 import com.evcharge.customer.wallet.PaymentLog;
 import com.evcharge.customer.wallet.PaymentPage;
@@ -14,9 +15,11 @@ import java.util.UUID;
 @Repository
 class JdbcPaymentLog implements PaymentLog {
 
-    private static final String SCOPE = "country_code = current_setting('app.country', true)";
+    private static final String SCOPE = "country_code = current_setting('app.country', true) "
+            + "and created_at >= :since";
     private static final String MERGED = "(select 'TOPUP' as kind, id, customer_id, operator, msisdn, amount_minor, "
             + "state, failure_code, reference, created_at from topup where " + SCOPE
+            + " and (provider_ref is null or provider_ref not like 'sandbox-%')"
             + " union all select 'WITHDRAWAL', id, customer_id, operator, msisdn, amount_minor, state, "
             + "failure_code, reference, created_at from withdrawal where " + SCOPE + ") p "
             + "join customer c on c.id = p.customer_id join wallet w on w.customer_id = p.customer_id";
@@ -32,9 +35,11 @@ class JdbcPaymentLog implements PaymentLog {
             Timestamps.read(rs, "created_at"));
 
     private final JdbcClient jdbc;
+    private final ReportingWindow reporting;
 
-    JdbcPaymentLog(JdbcClient jdbc) {
+    JdbcPaymentLog(JdbcClient jdbc, ReportingWindow reporting) {
         this.jdbc = jdbc;
+        this.reporting = reporting;
     }
 
     @Override
@@ -42,10 +47,11 @@ class JdbcPaymentLog implements PaymentLog {
         String where = " where true" + (query.kind() == null ? "" : " and p.kind = :kind")
                 + (query.state() == null ? "" : " and p.state = :state")
                 + (query.text() == null ? "" : TEXT_FILTER);
-        long total = bind(jdbc.sql("select count(*) from " + MERGED + where), query).query(Long.class).single();
+        long total = bind(jdbc.sql("select count(*) from " + MERGED + where), query)
+                .param("since", reporting.since()).query(Long.class).single();
         var items = bind(jdbc.sql("select p.*, c.first_name, c.last_name, w.currency, w.decimals from " + MERGED
                 + where + " order by p.created_at desc, p.id limit :limit"), query)
-                .param("limit", query.limit()).query(MAPPER).list();
+                .param("limit", query.limit()).param("since", reporting.since()).query(MAPPER).list();
         return new PaymentPage(total, items);
     }
 

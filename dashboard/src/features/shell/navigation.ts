@@ -7,6 +7,7 @@ export type NavId =
   | "incidents"
   | "customers"
   | "payments"
+  | "commissions"
   | "tariffs"
   | "reports"
   | "countries"
@@ -44,6 +45,7 @@ export const NAV_GROUPS: NavGroup[] = [
     items: [
       { id: "customers", href: "/customers", icon: "users", available: true, permission: "CUSTOMERS_READ" },
       { id: "payments", href: "/payments", icon: "wallet", available: true, permission: "PAYMENTS_READ" },
+      { id: "commissions", href: "/commissions", icon: "percent", available: true, permission: "PAYMENTS_READ" },
       { id: "tariffs", href: "/tariffs", icon: "tag", available: false },
     ],
   },

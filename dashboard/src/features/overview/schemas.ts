@@ -37,6 +37,7 @@ export const countryFiguresSchema = z.object({
 
 export const overviewSchema = z.object({
   scope: z.string(),
+  since: z.string().nullable().optional(),
   countries: z.array(countryFiguresSchema),
 });
 

@@ -37,6 +37,12 @@ function card(name: string): Promise<HTMLElement> {
   return screen.findByRole("heading", { name, level: 3 }).then((heading) => heading.closest("article") as HTMLElement);
 }
 
+function moneyRow(label: string): Promise<string> {
+  return screen
+    .findByText(label)
+    .then((node) => (node.closest("div.justify-between") as HTMLElement).textContent?.replace(/[\u00a0\u202f]/g, " ") ?? "");
+}
+
 function serve(handler: (url: string) => Response | Promise<Response>) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => handler(String(input)));
   vi.stubGlobal("fetch", fetchMock);
@@ -76,8 +82,8 @@ describe("OverviewPage", () => {
 
     renderConsole(<OverviewPage />, profileOf([gabon], "COUNTRY_ADMIN"));
 
-    const revenue = (await screen.findByText("Chiffre d'affaires")).closest("article") as HTMLElement;
-    expect(revenue.textContent?.replace(/[  ]/g, " ")).toContain("6 000 FCFA");
+    expect(await moneyRow("Recharges encaissées")).toContain("9 000 FCFA");
+    expect(await moneyRow("Charges facturées")).toContain("138 FCFA");
     const customers = screen.getByText("Clients").closest("article") as HTMLElement;
     expect(within(customers).getByText("10")).toBeInTheDocument();
     expect(within(customers).getByText(/8 actifs · 2 nouveaux/)).toBeInTheDocument();
@@ -96,9 +102,9 @@ describe("OverviewPage", () => {
 
     const customers = await card("Clients");
     expect(within(customers).getByText("30")).toBeInTheDocument();
-    const text = (await card("Chiffre d'affaires")).textContent?.replace(/[\u00a0\u202f]/g, " ") ?? "";
-    expect(text).toContain("6 000 XAF");
-    expect(text).toContain("12 000 XOF");
+    const text = await moneyRow("Recharges encaissées");
+    expect(text).toContain("9 000 XAF");
+    expect(text).toContain("18 000 XOF");
   });
 
   it("breaks the figures down by country when several are shown", async () => {
@@ -124,8 +130,27 @@ describe("OverviewPage", () => {
 
     renderConsole(<OverviewPage />);
 
-    const topups = await card("Recharges encaissées");
-    expect(within(topups).getByText("3 en attente")).toBeInTheDocument();
+    expect(await screen.findByText("3 en attente")).toBeInTheDocument();
+  });
+
+  it("shows the commission and the date the figures start from", async () => {
+    navigation.search = new URLSearchParams("country=GA");
+    serve((url) =>
+      url.includes("commissions")
+        ? Response.json({
+            summaries: [
+              { country: "GA", currency: "XAF", decimals: 0, sessions: 3, electricMinor: 1000, serviceFeeMinor: 20, vatMinor: 0, serviceFeePercent: 2, vatPercent: 0 },
+            ],
+            items: [],
+          })
+        : Response.json({ scope: "GA", since: "2026-10-28T00:00:00Z", countries: [figures("GA", "Gabon", "XAF", 1)] }),
+    );
+
+    renderConsole(<OverviewPage />);
+
+    const commission = await card("Commission");
+    expect(commission.textContent).toContain("2 % sur 3 charges facturées");
+    expect(await screen.findByText(/Chiffres comptés depuis le/)).toBeInTheDocument();
   });
 
   it("offers a retry when the figures cannot be loaded", async () => {

@@ -12,9 +12,9 @@ type MetricCardProps = {
 
 export function MetricCard({ label, icon, values, hint, badge }: MetricCardProps) {
   return (
-    <article className="flex flex-col gap-4 rounded-card border border-border bg-background p-5 shadow-[0_1px_2px_rgb(11_18_32/0.04)]">
+    <article className="flex flex-col gap-4 rounded-card border border-border bg-background p-5 shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
       <header className="flex items-center gap-2.5">
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink text-primary">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-primary-soft text-primary-text">
           <Icon name={icon} className="size-4" />
         </span>
         <h3 className="text-sm font-medium text-muted">{label}</h3>

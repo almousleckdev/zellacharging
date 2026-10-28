@@ -1,5 +1,6 @@
 package com.evcharge.customer.wallet.infrastructure;
 
+import com.evcharge.customer.shared.ReportingWindow;
 import com.evcharge.customer.wallet.CustomerWallet;
 import com.evcharge.customer.wallet.WalletFigures;
 import com.evcharge.customer.wallet.WalletStatistics;
@@ -13,9 +14,11 @@ import java.util.UUID;
 class JdbcWalletStatistics implements WalletStatistics {
 
     private final JdbcClient jdbc;
+    private final ReportingWindow reporting;
 
-    JdbcWalletStatistics(JdbcClient jdbc) {
+    JdbcWalletStatistics(JdbcClient jdbc, ReportingWindow reporting) {
         this.jdbc = jdbc;
+        this.reporting = reporting;
     }
 
     @Override
@@ -26,15 +29,19 @@ class JdbcWalletStatistics implements WalletStatistics {
                 .query((rs, rowNum) -> new long[]{rs.getLong(1), rs.getLong(2), rs.getLong(3)}).single();
         long[] topups = jdbc.sql("select coalesce(sum(amount_minor) filter (where state = 'SUCCEEDED'), 0)::bigint, "
                         + "count(*) filter (where state = 'PENDING') from topup "
-                        + "where country_code = current_setting('app.country', true)")
+                        + "where country_code = current_setting('app.country', true) and created_at >= :since "
+                        + "and (provider_ref is null or provider_ref not like 'sandbox-%')")
+                .param("since", reporting.since())
                 .query((rs, rowNum) -> new long[]{rs.getLong(1), rs.getLong(2)}).single();
         long[] withdrawals = jdbc.sql("select coalesce(sum(amount_minor) filter (where state = 'PAID'), 0)::bigint, "
                         + "count(*) filter (where state in ('REQUESTED', 'PROCESSING', 'REVIEW')) from withdrawal "
-                        + "where country_code = current_setting('app.country', true)")
+                        + "where country_code = current_setting('app.country', true) and created_at >= :since")
+                .param("since", reporting.since())
                 .query((rs, rowNum) -> new long[]{rs.getLong(1), rs.getLong(2)}).single();
         long captured = jdbc.sql("select coalesce(sum(amount_minor), 0)::bigint from ledger_entry "
-                        + "where type = 'CAPTURE' and country_code = current_setting('app.country', true)")
-                .query(Long.class).single();
+                        + "where type = 'CAPTURE' and country_code = current_setting('app.country', true) "
+                        + "and created_at >= :since")
+                .param("since", reporting.since()).query(Long.class).single();
         return new WalletFigures(wallets[0], wallets[1], wallets[2], topups[0], topups[1], withdrawals[0],
                 withdrawals[1], captured);
     }

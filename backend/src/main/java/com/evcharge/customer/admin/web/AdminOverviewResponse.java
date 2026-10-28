@@ -4,12 +4,13 @@ import com.evcharge.customer.admin.application.AdminOverview;
 import com.evcharge.customer.admin.application.CountryOverview;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 
-record AdminOverviewResponse(String scope, List<CountryFigures> countries) {
+record AdminOverviewResponse(String scope, Instant since, List<CountryFigures> countries) {
 
-    static AdminOverviewResponse from(AdminOverview overview) {
-        return new AdminOverviewResponse(overview.scope(), overview.countries().stream().map(CountryFigures::from).toList());
+    static AdminOverviewResponse from(AdminOverview overview, Instant since) {
+        return new AdminOverviewResponse(overview.scope(), since, overview.countries().stream().map(CountryFigures::from).toList());
     }
 
     record CountryFigures(String code, String name, String currency, int currencyDecimals, Customers customers,

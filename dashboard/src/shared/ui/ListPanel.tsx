@@ -38,7 +38,7 @@ export function ListPanel({
   const { t } = useI18n();
 
   return (
-    <section className="overflow-hidden rounded-card border border-border bg-background shadow-[0_1px_2px_rgb(11_18_32/0.04)]">
+    <section className="overflow-hidden rounded-card border border-border bg-background shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
       {toolbar}
       {pending && (
         <div role="status" aria-busy="true">

@@ -1,0 +1,28 @@
+export const frCommissions = {
+  commissions: {
+    title: "Commissions",
+    subtitle: "La part de Zella sur chaque charge facturée.",
+    explained:
+      "À chaque charge, le client paie l'électricité consommée plus une commission de service. La commission est prélevée sur son portefeuille et reste sur votre compte PVit : elle est à vous.",
+    loadError: "Impossible de charger les commissions.",
+    emptyTitle: "Aucune commission",
+    emptyText: "Les commissions apparaissent dès qu'une charge est facturée.",
+    recent: "Dernières charges facturées",
+    earned: "Commission gagnée ({rate} %)",
+    earnedHint: "Sur {count} charges facturées",
+    electric: "Électricité facturée",
+    electricHint: "Avant commission et TVA",
+    vat: "TVA",
+    vatHint: "Taux appliqué : {rate} %",
+    total: "Total prélevé aux clients",
+    totalHint: "Électricité, commission et TVA",
+    columns: {
+      session: "Charge",
+      date: "Date",
+      electric: "Électricité",
+      commission: "Commission",
+      vat: "TVA",
+      total: "Total prélevé",
+    },
+  },
+} as const;

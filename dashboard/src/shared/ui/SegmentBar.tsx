@@ -49,7 +49,7 @@ export function SegmentBar({ segments, cells = 40, label, className }: SegmentBa
         )),
       )}
       {Array.from({ length: Math.max(cells - filled, 0) }, (_, cell) => (
-        <span key={`empty-${cell}`} className="flex-1 rounded-[3px] bg-ink-line" />
+        <span key={`empty-${cell}`} className="flex-1 rounded-[3px] bg-surface-strong" />
       ))}
     </div>
   );

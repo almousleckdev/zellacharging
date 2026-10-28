@@ -1,3 +1,4 @@
+import '../../../core/format/msisdn.dart';
 import 'mobile_operator.dart';
 
 abstract final class OperatorHint {
@@ -8,9 +9,9 @@ abstract final class OperatorHint {
       forNumber(msisdn) ?? chosen;
 
   static MobileOperator? forNumber(String? msisdn) {
-    final digits = (msisdn ?? '').replaceAll(RegExp(r'\D'), '');
-    if (!digits.startsWith('241') || digits.length < 5) return null;
-    final prefix = digits.substring(3, 5);
+    final national = Msisdn.national(msisdn);
+    if (national.length < 2) return null;
+    final prefix = national.substring(0, 2);
     if (_airtel.contains(prefix)) return MobileOperator.airtel;
     if (_moov.contains(prefix)) return MobileOperator.moov;
     return null;

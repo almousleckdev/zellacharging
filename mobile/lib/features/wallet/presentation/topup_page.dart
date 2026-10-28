@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/format/amount_input.dart';
 import '../../../core/format/money_format.dart';
+import '../../../core/format/msisdn.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../shared/widgets/pay/action_bar.dart';
 import '../../profile/presentation/profile_providers.dart';
@@ -24,7 +25,7 @@ class TopupPage extends ConsumerStatefulWidget {
 
 class _TopupPageState extends ConsumerState<TopupPage> {
   final _formKey = GlobalKey<FormState>();
-  final _amount = TextEditingController(text: AmountInput.format(5000));
+  final _amount = TextEditingController();
   late final _phone = TextEditingController(
     text: ref.read(profileProvider).asData?.value.phone ?? '',
   );
@@ -46,7 +47,7 @@ class _TopupPageState extends ConsumerState<TopupPage> {
         .read(topupFlowProvider.notifier)
         .pay(
           amountMinor: AmountInput.parse(_amount.text) ?? 0,
-          msisdn: _phone.text.trim(),
+          msisdn: Msisdn.normalize(_phone.text),
           operator: OperatorHint.resolve(_phone.text, _operator),
           idempotencyKey: _attempt,
         );

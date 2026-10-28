@@ -1,4 +1,5 @@
 import '../format/amount_input.dart';
+import '../format/msisdn.dart';
 import '../l10n/strings.dart';
 
 abstract final class Validators {
@@ -29,7 +30,8 @@ abstract final class Validators {
       : Strings.invalidCode;
 
   static String? mobileMoneyNumber(String? value) =>
-      value != null && RegExp(r'^\+[1-9]\d{7,14}$').hasMatch(value.trim())
+      value != null &&
+          RegExp(r'^\+[1-9]\d{7,14}$').hasMatch(Msisdn.normalize(value))
       ? null
       : WalletText.invalidMobileMoney;
 

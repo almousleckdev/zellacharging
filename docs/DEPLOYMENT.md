@@ -6,7 +6,7 @@ Project `zella-staging`, environment `production`, three services:
 
 | Service | What it is | Public |
 |---|---|---|
-| `backend` | Built from `users/backend/Dockerfile`, configured by `users/backend/railway.json` | `https://backend-production-d2d1.up.railway.app` |
+| `backend` | Built from `users/backend/Dockerfile`, configured by `users/backend/railway.json` | `https://apicharging.up.railway.app` |
 | `Postgres` | Railway Postgres plugin, reached over the private network | no |
 | `Redis` | Railway Redis plugin, shared rate-limit counters, reached over the private network | no |
 | `maildev` | Inbox for verification emails, basic auth (`MAILDEV_WEB_USER`, `MAILDEV_WEB_PASS`) | yes, port 1080 |

@@ -1,3 +1,4 @@
+import '../../../../shared/widgets/dismissible_form.dart';
 import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/strings.dart';
@@ -42,43 +43,40 @@ class SetupForm extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Form(
-      key: formKey,
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          StationHeaderCard(station: station),
-          const SizedBox(height: AppSpacing.lg),
-          LabeledSection(
-            title: StationText.chooseConnector,
-            child: ConnectorPicker(
-              connectors: station.connectors,
-              selected: connector,
-              onSelected: onConnector,
-            ),
+    return DismissibleForm(
+      formKey: formKey,
+      children: [
+        StationHeaderCard(station: station),
+        const SizedBox(height: AppSpacing.lg),
+        LabeledSection(
+          title: StationText.chooseConnector,
+          child: ConnectorPicker(
+            connectors: station.connectors,
+            selected: connector,
+            onSelected: onConnector,
           ),
-          AmountHero(
-            title: PayText.budgetTitle,
-            controller: amount,
-            currency: plan.currency,
-            quickAmounts: ChargeText.chargeAmounts,
-            helper: AmountRules.helper(plan),
-            validator: (value) => AmountRules.validate(value, plan),
-            onChanged: onAmountChanged,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          PaymentMethodCard(
-            plan: plan,
-            operator: operator,
-            phone: phone,
-            onOperator: onOperator,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          ChargeSummary(plan: plan),
-          const SizedBox(height: AppSpacing.lg),
-          const SecureNote(),
-        ],
-      ),
+        ),
+        AmountHero(
+          title: PayText.budgetTitle,
+          controller: amount,
+          currency: plan.currency,
+          quickAmounts: ChargeText.chargeAmounts,
+          helper: AmountRules.helper(plan),
+          validator: (value) => AmountRules.validate(value, plan),
+          onChanged: onAmountChanged,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        PaymentMethodCard(
+          plan: plan,
+          operator: operator,
+          phone: phone,
+          onOperator: onOperator,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        ChargeSummary(plan: plan),
+        const SizedBox(height: AppSpacing.lg),
+        const SecureNote(),
+      ],
     );
   }
 }

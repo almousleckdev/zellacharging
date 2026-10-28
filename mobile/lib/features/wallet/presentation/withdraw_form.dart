@@ -1,3 +1,4 @@
+import '../../../shared/widgets/dismissible_form.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/format/amount_input.dart';
@@ -53,87 +54,84 @@ class WithdrawForm extends StatelessWidget {
     final theme = Theme.of(context);
     final value = AmountInput.parse(amount.text) ?? 0;
     final shown = MoneyFormat.format(value, wallet.currency, wallet.decimals);
-    return Form(
-      key: formKey,
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.lg),
-        children: [
-          WalletBalanceCard(wallet: wallet),
-          const SizedBox(height: AppSpacing.md),
-          Text(
-            WithdrawText.explained,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
-            ),
+    return DismissibleForm(
+      formKey: formKey,
+      children: [
+        WalletBalanceCard(wallet: wallet),
+        const SizedBox(height: AppSpacing.md),
+        Text(
+          WithdrawText.explained,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: AppColors.textSecondary,
           ),
-          const SizedBox(height: AppSpacing.lg),
-          AmountHero(
-            title: WithdrawText.amountTitle,
-            controller: amount,
-            currency: wallet.currency,
-            quickAmounts: _quick,
-            validator: (text) =>
-                Validators.withdrawAmount(text, wallet.availableMinor),
-            onChanged: onAmountChanged,
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          PayCard(
-            title: WithdrawText.destinationTitle,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                OperatorTiles(
-                  selected: operator,
-                  phone: phone,
-                  onSelected: onOperator,
-                ),
-                const SizedBox(height: AppSpacing.md),
-                Row(
-                  children: [
-                    const Icon(AppIcons.phone, size: 18),
-                    const SizedBox(width: AppSpacing.sm),
-                    Text(
-                      PhoneMask.of(phone),
-                      style: theme.textTheme.titleSmall?.copyWith(
-                        fontWeight: FontWeight.w700,
-                      ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        AmountHero(
+          title: WithdrawText.amountTitle,
+          controller: amount,
+          currency: wallet.currency,
+          quickAmounts: _quick,
+          validator: (text) =>
+              Validators.withdrawAmount(text, wallet.availableMinor),
+          onChanged: onAmountChanged,
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        PayCard(
+          title: WithdrawText.destinationTitle,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              OperatorTiles(
+                selected: operator,
+                phone: phone,
+                onSelected: onOperator,
+              ),
+              const SizedBox(height: AppSpacing.md),
+              Row(
+                children: [
+                  const Icon(AppIcons.phone, size: 18),
+                  const SizedBox(width: AppSpacing.sm),
+                  Text(
+                    PhoneMask.of(phone),
+                    style: theme.textTheme.titleSmall?.copyWith(
+                      fontWeight: FontWeight.w700,
                     ),
-                  ],
-                ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  WithdrawText.destinationNote,
-                  style: theme.textTheme.bodySmall?.copyWith(
-                    color: AppColors.textSecondary,
                   ),
+                ],
+              ),
+              const SizedBox(height: AppSpacing.xs),
+              Text(
+                WithdrawText.destinationNote,
+                style: theme.textTheme.bodySmall?.copyWith(
+                  color: AppColors.textSecondary,
                 ),
-              ],
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          PayCard(
-            child: AppTextField(
-              controller: password,
-              label: WithdrawText.passwordLabel,
-              hint: WithdrawText.passwordHint,
-              icon: AppIcons.lock,
-              obscure: true,
-              validator: Validators.password,
-              textInputAction: TextInputAction.done,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.lg),
-          SummaryCard(
-            title: PayText.summaryTitle,
-            lines: [
-              SummaryLine(WithdrawText.fromWallet, shown),
-              SummaryLine(WithdrawText.toReceive, shown, emphasis: true),
+              ),
             ],
           ),
-          const SizedBox(height: AppSpacing.lg),
-          const SecureNote(),
-        ],
-      ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        PayCard(
+          child: AppTextField(
+            controller: password,
+            label: WithdrawText.passwordLabel,
+            hint: WithdrawText.passwordHint,
+            icon: AppIcons.lock,
+            obscure: true,
+            validator: Validators.password,
+            textInputAction: TextInputAction.done,
+          ),
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        SummaryCard(
+          title: PayText.summaryTitle,
+          lines: [
+            SummaryLine(WithdrawText.fromWallet, shown),
+            SummaryLine(WithdrawText.toReceive, shown, emphasis: true),
+          ],
+        ),
+        const SizedBox(height: AppSpacing.lg),
+        const SecureNote(),
+      ],
     );
   }
 }

@@ -144,7 +144,8 @@ Future<void> _openTopup(WidgetTester tester, _ScriptedWallet wallet) async {
       ],
     ),
   );
-  await tester.enterText(find.byType(TextFormField), '+24177123456');
+  await tester.enterText(find.byType(TextFormField).first, '5000');
+  await tester.enterText(find.byType(TextFormField).last, '077 12 34 56');
 }
 
 Future<void> _tapPay(WidgetTester tester) async {

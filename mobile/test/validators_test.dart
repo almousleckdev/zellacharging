@@ -30,9 +30,12 @@ void main() {
     expect(Validators.password('12345678'), isNull);
   });
 
-  test('mobile money number needs a country code', () {
+  test('mobile money number accepts international and local formats', () {
     expect(Validators.mobileMoneyNumber('+24177123456'), isNull);
-    expect(Validators.mobileMoneyNumber('077123456'), isNotNull);
+    expect(Validators.mobileMoneyNumber('077123456'), isNull);
+    expect(Validators.mobileMoneyNumber('077 12 34 56'), isNull);
+    expect(Validators.mobileMoneyNumber('77123456'), isNull);
+    expect(Validators.mobileMoneyNumber('0771234'), isNotNull);
     expect(Validators.mobileMoneyNumber(''), isNotNull);
   });
 }

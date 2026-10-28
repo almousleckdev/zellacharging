@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 import '../../core/theme/app_colors.dart';
 import '../../core/theme/app_icons.dart';
@@ -17,6 +18,9 @@ class AppTextField extends StatefulWidget {
     this.textInputAction = TextInputAction.next,
     this.maxLength,
     this.autofillHints,
+    this.inputFormatters,
+    this.suffixText,
+    this.onChanged,
   });
 
   final TextEditingController controller;
@@ -29,6 +33,9 @@ class AppTextField extends StatefulWidget {
   final TextInputAction textInputAction;
   final int? maxLength;
   final Iterable<String>? autofillHints;
+  final List<TextInputFormatter>? inputFormatters;
+  final String? suffixText;
+  final ValueChanged<String>? onChanged;
 
   @override
   State<AppTextField> createState() => _AppTextFieldState();
@@ -79,10 +86,13 @@ class _AppTextFieldState extends State<AppTextField> {
           textInputAction: widget.textInputAction,
           maxLength: widget.maxLength,
           autofillHints: widget.autofillHints,
+          inputFormatters: widget.inputFormatters,
+          onChanged: widget.onChanged,
           decoration: InputDecoration(
             hintText: widget.hint ?? widget.label,
             counterText: '',
             suffixIcon: _suffix,
+            suffixText: widget.suffixText,
           ),
         ),
       ],

@@ -6,6 +6,7 @@ import org.springframework.http.MediaType;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientException;
+import org.springframework.web.client.RestClientResponseException;
 import tools.jackson.databind.JsonNode;
 import tools.jackson.databind.ObjectMapper;
 
@@ -15,6 +16,7 @@ import java.time.Instant;
 class PvitSecretProvider {
 
     private static final Logger log = LoggerFactory.getLogger(PvitSecretProvider.class);
+    private static final int MAX_LOGGED_BODY = 200;
     private static final Duration RENEW_MARGIN = Duration.ofMinutes(5);
 
     private final RestClient client;
@@ -40,6 +42,10 @@ class PvitSecretProvider {
         secret = null;
     }
 
+    private static String abbreviated(String body) {
+        return body.length() <= MAX_LOGGED_BODY ? body : body.substring(0, MAX_LOGGED_BODY);
+    }
+
     private void renew() {
         LinkedMultiValueMap<String, String> form = new LinkedMultiValueMap<>();
         form.add("operationAccountCode", properties.operationAccountCode());
@@ -55,8 +61,14 @@ class PvitSecretProvider {
             secret = renewed;
             renewAt = Instant.now().plusSeconds(json.path("expires_in").asLong(3600)).minus(RENEW_MARGIN);
             log.info("Payment provider secret key renewed");
+        } catch (RestClientResponseException e) {
+            secret = null;
+            log.warn("Payment provider refused the secret renewal: HTTP {} {}", e.getStatusCode().value(),
+                    abbreviated(e.getResponseBodyAsString()));
+            throw new PvitException("The provider secret key could not be renewed", e);
         } catch (RestClientException e) {
             secret = null;
+            log.warn("Payment provider unreachable for the secret renewal: {}", e.getClass().getSimpleName());
             throw new PvitException("The provider secret key could not be renewed", e);
         }
     }

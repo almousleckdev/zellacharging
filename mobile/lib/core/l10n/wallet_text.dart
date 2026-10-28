@@ -11,6 +11,12 @@ abstract final class WalletText {
     en: 'Pay with mobile money. The amount is added to your wallet instantly.',
   );
 
+  static String get topupAmountLabel =>
+      AppLanguage.pick(fr: 'Montant à créditer', en: 'Amount to add');
+
+  static String get topupAmountHint =>
+      AppLanguage.pick(fr: 'Ex. 5 000', en: 'e.g. 5,000');
+
   static String get chooseAmount =>
       AppLanguage.pick(fr: 'Montant', en: 'Amount');
 
@@ -21,11 +27,11 @@ abstract final class WalletText {
       AppLanguage.pick(fr: 'Numéro Mobile Money', en: 'Mobile money number');
 
   static String get mobileMoneyNumberHint =>
-      AppLanguage.pick(fr: '+241 77 12 34 56', en: '+241 77 12 34 56');
+      AppLanguage.pick(fr: '077 12 34 56', en: '077 12 34 56');
 
   static String get invalidMobileMoney => AppLanguage.pick(
-    fr: 'Saisissez le numéro avec l\'indicatif, ex. +24177123456',
-    en: 'Enter the number with country code, e.g. +24177123456',
+    fr: 'Saisissez un numéro valide, ex. 077 12 34 56',
+    en: 'Enter a valid number, e.g. 077 12 34 56',
   );
 
   static String get payNow => AppLanguage.pick(fr: 'Payer', en: 'Pay');
@@ -42,8 +48,6 @@ abstract final class WalletText {
     fr: 'Le paiement n\'a pas abouti.',
     en: 'The payment was not completed.',
   );
-
-  static const topUpAmounts = [1000, 2000, 5000, 10000, 20000];
 
   static const minimumTopupMinor = 500;
 

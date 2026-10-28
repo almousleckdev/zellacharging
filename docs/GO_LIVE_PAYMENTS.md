@@ -103,7 +103,7 @@ once, the payout becomes `PAID`, and a refused or failed payout is reversed exac
 
 ## Stalled sessions
 
-A session with no new energy for 20 minutes (power cut, dead charger, full battery) is closed by the sweeper: the
+A session with no new energy for 5 minutes (power cut, dead charger, full battery) is closed by the sweeper: the
 metered energy plus fees is charged, the rest of the reservation returns to the wallet. Tune with `ZELLA_STALL_AFTER`.
 
 ## Not part of this phase

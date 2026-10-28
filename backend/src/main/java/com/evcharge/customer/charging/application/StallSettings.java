@@ -8,6 +8,6 @@ import java.time.Duration;
 public record StallSettings(Duration after) {
 
     public StallSettings {
-        after = after == null ? Duration.ofMinutes(20) : after;
+        after = after == null ? Duration.ofMinutes(5) : after;
     }
 }

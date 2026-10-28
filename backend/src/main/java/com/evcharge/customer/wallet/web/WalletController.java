@@ -35,7 +35,8 @@ class WalletController {
 
     @GetMapping
     WalletResponse balance(CustomerPrincipal me) {
-        return WalletResponse.from(wallets.balance(me.id()), withdrawals.enabled());
+        return WalletResponse.from(wallets.balance(me.id()), withdrawals.enabled(),
+                wallets.payoutSource(me.id()));
     }
 
     @GetMapping("/transactions")

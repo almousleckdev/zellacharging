@@ -22,17 +22,6 @@ class CustomerVerificationService implements CustomerVerification {
     }
 
     @Override
-    public String verifiedPhone(UUID customerId) {
-        Customer customer = customers.findById(customerId).filter(Customer::canAuthenticate).orElseThrow(
-                () -> new ApiException(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "Account not found"));
-        boolean verified = customer.phone() != null && customers.isVerified(customerId, Channel.PHONE);
-        if (!verified) {
-            throw new ApiException(HttpStatus.CONFLICT, "PHONE_NOT_VERIFIED", "Verify your phone number first");
-        }
-        return customer.phone();
-    }
-
-    @Override
     public void confirmPassword(UUID customerId, String password) {
         passwords.confirm(customerId, password);
     }

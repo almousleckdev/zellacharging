@@ -22,6 +22,10 @@ abstract final class ChargingErrorText {
       fr: 'Vérifiez d’abord votre numéro de téléphone.',
       en: 'Please verify your phone number first.',
     ),
+    'NO_PAYOUT_NUMBER': AppLanguage.pick(
+      fr: 'Rechargez d’abord avec ce service pour pouvoir retirer.',
+      en: 'Top up with this service first to be able to withdraw.',
+    ),
     'STATION_NOT_FOUND': AppLanguage.pick(
       fr: 'Cette station est introuvable.',
       en: 'This station could not be found.',

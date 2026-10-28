@@ -1,3 +1,5 @@
+import 'mobile_operator.dart';
+
 class Wallet {
   const Wallet({
     required this.balanceMinor,
@@ -6,6 +8,8 @@ class Wallet {
     required this.currency,
     required this.decimals,
     this.withdrawalsEnabled = false,
+    this.payoutNumber,
+    this.payoutOperator,
   });
 
   final int balanceMinor;
@@ -14,4 +18,6 @@ class Wallet {
   final String currency;
   final int decimals;
   final bool withdrawalsEnabled;
+  final String? payoutNumber;
+  final MobileOperator? payoutOperator;
 }

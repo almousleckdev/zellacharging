@@ -60,6 +60,10 @@ class WithdrawalDailyLimitIntegrationTest extends PostgresTestBase {
         jdbc.update("insert into customer (id, first_name, last_name, phone_e164, phone_verified_at, password_hash, "
                 + "status, created_at) values (?, 'A', 'B', ?, ?, ?, 'ACTIVE', now())", customer, phone,
                 new Timestamp(System.currentTimeMillis()), hasher.hash(PASSWORD));
+        jdbc.update("insert into topup (id, customer_id, operator, msisdn, amount_minor, state, idempotency_key, "
+                + "reference, created_at, updated_at) values (?, ?, 'AIRTEL', ?, 2000000, 'SUCCEEDED', ?, ?, now(), now())",
+                UUID.randomUUID(), customer, phone, "seed-" + customer,
+                "GAP" + customer.toString().replace("-", "").substring(0, 17).toUpperCase());
         jdbc.update("insert into wallet (customer_id, currency, decimals, balance_minor, created_at) "
                 + "values (?, 'XAF', 0, 2000000, now())", customer);
         jdbc.update("insert into ledger_entry (id, customer_id, type, amount_minor, idempotency_key, created_at) "

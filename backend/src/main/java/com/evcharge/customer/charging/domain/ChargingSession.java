@@ -45,4 +45,9 @@ public record ChargingSession(
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, state, failureCode, transactionId,
                 startedAt, stoppedAt, energyKwh, minor, costCurrency, decimals, stopReason, createdAt, now);
     }
+
+    public ChargingSession withEnergy(BigDecimal kwh, Instant now) {
+        return new ChargingSession(id, customerId, stationId, connectorId, idTag, state, failureCode, transactionId,
+                startedAt, now, kwh, costMinor, currency, currencyDecimals, stopReason, createdAt, now);
+    }
 }

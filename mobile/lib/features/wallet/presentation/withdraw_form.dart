@@ -11,13 +11,11 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/pay/amount_hero.dart';
-import '../../../shared/widgets/pay/operator_tiles.dart';
 import '../../../shared/widgets/pay/pay_card.dart';
 import '../../../shared/widgets/pay/secure_note.dart';
 import '../../../shared/widgets/pay/summary_card.dart';
 import '../../../shared/widgets/pay/summary_line.dart';
 import '../../../shared/widgets/pay/wallet_balance_card.dart';
-import '../domain/mobile_operator.dart';
 import '../domain/wallet.dart';
 
 class WithdrawForm extends StatelessWidget {
@@ -27,9 +25,6 @@ class WithdrawForm extends StatelessWidget {
     required this.wallet,
     required this.amount,
     required this.password,
-    required this.phone,
-    required this.operator,
-    required this.onOperator,
     required this.onAmountChanged,
   });
 
@@ -37,9 +32,6 @@ class WithdrawForm extends StatelessWidget {
   final Wallet wallet;
   final TextEditingController amount;
   final TextEditingController password;
-  final String phone;
-  final MobileOperator operator;
-  final ValueChanged<MobileOperator> onOperator;
   final VoidCallback onAmountChanged;
 
   List<int> get _quick => {
@@ -53,6 +45,10 @@ class WithdrawForm extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     final value = AmountInput.parse(amount.text) ?? 0;
+    final operator = wallet.payoutOperator;
+    final destination = operator == null
+        ? '-'
+        : '${operator.label} · ${PhoneMask.of(wallet.payoutNumber ?? '')}';
     final shown = MoneyFormat.format(value, wallet.currency, wallet.decimals);
     return DismissibleForm(
       formKey: formKey,
@@ -81,27 +77,25 @@ class WithdrawForm extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              OperatorTiles(
-                selected: operator,
-                phone: phone,
-                onSelected: onOperator,
-              ),
-              const SizedBox(height: AppSpacing.md),
               Row(
                 children: [
                   const Icon(AppIcons.phone, size: 18),
                   const SizedBox(width: AppSpacing.sm),
-                  Text(
-                    PhoneMask.of(phone),
-                    style: theme.textTheme.titleSmall?.copyWith(
-                      fontWeight: FontWeight.w700,
+                  Expanded(
+                    child: Text(
+                      destination,
+                      style: theme.textTheme.titleSmall?.copyWith(
+                        fontWeight: FontWeight.w700,
+                      ),
                     ),
                   ),
                 ],
               ),
               const SizedBox(height: AppSpacing.xs),
               Text(
-                WithdrawText.destinationNote,
+                wallet.payoutNumber == null
+                    ? WithdrawText.noPayoutNumber
+                    : WithdrawText.destinationNote,
                 style: theme.textTheme.bodySmall?.copyWith(
                   color: AppColors.textSecondary,
                 ),

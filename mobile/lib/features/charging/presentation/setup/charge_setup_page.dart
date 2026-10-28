@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../../../core/format/amount_input.dart';
 import '../../../../core/l10n/strings.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../shared/app_toast.dart';
@@ -40,7 +39,7 @@ class ChargeSetupPage extends ConsumerStatefulWidget {
 class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
     with ConnectorSelectionMixin {
   final _formKey = GlobalKey<FormState>();
-  final _amount = TextEditingController(text: AmountInput.format(2000));
+  final _amount = TextEditingController();
   late final _phone = TextEditingController(
     text: ref.read(profileProvider).asData?.value.phone ?? '',
   );

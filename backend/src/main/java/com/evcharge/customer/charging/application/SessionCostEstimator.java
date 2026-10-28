@@ -38,6 +38,10 @@ public class SessionCostEstimator {
         return priced(session, session.energyKwh());
     }
 
+    public Optional<Money> forEnergy(ChargingSession session, BigDecimal kwh) {
+        return priced(session, kwh);
+    }
+
     private Optional<Money> priced(ChargingSession session, BigDecimal kwh) {
         return tariff.pricePerKwhMinor(session.id()).map(price -> {
             Money reserved = funding.reserved(session.id());

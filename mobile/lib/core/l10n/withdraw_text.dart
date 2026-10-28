@@ -18,8 +18,13 @@ abstract final class WithdrawText {
       AppLanguage.pick(fr: 'Destination', en: 'Destination');
 
   static String get destinationNote => AppLanguage.pick(
-    fr: 'L’argent est envoyé uniquement sur votre numéro vérifié.',
-    en: 'Money is only sent to your verified number.',
+    fr: 'L’argent est renvoyé uniquement sur le numéro qui a servi à recharger.',
+    en: 'Money is only sent back to the number you topped up with.',
+  );
+
+  static String get noPayoutNumber => AppLanguage.pick(
+    fr: 'Rechargez d’abord votre portefeuille avec Airtel Money ou Moov Money.',
+    en: 'Top up your wallet with Airtel Money or Moov Money first.',
   );
 
   static String get passwordLabel =>

@@ -55,6 +55,20 @@ class JdbcTopupRepository implements TopupRepository {
     }
 
     @Override
+    public Optional<Topup> lastSucceeded(UUID customerId, MobileOperator operator) {
+        return jdbc.sql("select * from topup where customer_id = :customer and operator = :operator "
+                        + "and state = 'SUCCEEDED' order by created_at desc limit 1")
+                .param("customer", customerId).param("operator", operator.name()).query(MAPPER).optional();
+    }
+
+    @Override
+    public Optional<Topup> lastSucceeded(UUID customerId) {
+        return jdbc.sql("select * from topup where customer_id = :customer and state = 'SUCCEEDED' "
+                        + "order by created_at desc limit 1")
+                .param("customer", customerId).query(MAPPER).optional();
+    }
+
+    @Override
     public Optional<Topup> findByReference(String reference) {
         return jdbc.sql("select * from topup where reference = :ref")
                 .param("ref", reference).query(MAPPER).optional();

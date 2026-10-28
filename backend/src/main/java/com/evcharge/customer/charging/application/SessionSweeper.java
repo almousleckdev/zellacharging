@@ -23,16 +23,18 @@ public class SessionSweeper {
     private final SessionReconciler reconciler;
     private final SessionSettlement settlement;
     private final FundsGuard guard;
+    private final StalledSessionCloser stalled;
     private final CountryDirectory countries;
 
     public SessionSweeper(WalletFunding funding, SessionRepository sessions, SessionReconciler reconciler,
                           SessionSettlement settlement, FundsGuard guard,
-                         CountryDirectory countries) {
+                         StalledSessionCloser stalled, CountryDirectory countries) {
         this.funding = funding;
         this.sessions = sessions;
         this.reconciler = reconciler;
         this.settlement = settlement;
         this.guard = guard;
+        this.stalled = stalled;
         this.countries = countries;
     }
 
@@ -57,7 +59,9 @@ public class SessionSweeper {
     private void tend(ChargingSession stored) {
         ChargingSession current = reconciler.reconcile(stored);
         if (current.state().isLive()) {
-            guard.enforce(current);
+            if (!stalled.closeIfStalled(current)) {
+                guard.enforce(current);
+            }
         } else {
             settlement.settle(current);
         }

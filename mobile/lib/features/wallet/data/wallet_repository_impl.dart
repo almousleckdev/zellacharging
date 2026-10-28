@@ -25,6 +25,10 @@ class WalletRepositoryImpl implements WalletRepository {
       currency: json['currency'] as String,
       decimals: (json['decimals'] as num).toInt(),
       withdrawalsEnabled: json['withdrawalsEnabled'] as bool? ?? false,
+      payoutNumber: json['payoutNumber'] as String?,
+      payoutOperator: MobileOperator.values
+          .where((operator) => operator.code == json['payoutOperator'])
+          .firstOrNull,
     );
   });
 

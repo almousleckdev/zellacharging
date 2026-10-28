@@ -41,7 +41,7 @@ void main() {
 
   test('the validators accept grouped amounts and enforce the minimum', () {
     expect(Validators.chargeAmount('2 000'), isNull);
-    expect(Validators.chargeAmount('999'), isNotNull);
+    expect(Validators.chargeAmount('1999'), isNotNull);
     expect(Validators.topupAmount('100'), isNull);
     expect(Validators.topupAmount('99'), isNotNull);
   });

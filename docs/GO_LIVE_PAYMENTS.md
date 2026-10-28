@@ -94,9 +94,19 @@ The caps are `zella.wallet.min-topup-minor` and `zella.wallet.max-topup-minor` (
 the closed beta lower the maximum with the environment variable `ZELLA_WALLET_MAX_TOPUP_MINOR`, for example `50000`,
 and raise it later. Watch the logs daily for lines starting with `ALERT`.
 
+## Withdrawals (after the top-ups are proven)
+
+Money only goes back to the number that paid a successful top-up (the PIN on that phone is the proof of ownership), with
+the same operator. Ask PVit to confirm that the `GIVE_CHANGE` payout works on both operator accounts, set
+`PVIT_CODE_URL_PAYOUT`, then enable with `ZELLA_WITHDRAWALS_ENABLED=true`. Test with 1 000 XAF: the wallet is debited at
+once, the payout becomes `PAID`, and a refused or failed payout is reversed exactly once.
+
+## Stalled sessions
+
+A session with no new energy for 20 minutes (power cut, dead charger, full battery) is closed by the sweeper: the
+metered energy plus fees is charged, the rest of the reservation returns to the wallet. Tune with `ZELLA_STALL_AFTER`.
+
 ## Not part of this phase
 
-* Withdrawals stay disabled: the PVit payout API is not verified and phone numbers cannot be verified (email-only
-  verification).
 * Real-charger validation (OCPP key, station ownership, MeterValues interval, auto-stop) is the next phase and is
   independent of payments.

@@ -164,7 +164,7 @@ class StartRulesIntegrationTest extends PostgresTestBase {
                 .andExpect(jsonPath("$.amountMinor").value(2000))
                 .andExpect(jsonPath("$.availableMinor").value(1500))
                 .andExpect(jsonPath("$.shortfallMinor").value(500))
-                .andExpect(jsonPath("$.minimumMinor").value(1000))
+                .andExpect(jsonPath("$.minimumMinor").value(2000))
                 .andExpect(jsonPath("$.maximumMinor").value(200000));
         assertThat(reserved(customer)).isZero();
     }

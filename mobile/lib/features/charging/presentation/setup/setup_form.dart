@@ -1,10 +1,14 @@
 import '../../../../shared/widgets/dismissible_form.dart';
 import 'package:flutter/material.dart';
 
+import '../../../../core/format/amount_input.dart';
+import '../../../../core/format/money_format.dart';
 import '../../../../core/l10n/strings.dart';
+import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/labeled_section.dart';
-import '../../../../shared/widgets/pay/amount_hero.dart';
+import '../../../../shared/widgets/app_text_field.dart';
+import '../../../../shared/widgets/pay/pay_card.dart';
 import '../../../../shared/widgets/pay/secure_note.dart';
 import '../../../stations/domain/station.dart';
 import '../../../wallet/domain/mobile_operator.dart';
@@ -56,14 +60,20 @@ class SetupForm extends StatelessWidget {
             onSelected: onConnector,
           ),
         ),
-        AmountHero(
+        PayCard(
           title: PayText.budgetTitle,
-          controller: amount,
-          currency: plan.currency,
-          quickAmounts: ChargeText.chargeAmounts,
-          helper: AmountRules.helper(plan),
-          validator: (value) => AmountRules.validate(value, plan),
-          onChanged: onAmountChanged,
+          child: AppTextField(
+            controller: amount,
+            label: ChargeText.budgetLabel,
+            hint: ChargeText.budgetHint,
+            icon: AppIcons.wallet,
+            helper: AmountRules.helper(plan),
+            validator: (value) => AmountRules.validate(value, plan),
+            keyboardType: TextInputType.number,
+            inputFormatters: [AmountInput.formatter],
+            suffixText: MoneyFormat.symbol(plan.currency),
+            onChanged: (_) => onAmountChanged(),
+          ),
         ),
         const SizedBox(height: AppSpacing.lg),
         PaymentMethodCard(

@@ -165,6 +165,8 @@ class FakeWallet implements WalletRepository {
     currency: 'XAF',
     decimals: 0,
     withdrawalsEnabled: true,
+    payoutNumber: '+24177123456',
+    payoutOperator: MobileOperator.airtel,
   );
 
   @override

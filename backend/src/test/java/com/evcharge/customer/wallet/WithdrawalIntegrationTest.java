@@ -64,12 +64,18 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
         customer = customerWith(10000, true);
     }
 
-    private UUID customerWith(long balance, boolean verifiedPhone) {
+    private UUID customerWith(long balance, boolean paidNumber) {
         UUID id = UUID.randomUUID();
         String phone = "+24177" + String.format("%06d", Math.abs(id.hashCode()) % 1_000_000);
         jdbc.update("insert into customer (id, first_name, last_name, phone_e164, phone_verified_at, password_hash, "
                 + "status, created_at) values (?, 'A', 'B', ?, ?, ?, 'ACTIVE', now())", id, phone,
-                verifiedPhone ? new java.sql.Timestamp(System.currentTimeMillis()) : null, hasher.hash(PASSWORD));
+                paidNumber ? new java.sql.Timestamp(System.currentTimeMillis()) : null, hasher.hash(PASSWORD));
+        if (paidNumber) {
+            jdbc.update("insert into topup (id, customer_id, operator, msisdn, amount_minor, state, idempotency_key, "
+                    + "reference, created_at, updated_at) values (?, ?, 'AIRTEL', ?, ?, 'SUCCEEDED', ?, ?, now(), now())",
+                    UUID.randomUUID(), id, phone, balance, "seed-" + id, "GAP" + id.toString().replace("-", "")
+                            .substring(0, 17).toUpperCase());
+        }
         jdbc.update("insert into wallet (customer_id, currency, decimals, balance_minor, created_at) "
                 + "values (?, 'XAF', 0, ?, now())", id, balance);
         jdbc.update("insert into ledger_entry (id, customer_id, type, amount_minor, idempotency_key, created_at) "
@@ -124,10 +130,10 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void anUnverifiedPhoneCannotReceiveFunds() throws Exception {
+    void moneyOnlyGoesBackToANumberThatPaidASuccessfulTopup() throws Exception {
         UUID unverified = customerWith(10000, false);
         withdraw(unverified, 4000, PASSWORD, "w3").andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("PHONE_NOT_VERIFIED"));
+                .andExpect(jsonPath("$.code").value("NO_PAYOUT_NUMBER"));
         assertThat(balance(unverified)).isEqualTo(10000);
     }
 

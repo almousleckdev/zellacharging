@@ -20,6 +20,7 @@ class AppTextField extends StatefulWidget {
     this.autofillHints,
     this.inputFormatters,
     this.suffixText,
+    this.helper,
     this.onChanged,
   });
 
@@ -35,6 +36,7 @@ class AppTextField extends StatefulWidget {
   final Iterable<String>? autofillHints;
   final List<TextInputFormatter>? inputFormatters;
   final String? suffixText;
+  final String? helper;
   final ValueChanged<String>? onChanged;
 
   @override
@@ -93,6 +95,8 @@ class _AppTextFieldState extends State<AppTextField> {
             counterText: '',
             suffixIcon: _suffix,
             suffixText: widget.suffixText,
+            helperText: widget.helper,
+            helperMaxLines: 3,
           ),
         ),
       ],

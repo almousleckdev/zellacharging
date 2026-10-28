@@ -108,6 +108,8 @@ zella:
     stop-lead-time: 15s
     user-refresh-interval: 5s
     metering-interval: 10s
+    stall:
+      after: ${ZELLA_STALL_AFTER:20m}
     price-per-kwh-minor: ${ZELLA_PRICE_PER_KWH:${NDZELA_PRICE_PER_KWH:}}
   fees:
     vat-percent: ${ZELLA_VAT_PERCENT:${NDZELA_VAT_PERCENT:0}}
@@ -142,7 +144,7 @@ zella:
   wallet:
     currency: ${ZELLA_WALLET_CURRENCY:${NDZELA_WALLET_CURRENCY:XAF}}
     decimals: 0
-    minimum-start-minor: ${ZELLA_WALLET_MIN_START:${NDZELA_WALLET_MIN_START:1000}}
+    minimum-start-minor: ${ZELLA_WALLET_MIN_START:${NDZELA_WALLET_MIN_START:2000}}
     maximum-start-minor: ${ZELLA_WALLET_MAX_START:${NDZELA_WALLET_MAX_START:200000}}
     ledger-check-interval: 10m
     withdrawal:

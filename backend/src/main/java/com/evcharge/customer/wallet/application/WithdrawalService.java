@@ -3,10 +3,12 @@ package com.evcharge.customer.wallet.application;
 import com.evcharge.customer.account.CustomerVerification;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.wallet.application.port.PayoutGateway;
+import com.evcharge.customer.wallet.application.port.TopupRepository;
 import com.evcharge.customer.wallet.application.port.WithdrawalRepository;
 import com.evcharge.customer.wallet.domain.MobileOperator;
 import com.evcharge.customer.wallet.domain.PayoutOutcome;
 import com.evcharge.customer.wallet.domain.PayoutRequest;
+import com.evcharge.customer.wallet.domain.Topup;
 import com.evcharge.customer.wallet.domain.Withdrawal;
 import com.evcharge.customer.wallet.domain.WithdrawalState;
 import org.slf4j.Logger;
@@ -30,6 +32,7 @@ public class WithdrawalService {
     private final WithdrawalSettings settings;
     private final WalletSettings wallet;
     private final WithdrawalRepository withdrawals;
+    private final TopupRepository topups;
     private final WithdrawalLedger ledger;
     private final WithdrawalSettlement settlement;
     private final PayoutGateways gateways;
@@ -37,11 +40,12 @@ public class WithdrawalService {
     private final Clock clock;
 
     public WithdrawalService(WithdrawalSettings settings, WalletSettings wallet, WithdrawalRepository withdrawals,
-                             WithdrawalLedger ledger, WithdrawalSettlement settlement, PayoutGateways gateways,
+                             TopupRepository topups, WithdrawalLedger ledger, WithdrawalSettlement settlement, PayoutGateways gateways,
                              CustomerVerification verification, Clock clock) {
         this.settings = settings;
         this.wallet = wallet;
         this.withdrawals = withdrawals;
+        this.topups = topups;
         this.ledger = ledger;
         this.settlement = settlement;
         this.gateways = gateways;
@@ -62,7 +66,7 @@ public class WithdrawalService {
         verification.confirmPassword(customerId, password);
         requireAllowedAmount(amountMinor);
         PayoutGateway gateway = gateways.forOperator(operator);
-        Withdrawal pending = Withdrawal.requested(customerId, operator, verification.verifiedPhone(customerId),
+        Withdrawal pending = Withdrawal.requested(customerId, operator, payoutNumber(customerId, operator),
                 amountMinor, key, clock.instant());
         if (ledger.debit(pending).isEmpty()) {
             return withdrawals.findByIdempotencyKey(customerId, key).orElseThrow();
@@ -81,6 +85,12 @@ public class WithdrawalService {
 
     public List<Withdrawal> recent(UUID customerId) {
         return withdrawals.recent(customerId, RECENT_LIMIT);
+    }
+
+    private String payoutNumber(UUID customerId, MobileOperator operator) {
+        return topups.lastSucceeded(customerId, operator).map(Topup::msisdn).orElseThrow(
+                () -> new ApiException(HttpStatus.CONFLICT, "NO_PAYOUT_NUMBER",
+                        "Top up with this operator first: money goes back to the number that paid"));
     }
 
     private void dispatch(PayoutGateway gateway, Withdrawal withdrawal) {

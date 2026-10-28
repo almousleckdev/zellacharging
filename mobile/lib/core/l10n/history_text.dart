@@ -1,6 +1,15 @@
 import 'app_language.dart';
 
 abstract final class HistoryText {
+  static String get batteryLevels =>
+      AppLanguage.pick(fr: 'Niveau de batterie', en: 'Battery level');
+
+  static String get batteryStart =>
+      AppLanguage.pick(fr: 'Au départ', en: 'At start');
+
+  static String get batteryEnd =>
+      AppLanguage.pick(fr: 'À l’arrivée', en: 'At end');
+
   static String get recentSessions =>
       AppLanguage.pick(fr: 'Recharges récentes', en: 'Recent charges');
 

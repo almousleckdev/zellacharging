@@ -28,6 +28,7 @@ function figures(code: string, name: string, currency: string, scale: number) {
       pendingTopups: scale,
       withdrawalsPaidMinor: 2000 * scale,
       pendingWithdrawals: 0,
+      capturedMinor: 138 * scale,
     },
   };
 }

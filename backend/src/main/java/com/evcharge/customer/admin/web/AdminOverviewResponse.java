@@ -26,7 +26,7 @@ record AdminOverviewResponse(String scope, List<CountryFigures> countries) {
                             sessions.energyKwh(), sessions.revenueMinor()),
                     new Wallets(wallets.wallets(), wallets.balanceMinor(), wallets.reservedMinor(),
                             wallets.topupsSucceededMinor(), wallets.pendingTopups(), wallets.withdrawalsPaidMinor(),
-                            wallets.pendingWithdrawals()));
+                            wallets.pendingWithdrawals(), wallets.capturedMinor()));
         }
     }
 
@@ -37,6 +37,6 @@ record AdminOverviewResponse(String scope, List<CountryFigures> countries) {
     }
 
     record Wallets(long count, long balanceMinor, long reservedMinor, long topupsSucceededMinor, long pendingTopups,
-                   long withdrawalsPaidMinor, long pendingWithdrawals) {
+                   long withdrawalsPaidMinor, long pendingWithdrawals, long capturedMinor) {
     }
 }

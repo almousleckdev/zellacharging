@@ -18,6 +18,7 @@ class ChargingSession {
     this.currency,
     this.currencyDecimals,
     this.metering,
+    this.startBatteryPercent,
     this.batteryPercent,
     this.lastVoltage,
     this.lastPowerKw,
@@ -38,6 +39,7 @@ class ChargingSession {
   final String? currency;
   final int? currencyDecimals;
   final Metering? metering;
+  final double? startBatteryPercent;
   final double? batteryPercent;
   final double? lastVoltage;
   final double? lastPowerKw;

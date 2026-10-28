@@ -4,16 +4,20 @@ type CardProps = {
   title: string;
   description?: string;
   children: ReactNode;
+  action?: ReactNode;
 };
 
-export function Card({ title, description, children }: CardProps) {
+export function Card({ title, description, children, action }: CardProps) {
   return (
-    <section className="rounded-card border border-border bg-background">
-      <header className="flex flex-col gap-1 border-b border-border px-5 py-4">
-        <h2 className="text-base font-semibold text-foreground">{title}</h2>
-        {description && <p className="text-sm text-muted">{description}</p>}
+    <section className="rounded-card border border-border bg-background shadow-[0_1px_2px_rgb(11_18_32/0.04)]">
+      <header className="flex items-start justify-between gap-4 px-6 pt-5">
+        <div className="flex flex-col gap-1">
+          <h2 className="font-display text-base font-semibold text-foreground">{title}</h2>
+          {description && <p className="text-sm text-muted">{description}</p>}
+        </div>
+        {action}
       </header>
-      <div className="p-5">{children}</div>
+      <div className="p-6 pt-4">{children}</div>
     </section>
   );
 }

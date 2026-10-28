@@ -12,18 +12,18 @@ type MetricCardProps = {
 
 export function MetricCard({ label, icon, values, hint, badge }: MetricCardProps) {
   return (
-    <article className="flex flex-col gap-3 rounded-card border border-border bg-background p-5">
-      <header className="flex items-center justify-between gap-3">
-        <h3 className="text-sm font-medium text-muted">{label}</h3>
-        <span className="flex size-8 shrink-0 items-center justify-center rounded-control bg-primary-soft text-primary-text">
+    <article className="flex flex-col gap-4 rounded-card border border-border bg-background p-5 shadow-[0_1px_2px_rgb(11_18_32/0.04)]">
+      <header className="flex items-center gap-2.5">
+        <span className="flex size-8 shrink-0 items-center justify-center rounded-full bg-ink text-primary">
           <Icon name={icon} className="size-4" />
         </span>
+        <h3 className="text-sm font-medium text-muted">{label}</h3>
       </header>
       <div className="flex flex-col">
         {values.map((value, index) => (
           <p
             key={value}
-            className={index === 0 ? "text-2xl font-semibold tracking-tight text-foreground" : "text-sm font-medium text-muted"}
+            className={index === 0 ? "figure text-3xl font-semibold text-foreground" : "text-sm font-medium text-muted"}
           >
             {value}
           </p>

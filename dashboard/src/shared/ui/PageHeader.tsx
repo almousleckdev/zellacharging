@@ -14,7 +14,7 @@ export function PageHeader({ title, subtitle, trail, actions }: PageHeaderProps)
       <Breadcrumbs trail={trail} />
       <div className="flex flex-wrap items-end justify-between gap-4">
         <div className="flex flex-col gap-1">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
+          <h1 className="font-display text-3xl font-semibold text-foreground">{title}</h1>
           {subtitle && <p className="text-sm text-muted">{subtitle}</p>}
         </div>
         {actions}

@@ -32,8 +32,11 @@ class JdbcWalletStatistics implements WalletStatistics {
                         + "count(*) filter (where state in ('REQUESTED', 'PROCESSING', 'REVIEW')) from withdrawal "
                         + "where country_code = current_setting('app.country', true)")
                 .query((rs, rowNum) -> new long[]{rs.getLong(1), rs.getLong(2)}).single();
+        long captured = jdbc.sql("select coalesce(sum(amount_minor), 0)::bigint from ledger_entry "
+                        + "where type = 'CAPTURE' and country_code = current_setting('app.country', true)")
+                .query(Long.class).single();
         return new WalletFigures(wallets[0], wallets[1], wallets[2], topups[0], topups[1], withdrawals[0],
-                withdrawals[1]);
+                withdrawals[1], captured);
     }
 
     @Override

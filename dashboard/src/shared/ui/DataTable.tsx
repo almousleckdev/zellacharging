@@ -21,12 +21,12 @@ export function DataTable<Row>({ caption, columns, rows, rowKey }: DataTableProp
       <table className="w-full min-w-[40rem] border-collapse text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className="border-b border-border bg-surface text-left">
+          <tr className="border-b border-border bg-surface/60 text-left">
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
-                className={cn("px-5 py-3 text-xs font-semibold uppercase tracking-wide text-subtle", column.align === "right" && "text-right")}
+                className={cn("px-5 py-3 text-xs font-medium text-subtle", column.align === "right" && "text-right")}
               >
                 {column.header}
               </th>
@@ -35,7 +35,7 @@ export function DataTable<Row>({ caption, columns, rows, rowKey }: DataTableProp
         </thead>
         <tbody>
           {rows.map((row) => (
-            <tr key={rowKey(row)} className="border-b border-border last:border-b-0">
+            <tr key={rowKey(row)} className="border-b border-border transition-colors last:border-b-0 hover:bg-surface/50">
               {columns.map((column) => (
                 <td key={column.key} className={cn("px-5 py-3.5 text-foreground", column.align === "right" && "text-right tabular-nums")}>
                   {column.cell(row)}

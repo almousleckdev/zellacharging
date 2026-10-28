@@ -22,6 +22,7 @@ const walletsSchema = z.object({
   pendingTopups: z.number(),
   withdrawalsPaidMinor: z.number(),
   pendingWithdrawals: z.number(),
+  capturedMinor: z.number(),
 });
 
 export const countryFiguresSchema = z.object({

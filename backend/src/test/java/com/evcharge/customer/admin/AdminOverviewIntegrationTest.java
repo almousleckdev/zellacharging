@@ -76,6 +76,7 @@ class AdminOverviewIntegrationTest extends PostgresTestBase {
         data.session("GA", active, 1, "COMPLETED", "12.500", 1875L);
         data.session("GA", blocked, 2, "ACTIVE", null, null);
         data.topup("GA", active, "SUCCEEDED", 5000);
+        data.capture("GA", active, 138);
         data.topup("GA", active, "PENDING", 2000);
         data.withdrawal("GA", active, "PAID", 3000);
         data.withdrawal("GA", active, "REQUESTED", 1000);
@@ -93,6 +94,7 @@ class AdminOverviewIntegrationTest extends PostgresTestBase {
         assertThat(figure(after, "GA", ".sessions.revenueMinor").longValue() - figure(before, "GA", ".sessions.revenueMinor").longValue()).isEqualTo(1875);
         assertThat(figure(after, "GA", ".sessions.energyKwh").doubleValue() - figure(before, "GA", ".sessions.energyKwh").doubleValue()).isEqualTo(12.5);
         assertThat(figure(after, "GA", ".wallets.topupsSucceededMinor").longValue() - figure(before, "GA", ".wallets.topupsSucceededMinor").longValue()).isEqualTo(5000);
+        assertThat(figure(after, "GA", ".wallets.capturedMinor").longValue() - figure(before, "GA", ".wallets.capturedMinor").longValue()).isEqualTo(138);
         assertThat(figure(after, "GA", ".wallets.pendingTopups").longValue() - figure(before, "GA", ".wallets.pendingTopups").longValue()).isEqualTo(1);
         assertThat(figure(after, "GA", ".wallets.withdrawalsPaidMinor").longValue() - figure(before, "GA", ".wallets.withdrawalsPaidMinor").longValue()).isEqualTo(3000);
         assertThat(figure(after, "GA", ".wallets.pendingWithdrawals").longValue() - figure(before, "GA", ".wallets.pendingWithdrawals").longValue()).isEqualTo(1);

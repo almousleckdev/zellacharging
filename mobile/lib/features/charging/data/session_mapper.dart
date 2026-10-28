@@ -23,6 +23,7 @@ abstract final class SessionMapper {
       currency: json['currency'] as String?,
       currencyDecimals: json['currencyDecimals'] as int?,
       metering: metering == null ? null : _metering(metering),
+      startBatteryPercent: (json['startBatteryPercent'] as num?)?.toDouble(),
       batteryPercent: (json['batteryPercent'] as num?)?.toDouble(),
       lastVoltage: (json['lastVoltage'] as num?)?.toDouble(),
       lastPowerKw: (json['lastPowerKw'] as num?)?.toDouble(),

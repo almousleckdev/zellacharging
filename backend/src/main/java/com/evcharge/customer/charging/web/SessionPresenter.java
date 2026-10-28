@@ -5,7 +5,6 @@ import com.evcharge.customer.charging.application.MeteringService;
 import com.evcharge.customer.charging.application.SessionCostEstimator;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.FeeBreakdown;
-import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
 import org.springframework.stereotype.Component;
 
@@ -36,7 +35,8 @@ class SessionPresenter {
     }
 
     private SessionResponse summary(ChargingSession session) {
-        return SessionResponse.from(session, null, LastReading.empty(), Optional.empty(), fees(session));
+        return SessionResponse.from(session, null, metering.lastReading(session, Optional.empty()), Optional.empty(),
+                fees(session));
     }
 
     private Optional<FeeBreakdown> fees(ChargingSession session) {

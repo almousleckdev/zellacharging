@@ -20,8 +20,12 @@ extension SessionFormatting on ChargingSession {
       ? '--'
       : '${shownPowerKw!.toStringAsFixed(1)} ${Strings.powerUnit}';
 
-  String get batteryText =>
-      batteryPercent == null ? '--' : '${batteryPercent!.toStringAsFixed(0)} %';
+  String get batteryText => _percent(batteryPercent);
+
+  String get startBatteryText => _percent(startBatteryPercent);
+
+  static String _percent(double? value) =>
+      value == null ? '--' : '${value.toStringAsFixed(0)} %';
 
   int? get shownDurationSeconds {
     final metered = metering?.durationSeconds;

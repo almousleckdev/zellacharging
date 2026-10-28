@@ -15,7 +15,7 @@ export function OverviewMetrics({ countries }: { countries: CountryFigures[] }) 
   const labels = t.overview;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
       <MetricCard
         label={labels.metrics.customers}
         icon="users"

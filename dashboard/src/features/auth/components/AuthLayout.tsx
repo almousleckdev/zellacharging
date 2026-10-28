@@ -5,8 +5,8 @@ import { BrandPanel } from "./BrandPanel";
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="grid min-h-screen lg:grid-cols-[minmax(0,1fr)_minmax(0,1.1fr)]">
-      <main className="flex flex-col px-6 py-6 sm:px-10">
+    <div className="grid min-h-screen bg-background lg:grid-cols-[minmax(0,1fr)_minmax(0,1.15fr)]">
+      <main className="flex flex-col px-6 py-6 sm:px-12">
         <header className="flex items-center justify-between">
           <Logo height={26} />
           <LanguageSwitch />

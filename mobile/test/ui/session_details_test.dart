@@ -27,6 +27,7 @@ class _Sessions extends FakeSessions {
     startedAt: DateTime(2026, 10, 16, 14, 31),
     stoppedAt: DateTime(2026, 10, 16, 15, 46),
     energyKwh: 18.5,
+    startBatteryPercent: 22,
     batteryPercent: 64,
     lastVoltage: 401,
     fees: const SessionFees(
@@ -80,6 +81,7 @@ void main() {
     final order = [
       HistoryText.detailsTitle,
       HistoryText.totalDuration,
+      HistoryText.batteryLevels,
       HistoryText.locationTitle,
       HistoryText.feeDetails,
       HistoryText.deviceInfo,
@@ -100,6 +102,18 @@ void main() {
     expect(find.text(_money(180)), findsOneWidget);
     expect(find.text(_money(50)), findsOneWidget);
     expect(find.text(_money(1230)), findsWidgets);
+    await _close(tester);
+  });
+
+  testWidgets('shows the battery level at the start and at the end', (
+    tester,
+  ) async {
+    await _open(tester);
+
+    expect(find.text(HistoryText.batteryStart), findsOneWidget);
+    expect(find.text('22 %'), findsOneWidget);
+    expect(find.text(HistoryText.batteryEnd), findsOneWidget);
+    expect(find.text('64 %'), findsWidgets);
     await _close(tester);
   });
 

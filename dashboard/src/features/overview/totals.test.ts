@@ -18,6 +18,7 @@ function country(code: string, currency: string, overrides: Partial<CountryFigur
       pendingTopups: 1,
       withdrawalsPaidMinor: 2000,
       pendingWithdrawals: 2,
+      capturedMinor: 1500,
     },
     ...overrides,
   };

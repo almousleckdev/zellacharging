@@ -11,6 +11,7 @@ export type OverviewTotals = {
   reserved: MoneyAmount[];
   topups: MoneyAmount[];
   withdrawals: MoneyAmount[];
+  captured: MoneyAmount[];
 };
 
 function sumByCurrency(countries: CountryFigures[], pick: (country: CountryFigures) => number): MoneyAmount[] {
@@ -47,5 +48,6 @@ export function overviewTotals(countries: CountryFigures[]): OverviewTotals {
     reserved: sumByCurrency(countries, (c) => c.wallets.reservedMinor),
     topups: sumByCurrency(countries, (c) => c.wallets.topupsSucceededMinor),
     withdrawals: sumByCurrency(countries, (c) => c.wallets.withdrawalsPaidMinor),
+    captured: sumByCurrency(countries, (c) => c.wallets.capturedMinor),
   };
 }

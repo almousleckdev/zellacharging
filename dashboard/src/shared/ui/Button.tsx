@@ -11,7 +11,7 @@ type ButtonProps = ButtonHTMLAttributes<HTMLButtonElement> & {
 };
 
 const VARIANTS: Record<Variant, string> = {
-  primary: "bg-primary text-on-primary hover:bg-primary-hover border border-transparent",
+  primary: "bg-primary text-on-primary hover:bg-primary-hover border border-transparent shadow-[0_1px_0_0_rgb(255_255_255/0.35)_inset]",
   secondary: "bg-background text-foreground border border-border-strong hover:bg-surface",
   ghost: "bg-transparent text-muted border border-transparent hover:bg-surface-strong hover:text-foreground",
 };
@@ -32,7 +32,7 @@ export function Button({
       disabled={disabled || loading}
       aria-busy={loading || undefined}
       className={cn(
-        "inline-flex h-10 items-center justify-center gap-2 rounded-control px-4 text-sm font-semibold",
+        "inline-flex h-11 items-center justify-center gap-2 rounded-control px-5 text-sm font-semibold",
         "transition-colors disabled:cursor-not-allowed disabled:opacity-60",
         VARIANTS[variant],
         fullWidth && "w-full",

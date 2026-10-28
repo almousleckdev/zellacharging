@@ -7,6 +7,7 @@ import '../../domain/charging_session.dart';
 import '../car_stage.dart';
 import '../session_formatting.dart';
 import '../session_message_card.dart';
+import 'battery_levels_card.dart';
 import 'details_summary.dart';
 import 'device_info_card.dart';
 import 'fee_details_card.dart';
@@ -31,6 +32,8 @@ class SessionDetailsView extends ConsumerWidget {
           const SizedBox(height: AppSpacing.md),
         ],
         DetailsSummary(session: session),
+        const SizedBox(height: AppSpacing.md),
+        BatteryLevelsCard(session: session),
         const SizedBox(height: AppSpacing.md),
         LocationCard(session: session, station: station),
         const SizedBox(height: AppSpacing.md),

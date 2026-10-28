@@ -28,8 +28,8 @@ export function CountryBreakdown({ countries }: { countries: CountryFigures[] })
   ];
 
   return (
-    <section className="overflow-hidden rounded-card border border-border bg-background">
-      <h2 className="px-5 py-4 text-base font-semibold text-foreground">{labels.title}</h2>
+    <section className="overflow-hidden rounded-card border border-border bg-background shadow-[0_1px_2px_rgb(11_18_32/0.04)]">
+      <h2 className="font-display px-6 py-5 text-base font-semibold text-foreground">{labels.title}</h2>
       <DataTable caption={labels.title} columns={columns} rows={countries} rowKey={(row) => row.code} />
     </section>
   );

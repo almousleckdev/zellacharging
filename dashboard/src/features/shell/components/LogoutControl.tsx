@@ -18,7 +18,7 @@ export function LogoutControl() {
         onClick={() => setOpen(true)}
         aria-label={t.shell.logout}
         title={t.shell.logout}
-        className="inline-flex size-9 shrink-0 items-center justify-center rounded-control text-subtle hover:bg-surface-strong hover:text-foreground"
+        className="inline-flex size-9 shrink-0 items-center justify-center rounded-control text-ink-muted hover:bg-ink-raised hover:text-white"
       >
         <Icon name="logout" />
       </button>

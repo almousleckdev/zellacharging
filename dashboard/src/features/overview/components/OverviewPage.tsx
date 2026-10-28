@@ -6,7 +6,9 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { ErrorState } from "@/shared/ui/ErrorState";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { useOverview } from "../api/useOverview";
+import { activeSplits } from "../moneySplit";
 import { CountryBreakdown } from "./CountryBreakdown";
+import { MoneyPanel } from "./MoneyPanel";
 import { OverviewMetrics } from "./OverviewMetrics";
 import { OverviewSkeleton } from "./OverviewSkeleton";
 
@@ -17,7 +19,7 @@ export function OverviewPage() {
   const scope = countryLabel(country, profile.countries, t.shell.country.all);
 
   return (
-    <div className="mx-auto flex max-w-6xl flex-col">
+    <div className="flex flex-col">
       <PageHeader
         title={t.overview.title}
         subtitle={t.overview.subtitle}
@@ -37,6 +39,9 @@ export function OverviewPage() {
       {overview.isError && <ErrorState message={t.overview.loadError} onRetry={() => void overview.refetch()} />}
       {overview.data && (
         <div className="flex flex-col gap-6">
+          {activeSplits(overview.data.countries).map((split) => (
+            <MoneyPanel key={split.currency} split={split} />
+          ))}
           <OverviewMetrics countries={overview.data.countries} />
           {overview.data.countries.length > 1 && <CountryBreakdown countries={overview.data.countries} />}
         </div>

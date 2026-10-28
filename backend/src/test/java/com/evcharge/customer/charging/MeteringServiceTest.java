@@ -68,7 +68,7 @@ class MeteringServiceTest {
     void fallsBackToTheRememberedReadingWhenThereIsNoLiveOne() {
         ChargingSession done = session(SessionState.COMPLETED);
         when(sessions.lastReadingOf(done.id()))
-                .thenReturn(new LastReading(new BigDecimal("100"), new BigDecimal("401"), new BigDecimal("22")));
+                .thenReturn(new LastReading(null, new BigDecimal("100"), new BigDecimal("401"), new BigDecimal("22")));
 
         LastReading last = service.lastReading(done, Optional.empty());
 
@@ -80,7 +80,7 @@ class MeteringServiceTest {
     void prefersLiveValuesAndKeepsRememberedOnesForWhatIsMissing() {
         ChargingSession live = session(SessionState.ACTIVE);
         when(sessions.lastReadingOf(live.id()))
-                .thenReturn(new LastReading(new BigDecimal("50"), new BigDecimal("399"), null));
+                .thenReturn(new LastReading(null, new BigDecimal("50"), new BigDecimal("399"), null));
 
         LastReading last = service.lastReading(live, reading("71"));
 

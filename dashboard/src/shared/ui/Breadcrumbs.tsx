@@ -13,7 +13,7 @@ export function Breadcrumbs({ trail }: { trail: string[] }) {
         {trail.map((label, index) => {
           const last = index === trail.length - 1;
           return (
-            <Fragment key={label}>
+            <Fragment key={`${index}-${label}`}>
               <li aria-current={last ? "page" : undefined} className={last ? "font-medium text-muted" : undefined}>
                 {label}
               </li>

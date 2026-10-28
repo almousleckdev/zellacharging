@@ -26,6 +26,7 @@ record SessionResponse(
         String stopReason,
         Instant createdAt,
         MeteringResponse metering,
+        BigDecimal startBatteryPercent,
         BigDecimal batteryPercent,
         BigDecimal lastVoltage,
         BigDecimal lastPowerKw,
@@ -37,7 +38,7 @@ record SessionResponse(
         return new SessionResponse(s.id(), s.stationId(), s.connectorId(), s.state().name(), s.failureCode(),
                 s.startedAt(), s.stoppedAt(), s.energyKwh(), s.costMinor(), s.currency(), s.currencyDecimals(),
                 s.stopReason(), s.createdAt(), MeteringResponse.from(metering),
-                last.batteryPercent(), last.voltage(), last.powerKw(), FeesResponse.from(s, fees),
+                last.startBatteryPercent(), last.batteryPercent(), last.voltage(), last.powerKw(), FeesResponse.from(s, fees),
                 EstimatedCostResponse.from(estimate));
     }
 }

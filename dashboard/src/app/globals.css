@@ -3,31 +3,41 @@
 @theme {
   --color-primary: #f97316;
   --color-primary-hover: #ea580c;
-  --color-primary-soft: #fff7ed;
+  --color-primary-soft: #fff1e6;
   --color-primary-text: #c2410c;
-  --color-on-primary: #0a0a0a;
+  --color-on-primary: #0b1220;
 
   --color-background: #ffffff;
-  --color-surface: #fafafa;
-  --color-surface-strong: #f5f5f5;
-  --color-border: #e5e5e5;
-  --color-border-strong: #d4d4d4;
+  --color-surface: #eef1f5;
+  --color-surface-strong: #e3e8ef;
+  --color-border: #dde2ea;
+  --color-border-strong: #c4ccd8;
 
-  --color-foreground: #171717;
-  --color-muted: #525252;
-  --color-subtle: #737373;
+  --color-foreground: #0b1220;
+  --color-muted: #465164;
+  --color-subtle: #657085;
 
-  --color-danger: #b91c1c;
-  --color-danger-soft: #fef2f2;
-  --color-danger-border: #fecaca;
-  --color-success: #15803d;
-  --color-success-soft: #f0fdf4;
+  --color-danger: #b42318;
+  --color-danger-soft: #fef3f2;
+  --color-danger-border: #fecdca;
+  --color-success: #067647;
+  --color-success-soft: #e7f8ef;
+  --color-energy: #12b76a;
 
-  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+  --color-ink: #0b1220;
+  --color-ink-raised: #121b2d;
+  --color-ink-line: #213049;
+  --color-ink-text: #e8ecf4;
+  --color-ink-muted: #94a1b8;
+  --color-steel: #7c93bd;
+
+  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-sora), var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --radius-control: 0.5rem;
-  --radius-card: 0.75rem;
+  --radius-control: 0.625rem;
+  --radius-card: 1rem;
+  --radius-panel: 1.5rem;
 }
 
 :root {
@@ -35,7 +45,7 @@
 }
 
 body {
-  background: var(--color-background);
+  background: var(--color-surface);
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
@@ -77,4 +87,43 @@ body {
   .skeleton::after {
     animation: none;
   }
+}
+
+.font-display {
+  font-family: var(--font-display);
+  letter-spacing: -0.02em;
+}
+
+.figure {
+  font-family: var(--font-display);
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -0.03em;
+}
+
+@keyframes charge-fill {
+  from {
+    transform: scaleY(0.15);
+    opacity: 0.4;
+  }
+  to {
+    transform: scaleY(1);
+    opacity: 1;
+  }
+}
+
+.charge-cell {
+  transform-origin: bottom;
+  animation: charge-fill 0.5s ease-out both;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .charge-cell {
+    animation: none;
+  }
+}
+
+.scroll-dark {
+  color-scheme: dark;
+  scrollbar-width: thin;
+  scrollbar-color: var(--color-ink-line) transparent;
 }

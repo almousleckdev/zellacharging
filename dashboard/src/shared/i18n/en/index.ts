@@ -7,6 +7,8 @@ import { enProfile } from "./profile";
 import { enCustomers } from "./customers";
 import { enUsers } from "./users";
 import { enOnboarding } from "./onboarding";
+import { enPayments } from "./payments";
+import { enSessions } from "./sessions";
 
 export const en: Dictionary = {
   ...enCommon,
@@ -17,4 +19,6 @@ export const en: Dictionary = {
   ...enCustomers,
   ...enUsers,
   ...enOnboarding,
+  ...enPayments,
+  ...enSessions,
 };

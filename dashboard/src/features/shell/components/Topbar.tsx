@@ -9,7 +9,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const { t } = useI18n();
 
   return (
-    <div className="sticky top-0 z-20 flex h-14 items-center justify-between gap-3 border-b border-border bg-background px-4 sm:px-6">
+    <div className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border bg-background/85 px-4 backdrop-blur sm:px-6">
       <button
         type="button"
         onClick={onOpenMenu}

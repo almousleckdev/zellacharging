@@ -52,4 +52,10 @@ public class AdminTestData {
                 + "values (?, ?, 'MOOV', '+24162000000', ?, ?, ?, ?, now(), now())", UUID.randomUUID(), customer,
                 amount, state, UUID.randomUUID().toString(), UUID.randomUUID().toString()));
     }
+
+    public void capture(String country, UUID customer, long amount) {
+        TenantContext.runAs(country, () -> jdbc.update("insert into ledger_entry (id, customer_id, type, "
+                + "amount_minor, idempotency_key, created_at) values (?, ?, 'CAPTURE', ?, ?, now())",
+                UUID.randomUUID(), customer, amount, UUID.randomUUID().toString()));
+    }
 }

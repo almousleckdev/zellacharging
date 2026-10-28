@@ -20,7 +20,7 @@ export function LoginForm() {
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-1.5">
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">{heading.title}</h1>
+        <h1 className="font-display text-3xl font-semibold text-foreground">{heading.title}</h1>
         <p className="text-sm text-muted">{heading.subtitle}</p>
       </div>
       {login.errorCode && <Alert>{t.errors[login.errorCode]}</Alert>}

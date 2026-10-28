@@ -26,7 +26,7 @@ function ConsoleFrame({ children }: { children: ReactNode }) {
       <Sidebar open={menuOpen} onClose={() => setMenuOpen(false)} />
       <div className="flex min-w-0 flex-1 flex-col">
         <Topbar onOpenMenu={() => setMenuOpen(true)} />
-        <main id="content" className="flex-1 px-4 py-8 sm:px-6 lg:px-8">
+        <main id="content" className="mx-auto w-full max-w-7xl flex-1 px-4 py-8 sm:px-6 lg:px-10">
           {children}
         </main>
       </div>

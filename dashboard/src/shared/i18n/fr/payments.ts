@@ -1,0 +1,33 @@
+export const frPayments = {
+  payments: {
+    title: "Paiements",
+    subtitle: "Recharges de portefeuille et retraits, du plus récent au plus ancien.",
+    results: "{count} opérations",
+    loadError: "Impossible de charger les paiements.",
+    emptyTitle: "Aucun paiement",
+    emptyText: "Aucune opération ne correspond à ces filtres.",
+    searchLabel: "Rechercher un paiement",
+    searchPlaceholder: "Référence, numéro ou nom du client",
+    kindLabel: "Type d'opération",
+    allKinds: "Tous les types",
+    stateLabel: "État",
+    allStates: "Tous les états",
+    kinds: { TOPUP: "Recharge", WITHDRAWAL: "Retrait" },
+    states: {
+      SUCCEEDED: "Réussie",
+      PAID: "Versé",
+      PENDING: "En attente",
+      PROCESSING: "En cours",
+      REQUESTED: "Demandé",
+      REVIEW: "À vérifier",
+      FAILED: "Échec",
+    },
+    columns: {
+      payment: "Opération",
+      customer: "Client",
+      state: "État",
+      amount: "Montant",
+      date: "Date",
+    },
+  },
+} as const;

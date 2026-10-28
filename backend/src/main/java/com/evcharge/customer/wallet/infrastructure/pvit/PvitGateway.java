@@ -66,9 +66,14 @@ class PvitGateway implements PaymentGateway {
         log.info("PVit payment {} status {} amount {}", reference, transaction.status(), transaction.amount());
         return switch (transaction.status()) {
             case SUCCESS -> confirmed(transaction);
-            case FAILED -> PaymentOutcome.failed("PAYMENT_DECLINED");
+            case FAILED -> declined(reference, transaction);
             case PENDING -> PaymentOutcome.pending(transaction.providerReference());
         };
+    }
+
+    private static PaymentOutcome declined(String reference, PvitTransaction transaction) {
+        log.warn("PVit payment {} declined, provider answer: {}", reference, transaction.answer());
+        return PaymentOutcome.failed("PAYMENT_DECLINED");
     }
 
     private static PaymentOutcome confirmed(PvitTransaction transaction) {

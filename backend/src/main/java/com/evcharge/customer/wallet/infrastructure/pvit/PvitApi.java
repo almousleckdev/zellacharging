@@ -83,7 +83,7 @@ class PvitApi {
                 .header("X-Secret", secret).retrieve().body(String.class));
         return new PvitTransaction(PvitStatus.from(json.path("status").asString(null)),
                 json.path("merchant_reference_id").asString(null), json.path("reference_id").asString(null),
-                decimal(json.path("amount")));
+                decimal(json.path("amount")), PvitAnswer.masked(json.toString()));
     }
 
     private JsonNode withSecret(Function<String, String> call) {

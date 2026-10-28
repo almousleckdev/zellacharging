@@ -14,15 +14,17 @@ class PvitPayoutGateway implements PayoutGateway {
     private static final Logger log = LoggerFactory.getLogger(PvitPayoutGateway.class);
     private static final String DESCRIPTION = "Zella Charging";
 
+    private final MobileOperator operator;
     private final PvitApi api;
 
-    PvitPayoutGateway(PvitApi api) {
+    PvitPayoutGateway(MobileOperator operator, PvitApi api) {
+        this.operator = operator;
         this.api = api;
     }
 
     @Override
     public boolean supports(String country, MobileOperator operator) {
-        return PvitOperators.codeOf(country, operator).isPresent();
+        return this.operator == operator && PvitOperators.codeOf(country, operator).isPresent();
     }
 
     @Override

@@ -22,12 +22,15 @@ class PvitApi {
     private final RestClient client;
     private final PvitSecretProvider secrets;
     private final PvitProperties properties;
+    private final String accountCode;
     private final ObjectMapper mapper;
 
-    PvitApi(RestClient client, PvitSecretProvider secrets, PvitProperties properties, ObjectMapper mapper) {
+    PvitApi(RestClient client, PvitSecretProvider secrets, PvitProperties properties, String accountCode,
+            ObjectMapper mapper) {
         this.client = client;
         this.secrets = secrets;
         this.properties = properties;
+        this.accountCode = accountCode;
         this.mapper = mapper;
     }
 
@@ -53,7 +56,7 @@ class PvitApi {
         body.put("service", "RESTFUL");
         body.put("callback_url_code", properties.callbackUrlCode());
         body.put("customer_account_number", customerNumber);
-        body.put("merchant_operation_account_code", properties.operationAccountCode());
+        body.put("merchant_operation_account_code", accountCode);
         body.put("transaction_type", operation);
         body.put("owner_charge", properties.ownerCharge());
         body.put("owner_charge_operator", "CUSTOMER");
@@ -76,7 +79,7 @@ class PvitApi {
     private PvitTransaction transaction(String reference, String operation) {
         JsonNode json = withSecret(secret -> client.get()
                 .uri("/{code}/status?transactionId={id}&accountOperationCode={account}&transactionOperation={op}",
-                        properties.codeUrlStatus(), reference, properties.operationAccountCode(), operation)
+                        properties.codeUrlStatus(), reference, accountCode, operation)
                 .header("X-Secret", secret).retrieve().body(String.class));
         return new PvitTransaction(PvitStatus.from(json.path("status").asString(null)),
                 json.path("merchant_reference_id").asString(null), json.path("reference_id").asString(null),

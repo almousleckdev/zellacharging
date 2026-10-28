@@ -21,13 +21,15 @@ class PvitSecretProvider {
 
     private final RestClient client;
     private final PvitProperties properties;
+    private final String accountCode;
     private final ObjectMapper mapper;
     private String secret;
     private Instant renewAt = Instant.MIN;
 
-    PvitSecretProvider(RestClient client, PvitProperties properties, ObjectMapper mapper) {
+    PvitSecretProvider(RestClient client, PvitProperties properties, String accountCode, ObjectMapper mapper) {
         this.client = client;
         this.properties = properties;
+        this.accountCode = accountCode;
         this.mapper = mapper;
     }
 
@@ -48,7 +50,7 @@ class PvitSecretProvider {
 
     private void renew() {
         LinkedMultiValueMap<String, String> form = new LinkedMultiValueMap<>();
-        form.add("operationAccountCode", properties.operationAccountCode());
+        form.add("operationAccountCode", accountCode);
         form.add("password", properties.secretPassword());
         try {
             String body = client.post().uri("/v2/{code}/renew-secret", properties.codeUrlSecret())

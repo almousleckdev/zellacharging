@@ -15,15 +15,19 @@ class PvitGateway implements PaymentGateway {
     private static final Logger log = LoggerFactory.getLogger(PvitGateway.class);
     private static final String DESCRIPTION = "Zella Charging";
 
+    private final MobileOperator operator;
     private final PvitApi api;
+    private final PvitKyc kyc;
 
-    PvitGateway(PvitApi api) {
+    PvitGateway(MobileOperator operator, PvitApi api, PvitKyc kyc) {
+        this.operator = operator;
         this.api = api;
+        this.kyc = kyc;
     }
 
     @Override
     public boolean supports(String country, MobileOperator operator) {
-        return PvitOperators.codeOf(country, operator).isPresent();
+        return this.operator == operator && PvitOperators.codeOf(country, operator).isPresent();
     }
 
     @Override
@@ -31,8 +35,10 @@ class PvitGateway implements PaymentGateway {
         String country = request.reference().substring(0, 2);
         String operatorCode = PvitOperators.codeOf(country, request.operator()).orElseThrow();
         try {
+            String customerNumber = PvitPhone.nationalFormat(request.msisdn());
+            kyc.inspect(operatorCode, customerNumber);
             PvitStatus status = api.startPayment(request.reference(), BigDecimal.valueOf(request.amountMinor()),
-                    operatorCode, PvitPhone.nationalFormat(request.msisdn()), DESCRIPTION);
+                    operatorCode, customerNumber, DESCRIPTION);
             return status == PvitStatus.FAILED ? PaymentOutcome.failed("PROVIDER_REFUSED") : PaymentOutcome.pending(null);
         } catch (PvitException e) {
             if (e.refused()) {

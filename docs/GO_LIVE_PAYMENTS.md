@@ -39,9 +39,13 @@ Rollback: set `*_TENANCY_REQUIRE_RESTRICTED_ROLE=false` and put the owner back i
 
 Set on the `backend` service (values come from PVit, never from chat or git):
 
-`PVIT_BASE_URL`, `PVIT_OPERATION_ACCOUNT_CODE`, `PVIT_SECRET_PASSWORD`, `PVIT_CODE_URL_SECRET`,
-`PVIT_CODE_URL_PAYMENT`, `PVIT_CODE_URL_STATUS`, `PVIT_CODE_URL_PAYOUT`, `PVIT_CALLBACK_URL_CODE`,
-`PVIT_AGENT`, `PVIT_PRODUCT`, `PVIT_OWNER_CHARGE`, and `ZELLA_PAYMENT_PROVIDER=pvit`.
+`PVIT_BASE_URL`, `PVIT_SECRET_PASSWORD`, `PVIT_CODE_URL_SECRET`, `PVIT_CODE_URL_PAYMENT`,
+`PVIT_CODE_URL_STATUS`, `PVIT_CODE_URL_KYC`, `PVIT_CALLBACK_URL_CODE`, `PVIT_AGENT`, `PVIT_PRODUCT`,
+`PVIT_OWNER_CHARGE`, and `ZELLA_PAYMENT_PROVIDER=pvit`.
+
+Each operator has its own PVit operation account: set `PVIT_COMPTE_OPERATION_AIRTEL` and/or
+`PVIT_COMPTE_OPERATION_MOOV`. An operator without an account is reported as unavailable in the app. `PVIT_CODE_URL_PAYOUT`
+is only needed once withdrawals are enabled. The KYC lookup never blocks a payment; its answer is logged.
 
 Do not set `ZELLA_PAYMENT_ALLOW_SANDBOX` (or its `NDZELA_` twin). With `pvit` selected and a setting missing, the
 service refuses to start, which is the intended safety net.

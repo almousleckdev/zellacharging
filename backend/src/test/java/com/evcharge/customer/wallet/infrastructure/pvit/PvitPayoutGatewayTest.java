@@ -33,15 +33,15 @@ class PvitPayoutGatewayTest {
 
     @BeforeEach
     void wire() {
-        PvitProperties properties = new PvitProperties("http://pvit.test", "ACC-1", "pw", "SECRETCODE",
-                "PAYCODE", "STATUSCODE", "PAYOUTCODE", "CALLBACK", "ZELLA", "CHARGING", "CUSTOMER",
+        PvitProperties properties = new PvitProperties("http://pvit.test", null, "ACC-1", "pw",
+                "SECRETCODE", "PAYCODE", "STATUSCODE", "PAYOUTCODE", "", "CALLBACK", "ZELLA", "CHARGING", "CUSTOMER",
                 Duration.ofSeconds(5));
         RestClient.Builder builder = RestClient.builder().baseUrl(properties.baseUrl());
         server = MockRestServiceServer.bindTo(builder).build();
         RestClient client = builder.build();
         JsonMapper mapper = JsonMapper.builder().build();
-        gateway = new PvitPayoutGateway(new PvitApi(client, new PvitSecretProvider(client, properties, mapper),
-                properties, mapper));
+        gateway = new PvitPayoutGateway(MobileOperator.MOOV, new PvitApi(client,
+                new PvitSecretProvider(client, properties, "ACC-1", mapper), properties, "ACC-1", mapper));
         server.expect(requestTo("http://pvit.test/v2/SECRETCODE/renew-secret")).andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"secret\":\"s3\",\"expires_in\":3600}", MediaType.APPLICATION_JSON));
     }

@@ -49,12 +49,12 @@ abstract final class WalletText {
     en: 'The payment was not completed.',
   );
 
-  static const minimumTopupMinor = 500;
+  static const minimumTopupMinor = 100;
 
   static const minimumWithdrawMinor = 1000;
 
   static String get invalidTopupAmount => AppLanguage.pick(
-    fr: 'Saisissez un montant d\'au moins 500',
-    en: 'Enter an amount of at least 500',
+    fr: 'Saisissez un montant d\'au moins $minimumTopupMinor',
+    en: 'Enter an amount of at least $minimumTopupMinor',
   );
 }

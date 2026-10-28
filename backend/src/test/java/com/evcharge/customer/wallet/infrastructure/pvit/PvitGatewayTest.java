@@ -33,14 +33,16 @@ class PvitGatewayTest {
 
     @BeforeEach
     void wire() {
-        PvitProperties properties = new PvitProperties("http://pvit.test", "ACC-1", "pw", "SECRETCODE",
-                "PAYCODE", "STATUSCODE", "PAYOUTCODE", "CALLBACK", "ZELLA", "CHARGING", "CUSTOMER", Duration.ofSeconds(5));
+        PvitProperties properties = new PvitProperties("http://pvit.test", "ACC-1", null, "pw",
+                "SECRETCODE", "PAYCODE", "STATUSCODE", "PAYOUTCODE", "", "CALLBACK", "ZELLA", "CHARGING", "CUSTOMER",
+                Duration.ofSeconds(5));
         RestClient.Builder builder = RestClient.builder().baseUrl(properties.baseUrl());
         server = MockRestServiceServer.bindTo(builder).build();
         RestClient client = builder.build();
         JsonMapper mapper = JsonMapper.builder().build();
-        gateway = new PvitGateway(new PvitApi(client, new PvitSecretProvider(client, properties, mapper),
-                properties, mapper));
+        PvitSecretProvider secrets = new PvitSecretProvider(client, properties, "ACC-1", mapper);
+        gateway = new PvitGateway(MobileOperator.AIRTEL, new PvitApi(client, secrets, properties, "ACC-1", mapper),
+                new PvitKyc(client, secrets, properties, mapper));
         server.expect(requestTo("http://pvit.test/v2/SECRETCODE/renew-secret")).andExpect(method(HttpMethod.POST))
                 .andRespond(withSuccess("{\"secret\":\"s3\",\"expires_in\":3600}", MediaType.APPLICATION_JSON));
     }
@@ -126,8 +128,13 @@ class PvitGatewayTest {
 
     @Test
     void anOperatorOutsideGabonIsNotSupported() {
-        assertThat(gateway.supports("GA", MobileOperator.MOOV)).isTrue();
-        assertThat(gateway.supports("ML", MobileOperator.MOOV)).isFalse();
+        assertThat(gateway.supports("GA", MobileOperator.AIRTEL)).isTrue();
+        assertThat(gateway.supports("ML", MobileOperator.AIRTEL)).isFalse();
+    }
+
+    @Test
+    void anOperatorWithoutItsOwnAccountIsNotSupported() {
+        assertThat(gateway.supports("GA", MobileOperator.MOOV)).isFalse();
     }
 
     @Test

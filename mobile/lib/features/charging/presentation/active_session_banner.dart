@@ -15,7 +15,7 @@ class ActiveSessionBanner extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final session = ref.watch(activeSessionProvider).asData?.value;
+    final session = ref.watch(activeSessionProvider).value;
     if (session == null) return const SizedBox.shrink();
     return Padding(
       padding: const EdgeInsets.only(bottom: AppSpacing.md),

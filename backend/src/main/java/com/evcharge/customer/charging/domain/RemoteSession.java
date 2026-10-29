@@ -16,7 +16,9 @@ public record RemoteSession(
         Integer currencyDecimals,
         String stopReason,
         Long pricePerKwhMinor,
-        String idTag) {
+        String idTag,
+        BigDecimal socStartPercent,
+        BigDecimal socEndPercent) {
 
     public SessionState toState() {
         return switch (status) {

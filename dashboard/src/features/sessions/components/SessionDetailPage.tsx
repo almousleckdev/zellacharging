@@ -72,7 +72,7 @@ export function SessionDetailPage() {
           <Card title={labels.energy}>
             <FactList
               facts={[
-                { label: labels.delivered, value: number(session.energyKwh, 2, t.sessions.unitKwh) },
+                { label: labels.delivered, value: number(session.energyKwh, 3, t.sessions.unitKwh) },
                 { label: t.sessions.columns.batteryStart, value: percentLabel(session.startBatteryPercent) },
                 { label: t.sessions.columns.batteryEnd, value: percentLabel(session.endBatteryPercent) },
                 { label: labels.power, value: number(data.lastPowerKw, 1, "kW") },

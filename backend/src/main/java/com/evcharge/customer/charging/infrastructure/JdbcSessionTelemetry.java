@@ -5,6 +5,8 @@ import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionProgress;
 import org.springframework.jdbc.core.simple.JdbcClient;
+
+import java.math.BigDecimal;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -54,6 +56,20 @@ class JdbcSessionTelemetry implements SessionTelemetry {
                 .query((rs, rowNum) -> new SessionProgress(rs.getBigDecimal("last_energy_kwh"),
                         rs.getTimestamp("progress_at") == null ? null : rs.getTimestamp("progress_at").toInstant()))
                 .optional().orElse(SessionProgress.none());
+    }
+
+    @Override
+    public void recordBatteryLevels(UUID id, BigDecimal start, BigDecimal end) {
+        jdbc.sql("""
+                update charging_session set start_battery_percent = coalesce(cast(:start as numeric), start_battery_percent),
+                    battery_percent = coalesce(cast(:end as numeric), battery_percent)
+                where id = :id
+                """)
+                .param("start", positive(start)).param("end", positive(end)).param("id", id).update();
+    }
+
+    private static BigDecimal positive(BigDecimal level) {
+        return level != null && level.signum() > 0 && level.compareTo(BigDecimal.valueOf(100)) <= 0 ? level : null;
     }
 
     @Override

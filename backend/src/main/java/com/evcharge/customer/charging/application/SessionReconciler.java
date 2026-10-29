@@ -51,6 +51,7 @@ public class SessionReconciler {
             throw e;
         }
         rememberPrice(session, remote);
+        rememberBattery(session, remote);
         ChargingSession next = remote
                 .map(found -> priced(session.withRemote(found, nextState(session, found), now), now))
                 .orElseGet(() -> expireIfStale(session, now));
@@ -64,6 +65,11 @@ public class SessionReconciler {
     private void rememberPrice(ChargingSession session, Optional<RemoteSession> remote) {
         remote.map(RemoteSession::pricePerKwhMinor).filter(price -> price > 0)
                 .ifPresent(price -> telemetry.recordPrice(session.id(), price));
+    }
+
+    private void rememberBattery(ChargingSession session, Optional<RemoteSession> remote) {
+        remote.ifPresent(found -> telemetry.recordBatteryLevels(session.id(), found.socStartPercent(),
+                found.socEndPercent()));
     }
 
     private ChargingSession priced(ChargingSession session, Instant now) {

@@ -66,7 +66,7 @@ class SessionReconcilerTest {
     private void platformReports(Long costMinor, Long platformPrice) {
         RemoteSession done = new RemoteSession(7, "CP-1", 1, "COMPLETED", NOW.minusSeconds(600), NOW,
                 new BigDecimal("2.5"), costMinor, costMinor == null ? null : "XAF", costMinor == null ? null : 0,
-                "Remote", platformPrice, "Z-X");
+                "Remote", platformPrice, "Z-X", new BigDecimal("91"), new BigDecimal("100"));
         when(gateway.sessionsOf("Z-X")).thenReturn(List.of(done));
     }
 
@@ -105,5 +105,15 @@ class SessionReconcilerTest {
         reconciler(150L).reconcile(live);
 
         verify(telemetry).recordPrice(live.id(), 350L);
+    }
+
+    @Test
+    void remembersTheFinalBatteryLevelsTheChargerPlatformReports() {
+        platformReports(null);
+        ChargingSession live = stopping();
+
+        reconciler(150L).reconcile(live);
+
+        verify(telemetry).recordBatteryLevels(live.id(), new BigDecimal("91"), new BigDecimal("100"));
     }
 }

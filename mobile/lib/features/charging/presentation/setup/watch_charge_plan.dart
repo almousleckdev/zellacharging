@@ -18,7 +18,7 @@ ChargePlan watchChargePlan(
       : QuoteRequest(stationId, connector, amount);
   return ChargePlan.of(
     amountMinor: amount,
-    wallet: ref.watch(walletProvider).asData?.value,
+    wallet: ref.watch(walletProvider).value,
     server: request == null
         ? null
         : ref.watch(quoteProvider(request)).asData?.value,

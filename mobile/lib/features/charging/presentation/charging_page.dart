@@ -57,7 +57,7 @@ class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
   @override
   Widget build(BuildContext context) {
     final live = ref.watch(liveSessionProvider(widget.sessionId));
-    final session = live.asData?.value;
+    final session = live.value;
     final finished = session != null && !session.state.isLive;
     return Scaffold(
       backgroundColor: finished ? AppColors.surfaceMuted : null,

@@ -18,7 +18,7 @@ class ProfileTiles extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final coupons = ref.watch(couponsProvider).asData?.value;
-    final wallet = ref.watch(walletProvider).asData?.value;
+    final wallet = ref.watch(walletProvider).value;
     return Row(
       children: [
         Expanded(

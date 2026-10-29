@@ -62,7 +62,7 @@ class _TopupPageState extends ConsumerState<TopupPage> {
   @override
   Widget build(BuildContext context) {
     final flow = ref.watch(topupFlowProvider);
-    final wallet = ref.watch(walletProvider).asData?.value;
+    final wallet = ref.watch(walletProvider).value;
     final currency = wallet?.currency ?? '';
     final idle = flow.phase == TopupPhase.idle;
     return Scaffold(

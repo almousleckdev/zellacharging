@@ -11,6 +11,7 @@ import '../domain/start_charge.dart';
 
 const _pollInterval = Duration(seconds: 5);
 const _quoteDebounce = Duration(milliseconds: 400);
+const _settleDelay = Duration(seconds: 3);
 
 final sessionRepositoryProvider = Provider<SessionRepository>(
   (ref) => SessionRepositoryImpl(ref.watch(dioProvider)),
@@ -50,8 +51,18 @@ final sessionByIdProvider = FutureProvider.autoDispose
 final liveSessionProvider = StreamProvider.autoDispose
     .family<ChargingSession, String>((ref, id) async* {
       final repository = ref.watch(sessionRepositoryProvider);
-      while (true) {
-        yield await repository.get(id);
+      var session = await repository.get(id);
+      yield session;
+      while (session.state.isLive) {
         await Future<void>.delayed(_pollInterval);
+        session = await repository.get(id);
+        yield session;
       }
+      if (!ref.mounted) return;
+      ref.invalidate(activeSessionProvider);
+      ref.invalidate(historyProvider);
+      ref.invalidate(walletProvider);
+      ref.invalidate(walletEntriesProvider);
+      await Future<void>.delayed(_settleDelay);
+      if (ref.mounted) yield await repository.get(id);
     });

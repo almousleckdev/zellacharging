@@ -4,6 +4,7 @@ import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionProgress;
 
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -14,6 +15,8 @@ public interface SessionTelemetry {
     LastReading lastReadingOf(UUID id);
 
     SessionProgress progressOf(UUID id);
+
+    void recordBatteryLevels(UUID id, BigDecimal start, BigDecimal end);
 
     void recordPrice(UUID id, long pricePerKwhMinor);
 

@@ -31,7 +31,7 @@ class WalletEntryPage extends ConsumerWidget {
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final detail = ref.watch(walletEntryDetailProvider(entryId));
-    final wallet = ref.watch(walletProvider).asData?.value;
+    final wallet = ref.watch(walletProvider).value;
     return Scaffold(
       appBar: AppBar(
         title: Text(WalletHistoryText.detailsTitle),

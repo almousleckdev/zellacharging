@@ -17,7 +17,7 @@ export function useSessionColumns(): Column<SessionItem>[] {
   const fallback = profile.countries.find((item) => item.code === country) ?? profile.countries[0];
   const states: Record<string, string> = t.sessions.states;
   const cost = (row: SessionItem) => sessionCost(row, format, fallback?.currency ?? "XAF");
-  const energy = (row: SessionItem) => (row.energyKwh === null ? "–" : `${format.number(row.energyKwh, 2)} ${t.sessions.unitKwh}`);
+  const energy = (row: SessionItem) => (row.energyKwh === null ? "–" : `${format.number(row.energyKwh, 3)} ${t.sessions.unitKwh}`);
 
   return [
     {

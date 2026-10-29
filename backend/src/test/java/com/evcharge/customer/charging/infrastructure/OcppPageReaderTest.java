@@ -18,7 +18,7 @@ class OcppPageReaderTest {
 
     private static OcppSessionPayload payload(int transactionId) {
         return new OcppSessionPayload(transactionId, "CP-1", 1, "ACTIVE", null, null, null, null, null, null, null,
-                null, "Z-TAG");
+                null, "Z-TAG", null, null);
     }
 
     private OcppSessionPage serve(int index, long total) {

@@ -20,10 +20,13 @@ record OcppSessionPayload(
         Integer currencyDecimals,
         String stopReason,
         Long pricePerKwhMinor,
-        String idTag) {
+        String idTag,
+        BigDecimal socStartPercent,
+        BigDecimal socEndPercent) {
 
     RemoteSession toDomain() {
         return new RemoteSession(transactionId, deviceId, connectorId, status, startedAt, stoppedAt,
-                energyKwh, costMinor, currency, currencyDecimals, stopReason, pricePerKwhMinor, idTag);
+                energyKwh, costMinor, currency, currencyDecimals, stopReason, pricePerKwhMinor, idTag,
+                socStartPercent, socEndPercent);
     }
 }

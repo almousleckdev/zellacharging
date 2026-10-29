@@ -43,7 +43,7 @@ class RemoteSessionLookupTest {
 
     private RemoteSession remote(int transaction, String station, String idTag, String status) {
         return new RemoteSession(transaction, station, 1, status, NOW.minusSeconds(20), null, null, null, null, null,
-                null, 150L, idTag);
+                null, 150L, idTag, null, null);
     }
 
     @Test

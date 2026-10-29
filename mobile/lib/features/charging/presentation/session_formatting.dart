@@ -10,7 +10,7 @@ import '../domain/session_state.dart';
 extension SessionFormatting on ChargingSession {
   String get energyText => shownEnergyKwh == null
       ? '--'
-      : '${shownEnergyKwh!.toStringAsFixed(2)} ${Strings.kwhUnit}';
+      : '${shownEnergyKwh!.toStringAsFixed(3)} ${Strings.kwhUnit}';
 
   double? get shownPowerKw => metering?.powerKw ?? lastPowerKw;
 

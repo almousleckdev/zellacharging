@@ -101,27 +101,27 @@ describe("OverviewPage", () => {
 
     renderConsole(<OverviewPage />);
 
-    expect(await screen.findByText("Ventes (recharges facturées)")).toBeInTheDocument();
+    expect(await screen.findByText("Commission Zella")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/admin/overview?country=GA", expect.anything());
     expect(fetchMock.mock.calls.some(([url]) => String(url).startsWith("/api/admin/series?country=GA"))).toBe(true);
   });
 
-  it("shows the period key figures with their money and the money panel", async () => {
+  it("shows the company sales and commission and never the customers' wallet money", async () => {
     navigation.search = new URLSearchParams("country=GA");
-    serve([figures("GA", "Gabon", "XAF", 1)], "2026-10-28T00:00:00Z");
+    serve([figures("GA", "Gabon", "XAF", 1)]);
 
     renderConsole(<OverviewPage />, profileOf([gabon], "COUNTRY_ADMIN"));
 
-    const sales = (await screen.findByText("Ventes (recharges facturées)")).closest("article") as HTMLElement;
+    const sales = (await screen.findAllByText("Ventes")).map((node) => node.closest("article")).find(Boolean) as HTMLElement;
     expect(text(sales)).toContain("138 FCFA");
-    const commission = (await screen.findByText("Commission")).closest("article") as HTMLElement;
+    const commission = (await screen.findByText("Commission Zella")).closest("article") as HTMLElement;
     expect(text(commission)).toContain("20 FCFA");
-    expect(await screen.findByText("Argent de la plateforme")).toBeInTheDocument();
-    expect(await screen.findByText(/Chiffres comptés depuis le/)).toBeInTheDocument();
-    expect(screen.queryByRole("table", { name: "Détail par pays" })).not.toBeInTheDocument();
+    for (const hidden of [/Rechargements de portefeuille/, /Retraits/, /Dû aux clients/, /Argent de la plateforme/, /Soldes/]) {
+      expect(screen.queryByText(hidden)).not.toBeInTheDocument();
+    }
   });
 
-  it("puts what needs attention in front: incidents, pending payments and live charges", async () => {
+  it("puts what needs attention in front: incidents, offline stations and live charges", async () => {
     navigation.search = new URLSearchParams("country=GA");
     serve([figures("GA", "Gabon", "XAF", 3)]);
 
@@ -129,7 +129,6 @@ describe("OverviewPage", () => {
 
     const strip = await screen.findByRole("region", { name: "À surveiller" });
     expect(await within(strip).findByText("Incidents prioritaires")).toBeInTheDocument();
-    expect(text(within(strip).getByText("Rechargements en attente").closest("a") as HTMLElement)).toContain("3");
     expect(text(within(strip).getByText("Recharges en cours").closest("a") as HTMLElement)).toContain("3");
     expect(within(strip).getByRole("link", { name: /Incidents prioritaires/ })).toHaveAttribute(
       "href",
@@ -137,17 +136,16 @@ describe("OverviewPage", () => {
     );
   });
 
-  it("breaks the figures down by country when several are shown", async () => {
+  it("compares the sales of each country in its own currency", async () => {
     serve([figures("GA", "Gabon", "XAF", 1), figures("ML", "Mali", "XOF", 2)]);
 
     renderConsole(<OverviewPage />);
 
-    const table = await screen.findByRole("table", { name: "Détail par pays" });
-    const rows = within(table).getAllByRole("row");
-    expect(rows).toHaveLength(3);
-    expect(within(rows[1]).getByText("Gabon")).toBeInTheDocument();
-    expect(within(rows[2]).getByText("Mali")).toBeInTheDocument();
-    expect(await screen.findByText(/mélange plusieurs devises/)).toBeInTheDocument();
+    const card = (await screen.findByText("Ventes par pays")).closest("section") as HTMLElement;
+    expect(within(card).getByText("Gabon")).toBeInTheDocument();
+    expect(within(card).getByText("Mali")).toBeInTheDocument();
+    expect(text(card)).toContain("138");
+    expect(text(card)).toContain("276");
   });
 
   it("offers a retry when the figures cannot be loaded", async () => {

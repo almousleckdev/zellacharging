@@ -1,7 +1,6 @@
 "use client";
 
 import { useSession } from "@/features/session/SessionProvider";
-import { interpolate } from "@/shared/i18n/interpolate";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
 import { incidentListSchema } from "../schemas";
@@ -35,11 +34,6 @@ export function IncidentsPage() {
         { key: "status", label: labels.statusLabel, allLabel: labels.allStatuses, options: pick(labels.statuses, STATUSES) },
         { key: "kind", label: labels.kindLabel, allLabel: labels.allKinds, options: pick(labels.kinds, KINDS) },
       ]}
-      above={(data) => (
-        <p className="rounded-control border border-border bg-surface px-4 py-3 text-sm text-muted">
-          {interpolate(labels.summary, { open: data.open, high: data.openHigh })}
-        </p>
-      )}
     />
   );
 }

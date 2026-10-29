@@ -3,6 +3,9 @@ package com.evcharge.customer.admin.application;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.wallet.PaymentDetail;
+import com.evcharge.customer.wallet.PaymentDigest;
+import com.evcharge.customer.wallet.PaymentDigestPage;
+import com.evcharge.customer.wallet.PaymentDigests;
 import com.evcharge.customer.wallet.PaymentLog;
 import com.evcharge.customer.wallet.PaymentPage;
 import com.evcharge.customer.wallet.PaymentQuery;
@@ -22,10 +25,12 @@ public class AdminPaymentService {
 
     private final AdminAccessService access;
     private final PaymentLog payments;
+    private final PaymentDigests digests;
 
-    public AdminPaymentService(AdminAccessService access, PaymentLog payments) {
+    public AdminPaymentService(AdminAccessService access, PaymentLog payments, PaymentDigests digests) {
         this.access = access;
         this.payments = payments;
+        this.digests = digests;
     }
 
     public CountryListing<PaymentRecord> list(AdminAccess admin, String country, String kind, String state,
@@ -38,6 +43,17 @@ public class AdminPaymentService {
                     limit));
             return new CountryMerge.Found<>(found.total(), found.items());
         }, PaymentRecord::createdAt, SortOrders.payments(sort));
+    }
+
+    public CountryListing<PaymentDigest> byCustomer(AdminAccess admin, String country, String kind, String state,
+                                                    String text, LogFilter filter, String sortBy, int page, int size) {
+        List<String> scope = access.scope(admin, Permission.PAYMENTS_READ, country);
+        Sort sort = Sort.parse(sortBy, SortOrders.DIGEST_FIELDS, "last");
+        return CountryMerge.ordered(scope, PageWindow.of(page, size), limit -> {
+            PaymentDigestPage found = digests.search(new PaymentQuery(blank(kind), blank(state), blank(text), filter,
+                    sort, limit));
+            return new CountryMerge.Found<>(found.total(), found.items());
+        }, digest -> digest.last().createdAt(), SortOrders.paymentDigests(sort));
     }
 
     public CountryEntry<PaymentDetail> detail(AdminAccess admin, String country, String kind, UUID id) {

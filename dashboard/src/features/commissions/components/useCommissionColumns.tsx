@@ -1,30 +1,32 @@
 "use client";
 
+import { useSession } from "@/features/session/SessionProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { useI18n } from "@/shared/i18n/I18nProvider";
+import { CellLink } from "@/shared/ui/CellLink";
 import type { Column } from "@/shared/ui/DataTable";
 import type { CommissionItem } from "../schemas";
 
 export function useCommissionColumns(): Column<CommissionItem>[] {
   const { t } = useI18n();
   const format = useFormatters();
+  const { scopedHref } = useSession();
   const labels = t.commissions.columns;
   const money = (row: CommissionItem, minor: number) =>
     format.money([{ currency: row.currency, decimals: row.decimals, minor }])[0];
 
   return [
     {
-      key: "session",
-      header: labels.session,
-      text: (row) => `${row.customerName} (${row.stationId})`,
+      key: "customer",
+      header: labels.customer,
+      text: (row) => row.customerName,
       cell: (row) => (
-        <span className="flex flex-col">
-          <span className="font-medium text-foreground">{row.customerName}</span>
-          <span className="text-xs text-subtle">{row.stationId}</span>
-        </span>
+        <CellLink href={scopedHref(`/customers/${row.country}/${row.customerId}`)} className="font-medium">
+          {row.customerName}
+        </CellLink>
       ),
     },
-    { key: "date", header: labels.date, text: (row) => format.dateTime(row.at), cell: (row) => format.dateTime(row.at) },
+    { key: "charges", header: labels.charges, align: "right", text: (row) => row.sessions, cell: (row) => format.number(row.sessions) },
     { key: "electric", header: labels.electric, align: "right", text: (row) => money(row, row.electricMinor), cell: (row) => money(row, row.electricMinor) },
     {
       key: "commission",
@@ -41,5 +43,6 @@ export function useCommissionColumns(): Column<CommissionItem>[] {
       text: (row) => money(row, row.totalMinor),
       cell: (row) => <span className="figure font-semibold">{money(row, row.totalMinor)}</span>,
     },
+    { key: "last", header: labels.last, align: "right", text: (row) => format.dateTime(row.lastAt), cell: (row) => format.dateTime(row.lastAt) },
   ];
 }

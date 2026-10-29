@@ -5,7 +5,6 @@ export const enIncidents: Pick<Dictionary, "incidents"> = {
     title: "Incidents",
     subtitle: "Failed charges, stuck payments and operations to review.",
     results: "{count} incidents",
-    summary: "{open} open incidents, {high} high priority.",
     loadError: "We couldn't load the incidents.",
     emptyTitle: "No incidents",
     emptyText: "Nothing to report for these filters.",

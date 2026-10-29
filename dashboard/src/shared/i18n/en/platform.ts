@@ -28,7 +28,6 @@ export const enPlatform: Pick<Dictionary, "platform" | "tariffs" | "system" | "c
   tariffs: {
     title: "Tariffs",
     subtitle: "Prices, commission and limits applied to charges.",
-    explained: "The price per kWh is set by the charger platform and frozen when each charge starts. This page shows Zella's rules and the prices actually applied.",
     loadError: "We couldn't load the tariffs.",
     applied: "Prices applied per station",
     appliedText: "Price per kWh recorded on started charges.",

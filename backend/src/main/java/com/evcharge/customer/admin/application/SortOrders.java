@@ -1,8 +1,10 @@
 package com.evcharge.customer.admin.application;
 
 import com.evcharge.customer.account.CustomerRecord;
+import com.evcharge.customer.charging.SessionDigest;
 import com.evcharge.customer.charging.SessionRecord;
 import com.evcharge.customer.shared.Sort;
+import com.evcharge.customer.wallet.PaymentDigest;
 import com.evcharge.customer.wallet.PaymentRecord;
 
 import java.util.Comparator;
@@ -12,6 +14,7 @@ final class SortOrders {
 
     static final Set<String> SESSION_FIELDS = Set.of("date", "amount", "energy");
     static final Set<String> PAYMENT_FIELDS = Set.of("date", "amount");
+    static final Set<String> DIGEST_FIELDS = Set.of("last", "count", "spent");
     static final Set<String> CUSTOMER_FIELDS = Set.of("date", "name");
 
     private SortOrders() {
@@ -36,6 +39,24 @@ final class SortOrders {
         Comparator<CustomerRecord> order = "name".equals(sort.field())
                 ? Comparator.comparing((CustomerRecord customer) -> (customer.firstName() + " " + customer.lastName()).toLowerCase())
                 : Comparator.comparing(CustomerRecord::createdAt);
+        return directed(order, sort);
+    }
+
+    static Comparator<SessionDigest> sessionDigests(Sort sort) {
+        Comparator<SessionDigest> order = switch (sort.field()) {
+            case "count" -> Comparator.comparingLong(SessionDigest::sessions);
+            case "spent" -> Comparator.comparingLong(SessionDigest::spentMinor);
+            default -> Comparator.comparing((SessionDigest digest) -> digest.last().createdAt());
+        };
+        return directed(order, sort);
+    }
+
+    static Comparator<PaymentDigest> paymentDigests(Sort sort) {
+        Comparator<PaymentDigest> order = switch (sort.field()) {
+            case "count" -> Comparator.comparingLong(PaymentDigest::operations);
+            case "spent" -> Comparator.comparingLong(PaymentDigest::topupsMinor);
+            default -> Comparator.comparing((PaymentDigest digest) -> digest.last().createdAt());
+        };
         return directed(order, sort);
     }
 

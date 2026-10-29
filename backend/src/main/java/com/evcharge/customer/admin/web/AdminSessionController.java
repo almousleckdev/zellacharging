@@ -26,9 +26,24 @@ class AdminSessionController {
     SessionListResponse list(AdminAccess admin, @RequestParam(required = false) String country,
                              @RequestParam(required = false) String state, @RequestParam(required = false) String q,
                              @RequestParam(required = false) Instant from, @RequestParam(required = false) Instant to,
-                             @RequestParam(required = false) UUID customerId, @RequestParam(required = false) String sort,
+                             @RequestParam(required = false) UUID customerId, @RequestParam(required = false) String sort, @RequestParam(required = false) String station,
                              @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        return SessionListResponse.from(sessions.list(admin, country, state, q, new LogFilter(from, to, customerId), sort, page, size));
+        return SessionListResponse.from(sessions.list(admin, country, state, q, new LogFilter(from, to, customerId), station, sort, page, size));
+    }
+
+    @GetMapping("/by-customer")
+    SessionDigestResponse byCustomer(AdminAccess admin, 
+                                    @RequestParam(required = false) String country,
+                                    @RequestParam(required = false) String state,
+                                    @RequestParam(required = false) String q,
+                                    @RequestParam(required = false) Instant from,
+                                    @RequestParam(required = false) Instant to,
+                                    @RequestParam(required = false) String sort, 
+                                    @RequestParam(required = false) String station,
+                                    @RequestParam(defaultValue = "0") int page,
+                                    @RequestParam(defaultValue = "10") int size) {
+        return SessionDigestResponse.from(sessions.byCustomer(admin, country, state, q,
+                new LogFilter(from, to, null), station, sort, page, size));
     }
 
     @GetMapping("/{country}/{id}")

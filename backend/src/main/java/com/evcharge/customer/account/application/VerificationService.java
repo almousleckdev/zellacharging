@@ -67,6 +67,12 @@ public class VerificationService {
         ContactPoint contact = contacts.of(channel, target);
         Customer customer = customers.findByContact(contact.channel(), contact.target())
                 .orElseThrow(VerificationService::invalidCode);
+        confirm(customer, channel, submitted);
+        customers.markContactVerified(customer.id(), channel, clock.instant());
+    }
+
+    @Transactional(noRollbackFor = ApiException.class)
+    public void confirm(Customer customer, Channel channel, String submitted) {
         VerificationCode code = codes.findLatest(customer.id(), channel)
                 .filter(candidate -> candidate.isUsableAt(clock.instant(), settings.verification().maxAttempts()))
                 .orElseThrow(VerificationService::invalidCode);
@@ -75,10 +81,9 @@ public class VerificationService {
             throw invalidCode();
         }
         codes.consume(code.id(), clock.instant());
-        customers.markContactVerified(customer.id(), channel, clock.instant());
     }
 
-    private void reissue(Customer customer, ContactPoint contact) {
+    public void reissue(Customer customer, ContactPoint contact) {
         boolean tooSoon = codes.findLatest(customer.id(), contact.channel())
                 .filter(previous -> previous.createdAt()
                         .plus(settings.verification().resendCooldown()).isAfter(clock.instant()))

@@ -1,0 +1,133 @@
+package com.evcharge.customer.account;
+
+import com.evcharge.customer.PostgresTestBase;
+import com.evcharge.customer.TestTenants;
+import com.evcharge.customer.account.application.port.VerificationSender;
+import com.evcharge.customer.account.domain.Channel;
+import org.junit.jupiter.api.Test;
+import org.mockito.ArgumentCaptor;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
+import org.springframework.http.MediaType;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.ResultActions;
+
+import java.util.UUID;
+import java.util.concurrent.ThreadLocalRandom;
+
+import static org.hamcrest.Matchers.anyOf;
+import static org.hamcrest.Matchers.is;
+import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.atLeastOnce;
+import static org.mockito.Mockito.verify;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@AutoConfigureMockMvc
+class ContactFlowIntegrationTest extends PostgresTestBase {
+
+    @Autowired
+    MockMvc mvc;
+
+    @Autowired
+    JdbcTemplate jdbc;
+
+    @MockitoBean
+    VerificationSender sender;
+
+    private UUID customer(String email, String phone) {
+        UUID id = UUID.randomUUID();
+        jdbc.update("insert into customer (id, first_name, last_name, email, phone_e164, password_hash, status, "
+                + "created_at) values (?, 'Aline', 'Obame', ?, ?, 'x', 'ACTIVE', now())", id, email, phone);
+        return id;
+    }
+
+    private String freshPhone() {
+        return "+24177" + (100000 + ThreadLocalRandom.current().nextInt(900000));
+    }
+
+    private ResultActions submit(UUID id, String path, String json) throws Exception {
+        return mvc.perform(post(path).with(TestTenants.customer(id)).contentType(MediaType.APPLICATION_JSON)
+                .content(json));
+    }
+
+    private String lastCode(String email) {
+        ArgumentCaptor<String> code = ArgumentCaptor.forClass(String.class);
+        verify(sender, atLeastOnce()).send(eq(Channel.EMAIL), eq(email), code.capture());
+        return code.getValue();
+    }
+
+    @Test
+    void aCustomerWithOnlyAPhoneAddsAnEmailAndConfirmsItWithTheCodeSentThere() throws Exception {
+        UUID id = customer(null, freshPhone());
+        String email = "new-" + id + "@example.com";
+
+        submit(id, "/v1/me/email", "{\"email\":\"" + email + "\"}").andExpect(status().isNoContent());
+        mvc.perform(get("/v1/me").with(TestTenants.customer(id))).andExpect(jsonPath("$.email").doesNotExist());
+
+        submit(id, "/v1/me/email/verify", "{\"code\":\"" + lastCode(email) + "\"}").andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(email)).andExpect(jsonPath("$.emailVerified").value(true));
+    }
+
+    @Test
+    void aWrongCodeLeavesTheEmailUnattached() throws Exception {
+        UUID id = customer(null, freshPhone());
+        submit(id, "/v1/me/email", "{\"email\":\"wrong-" + id + "@example.com\"}").andExpect(status().isNoContent());
+
+        submit(id, "/v1/me/email/verify", "{\"code\":\"000000\"}").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_CODE"));
+        mvc.perform(get("/v1/me").with(TestTenants.customer(id))).andExpect(jsonPath("$.email").doesNotExist());
+    }
+
+    @Test
+    void confirmingWithoutAnEmailWaitingIsRefused() throws Exception {
+        UUID id = customer(null, freshPhone());
+
+        submit(id, "/v1/me/email/verify", "{\"code\":\"123456\"}").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("NO_PENDING_EMAIL"));
+    }
+
+    @Test
+    void anEmailAlreadyUsedOrAlreadySetIsRefused() throws Exception {
+        String taken = "taken-" + UUID.randomUUID() + "@example.com";
+        customer(taken, null);
+        UUID phoneOnly = customer(null, freshPhone());
+        UUID withEmail = customer("own-" + UUID.randomUUID() + "@example.com", null);
+
+        submit(phoneOnly, "/v1/me/email", "{\"email\":\"" + taken + "\"}").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONTACT_ALREADY_USED"));
+        submit(withEmail, "/v1/me/email", "{\"email\":\"other@example.com\"}").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("EMAIL_ALREADY_SET"));
+    }
+
+    @Test
+    void aCustomerWithOnlyAnEmailAddsAPhoneThatStaysUnverified() throws Exception {
+        UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", null);
+        String phone = freshPhone();
+
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + phone + "\"}").andExpect(status().isOk())
+                .andExpect(jsonPath("$.phone").value(phone)).andExpect(jsonPath("$.phoneVerified").value(false));
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + freshPhone() + "\"}").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("PHONE_ALREADY_SET"));
+    }
+
+    @Test
+    void aPhoneOfAnUnsupportedCountryOrAlreadyUsedOrInvalidIsRefused() throws Exception {
+        String used = freshPhone();
+        customer(null, used);
+        UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", null);
+
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + used + "\"}").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("CONTACT_ALREADY_USED"));
+        submit(id, "/v1/me/phone", "{\"phone\":\"+22370123456\"}").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value(anyOf(is("UNSUPPORTED_COUNTRY"), is("PHONE_COUNTRY_MISMATCH"))));
+        submit(id, "/v1/me/phone", "{\"phone\":\"abc\"}").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_PHONE"));
+    }
+}

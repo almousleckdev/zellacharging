@@ -1,6 +1,7 @@
 package com.evcharge.customer.account.application;
 
 import com.evcharge.customer.account.application.port.CustomerRepository;
+import com.evcharge.customer.account.domain.Channel;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.CustomerStatus;
 import com.evcharge.customer.shared.ApiException;
@@ -21,6 +22,12 @@ public class ProfileService {
     public Customer get(UUID customerId) {
         return customers.findById(customerId).filter(customer -> customer.status() != CustomerStatus.DELETED)
                 .orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "Customer not found"));
+    }
+
+    public ProfileView view(UUID customerId) {
+        Customer customer = get(customerId);
+        return new ProfileView(customer, customers.isVerified(customerId, Channel.EMAIL),
+                customers.isVerified(customerId, Channel.PHONE));
     }
 
     public Customer updateName(UUID customerId, String firstName, String lastName) {

@@ -26,6 +26,25 @@ export const paymentListSchema = z.object({
 
 export type PaymentItem = z.infer<typeof paymentItemSchema>;
 
+export const paymentDigestSchema = z.object({
+  total: z.number(),
+  page: z.number(),
+  size: z.number(),
+  items: z.array(
+    z.object({
+      customerId: z.string(),
+      country: z.string(),
+      customerName: z.string(),
+      operations: z.number(),
+      topupsMinor: z.number(),
+      withdrawalsMinor: z.number(),
+      last: paymentItemSchema,
+    }),
+  ),
+});
+
+export type PaymentDigest = z.infer<typeof paymentDigestSchema>["items"][number];
+
 export const paymentDetailSchema = z.object({
   payment: paymentItemSchema,
   providerRef: z.string().nullable(),

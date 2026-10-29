@@ -4,6 +4,7 @@ import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
 import { customerListSchema } from "../schemas";
+import { CustomerActions } from "./CustomerActions";
 import { useCustomerColumns } from "./useCustomerColumns";
 
 const STATUSES = ["ACTIVE", "BLOCKED", "PENDING_VERIFICATION", "PENDING_PHONE"] as const;
@@ -22,6 +23,16 @@ export function CustomersPage() {
       icon="users"
       columns={columns}
       rowKey={(row) => `${row.country}-${row.id}`}
+      rowActions={{
+        key: "actions",
+        header: "",
+        align: "right",
+        cell: (row) => (
+          <div onClick={(event) => event.stopPropagation()}>
+            <CustomerActions customer={row} compact />
+          </div>
+        ),
+      }}
       rowHref={(row) => scopedHref(`/customers/${row.country}/${row.id}`)}
       filters={[
         {

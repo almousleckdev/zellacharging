@@ -6,6 +6,8 @@ export const enShell: Pick<Dictionary, "shell" | "nav" | "dialogs"> = {
     mainNavigation: "Main navigation",
     openMenu: "Open menu",
     closeMenu: "Close menu",
+    accountMenu: "Account menu",
+    settings: "Settings",
     profileLink: "My profile",
     breadcrumbRoot: "Console",
     comingSoon: "Soon",

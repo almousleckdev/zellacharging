@@ -5,7 +5,7 @@ import type { BackendResult } from "./backendClient";
 import { clientIpOf, guardMutation, jsonError, readJson } from "./requestGuards";
 import { callWithSession } from "./sessionCall";
 
-const SEGMENT = /^[A-Za-z0-9_-]+$/;
+const SEGMENT = /^(?!\.+$)[A-Za-z0-9_.-]+$/;
 const READ_METHODS = new Set(["GET", "HEAD"]);
 
 function backendPath(segments: string[], search: string): string | null {

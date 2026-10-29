@@ -39,6 +39,14 @@ public class AdminTestData {
                 "CP-" + UUID.randomUUID(), connector, state, energy, cost));
     }
 
+    public void sessionAt(String country, UUID customer, String station, int connector, String state, String energy,
+                          Long cost) {
+        TenantContext.runAs(country, () -> jdbc.update("insert into charging_session (id, customer_id, station_id, "
+                + "connector_id, id_tag, state, started_at, energy_kwh, cost_minor, created_at, updated_at) "
+                + "values (?, ?, ?, ?, 'Z-x', ?, now(), ?::numeric, ?, now(), now())", UUID.randomUUID(), customer,
+                station, connector, state, energy, cost));
+    }
+
     public void topup(String country, UUID customer, String state, long amount) {
         TenantContext.runAs(country, () -> jdbc.update("insert into topup (id, customer_id, operator, msisdn, "
                 + "amount_minor, state, idempotency_key, reference, created_at, updated_at) "

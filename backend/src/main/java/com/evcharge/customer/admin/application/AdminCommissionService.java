@@ -6,7 +6,7 @@ import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.charging.CommissionLog;
 import com.evcharge.customer.charging.CommissionPage;
 import com.evcharge.customer.charging.CommissionQuery;
-import com.evcharge.customer.charging.CommissionRecord;
+import com.evcharge.customer.charging.CommissionDigest;
 import com.evcharge.customer.shared.LogFilter;
 import com.evcharge.customer.shared.TenantContext;
 import org.springframework.stereotype.Service;
@@ -34,10 +34,10 @@ public class AdminCommissionService {
         List<CountryCommissionTotals> summaries = catalog.all().stream().filter(item -> scope.contains(item.code()))
                 .map(item -> new CountryCommissionTotals(item, TenantContext.callAs(item.code(),
                         () -> commissions.search(new CommissionQuery(pattern, filter, 1)).totals()))).toList();
-        CountryListing<CommissionRecord> items = CountryMerge.newestFirst(scope, window, limit -> {
+        CountryListing<CommissionDigest> items = CountryMerge.newestFirst(scope, window, limit -> {
                     CommissionPage found = commissions.search(new CommissionQuery(pattern, filter, limit));
-                    return new CountryMerge.Found<>(found.count(), found.items());
-                }, CommissionRecord::at);
+                    return new CountryMerge.Found<>(found.customers(), found.items());
+                }, CommissionDigest::lastAt);
         return new CommissionListing(summaries, items);
     }
 }

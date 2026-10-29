@@ -4,7 +4,6 @@ import { useSession } from "@/features/session/SessionProvider";
 import { mergeByCurrency } from "@/features/overview/seriesMath";
 import { ExportMenu } from "@/shared/export/ExportMenu";
 import { useI18n } from "@/shared/i18n/I18nProvider";
-import { useFormatters } from "@/shared/i18n/useFormatters";
 import { presetRange } from "@/shared/lib/dateRange";
 import { useUrlParams } from "@/shared/lib/useUrlParams";
 import { DateRangeFilter } from "@/shared/ui/DateRangeFilter";
@@ -20,7 +19,6 @@ const BUCKETS = ["day", "week", "month"] as const;
 
 export function ReportsPage() {
   const { t } = useI18n();
-  const format = useFormatters();
   const { country } = useSession();
   const { params, update } = useUrlParams();
   const defaults = presetRange("last30");
@@ -57,8 +55,6 @@ export function ReportsPage() {
       {report.isError && <ErrorState message={t.reports.loadError} onRetry={() => void report.refetch()} />}
       {report.data && !group && <p className="text-sm text-muted">{t.reports.empty}</p>}
       {group && <ReportTable group={group} bucket={bucket} />}
-      {groups.length > 1 && <p className="text-sm text-muted">{t.overview.mixedCurrencies}</p>}
-      <p className="sr-only">{format.number(groups.length)}</p>
     </div>
   );
 }

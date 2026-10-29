@@ -26,6 +26,9 @@ import 'package:zella/features/coupons/presentation/coupon_providers.dart';
 import 'package:zella/features/coupons/presentation/coupons_page.dart';
 import 'package:zella/features/profile/presentation/change_password_page.dart';
 import 'package:zella/features/profile/presentation/delete_account_page.dart';
+import 'package:zella/features/profile/domain/contact_kind.dart';
+import 'package:zella/features/profile/presentation/add_contact_page.dart';
+import 'package:zella/features/profile/presentation/confirm_email_page.dart';
 import 'package:zella/features/profile/presentation/edit_profile_page.dart';
 import 'package:zella/features/profile/presentation/settings_page.dart';
 import 'package:zella/features/support/domain/support_info.dart';
@@ -76,6 +79,9 @@ final screens = <String, Widget Function()>{
   'charging-active': () => const ChargingPage(sessionId: 'a'),
   'details': () => const ChargingPage(sessionId: 'a'),
   'edit-profile': () => const EditProfilePage(),
+  'add-email': () => const AddContactPage(kind: ContactKind.email),
+  'add-phone': () => const AddContactPage(kind: ContactKind.phone),
+  'confirm-email': () => const ConfirmEmailPage(email: 'aline@example.com'),
   'pay-progress': () => FlowPanel(
     kind: FlowKind.progress,
     title: PayFlowText.approveTitle,

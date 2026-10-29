@@ -3,10 +3,8 @@ import type { Dictionary } from "../types";
 export const enCommissions: Pick<Dictionary, "commissions"> = {
   commissions: {
     title: "Commissions",
-    subtitle: "Zella's share of every billed charge.",
-    explained:
-      "On each charge the customer pays the electricity used plus a service commission. The commission is taken from their wallet and stays in your PVit account: it is yours.",
-    results: "{count} billed charges",
+    subtitle: "Zella's commission per customer.",
+    results: "{count} customers",
     searchLabel: "Search commissions",
     searchPlaceholder: "Customer or station",
     loadError: "We couldn't load the commissions.",
@@ -22,12 +20,13 @@ export const enCommissions: Pick<Dictionary, "commissions"> = {
     total: "Total taken from customers",
     totalHint: "Electricity, commission and VAT",
     columns: {
-      session: "Charge",
-      date: "Date",
+      customer: "Customer",
+      charges: "Charges",
       electric: "Electricity",
       commission: "Commission",
       vat: "VAT",
       total: "Total taken",
+      last: "Last charge",
     },
   },
 };

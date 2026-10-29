@@ -3,6 +3,9 @@ package com.evcharge.customer.admin.application;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.charging.SessionDetail;
+import com.evcharge.customer.charging.SessionDigest;
+import com.evcharge.customer.charging.SessionDigestPage;
+import com.evcharge.customer.charging.SessionDigests;
 import com.evcharge.customer.charging.SessionLog;
 import com.evcharge.customer.charging.SessionLogQuery;
 import com.evcharge.customer.charging.SessionPage;
@@ -22,20 +25,33 @@ public class AdminSessionService {
 
     private final AdminAccessService access;
     private final SessionLog sessions;
+    private final SessionDigests digests;
 
-    public AdminSessionService(AdminAccessService access, SessionLog sessions) {
+    public AdminSessionService(AdminAccessService access, SessionLog sessions, SessionDigests digests) {
         this.access = access;
         this.sessions = sessions;
+        this.digests = digests;
     }
 
     public CountryListing<SessionRecord> list(AdminAccess admin, String country, String state, String text,
-                                              LogFilter filter, String sortBy, int page, int size) {
+                                              LogFilter filter, String station, String sortBy, int page, int size) {
         List<String> scope = access.scope(admin, Permission.SESSIONS_READ, country);
         Sort sort = Sort.parse(sortBy, SortOrders.SESSION_FIELDS, "date");
         return CountryMerge.ordered(scope, PageWindow.of(page, size), limit -> {
-            SessionPage found = sessions.search(new SessionLogQuery(blank(state), blank(text), filter, sort, limit));
+            SessionPage found = sessions.search(new SessionLogQuery(blank(state), blank(text), blank(station), filter, sort, limit));
             return new CountryMerge.Found<>(found.total(), found.items());
         }, SessionRecord::createdAt, SortOrders.sessions(sort));
+    }
+
+    public CountryListing<SessionDigest> byCustomer(AdminAccess admin, String country, String state, String text,
+                                                    LogFilter filter, String station, String sortBy, int page, int size) {
+        List<String> scope = access.scope(admin, Permission.SESSIONS_READ, country);
+        Sort sort = Sort.parse(sortBy, SortOrders.DIGEST_FIELDS, "last");
+        return CountryMerge.ordered(scope, PageWindow.of(page, size), limit -> {
+            SessionDigestPage found = digests.search(new SessionLogQuery(blank(state), blank(text), blank(station), filter,
+                    sort, limit));
+            return new CountryMerge.Found<>(found.total(), found.items());
+        }, digest -> digest.last().createdAt(), SortOrders.sessionDigests(sort));
     }
 
     public CountryEntry<SessionDetail> detail(AdminAccess admin, String country, UUID id) {

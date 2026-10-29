@@ -45,7 +45,7 @@ describe("SessionsPage", () => {
     expect(within(table).getByText("CP-12")).toBeInTheDocument();
     expect(within(table).getByText("Terminée")).toBeInTheDocument();
     expect(within(table).getByText("0,39 kWh")).toBeInTheDocument();
-    expect(screen.getByText("1 sessions")).toBeInTheDocument();
+    expect(screen.getByText("1 clients")).toBeInTheDocument();
   });
 
   it("shows dashes while a session has no figures yet", async () => {

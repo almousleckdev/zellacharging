@@ -4,6 +4,7 @@ import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
 import { commissionsSchema } from "../schemas";
+import { mergeSummaries } from "../summary";
 import { CommissionsSummary } from "./CommissionsSummary";
 import { useCommissionColumns } from "./useCommissionColumns";
 
@@ -19,13 +20,12 @@ export function CommissionsPage() {
       labels={t.commissions}
       icon="percent"
       columns={columns}
-      rowKey={(row) => `${row.country}-${row.sessionId}`}
-      rowHref={(row) => scopedHref(`/sessions/${row.country}/${row.sessionId}`)}
+      rowKey={(row) => `${row.country}-${row.customerId}`}
+      rowHref={(row) => scopedHref(`/customers/${row.country}/${row.customerId}?tab=sessions`)}
       above={(data) => (
         <div className="flex flex-col gap-6">
-          <p className="max-w-3xl rounded-control border border-border bg-surface px-4 py-3 text-sm text-muted">{t.commissions.explained}</p>
-          {data.summaries.map((summary) => (
-            <CommissionsSummary key={summary.country} summary={summary} />
+          {mergeSummaries(data.summaries).map((summary) => (
+            <CommissionsSummary key={summary.currency} summary={summary} />
           ))}
         </div>
       )}

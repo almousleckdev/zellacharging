@@ -11,9 +11,7 @@ import 'core/storage/secure_preference_store.dart';
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Firebase.initializeApp(
-    options: DefaultFirebaseOptions.currentPlatform,
-  );
+  await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   AppLanguage.current = AppLanguage.fromCode(
     await SecurePreferenceStore().read(LanguageController.storageKey),

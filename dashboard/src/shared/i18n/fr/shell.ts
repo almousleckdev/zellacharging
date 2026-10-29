@@ -4,6 +4,8 @@ export const frShell = {
     mainNavigation: "Navigation principale",
     openMenu: "Ouvrir le menu",
     closeMenu: "Fermer le menu",
+    accountMenu: "Menu du compte",
+    settings: "Paramètres",
     profileLink: "Mon profil",
     breadcrumbRoot: "Console",
     comingSoon: "Bientôt",

@@ -18,6 +18,8 @@ public interface CustomerRepository {
     void clearFailedLogins(UUID id);
     void updateName(UUID id, String firstName, String lastName);
     void updatePasswordHash(UUID id, String passwordHash);
+    void attachEmail(UUID id, String email, Instant verifiedAt);
+    void attachPhone(UUID id, String phone);
     boolean updateStatus(UUID id, String from, String to);
     void markDeleted(UUID id, String unusablePasswordHash);
 }

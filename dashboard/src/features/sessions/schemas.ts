@@ -29,6 +29,25 @@ export const sessionListSchema = z.object({
 
 export type SessionItem = z.infer<typeof sessionItemSchema>;
 
+export const sessionDigestSchema = z.object({
+  total: z.number(),
+  page: z.number(),
+  size: z.number(),
+  items: z.array(
+    z.object({
+      customerId: z.string(),
+      country: z.string(),
+      customerName: z.string(),
+      sessions: z.number(),
+      energyKwh: z.number(),
+      spentMinor: z.number(),
+      last: sessionItemSchema,
+    }),
+  ),
+});
+
+export type SessionDigest = z.infer<typeof sessionDigestSchema>["items"][number];
+
 export const sessionDetailSchema = z.object({
   session: sessionItemSchema,
   idTag: z.string(),

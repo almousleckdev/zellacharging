@@ -123,6 +123,26 @@ class JdbcCustomerRepository implements CustomerRepository {
     }
 
     @Override
+    public void attachEmail(UUID id, String email, Instant verifiedAt) {
+        try {
+            jdbc.sql("update customer set email = :email, email_verified_at = :at where id = :id and email is null")
+                    .param("email", email).param("at", Timestamps.toDb(verifiedAt)).param("id", id).update();
+        } catch (DuplicateKeyException e) {
+            throw new ApiException(HttpStatus.CONFLICT, "CONTACT_ALREADY_USED", "Contact already registered");
+        }
+    }
+
+    @Override
+    public void attachPhone(UUID id, String phone) {
+        try {
+            jdbc.sql("update customer set phone_e164 = :phone where id = :id and phone_e164 is null")
+                    .param("phone", phone).param("id", id).update();
+        } catch (DuplicateKeyException e) {
+            throw new ApiException(HttpStatus.CONFLICT, "CONTACT_ALREADY_USED", "Contact already registered");
+        }
+    }
+
+    @Override
     public boolean updateStatus(UUID id, String from, String to) {
         return jdbc.sql("update customer set status = :to where id = :id and status = :from")
                 .param("to", to).param("id", id).param("from", from).update() == 1;

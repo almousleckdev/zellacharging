@@ -21,6 +21,18 @@ abstract final class ErrorText {
       fr: 'Votre compte est suspendu. Contactez le support.',
       en: 'Your account is suspended. Contact support.',
     ),
+    'EMAIL_ALREADY_SET': AppLanguage.pick(
+      fr: 'Une adresse e-mail est déjà enregistrée sur ce compte.',
+      en: 'This account already has an email address.',
+    ),
+    'PHONE_ALREADY_SET': AppLanguage.pick(
+      fr: 'Un numéro de téléphone est déjà enregistré sur ce compte.',
+      en: 'This account already has a phone number.',
+    ),
+    'NO_PENDING_EMAIL': AppLanguage.pick(
+      fr: 'Aucune adresse e-mail en attente de confirmation. Recommencez.',
+      en: 'No email is waiting for confirmation. Please start again.',
+    ),
     'ACCOUNT_LOCKED': AppLanguage.pick(
       fr: 'Trop de tentatives. Réessayez dans quelques minutes.',
       en: 'Too many attempts. Try again in a few minutes.',

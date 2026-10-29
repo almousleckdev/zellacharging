@@ -14,6 +14,9 @@ import '../../features/stations/presentation/locations_page.dart';
 import '../../features/coupons/presentation/coupons_page.dart';
 import '../../features/profile/presentation/change_password_page.dart';
 import '../../features/profile/presentation/delete_account_page.dart';
+import '../../features/profile/domain/contact_kind.dart';
+import '../../features/profile/presentation/add_contact_page.dart';
+import '../../features/profile/presentation/confirm_email_page.dart';
 import '../../features/profile/presentation/edit_profile_page.dart';
 import '../../features/profile/presentation/settings_page.dart';
 import '../../features/support/presentation/contact_page.dart';
@@ -78,6 +81,18 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.editProfile,
         builder: (_, _) => const EditProfilePage(),
+      ),
+      GoRoute(
+        path: Routes.addEmail,
+        builder: (_, _) => const AddContactPage(kind: ContactKind.email),
+      ),
+      GoRoute(
+        path: Routes.addPhone,
+        builder: (_, _) => const AddContactPage(kind: ContactKind.phone),
+      ),
+      GoRoute(
+        path: Routes.confirmEmail,
+        builder: (_, state) => ConfirmEmailPage(email: state.extra as String),
       ),
       GoRoute(path: Routes.settings, builder: (_, _) => const SettingsPage()),
       GoRoute(

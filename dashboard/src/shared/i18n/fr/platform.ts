@@ -26,7 +26,6 @@ export const frPlatform = {
   tariffs: {
     title: "Tarifs",
     subtitle: "Prix, commission et limites appliqués aux recharges.",
-    explained: "Le prix du kWh est fixé par la plateforme des bornes ; il est figé au démarrage de chaque recharge. Cette page affiche les règles de Zella et les prix réellement appliqués.",
     loadError: "Impossible de charger les tarifs.",
     applied: "Prix appliqués par borne",
     appliedText: "Prix du kWh relevés sur les recharges démarrées.",

@@ -3,8 +3,8 @@ import type { Dictionary } from "../types";
 export const enPayments: Pick<Dictionary, "payments"> = {
   payments: {
     title: "Payments",
-    subtitle: "Wallet top-ups and withdrawals, newest first.",
-    results: "{count} operations",
+    subtitle: "One customer per row with their last operation. Click a customer to see their full history.",
+    results: "{count} customers",
     loadError: "We couldn't load the payments.",
     emptyTitle: "No payments",
     emptyText: "No operation matches these filters.",
@@ -24,6 +24,7 @@ export const enPayments: Pick<Dictionary, "payments"> = {
       REVIEW: "To review",
       FAILED: "Failed",
     },
+    digest: { customer: "Customer", operations: "Operations", last: "Last operation", lastAmount: "Amount", topups: "Total topped up", withdrawn: "Total withdrawn" },
     detail: {
       back: "Back to payments",
       loadError: "We couldn't load this payment.",

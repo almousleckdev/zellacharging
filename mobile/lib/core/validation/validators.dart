@@ -19,6 +19,11 @@ abstract final class Validators {
     return _phone.hasMatch(value.trim()) ? null : Strings.invalidPhone;
   }
 
+  static String? requiredPhone(String? value) {
+    if (value == null || value.trim().isEmpty) return Strings.required;
+    return _phone.hasMatch(value.trim()) ? null : Strings.invalidPhone;
+  }
+
   static String? password(String? value) {
     if (value == null || value.isEmpty) return Strings.required;
     return value.length < 8 ? Strings.shortPassword : null;

@@ -49,7 +49,7 @@ describe("PaymentsPage", () => {
     expect(within(table).getByText("Versé")).toBeInTheDocument();
     expect(within(table).getByText(/^\+\s/)).toBeInTheDocument();
     expect(within(table).getAllByRole("link", { name: /Aline Obame/ })[0]).toHaveAttribute("href", "/customers/GA/c1?country=GA");
-    expect(screen.getByText("2 opérations")).toBeInTheDocument();
+    expect(screen.getByText("2 clients")).toBeInTheDocument();
     expect(String(fetchMock.mock.calls[0][0])).toContain("/api/admin/payments?country=GA");
   });
 

@@ -5,6 +5,9 @@ import 'profile.dart';
 abstract class ProfileRepository {
   Future<Profile> fetch();
   Future<Profile> updateName(String firstName, String lastName);
+  Future<void> addEmail(String email);
+  Future<Profile> confirmEmail(String code);
+  Future<Profile> addPhone(String phone);
   Future<Uint8List?> fetchAvatar();
   Future<void> uploadAvatar(Uint8List bytes, String contentType);
   Future<void> deleteAvatar();

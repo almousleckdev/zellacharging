@@ -3,7 +3,7 @@ package com.evcharge.customer.admin.web;
 import com.evcharge.customer.admin.application.CommissionListing;
 import com.evcharge.customer.admin.application.CountryCommissionTotals;
 import com.evcharge.customer.admin.application.CountryEntry;
-import com.evcharge.customer.charging.CommissionRecord;
+import com.evcharge.customer.charging.CommissionDigest;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -29,14 +29,14 @@ record CommissionResponse(List<Summary> summaries, long total, int page, int siz
         }
     }
 
-    record Item(UUID sessionId, String country, String customerName, String stationId, long electricMinor,
-                long serviceFeeMinor, long vatMinor, long totalMinor, String currency, int decimals, Instant at) {
+    record Item(UUID customerId, String country, String customerName, long sessions, long electricMinor,
+                long serviceFeeMinor, long vatMinor, long totalMinor, String currency, int decimals, Instant lastAt) {
 
-        static Item from(CountryEntry<CommissionRecord> entry) {
-            CommissionRecord record = entry.item();
-            return new Item(record.sessionId(), entry.country(), record.customerName(), record.stationId(),
-                    record.electricMinor(), record.serviceFeeMinor(), record.vatMinor(), record.totalMinor(),
-                    record.currency(), record.decimals(), record.at());
+        static Item from(CountryEntry<CommissionDigest> entry) {
+            CommissionDigest digest = entry.item();
+            return new Item(digest.customerId(), entry.country(), digest.customerName(), digest.sessions(),
+                    digest.electricMinor(), digest.serviceFeeMinor(), digest.vatMinor(), digest.totalMinor(),
+                    digest.currency(), digest.decimals(), digest.lastAt());
         }
     }
 }

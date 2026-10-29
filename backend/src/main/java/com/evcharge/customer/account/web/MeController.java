@@ -31,13 +31,13 @@ class MeController {
 
     @GetMapping
     ProfileResponse me(CustomerPrincipal me) {
-        return ProfileResponse.from(profiles.get(me.id()));
+        return ProfileResponse.from(profiles.view(me.id()));
     }
 
     @PatchMapping
     ProfileResponse update(CustomerPrincipal me, @Valid @RequestBody UpdateProfileRequest request) {
-        return ProfileResponse.from(profiles.updateName(me.id(), request.firstName(),
-                request.lastName()));
+        profiles.updateName(me.id(), request.firstName(), request.lastName());
+        return ProfileResponse.from(profiles.view(me.id()));
     }
 
     @PostMapping("/password")

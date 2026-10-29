@@ -32,6 +32,20 @@ class AdminPaymentController {
         return PaymentListResponse.from(payments.list(admin, country, kind, state, q, new LogFilter(from, to, customerId), sort, page, size));
     }
 
+    @GetMapping("/by-customer")
+    PaymentDigestResponse byCustomer(AdminAccess admin, @RequestParam(required = false) String country,
+                                     @RequestParam(required = false) String kind,
+                                     @RequestParam(required = false) String state,
+                                     @RequestParam(required = false) String q,
+                                     @RequestParam(required = false) Instant from,
+                                     @RequestParam(required = false) Instant to,
+                                     @RequestParam(required = false) String sort,
+                                     @RequestParam(defaultValue = "0") int page,
+                                     @RequestParam(defaultValue = "10") int size) {
+        return PaymentDigestResponse.from(payments.byCustomer(admin, country, kind, state, q,
+                new LogFilter(from, to, null), sort, page, size));
+    }
+
     @GetMapping("/{country}/{kind}/{id}")
     PaymentDetailResponse detail(AdminAccess admin, @PathVariable String country, @PathVariable String kind,
                                  @PathVariable UUID id) {

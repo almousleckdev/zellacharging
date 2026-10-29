@@ -11,6 +11,9 @@ abstract final class Routes {
   static const profile = '/profile';
   static const editProfile = '/profile/edit';
   static const settings = '/profile/settings';
+  static const addEmail = '/profile/edit/email';
+  static const confirmEmail = '/profile/edit/email/confirm';
+  static const addPhone = '/profile/edit/phone';
   static const changePassword = '/profile/settings/password';
   static const deleteAccount = '/profile/settings/delete';
   static const contact = '/profile/contact';

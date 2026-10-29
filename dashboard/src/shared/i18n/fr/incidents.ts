@@ -3,7 +3,6 @@ export const frIncidents = {
     title: "Incidents",
     subtitle: "Recharges en échec, paiements bloqués et opérations à vérifier.",
     results: "{count} incidents",
-    summary: "{open} incidents ouverts dont {high} prioritaires.",
     loadError: "Impossible de charger les incidents.",
     emptyTitle: "Aucun incident",
     emptyText: "Rien à signaler pour ces filtres.",

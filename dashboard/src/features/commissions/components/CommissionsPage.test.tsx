@@ -24,17 +24,17 @@ const summary = {
 };
 
 const item = {
-  sessionId: "s1",
+  customerId: "c1",
   country: "GA",
   customerName: "Aline Obame",
-  stationId: "CP-12",
-  electricMinor: 135,
-  serviceFeeMinor: 3,
+  sessions: 2,
+  electricMinor: 735,
+  serviceFeeMinor: 15,
   vatMinor: 0,
-  totalMinor: 138,
+  totalMinor: 750,
   currency: "XAF",
   decimals: 0,
-  at: "2026-10-28T15:48:00Z",
+  lastAt: "2026-10-28T15:48:00Z",
 };
 
 describe("CommissionsPage", () => {
@@ -49,7 +49,7 @@ describe("CommissionsPage", () => {
 
     const table = await screen.findByRole("table");
     expect(within(table).getByText("Aline Obame")).toBeInTheDocument();
-    expect(within(table).getByText(/138/)).toBeInTheDocument();
+    expect(within(table).getByText(/750/)).toBeInTheDocument();
     const earned = (await screen.findByText("Commission gagnée (2 %)")).closest("article") as HTMLElement;
     expect(earned.textContent?.replace(/[  ]/g, " ")).toContain("15 FCFA");
     expect(screen.getByRole("columnheader", { name: "TVA" })).toBeInTheDocument();

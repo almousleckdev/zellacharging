@@ -1,8 +1,8 @@
 export const frSessions = {
   sessions: {
     title: "Sessions de charge",
-    subtitle: "Toutes les recharges, de la plus récente à la plus ancienne.",
-    results: "{count} sessions",
+    subtitle: "Un client par ligne avec sa dernière recharge. Cliquez sur un client pour voir tout son historique.",
+    results: "{count} clients",
     loadError: "Impossible de charger les sessions.",
     emptyTitle: "Aucune session",
     emptyText: "Aucune session ne correspond à ces filtres.",
@@ -21,6 +21,7 @@ export const frSessions = {
       FAILED: "Échec",
       ABANDONED: "Interrompue",
     },
+    digest: { customer: "Client", charges: "Recharges", last: "Dernière recharge", lastAmount: "Montant", energy: "Énergie", spent: "Total dépensé" },
     detail: {
       back: "Retour aux recharges",
       loadError: "Impossible de charger cette recharge.",

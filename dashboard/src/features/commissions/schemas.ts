@@ -13,17 +13,17 @@ export const commissionSummarySchema = z.object({
 });
 
 export const commissionItemSchema = z.object({
-  sessionId: z.string(),
+  customerId: z.string(),
   country: z.string(),
   customerName: z.string(),
-  stationId: z.string(),
+  sessions: z.number(),
   electricMinor: z.number(),
   serviceFeeMinor: z.number(),
   vatMinor: z.number(),
   totalMinor: z.number(),
   currency: z.string(),
   decimals: z.number(),
-  at: z.string(),
+  lastAt: z.string(),
 });
 
 export const commissionsSchema = z.object({

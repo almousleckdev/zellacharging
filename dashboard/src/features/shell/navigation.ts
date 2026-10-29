@@ -35,7 +35,7 @@ export const NAV_GROUPS: NavGroup[] = [
     id: "operations",
     items: [
       { id: "overview", href: "/", icon: "overview", available: true, permission: "OVERVIEW_READ" },
-      { id: "stations", href: "/stations", icon: "station", available: false },
+      { id: "stations", href: "/stations", icon: "station", available: true, permission: "STATIONS_READ" },
       { id: "sessions", href: "/sessions", icon: "bolt", available: true, permission: "SESSIONS_READ" },
       { id: "incidents", href: "/incidents", icon: "bell", available: true, permission: "OVERVIEW_READ" },
     ],

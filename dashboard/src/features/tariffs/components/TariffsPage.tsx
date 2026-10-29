@@ -39,7 +39,6 @@ export function TariffsPage() {
   return (
     <div className="flex flex-col gap-6">
       <PageHeader title={labels.title} subtitle={labels.subtitle} trail={[t.shell.breadcrumbRoot, labels.title]} />
-      <p className="max-w-3xl rounded-control border border-border bg-surface px-4 py-3 text-sm text-muted">{labels.explained}</p>
       {query.isPending && <Skeleton className="h-48" />}
       {query.isError && <ErrorState message={labels.loadError} onRetry={() => void query.refetch()} />}
       {query.data && (

@@ -4,7 +4,7 @@ import { keepPreviousData, useQuery } from "@tanstack/react-query";
 import { adminFetch } from "@/shared/api/adminFetch";
 import { adminUserPageSchema } from "../schemas";
 
-export const USERS_PAGE_SIZE = 20;
+export const USERS_PAGE_SIZE = 10;
 export const USERS_KEY = ["admin", "users"] as const;
 
 export type UserFilters = { text: string; status: string; page: number };

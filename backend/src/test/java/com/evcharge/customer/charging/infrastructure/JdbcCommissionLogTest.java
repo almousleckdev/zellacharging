@@ -5,7 +5,6 @@ import com.evcharge.customer.admin.AdminTestData;
 import com.evcharge.customer.charging.CommissionPage;
 import com.evcharge.customer.charging.CommissionQuery;
 import com.evcharge.customer.shared.LogFilter;
-import com.evcharge.customer.charging.application.FeeCalculator;
 import com.evcharge.customer.charging.application.FeeSettings;
 import com.evcharge.customer.shared.ReportingWindow;
 import com.evcharge.customer.shared.TenantContext;
@@ -33,11 +32,11 @@ class JdbcCommissionLogTest extends PostgresTestBase {
 
     private JdbcCommissionLog log(Instant start) {
         FeeSettings fees = new FeeSettings(BigDecimal.ZERO, new BigDecimal("2"));
-        return new JdbcCommissionLog(client, new FeeCalculator(fees), fees, new ReportingWindow(start));
+        return new JdbcCommissionLog(client, fees, new ReportingWindow(start));
     }
 
     @Test
-    void theServiceFeeOfEachSessionAddsUpToTheTotalAndIgnoresSessionsBeforeTheReportingStart() {
+    void aCustomerAppearsOnceWithTheFeesOfAllHisSessionsAndSessionsBeforeTheReportingStartAreIgnored() {
         AdminTestData data = new AdminTestData(jdbc);
         UUID customer = data.customer("GA", "ACTIVE", "Zq", "Fee", null, Instant.now());
         Instant start = Instant.now().minus(5, ChronoUnit.MINUTES);
@@ -48,10 +47,14 @@ class JdbcCommissionLogTest extends PostgresTestBase {
         CommissionPage recent = TenantContext.callAs("GA", () -> log(start).search(new CommissionQuery(null, new LogFilter(null, null, customer), 10)));
         CommissionPage future = TenantContext.callAs("GA", () -> log(Instant.now().plus(1, ChronoUnit.DAYS)).search(new CommissionQuery(null, LogFilter.NONE, 10)));
 
-        var mine = recent.items().stream().filter(item -> item.customerName().equals("Zq Fee")).toList();
+        assertThat(recent.items()).hasSize(1);
+        var mine = recent.items().getFirst();
 
-        assertThat(mine).extracting(item -> item.serviceFeeMinor()).containsExactlyInAnyOrder(3L, 12L);
-        assertThat(mine).extracting(item -> item.totalMinor()).containsExactlyInAnyOrder(138L, 612L);
+        assertThat(mine.customerName()).isEqualTo("Zq Fee");
+        assertThat(mine.sessions()).isEqualTo(2);
+        assertThat(mine.electricMinor()).isEqualTo(735L);
+        assertThat(mine.serviceFeeMinor()).isEqualTo(15L);
+        assertThat(mine.totalMinor()).isEqualTo(750L);
         assertThat(recent.totals().serviceFeeMinor()).isGreaterThanOrEqualTo(15);
         assertThat(everything.totals().sessions()).isGreaterThanOrEqualTo(recent.totals().sessions());
         assertThat(future.totals().sessions()).isZero();

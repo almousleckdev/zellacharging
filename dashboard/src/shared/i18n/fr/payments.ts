@@ -1,8 +1,8 @@
 export const frPayments = {
   payments: {
     title: "Paiements",
-    subtitle: "Recharges de portefeuille et retraits, du plus récent au plus ancien.",
-    results: "{count} opérations",
+    subtitle: "Un client par ligne avec sa dernière opération. Cliquez sur un client pour voir tout son historique.",
+    results: "{count} clients",
     loadError: "Impossible de charger les paiements.",
     emptyTitle: "Aucun paiement",
     emptyText: "Aucune opération ne correspond à ces filtres.",
@@ -22,6 +22,7 @@ export const frPayments = {
       REVIEW: "À vérifier",
       FAILED: "Échec",
     },
+    digest: { customer: "Client", operations: "Opérations", last: "Dernière opération", lastAmount: "Montant", topups: "Total rechargé", withdrawn: "Total retiré" },
     detail: {
       back: "Retour aux paiements",
       loadError: "Impossible de charger ce paiement.",

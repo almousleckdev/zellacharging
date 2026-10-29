@@ -66,11 +66,6 @@ abstract final class ProfileText {
     en: 'Personal information',
   );
 
-  static String get contactReadOnly => AppLanguage.pick(
-    fr: 'Votre e-mail et votre téléphone ne peuvent pas être modifiés ici.',
-    en: 'Your email and phone number cannot be changed here.',
-  );
-
   static String get notificationsTitle =>
       AppLanguage.pick(fr: 'Notifications', en: 'Notifications');
 
@@ -146,4 +141,52 @@ abstract final class ProfileText {
 
   static String get photoRemoved =>
       AppLanguage.pick(fr: 'Photo supprimée', en: 'Photo removed');
+
+  static String get contactDetails =>
+      AppLanguage.pick(fr: 'Coordonnées', en: 'Contact details');
+
+  static String get verified => AppLanguage.pick(fr: 'Vérifié', en: 'Verified');
+
+  static String get notVerified =>
+      AppLanguage.pick(fr: 'Non vérifié', en: 'Not verified');
+
+  static String get addEmail => AppLanguage.pick(
+    fr: 'Ajouter une adresse e-mail',
+    en: 'Add an email address',
+  );
+
+  static String get addPhone => AppLanguage.pick(
+    fr: 'Ajouter un numéro de téléphone',
+    en: 'Add a phone number',
+  );
+
+  static String get addEmailHint => AppLanguage.pick(
+    fr: 'Nous enverrons un code de confirmation à cette adresse.',
+    en: 'We will send a confirmation code to this address.',
+  );
+
+  static String get addPhoneHint => AppLanguage.pick(
+    fr: 'Ce numéro vous servira à vous connecter. La vérification par SMS arrivera bientôt.',
+    en: 'This number can be used to sign in. SMS verification is coming soon.',
+  );
+
+  static String get sendCode =>
+      AppLanguage.pick(fr: 'Envoyer le code', en: 'Send the code');
+
+  static String get savePhone =>
+      AppLanguage.pick(fr: 'Ajouter ce numéro', en: 'Add this number');
+
+  static String get confirmEmailTitle =>
+      AppLanguage.pick(fr: 'Confirmer l’e-mail', en: 'Confirm your email');
+
+  static String confirmEmailBody(String email) => AppLanguage.pick(
+    fr: 'Saisissez le code à 6 chiffres envoyé à $email.',
+    en: 'Enter the 6-digit code sent to $email.',
+  );
+
+  static String get emailAdded =>
+      AppLanguage.pick(fr: 'Adresse e-mail ajoutée', en: 'Email address added');
+
+  static String get phoneAdded =>
+      AppLanguage.pick(fr: 'Numéro ajouté', en: 'Phone number added');
 }

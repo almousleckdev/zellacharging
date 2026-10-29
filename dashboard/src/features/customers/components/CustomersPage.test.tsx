@@ -82,11 +82,11 @@ describe("CustomersPage", () => {
 
   it("sends the filters to the server and pages through results", async () => {
     navigation.search = new URLSearchParams("country=GA&q=aline&status=ACTIVE&page=1");
-    const fetchMock = serve({ total: 45, page: 1, size: 20, items: [item("c1", "Aline", "GA")] });
+    const fetchMock = serve({ total: 45, page: 1, size: 10, items: [item("c1", "Aline", "GA")] });
     const user = userEvent.setup();
     renderConsole(<CustomersPage />, profileOf([gabon, mali]));
 
-    expect(await screen.findByText("Page 2 sur 3")).toBeInTheDocument();
+    expect(await screen.findByText("Page 2 sur 5")).toBeInTheDocument();
     const url = String(fetchMock.mock.calls[0][0]);
     expect(url).toContain("q=aline");
     expect(url).toContain("status=ACTIVE");
@@ -112,5 +112,22 @@ describe("CustomersPage", () => {
     expect(await screen.findByRole("alert")).toHaveTextContent("Impossible de charger les clients.");
     await user.click(screen.getByRole("button", { name: "Réessayer" }));
     await waitFor(() => expect(fetchMock).toHaveBeenCalledTimes(2));
+  });
+
+  it("lets an administrator who may manage customers suspend or delete from the list, and hides it otherwise", async () => {
+    serve({ total: 1, page: 0, size: 10, items: [item("c1", "Aline", "GA")] });
+    const user = userEvent.setup();
+    const manager = { ...profileOf([gabon]), permissions: ["CUSTOMERS_READ", "CUSTOMERS_MANAGE"] };
+
+    const { unmount } = renderConsole(<CustomersPage />, manager);
+
+    await user.click(await screen.findByRole("button", { name: "Gérer" }));
+    expect(screen.getByRole("menuitem", { name: "Suspendre" })).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Supprimer le compte" })).toBeInTheDocument();
+    unmount();
+
+    renderConsole(<CustomersPage />, { ...profileOf([gabon]), permissions: ["CUSTOMERS_READ"] });
+    await screen.findByText("Aline Obame");
+    expect(screen.queryByRole("button", { name: "Gérer" })).not.toBeInTheDocument();
   });
 });

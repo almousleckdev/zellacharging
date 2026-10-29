@@ -3,8 +3,8 @@ import type { Dictionary } from "../types";
 export const enSessions: Pick<Dictionary, "sessions"> = {
   sessions: {
     title: "Charging sessions",
-    subtitle: "Every charge, newest first.",
-    results: "{count} sessions",
+    subtitle: "One customer per row with their last charge. Click a customer to see their full history.",
+    results: "{count} customers",
     loadError: "We couldn't load the sessions.",
     emptyTitle: "No sessions",
     emptyText: "No session matches these filters.",
@@ -23,6 +23,7 @@ export const enSessions: Pick<Dictionary, "sessions"> = {
       FAILED: "Failed",
       ABANDONED: "Interrupted",
     },
+    digest: { customer: "Customer", charges: "Charges", last: "Last charge", lastAmount: "Amount", energy: "Energy", spent: "Total spent" },
     detail: {
       back: "Back to charging sessions",
       loadError: "We couldn't load this charge.",

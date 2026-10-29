@@ -27,6 +27,8 @@ class ProfileRepositoryImpl implements ProfileRepository {
           lastName: json['lastName'] as String,
           email: json['email'] as String?,
           phone: json['phone'] as String?,
+          emailVerified: json['emailVerified'] as bool? ?? false,
+          phoneVerified: json['phoneVerified'] as bool? ?? false,
         );
       });
 
@@ -40,6 +42,23 @@ class ProfileRepositoryImpl implements ProfileRepository {
       '/v1/me',
       data: {'firstName': firstName, 'lastName': lastName},
     ),
+  );
+
+  @override
+  Future<void> addEmail(String email) =>
+      _guard(() => _client.post<void>('/v1/me/email', data: {'email': email}));
+
+  @override
+  Future<Profile> confirmEmail(String code) => _profile(
+    _client.post<Map<String, dynamic>>(
+      '/v1/me/email/verify',
+      data: {'code': code},
+    ),
+  );
+
+  @override
+  Future<Profile> addPhone(String phone) => _profile(
+    _client.post<Map<String, dynamic>>('/v1/me/phone', data: {'phone': phone}),
   );
 
   @override

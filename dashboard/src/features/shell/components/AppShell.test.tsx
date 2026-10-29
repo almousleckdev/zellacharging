@@ -63,6 +63,10 @@ function renderShell() {
   );
 }
 
+async function openAccountMenu(user: ReturnType<typeof userEvent.setup>) {
+  await user.click(await screen.findByRole("button", { name: "Menu du compte" }));
+}
+
 describe("AppShell", () => {
   const replaceLocation = vi.fn();
 
@@ -101,11 +105,13 @@ describe("AppShell", () => {
 
     renderShell();
 
-    expect(await screen.findByText("Root Admin")).toBeInTheDocument();
+    await openAccountMenu(userEvent.setup());
+    expect(screen.getAllByText("Root Admin").length).toBeGreaterThan(0);
     expect(screen.getByText("Super administrateur")).toBeInTheDocument();
+    expect(screen.getByRole("menuitem", { name: "Paramètres" })).toHaveAttribute("href", "/profile#preferences");
     expect(screen.getByRole("link", { name: "Vue d'ensemble" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Clients" })).toBeInTheDocument();
-    expect(screen.getAllByText("Bientôt")).toHaveLength(1);
+    expect(screen.queryAllByText("Bientôt")).toHaveLength(0);
   });
 
   it("lets a multi-country admin switch the data scope through the URL", async () => {
@@ -131,7 +137,8 @@ describe("AppShell", () => {
 
     renderShell();
 
-    expect(await screen.findByText("Administrateur")).toBeInTheDocument();
+    await openAccountMenu(userEvent.setup());
+    expect(screen.getByText("Administrateur")).toBeInTheDocument();
     expect(screen.queryByLabelText("Pays")).not.toBeInTheDocument();
     expect(screen.getAllByText("Gabon").length).toBeGreaterThan(0);
   });
@@ -141,7 +148,8 @@ describe("AppShell", () => {
     const user = userEvent.setup();
 
     renderShell();
-    await user.click(await screen.findByRole("button", { name: "Se déconnecter" }));
+    await openAccountMenu(user);
+    await user.click(screen.getByRole("menuitem", { name: "Se déconnecter" }));
 
     const dialog = screen.getByRole("dialog", { name: "Se déconnecter ?" });
     expect(dialog).toBeInTheDocument();
@@ -159,7 +167,8 @@ describe("AppShell", () => {
     const user = userEvent.setup();
 
     renderShell();
-    await user.click(await screen.findByRole("button", { name: "Se déconnecter" }));
+    await openAccountMenu(user);
+    await user.click(screen.getByRole("menuitem", { name: "Se déconnecter" }));
     const dialog = screen.getByRole("dialog", { name: "Se déconnecter ?" });
     await user.click(within(dialog).getByRole("button", { name: "Se déconnecter" }));
 
@@ -175,7 +184,8 @@ describe("AppShell", () => {
     const user = userEvent.setup();
 
     renderShell();
-    await user.click(await screen.findByRole("button", { name: "Se déconnecter" }));
+    await openAccountMenu(user);
+    await user.click(screen.getByRole("menuitem", { name: "Se déconnecter" }));
     const dialog = screen.getByRole("dialog", { name: "Se déconnecter ?" });
     await user.click(within(dialog).getByRole("button", { name: "Se déconnecter" }));
 
@@ -208,7 +218,8 @@ describe("AppShell", () => {
 
     renderShell();
 
-    expect(await screen.findByRole("link", { name: "Mon profil" })).toHaveAttribute("href", "/profile?country=ML");
+    await openAccountMenu(userEvent.setup());
+    expect(screen.getByRole("menuitem", { name: "Mon profil" })).toHaveAttribute("href", "/profile?country=ML");
     expect(screen.getByRole("link", { name: "Vue d'ensemble" })).toHaveAttribute("href", "/?country=ML");
   });
 
@@ -217,6 +228,7 @@ describe("AppShell", () => {
 
     renderShell();
 
-    expect(await screen.findByRole("link", { name: "Mon profil" })).toHaveAttribute("href", "/profile");
+    await openAccountMenu(userEvent.setup());
+    expect(screen.getByRole("menuitem", { name: "Mon profil" })).toHaveAttribute("href", "/profile");
   });
 });

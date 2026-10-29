@@ -34,6 +34,7 @@ abstract final class AppIcons {
   static const info = PhosphorIconsRegular.info;
   static const warning = PhosphorIconsRegular.warningCircle;
   static const close = PhosphorIconsRegular.x;
+  static const plus = PhosphorIconsRegular.plus;
   static const check = PhosphorIconsBold.check;
   static const checkCircle = PhosphorIconsFill.checkCircle;
   static const circle = PhosphorIconsRegular.circle;

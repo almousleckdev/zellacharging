@@ -245,18 +245,40 @@ class FakeProfile implements ProfileRepository {
   final closedWith = <String>[];
   final renamed = <String>[];
 
-  @override
-  Future<Profile> fetch() async => const Profile(
+  Profile served = const Profile(
     firstName: 'Alexandrine-Marguerite',
     lastName: 'Montgomery-Dubois',
     email: 'alexandrine.montgomery-dubois@very-long-company-domain.example.com',
     phone: '+24177123456',
+    emailVerified: true,
   );
+
+  @override
+  Future<Profile> fetch() async => served;
 
   @override
   Future<Profile> updateName(String firstName, String lastName) async {
     renamed.add('$firstName $lastName');
     return Profile(firstName: firstName, lastName: lastName);
+  }
+
+  final emailsAdded = <String>[];
+  final phonesAdded = <String>[];
+  final confirmed = <String>[];
+
+  @override
+  Future<void> addEmail(String email) async => emailsAdded.add(email);
+
+  @override
+  Future<Profile> confirmEmail(String code) async {
+    confirmed.add(code);
+    return const Profile(firstName: 'A', lastName: 'B', email: 'x@y.z');
+  }
+
+  @override
+  Future<Profile> addPhone(String phone) async {
+    phonesAdded.add(phone);
+    return Profile(firstName: 'A', lastName: 'B', phone: phone);
   }
 
   @override

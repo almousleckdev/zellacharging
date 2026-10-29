@@ -10,11 +10,10 @@ import '../../../core/validation/validators.dart';
 import '../../../shared/app_toast.dart';
 import '../../../shared/submit_mixin.dart';
 import '../../../shared/widgets/app_text_field.dart';
-import '../../../shared/widgets/info_card.dart';
-import '../../../shared/widgets/info_row.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../domain/profile.dart';
 import 'avatar_editor.dart';
+import 'contact_section.dart';
 import 'profile_providers.dart';
 
 class EditProfilePage extends ConsumerStatefulWidget {
@@ -98,7 +97,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage>
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            if (profile != null) _contactCard(profile.email, profile.phone),
+            if (profile != null) ContactSection(profile: profile),
             const SizedBox(height: AppSpacing.xl),
             PrimaryButton(
               label: ProfileText.saveChanges,
@@ -110,18 +109,4 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage>
       ),
     );
   }
-
-  Widget _contactCard(String? email, String? phone) => InfoCard(
-    title: ProfileText.personalInfo,
-    children: [
-      if (email != null) InfoRow(label: Strings.email, value: email),
-      if (phone != null) InfoRow(label: Strings.phone, value: phone),
-      Text(
-        ProfileText.contactReadOnly,
-        style: Theme.of(
-          context,
-        ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
-      ),
-    ],
-  );
 }

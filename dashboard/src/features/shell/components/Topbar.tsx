@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { Icon } from "@/shared/ui/Icon";
+import { ProfileMenu } from "./ProfileMenu";
 import { LanguageSwitch } from "@/shared/ui/LanguageSwitch";
 import { CountrySwitcher } from "./CountrySwitcher";
 
@@ -9,7 +10,7 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const { t } = useI18n();
 
   return (
-    <div className="sticky top-0 z-20 flex h-16 items-center justify-between gap-3 border-b border-border bg-background/85 px-4 backdrop-blur sm:px-6">
+    <div className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-background/85 px-4 backdrop-blur sm:px-6">
       <button
         type="button"
         onClick={onOpenMenu}
@@ -18,9 +19,10 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
       >
         <Icon name="menu" />
       </button>
+      <CountrySwitcher />
       <div className="ml-auto flex items-center gap-3">
-        <CountrySwitcher />
         <LanguageSwitch />
+        <ProfileMenu />
       </div>
     </div>
   );

@@ -47,6 +47,7 @@ export const frProfile = {
       STATIONS_READ: "Consulter les bornes",
       SESSIONS_READ: "Consulter les sessions de charge",
       CUSTOMERS_READ: "Consulter les clients",
+      CUSTOMERS_MANAGE: "Suspendre et supprimer des clients",
       PAYMENTS_READ: "Consulter les paiements",
       AUDIT_READ: "Consulter le journal d'audit",
       ADMINS_MANAGE: "Gérer les administrateurs",

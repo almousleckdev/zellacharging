@@ -123,6 +123,12 @@ class JdbcCustomerRepository implements CustomerRepository {
     }
 
     @Override
+    public boolean updateStatus(UUID id, String from, String to) {
+        return jdbc.sql("update customer set status = :to where id = :id and status = :from")
+                .param("to", to).param("id", id).param("from", from).update() == 1;
+    }
+
+    @Override
     public void markDeleted(UUID id, String unusablePasswordHash) {
         jdbc.sql("""
                 update customer set status = 'DELETED', first_name = 'Deleted', last_name = 'Account',

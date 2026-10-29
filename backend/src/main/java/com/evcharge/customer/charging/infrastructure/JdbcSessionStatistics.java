@@ -8,6 +8,11 @@ import org.springframework.jdbc.core.simple.JdbcClient;
 import com.evcharge.customer.shared.Timestamps;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.UUID;
 
 @Repository
@@ -39,18 +44,28 @@ class JdbcSessionStatistics implements SessionStatistics {
 
     @Override
     public CustomerSessions ofCustomer(UUID customerId) {
-        return jdbc.sql("select "
+        return ofCustomers(List.of(customerId)).getOrDefault(customerId, new CustomerSessions(0, 0, BigDecimal.ZERO, 0, null));
+    }
+
+    @Override
+    public Map<UUID, CustomerSessions> ofCustomers(Collection<UUID> customerIds) {
+        Map<UUID, CustomerSessions> sessions = new HashMap<>();
+        if (customerIds.isEmpty()) {
+            return sessions;
+        }
+        jdbc.sql("select customer_id, "
                         + "count(*) filter (where state = 'COMPLETED') as completed, "
                         + "count(*) filter (where state in ('REQUESTED', 'START_ACCEPTED', 'ACTIVE', 'STOPPING')) "
                         + "as live, "
                         + "coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) as energy, "
                         + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED'), 0)::bigint as spent, "
                         + "max(started_at) as last_session "
-                        + "from charging_session where customer_id = :id "
-                        + "and country_code = current_setting('app.country', true)")
-                .param("id", customerId)
-                .query((rs, rowNum) -> new CustomerSessions(rs.getLong("completed"), rs.getLong("live"),
-                        rs.getBigDecimal("energy"), rs.getLong("spent"), Timestamps.read(rs, "last_session")))
-                .single();
+                        + "from charging_session where customer_id in (:ids) "
+                        + "and country_code = current_setting('app.country', true) group by customer_id")
+                .param("ids", customerIds)
+                .query((rs, rowNum) -> sessions.put(rs.getObject("customer_id", UUID.class),
+                        new CustomerSessions(rs.getLong("completed"), rs.getLong("live"), rs.getBigDecimal("energy"),
+                                rs.getLong("spent"), Timestamps.read(rs, "last_session")))).list();
+        return sessions;
     }
 }

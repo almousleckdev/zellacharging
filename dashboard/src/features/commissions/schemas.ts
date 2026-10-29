@@ -28,8 +28,13 @@ export const commissionItemSchema = z.object({
 
 export const commissionsSchema = z.object({
   summaries: z.array(commissionSummarySchema),
+  total: z.number(),
+  page: z.number(),
+  size: z.number(),
   items: z.array(commissionItemSchema),
 });
+
+export type CommissionList = z.infer<typeof commissionsSchema>;
 
 export type CommissionSummary = z.infer<typeof commissionSummarySchema>;
 export type CommissionItem = z.infer<typeof commissionItemSchema>;

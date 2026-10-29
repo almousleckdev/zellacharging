@@ -13,8 +13,8 @@ record AdminOverviewResponse(String scope, Instant since, List<CountryFigures> c
         return new AdminOverviewResponse(overview.scope(), since, overview.countries().stream().map(CountryFigures::from).toList());
     }
 
-    record CountryFigures(String code, String name, String currency, int currencyDecimals, Customers customers,
-                          Sessions sessions, Wallets wallets) {
+    record CountryFigures(String code, String name, String currency, int currencyDecimals, String phoneRegion,
+                          Customers customers, Sessions sessions, Wallets wallets) {
 
         static CountryFigures from(CountryOverview overview) {
             var country = overview.country();
@@ -22,7 +22,7 @@ record AdminOverviewResponse(String scope, Instant since, List<CountryFigures> c
             var sessions = overview.sessions();
             var wallets = overview.wallets();
             return new CountryFigures(country.code(), country.name(), country.currency(), country.currencyDecimals(),
-                    new Customers(customers.total(), customers.active(), customers.newLast30Days()),
+                    country.phoneRegion(), new Customers(customers.total(), customers.active(), customers.newLast30Days()),
                     new Sessions(sessions.live(), sessions.completed(), sessions.startedLast24Hours(),
                             sessions.energyKwh(), sessions.revenueMinor()),
                     new Wallets(wallets.wallets(), wallets.balanceMinor(), wallets.reservedMinor(),

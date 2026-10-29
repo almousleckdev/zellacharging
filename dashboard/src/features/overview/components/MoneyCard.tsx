@@ -30,7 +30,10 @@ export function MoneyCard({ totals }: { totals: OverviewTotals }) {
   const { t } = useI18n();
   const format = useFormatters();
   const labels = t.overview.money;
-  const line = (amounts: MoneyAmount[]) => format.money(amounts).join(" · ");
+  const line = (amounts: MoneyAmount[]) => {
+    const used = amounts.filter((amount) => amount.minor !== 0);
+    return format.money(used.length > 0 ? used : amounts.slice(0, 1)).join(" · ");
+  };
   const single = totals.walletBalance.length === 1;
   const owed = single ? totals.walletBalance[0].minor : 0;
   const sales = single ? (totals.captured[0]?.minor ?? 0) : 0;

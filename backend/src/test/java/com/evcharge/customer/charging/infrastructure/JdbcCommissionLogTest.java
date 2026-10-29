@@ -3,6 +3,8 @@ package com.evcharge.customer.charging.infrastructure;
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.admin.AdminTestData;
 import com.evcharge.customer.charging.CommissionPage;
+import com.evcharge.customer.charging.CommissionQuery;
+import com.evcharge.customer.shared.LogFilter;
 import com.evcharge.customer.charging.application.FeeCalculator;
 import com.evcharge.customer.charging.application.FeeSettings;
 import com.evcharge.customer.shared.ReportingWindow;
@@ -38,13 +40,13 @@ class JdbcCommissionLogTest extends PostgresTestBase {
     void theServiceFeeOfEachSessionAddsUpToTheTotalAndIgnoresSessionsBeforeTheReportingStart() {
         AdminTestData data = new AdminTestData(jdbc);
         UUID customer = data.customer("GA", "ACTIVE", "Zq", "Fee", null, Instant.now());
-        Instant start = Instant.now();
+        Instant start = Instant.now().minus(5, ChronoUnit.MINUTES);
         data.session("GA", customer, 11, "COMPLETED", "0.385", 135L);
         data.session("GA", customer, 12, "COMPLETED", "1.9", 600L);
 
-        CommissionPage everything = TenantContext.callAs("GA", () -> log(Instant.EPOCH).search(10));
-        CommissionPage recent = TenantContext.callAs("GA", () -> log(start).search(10));
-        CommissionPage future = TenantContext.callAs("GA", () -> log(Instant.now().plus(1, ChronoUnit.DAYS)).search(10));
+        CommissionPage everything = TenantContext.callAs("GA", () -> log(Instant.EPOCH).search(new CommissionQuery(null, LogFilter.NONE, 10)));
+        CommissionPage recent = TenantContext.callAs("GA", () -> log(start).search(new CommissionQuery(null, new LogFilter(null, null, customer), 10)));
+        CommissionPage future = TenantContext.callAs("GA", () -> log(Instant.now().plus(1, ChronoUnit.DAYS)).search(new CommissionQuery(null, LogFilter.NONE, 10)));
 
         var mine = recent.items().stream().filter(item -> item.customerName().equals("Zq Fee")).toList();
 

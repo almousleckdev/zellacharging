@@ -1,10 +1,11 @@
 import type { ReactNode } from "react";
 import { Breadcrumbs } from "./Breadcrumbs";
+import type { Crumb } from "./Breadcrumbs";
 
 type PageHeaderProps = {
   title: string;
   subtitle?: string;
-  trail: string[];
+  trail: Crumb[];
   actions?: ReactNode;
 };
 

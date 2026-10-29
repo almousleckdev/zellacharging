@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "445891709592",
+    "project_id": "charging-f975e",
+    "storage_bucket": "charging-f975e.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445891709592:android:533da1c18f919d8d881eed",
+        "android_client_info": {
+          "package_name": "com.zella.ocpp.mobile"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYv-st2kDr79XHWowcsJodLr0zzXnqY2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

@@ -6,14 +6,18 @@ export type MoneyAmount = {
 
 export type CurrencyDisplay = "symbol" | "code";
 
+export function spaced(text: string): string {
+  return text.replace(/\u202f/g, "\u00a0");
+}
+
 export function formatMoney(amount: MoneyAmount, locale: string, display: CurrencyDisplay = "symbol"): string {
-  return new Intl.NumberFormat(locale, {
+  return spaced(new Intl.NumberFormat(locale, {
     style: "currency",
     currency: amount.currency,
     currencyDisplay: display,
     minimumFractionDigits: amount.decimals,
     maximumFractionDigits: amount.decimals,
-  }).format(amount.minor / 10 ** amount.decimals);
+  }).format(amount.minor / 10 ** amount.decimals));
 }
 
 export function formatMoneyLines(
@@ -30,10 +34,12 @@ export function formatMoneyLines(
 }
 
 export function formatNumber(value: number, locale: string, fractionDigits = 0): string {
-  return new Intl.NumberFormat(locale, {
-    minimumFractionDigits: fractionDigits,
-    maximumFractionDigits: fractionDigits,
-  }).format(value);
+  return spaced(
+    new Intl.NumberFormat(locale, {
+      minimumFractionDigits: fractionDigits,
+      maximumFractionDigits: fractionDigits,
+    }).format(value),
+  );
 }
 
 export function formatDate(iso: string, locale: string): string {

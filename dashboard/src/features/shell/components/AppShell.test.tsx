@@ -105,7 +105,7 @@ describe("AppShell", () => {
     expect(screen.getByText("Super administrateur")).toBeInTheDocument();
     expect(screen.getByRole("link", { name: "Vue d'ensemble" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Clients" })).toBeInTheDocument();
-    expect(screen.getAllByText("Bientôt")).toHaveLength(7);
+    expect(screen.getAllByText("Bientôt")).toHaveLength(1);
   });
 
   it("lets a multi-country admin switch the data scope through the URL", async () => {

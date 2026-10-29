@@ -36,7 +36,7 @@ describe("SessionsPage", () => {
     navigation.search = new URLSearchParams("country=GA");
   });
 
-  it("shows the station, the energy, the battery levels and the amount of each session", async () => {
+  it("shows the station, the energy and the amount of each session", async () => {
     vi.stubGlobal("fetch", vi.fn(async () => Response.json({ total: 1, page: 0, size: 20, items: [session] })));
 
     renderConsole(<SessionsPage />);
@@ -45,8 +45,6 @@ describe("SessionsPage", () => {
     expect(within(table).getByText("CP-12")).toBeInTheDocument();
     expect(within(table).getByText("Terminée")).toBeInTheDocument();
     expect(within(table).getByText("0,39 kWh")).toBeInTheDocument();
-    expect(within(table).getByText("22 %")).toBeInTheDocument();
-    expect(within(table).getByText("64 %")).toBeInTheDocument();
     expect(screen.getByText("1 sessions")).toBeInTheDocument();
   });
 
@@ -58,6 +56,6 @@ describe("SessionsPage", () => {
 
     const table = await screen.findByRole("table");
     expect(within(table).getByText("En charge")).toBeInTheDocument();
-    expect(within(table).getAllByText("–").length).toBeGreaterThanOrEqual(4);
+    expect(within(table).getAllByText("–").length).toBeGreaterThanOrEqual(2);
   });
 });

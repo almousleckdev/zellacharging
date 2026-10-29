@@ -49,6 +49,7 @@ export const enProfile: Pick<Dictionary, "profile"> = {
       STATIONS_READ: "View stations",
       SESSIONS_READ: "View charging sessions",
       CUSTOMERS_READ: "View customers",
+      CUSTOMERS_MANAGE: "Suspend and delete customers",
       PAYMENTS_READ: "View payments",
       AUDIT_READ: "View the audit log",
       ADMINS_MANAGE: "Manage administrators",

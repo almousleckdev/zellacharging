@@ -28,3 +28,23 @@ export const sessionListSchema = z.object({
 });
 
 export type SessionItem = z.infer<typeof sessionItemSchema>;
+
+export const sessionDetailSchema = z.object({
+  session: sessionItemSchema,
+  idTag: z.string(),
+  transactionId: z.number().nullable(),
+  stopReason: z.string().nullable(),
+  pricePerKwhMinor: z.number().nullable(),
+  lastVoltage: z.number().nullable(),
+  lastPowerKw: z.number().nullable(),
+  lastEnergyKwh: z.number().nullable(),
+  progressAt: z.string().nullable(),
+  updatedAt: z.string(),
+  reservedMinor: z.number().nullable(),
+  capturedMinor: z.number().nullable(),
+  holdState: z.string().nullable(),
+  serviceFeeMinor: z.number().nullable(),
+  vatMinor: z.number().nullable(),
+});
+
+export type SessionDetail = z.infer<typeof sessionDetailSchema>;

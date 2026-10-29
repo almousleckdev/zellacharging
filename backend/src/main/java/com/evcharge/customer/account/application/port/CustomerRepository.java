@@ -18,5 +18,6 @@ public interface CustomerRepository {
     void clearFailedLogins(UUID id);
     void updateName(UUID id, String firstName, String lastName);
     void updatePasswordHash(UUID id, String passwordHash);
+    boolean updateStatus(UUID id, String from, String to);
     void markDeleted(UUID id, String unusablePasswordHash);
 }

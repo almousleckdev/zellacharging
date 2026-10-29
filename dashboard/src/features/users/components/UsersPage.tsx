@@ -92,7 +92,7 @@ export function UsersPage() {
             onAction={(action, user) => setDialog({ kind: "action", action, user })}
           />
         )}
-        <Pagination page={page} pageCount={data ? Math.ceil(data.total / USERS_PAGE_SIZE) : 0} onChange={(next) => update({ page: next === 0 ? null : String(next) }, false)} />
+        <Pagination page={page} size={USERS_PAGE_SIZE} total={data?.total ?? 0} onPage={(next) => update({ page: next === 0 ? null : String(next) }, false)} />
       </section>
       {dialog?.kind === "form" && <UserFormDialog key={dialog.user?.id ?? "new"} user={dialog.user} onClose={() => setDialog(null)} />}
       {dialog?.kind === "action" && <UserActionConfirm action={dialog.action} user={dialog.user} onClose={() => setDialog(null)} />}

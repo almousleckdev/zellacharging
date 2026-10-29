@@ -53,7 +53,7 @@ describe("CustomersPage", () => {
 
     const link = await screen.findByRole("link", { name: /Aline Obame/ });
     expect(link).toHaveAttribute("href", "/customers/GA/c1?country=GA");
-    expect(within(await screen.findByRole("table")).getByText("Bloqué")).toBeInTheDocument();
+    expect(within(await screen.findByRole("table")).getByText("Suspendu")).toBeInTheDocument();
     expect(screen.getByText("2 clients")).toBeInTheDocument();
     expect(screen.queryByRole("columnheader", { name: "Pays" })).not.toBeInTheDocument();
     expect(String(fetchMock.mock.calls[0][0])).toContain("/api/admin/customers?country=GA");

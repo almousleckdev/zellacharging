@@ -4,6 +4,9 @@ export const frCommissions = {
     subtitle: "La part de Zella sur chaque charge facturée.",
     explained:
       "À chaque charge, le client paie l'électricité consommée plus une commission de service. La commission est prélevée sur son portefeuille et reste sur votre compte PVit : elle est à vous.",
+    results: "{count} recharges facturées",
+    searchLabel: "Rechercher une commission",
+    searchPlaceholder: "Client ou borne",
     loadError: "Impossible de charger les commissions.",
     emptyTitle: "Aucune commission",
     emptyText: "Les commissions apparaissent dès qu'une charge est facturée.",

@@ -1,0 +1,41 @@
+import type { Dictionary } from "../types";
+
+export const enIncidents: Pick<Dictionary, "incidents"> = {
+  incidents: {
+    title: "Incidents",
+    subtitle: "Failed charges, stuck payments and operations to review.",
+    results: "{count} incidents",
+    summary: "{open} open incidents, {high} high priority.",
+    loadError: "We couldn't load the incidents.",
+    emptyTitle: "No incidents",
+    emptyText: "Nothing to report for these filters.",
+    searchLabel: "Search incidents",
+    searchPlaceholder: "Customer or reference",
+    severityLabel: "Severity",
+    allSeverities: "All severities",
+    statusLabel: "Status",
+    allStatuses: "All statuses",
+    kindLabel: "Type",
+    allKinds: "All types",
+    severities: { HIGH: "High", MEDIUM: "Medium", LOW: "Low" },
+    statuses: { OPEN: "Open", ACKNOWLEDGED: "Acknowledged", RESOLVED: "Resolved" },
+    kinds: {
+      SESSION_FAILED: "Failed charge",
+      SESSION_ABANDONED: "Interrupted charge",
+      HOLD_REVIEW: "Held funds to review",
+      TOPUP_FAILED: "Top-up declined",
+      TOPUP_STUCK: "Top-up stuck",
+      WITHDRAWAL_FAILED: "Failed withdrawal",
+      WITHDRAWAL_REVIEW: "Withdrawal to review",
+    },
+    columns: { severity: "Severity", incident: "Incident", customer: "Customer", amount: "Amount", date: "Date", status: "Status" },
+    actions: { menu: "Incident actions", acknowledge: "Acknowledge", resolve: "Mark as resolved" },
+    review: {
+      acknowledgeTitle: "Acknowledge the incident",
+      resolveTitle: "Mark the incident as resolved",
+      noteLabel: "Internal note",
+      notePlaceholder: "What was checked or done",
+      saved: "Incident updated.",
+    },
+  },
+};

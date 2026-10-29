@@ -37,7 +37,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "overview", href: "/", icon: "overview", available: true, permission: "OVERVIEW_READ" },
       { id: "stations", href: "/stations", icon: "station", available: false },
       { id: "sessions", href: "/sessions", icon: "bolt", available: true, permission: "SESSIONS_READ" },
-      { id: "incidents", href: "/incidents", icon: "bell", available: false },
+      { id: "incidents", href: "/incidents", icon: "bell", available: true, permission: "OVERVIEW_READ" },
     ],
   },
   {
@@ -46,20 +46,20 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "customers", href: "/customers", icon: "users", available: true, permission: "CUSTOMERS_READ" },
       { id: "payments", href: "/payments", icon: "wallet", available: true, permission: "PAYMENTS_READ" },
       { id: "commissions", href: "/commissions", icon: "percent", available: true, permission: "PAYMENTS_READ" },
-      { id: "tariffs", href: "/tariffs", icon: "tag", available: false },
+      { id: "tariffs", href: "/tariffs", icon: "tag", available: true, permission: "OVERVIEW_READ"},
     ],
   },
   {
     id: "insights",
-    items: [{ id: "reports", href: "/reports", icon: "chart", available: false }],
+    items: [{ id: "reports", href: "/reports", icon: "chart", available: true, permission: "PAYMENTS_READ"}],
   },
   {
     id: "administration",
     items: [
-      { id: "countries", href: "/countries", icon: "globe", available: false },
+      { id: "countries", href: "/countries", icon: "globe", available: true, permission: "OVERVIEW_READ"},
       { id: "users", href: "/users", icon: "shield", available: true, permission: "ADMINS_MANAGE" },
-      { id: "audit", href: "/audit", icon: "clipboard", available: false },
-      { id: "system", href: "/system", icon: "sliders", available: false },
+      { id: "audit", href: "/audit", icon: "clipboard", available: true, permission: "AUDIT_READ" },
+      { id: "system", href: "/system", icon: "sliders", available: true, permission: "ADMINS_MANAGE"},
     ],
   },
 ];

@@ -6,6 +6,9 @@ export const enCommissions: Pick<Dictionary, "commissions"> = {
     subtitle: "Zella's share of every billed charge.",
     explained:
       "On each charge the customer pays the electricity used plus a service commission. The commission is taken from their wallet and stays in your PVit account: it is yours.",
+    results: "{count} billed charges",
+    searchLabel: "Search commissions",
+    searchPlaceholder: "Customer or station",
     loadError: "We couldn't load the commissions.",
     emptyTitle: "No commissions yet",
     emptyText: "Commissions appear as soon as a charge is billed.",

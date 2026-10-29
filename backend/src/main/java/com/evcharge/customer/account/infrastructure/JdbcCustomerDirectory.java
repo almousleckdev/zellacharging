@@ -5,10 +5,12 @@ import com.evcharge.customer.account.CustomerPage;
 import com.evcharge.customer.account.CustomerQuery;
 import com.evcharge.customer.account.CustomerRecord;
 import com.evcharge.customer.shared.Timestamps;
+import com.evcharge.customer.shared.LikePattern;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -16,6 +18,8 @@ import java.util.UUID;
 class JdbcCustomerDirectory implements CustomerDirectory {
 
     private static final String SCOPE = "country_code = current_setting('app.country', true) and status <> 'DELETED'";
+    private static final Map<String, String> SORTS = Map.of("date", "created_at",
+            "name", "lower(first_name || ' ' || last_name)");
     private static final String TEXT_FILTER = " and (lower(first_name || ' ' || last_name) like :pattern escape '\\' "
             + "or lower(coalesce(email, '')) like :pattern escape '\\' "
             + "or coalesce(phone_e164, '') like :pattern escape '\\')";
@@ -39,7 +43,7 @@ class JdbcCustomerDirectory implements CustomerDirectory {
         String where = SCOPE + statusFilter(query) + textFilter(query);
         long total = bind(jdbc.sql("select count(*) from customer where " + where), query).query(Long.class).single();
         var items = bind(jdbc.sql("select " + COLUMNS + " from customer where " + where
-                + " order by created_at desc, id limit :limit offset :offset"), query)
+                + query.sort().orderBy(SORTS, "id") + " limit :limit offset :offset"), query)
                 .param("limit", query.limit()).param("offset", query.offset()).query(MAPPER).list();
         return new CustomerPage(total, items);
     }
@@ -63,12 +67,8 @@ class JdbcCustomerDirectory implements CustomerDirectory {
             spec = spec.param("status", query.status());
         }
         if (query.text() != null) {
-            spec = spec.param("pattern", "%" + escape(query.text().toLowerCase()) + "%");
+            spec = spec.param("pattern", LikePattern.contains(query.text()));
         }
         return spec;
-    }
-
-    private static String escape(String text) {
-        return text.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_");
     }
 }

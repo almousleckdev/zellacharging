@@ -10,7 +10,7 @@ export type ActionItem = {
   danger?: boolean;
 };
 
-export function ActionMenu({ label, items }: { label: string; items: ActionItem[] }) {
+export function ActionMenu({ label, items, trigger }: { label: string; items: ActionItem[]; trigger?: string }) {
   const [open, setOpen] = useState(false);
   const root = useRef<HTMLDivElement>(null);
   const menuId = useId();
@@ -41,9 +41,21 @@ export function ActionMenu({ label, items }: { label: string; items: ActionItem[
         aria-expanded={open}
         aria-controls={open ? menuId : undefined}
         onClick={() => setOpen((current) => !current)}
-        className="inline-flex size-8 items-center justify-center rounded-control text-subtle hover:bg-surface-strong hover:text-foreground"
+        className={cn(
+          "inline-flex items-center justify-center rounded-control",
+          trigger
+            ? "h-10 gap-2 border border-border-strong bg-background px-4 text-sm font-semibold text-foreground hover:bg-surface"
+            : "size-8 text-subtle hover:bg-surface-strong hover:text-foreground",
+        )}
       >
-        <Icon name="more" className="size-5" />
+        {trigger ? (
+          <>
+            {trigger}
+            <Icon name="chevronDown" className="size-4" />
+          </>
+        ) : (
+          <Icon name="more" className="size-5" />
+        )}
       </button>
       {open && (
         <ul

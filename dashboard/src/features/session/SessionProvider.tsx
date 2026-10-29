@@ -32,7 +32,7 @@ export function SessionProvider({ profile, children }: { profile: AdminProfile; 
 
   const scoped = searchParams.has("country");
   const scopedHref = useCallback(
-    (href: string) => (scoped ? `${href}?country=${encodeURIComponent(country)}` : href),
+    (href: string) => (scoped ? `${href}${href.includes("?") ? "&" : "?"}country=${encodeURIComponent(country)}` : href),
     [country, scoped],
   );
 

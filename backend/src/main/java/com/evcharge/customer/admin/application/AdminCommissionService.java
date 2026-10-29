@@ -5,6 +5,9 @@ import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.charging.CommissionLog;
 import com.evcharge.customer.charging.CommissionPage;
+import com.evcharge.customer.charging.CommissionQuery;
+import com.evcharge.customer.charging.CommissionRecord;
+import com.evcharge.customer.shared.LogFilter;
 import com.evcharge.customer.shared.TenantContext;
 import org.springframework.stereotype.Service;
 
@@ -12,8 +15,6 @@ import java.util.List;
 
 @Service
 public class AdminCommissionService {
-
-    private static final int RECENT = 50;
 
     private final AdminAccessService access;
     private final CountryCatalog catalog;
@@ -25,11 +26,18 @@ public class AdminCommissionService {
         this.commissions = commissions;
     }
 
-    public List<CountryCommission> list(AdminAccess admin, String country) {
+    public CommissionListing list(AdminAccess admin, String country, String text, LogFilter filter, int page,
+                                  int size) {
         List<String> scope = access.scope(admin, Permission.PAYMENTS_READ, country);
-        return catalog.all().stream().filter(item -> scope.contains(item.code())).map(item -> {
-            CommissionPage page = TenantContext.callAs(item.code(), () -> commissions.search(RECENT));
-            return new CountryCommission(item, page.totals(), page.items());
-        }).toList();
+        PageWindow window = PageWindow.of(page, size);
+        String pattern = text == null || text.isBlank() ? null : text.trim();
+        List<CountryCommissionTotals> summaries = catalog.all().stream().filter(item -> scope.contains(item.code()))
+                .map(item -> new CountryCommissionTotals(item, TenantContext.callAs(item.code(),
+                        () -> commissions.search(new CommissionQuery(pattern, filter, 1)).totals()))).toList();
+        CountryListing<CommissionRecord> items = CountryMerge.newestFirst(scope, window, limit -> {
+                    CommissionPage found = commissions.search(new CommissionQuery(pattern, filter, limit));
+                    return new CountryMerge.Found<>(found.count(), found.items());
+                }, CommissionRecord::at);
+        return new CommissionListing(summaries, items);
     }
 }

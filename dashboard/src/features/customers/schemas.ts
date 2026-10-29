@@ -9,6 +9,13 @@ export const customerItemSchema = z.object({
   phone: z.string().nullable(),
   status: z.string(),
   createdAt: z.string(),
+  balanceMinor: z.number().nullable().optional(),
+  currency: z.string().nullable().optional(),
+  decimals: z.number().nullable().optional(),
+  completedSessions: z.number().optional(),
+  spentMinor: z.number().optional(),
+  energyKwh: z.number().optional(),
+  lastSessionAt: z.string().nullable().optional(),
 });
 
 export const customerListSchema = z.object({

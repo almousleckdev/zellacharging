@@ -7,6 +7,10 @@ import com.evcharge.customer.wallet.WalletStatistics;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -48,18 +52,29 @@ class JdbcWalletStatistics implements WalletStatistics {
 
     @Override
     public Optional<CustomerWallet> ofCustomer(UUID customerId) {
-        return jdbc.sql("select w.currency, w.decimals, w.balance_minor, w.reserved_minor, "
+        return Optional.ofNullable(ofCustomers(List.of(customerId)).get(customerId));
+    }
+
+    @Override
+    public Map<UUID, CustomerWallet> ofCustomers(Collection<UUID> customerIds) {
+        Map<UUID, CustomerWallet> wallets = new HashMap<>();
+        if (customerIds.isEmpty()) {
+            return wallets;
+        }
+        jdbc.sql("select w.customer_id, w.currency, w.decimals, w.balance_minor, w.reserved_minor, "
                         + "(select coalesce(sum(amount_minor), 0)::bigint from topup t where t.customer_id = w.customer_id "
                         + "and t.state = 'SUCCEEDED') as topups, "
                         + "(select count(*) from topup t where t.customer_id = w.customer_id and t.state = 'PENDING') "
                         + "as pending, "
                         + "(select coalesce(sum(amount_minor), 0)::bigint from withdrawal x "
                         + "where x.customer_id = w.customer_id and x.state = 'PAID') as withdrawn "
-                        + "from wallet w where w.customer_id = :id "
+                        + "from wallet w where w.customer_id in (:ids) "
                         + "and w.country_code = current_setting('app.country', true)")
-                .param("id", customerId)
-                .query((rs, rowNum) -> new CustomerWallet(rs.getString("currency").trim(), rs.getInt("decimals"),
-                        rs.getLong("balance_minor"), rs.getLong("reserved_minor"), rs.getLong("topups"),
-                        rs.getLong("pending"), rs.getLong("withdrawn"))).optional();
+                .param("ids", customerIds)
+                .query((rs, rowNum) -> wallets.put(rs.getObject("customer_id", UUID.class),
+                        new CustomerWallet(rs.getString("currency").trim(), rs.getInt("decimals"),
+                                rs.getLong("balance_minor"), rs.getLong("reserved_minor"), rs.getLong("topups"),
+                                rs.getLong("pending"), rs.getLong("withdrawn")))).list();
+        return wallets;
     }
 }

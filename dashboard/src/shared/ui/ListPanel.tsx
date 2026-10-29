@@ -17,8 +17,10 @@ type ListPanelProps = {
   empty: { icon: IconName; title: string; text: string };
   isEmpty: boolean;
   page: number;
-  pageCount: number;
+  size: number;
+  total: number;
   onPage: (page: number) => void;
+  onSize: (size: number) => void;
   children: ReactNode;
 };
 
@@ -31,8 +33,10 @@ export function ListPanel({
   empty,
   isEmpty,
   page,
-  pageCount,
+  size,
+  total,
   onPage,
+  onSize,
   children,
 }: ListPanelProps) {
   const { t } = useI18n();
@@ -57,7 +61,7 @@ export function ListPanel({
         </div>
       )}
       {children}
-      <Pagination page={page} pageCount={pageCount} onChange={onPage} />
+      <Pagination page={page} size={size} total={total} onPage={onPage} onSize={onSize} />
     </section>
   );
 }

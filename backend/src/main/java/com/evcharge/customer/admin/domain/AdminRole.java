@@ -4,6 +4,7 @@ import java.util.EnumSet;
 import java.util.Set;
 
 import static com.evcharge.customer.admin.domain.Permission.AUDIT_READ;
+import static com.evcharge.customer.admin.domain.Permission.CUSTOMERS_MANAGE;
 import static com.evcharge.customer.admin.domain.Permission.CUSTOMERS_READ;
 import static com.evcharge.customer.admin.domain.Permission.OVERVIEW_READ;
 import static com.evcharge.customer.admin.domain.Permission.PAYMENTS_READ;
@@ -12,7 +13,8 @@ import static com.evcharge.customer.admin.domain.Permission.STATIONS_READ;
 
 public enum AdminRole {
     SUPER_ADMIN(EnumSet.allOf(Permission.class)),
-    ADMIN(EnumSet.of(OVERVIEW_READ, STATIONS_READ, SESSIONS_READ, CUSTOMERS_READ, PAYMENTS_READ, AUDIT_READ)),
+    ADMIN(EnumSet.of(OVERVIEW_READ, STATIONS_READ, SESSIONS_READ, CUSTOMERS_READ, CUSTOMERS_MANAGE, PAYMENTS_READ,
+            AUDIT_READ)),
     SUPPORT(EnumSet.of(OVERVIEW_READ, CUSTOMERS_READ, SESSIONS_READ)),
     FINANCE(EnumSet.of(OVERVIEW_READ, CUSTOMERS_READ, PAYMENTS_READ)),
     OPERATIONS(EnumSet.of(OVERVIEW_READ, STATIONS_READ, SESSIONS_READ));

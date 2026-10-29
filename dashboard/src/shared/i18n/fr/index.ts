@@ -9,6 +9,9 @@ import { frOnboarding } from "./onboarding";
 import { frPayments } from "./payments";
 import { frSessions } from "./sessions";
 import { frCommissions } from "./commissions";
+import { frIncidents } from "./incidents";
+import { frAudit } from "./audit";
+import { frPlatform } from "./platform";
 
 export const fr = {
   ...frCommon,
@@ -22,4 +25,7 @@ export const fr = {
   ...frPayments,
   ...frSessions,
   ...frCommissions,
+  ...frIncidents,
+  ...frAudit,
+  ...frPlatform,
 } as const;

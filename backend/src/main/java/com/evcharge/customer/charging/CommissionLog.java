@@ -2,5 +2,5 @@ package com.evcharge.customer.charging;
 
 public interface CommissionLog {
 
-    CommissionPage search(int limit);
+    CommissionPage search(CommissionQuery query);
 }

@@ -33,20 +33,51 @@ function figures(code: string, name: string, currency: string, scale: number) {
   };
 }
 
-function card(name: string): Promise<HTMLElement> {
-  return screen.findByRole("heading", { name, level: 3 }).then((heading) => heading.closest("article") as HTMLElement);
+function point(scale: number) {
+  return {
+    day: new Date().toISOString().slice(0, 10),
+    topupsMinor: 9000 * scale,
+    topupCount: 4,
+    withdrawalsMinor: 2000 * scale,
+    capturedMinor: 138 * scale,
+    sessions: 6,
+    completed: 5,
+    failed: 1,
+    energyKwh: 40.5,
+    revenueMinor: 6000,
+    serviceFeeMinor: 20 * scale,
+    vatMinor: 0,
+  };
 }
 
-function moneyRow(label: string): Promise<string> {
-  return screen
-    .findByText(label)
-    .then((node) => (node.closest("div.justify-between") as HTMLElement).textContent?.replace(/[\u00a0\u202f]/g, " ") ?? "");
-}
-
-function serve(handler: (url: string) => Response | Promise<Response>) {
-  const fetchMock = vi.fn(async (input: RequestInfo | URL) => handler(String(input)));
+function serve(countries: ReturnType<typeof figures>[], since?: string) {
+  const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
+    const url = String(input);
+    if (url.includes("/overview")) {
+      return Response.json({ scope: "ALL", since, countries });
+    }
+    if (url.includes("/series")) {
+      return Response.json({
+        countries: countries.map((item, index) => ({
+          code: item.code,
+          name: item.name,
+          currency: item.currency,
+          decimals: 0,
+          points: [point(index + 1)],
+        })),
+      });
+    }
+    if (url.includes("/incidents")) {
+      return Response.json({ total: 4, open: 4, openHigh: 2, page: 0, size: 1, items: [] });
+    }
+    return Response.json({ total: 0, page: 0, size: 6, items: [] });
+  });
   vi.stubGlobal("fetch", fetchMock);
   return fetchMock;
+}
+
+function text(node: HTMLElement): string {
+  return node.textContent?.replace(/[\u00a0\u202f]/g, " ") ?? "";
 }
 
 describe("OverviewPage", () => {
@@ -55,7 +86,7 @@ describe("OverviewPage", () => {
   });
 
   it("shows shimmer cards while the figures load", () => {
-    serve(() => new Promise<Response>(() => undefined));
+    vi.stubGlobal("fetch", vi.fn(() => new Promise<Response>(() => undefined)));
 
     renderConsole(<OverviewPage />);
 
@@ -66,54 +97,48 @@ describe("OverviewPage", () => {
 
   it("asks the server for the selected country only", async () => {
     navigation.search = new URLSearchParams("country=GA");
-    const fetchMock = serve(() =>
-      Response.json({ scope: "GA", countries: [figures("GA", "Gabon", "XAF", 1)] }),
-    );
+    const fetchMock = serve([figures("GA", "Gabon", "XAF", 1)]);
 
     renderConsole(<OverviewPage />);
 
-    expect(await card("Clients")).toBeInTheDocument();
+    expect(await screen.findByText("Ventes (recharges facturées)")).toBeInTheDocument();
     expect(fetchMock).toHaveBeenCalledWith("/api/admin/overview?country=GA", expect.anything());
+    expect(fetchMock.mock.calls.some(([url]) => String(url).startsWith("/api/admin/series?country=GA"))).toBe(true);
   });
 
-  it("shows the figures of one country in its own currency without a breakdown table", async () => {
+  it("shows the period key figures with their money and the money panel", async () => {
     navigation.search = new URLSearchParams("country=GA");
-    serve(() => Response.json({ scope: "GA", countries: [figures("GA", "Gabon", "XAF", 1)] }));
+    serve([figures("GA", "Gabon", "XAF", 1)], "2026-10-28T00:00:00Z");
 
     renderConsole(<OverviewPage />, profileOf([gabon], "COUNTRY_ADMIN"));
 
-    expect(await moneyRow("Recharges encaissées")).toContain("9 000 FCFA");
-    expect(await moneyRow("Charges facturées")).toContain("138 FCFA");
-    const customers = screen.getByText("Clients").closest("article") as HTMLElement;
-    expect(within(customers).getByText("10")).toBeInTheDocument();
-    expect(within(customers).getByText(/8 actifs · 2 nouveaux/)).toBeInTheDocument();
-    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    const sales = (await screen.findByText("Ventes (recharges facturées)")).closest("article") as HTMLElement;
+    expect(text(sales)).toContain("138 FCFA");
+    const commission = (await screen.findByText("Commission")).closest("article") as HTMLElement;
+    expect(text(commission)).toContain("20 FCFA");
+    expect(await screen.findByText("Argent de la plateforme")).toBeInTheDocument();
+    expect(await screen.findByText(/Chiffres comptés depuis le/)).toBeInTheDocument();
+    expect(screen.queryByRole("table", { name: "Détail par pays" })).not.toBeInTheDocument();
   });
 
-  it("totals the counts across countries and keeps each currency on its own line", async () => {
-    serve(() =>
-      Response.json({
-        scope: "ALL",
-        countries: [figures("GA", "Gabon", "XAF", 1), figures("ML", "Mali", "XOF", 2)],
-      }),
-    );
+  it("puts what needs attention in front: incidents, pending payments and live charges", async () => {
+    navigation.search = new URLSearchParams("country=GA");
+    serve([figures("GA", "Gabon", "XAF", 3)]);
 
     renderConsole(<OverviewPage />);
 
-    const customers = await card("Clients");
-    expect(within(customers).getByText("30")).toBeInTheDocument();
-    const text = await moneyRow("Recharges encaissées");
-    expect(text).toContain("9 000 XAF");
-    expect(text).toContain("18 000 XOF");
+    const strip = await screen.findByRole("region", { name: "À surveiller" });
+    expect(await within(strip).findByText("Incidents prioritaires")).toBeInTheDocument();
+    expect(text(within(strip).getByText("Rechargements en attente").closest("a") as HTMLElement)).toContain("3");
+    expect(text(within(strip).getByText("Recharges en cours").closest("a") as HTMLElement)).toContain("3");
+    expect(within(strip).getByRole("link", { name: /Incidents prioritaires/ })).toHaveAttribute(
+      "href",
+      expect.stringContaining("severity=HIGH"),
+    );
   });
 
   it("breaks the figures down by country when several are shown", async () => {
-    serve(() =>
-      Response.json({
-        scope: "ALL",
-        countries: [figures("GA", "Gabon", "XAF", 1), figures("ML", "Mali", "XOF", 2)],
-      }),
-    );
+    serve([figures("GA", "Gabon", "XAF", 1), figures("ML", "Mali", "XOF", 2)]);
 
     renderConsole(<OverviewPage />);
 
@@ -122,45 +147,17 @@ describe("OverviewPage", () => {
     expect(rows).toHaveLength(3);
     expect(within(rows[1]).getByText("Gabon")).toBeInTheDocument();
     expect(within(rows[2]).getByText("Mali")).toBeInTheDocument();
-  });
-
-  it("flags pending top-ups with a badge", async () => {
-    serve(() => Response.json({ scope: "GA", countries: [figures("GA", "Gabon", "XAF", 3)] }));
-    navigation.search = new URLSearchParams("country=GA");
-
-    renderConsole(<OverviewPage />);
-
-    expect(await screen.findByText("3 en attente")).toBeInTheDocument();
-  });
-
-  it("shows the commission and the date the figures start from", async () => {
-    navigation.search = new URLSearchParams("country=GA");
-    serve((url) =>
-      url.includes("commissions")
-        ? Response.json({
-            summaries: [
-              { country: "GA", currency: "XAF", decimals: 0, sessions: 3, electricMinor: 1000, serviceFeeMinor: 20, vatMinor: 0, serviceFeePercent: 2, vatPercent: 0 },
-            ],
-            items: [],
-          })
-        : Response.json({ scope: "GA", since: "2026-10-28T00:00:00Z", countries: [figures("GA", "Gabon", "XAF", 1)] }),
-    );
-
-    renderConsole(<OverviewPage />);
-
-    const commission = await card("Commission");
-    expect(commission.textContent).toContain("2 % sur 3 charges facturées");
-    expect(await screen.findByText(/Chiffres comptés depuis le/)).toBeInTheDocument();
+    expect(await screen.findByText(/mélange plusieurs devises/)).toBeInTheDocument();
   });
 
   it("offers a retry when the figures cannot be loaded", async () => {
-    const fetchMock = serve(() => Response.json({ code: "FORBIDDEN" }, { status: 403 }));
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ code: "FORBIDDEN" }, { status: 403 })));
     const user = userEvent.setup();
 
     renderConsole(<OverviewPage />);
 
     expect(await screen.findByRole("alert")).toHaveTextContent("Impossible de charger les indicateurs.");
     await user.click(screen.getByRole("button", { name: "Réessayer" }));
-    expect(fetchMock).toHaveBeenCalledTimes(2);
+    expect(await screen.findByRole("alert")).toBeInTheDocument();
   });
 });

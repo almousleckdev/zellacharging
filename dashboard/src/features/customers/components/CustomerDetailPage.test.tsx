@@ -1,12 +1,15 @@
 import { screen, within } from "@testing-library/react";
-import { describe, expect, it, vi } from "vitest";
-import { renderConsole } from "@/test/renderConsole";
+import userEvent from "@testing-library/user-event";
+import { beforeEach, describe, expect, it, vi } from "vitest";
+import { profileOf, renderConsole } from "@/test/renderConsole";
 import { CustomerDetailPage } from "./CustomerDetailPage";
 
+const navigation = vi.hoisted(() => ({ replace: vi.fn(), search: new URLSearchParams("country=GA") }));
+
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: vi.fn() }),
+  useRouter: () => ({ replace: navigation.replace, push: vi.fn() }),
   usePathname: () => "/customers/GA/c1",
-  useSearchParams: () => new URLSearchParams("country=GA"),
+  useSearchParams: () => navigation.search,
   useParams: () => ({ country: "GA", id: "c1" }),
 }));
 
@@ -40,6 +43,10 @@ function serve(body: unknown, status = 200) {
 }
 
 describe("CustomerDetailPage", () => {
+  beforeEach(() => {
+    navigation.search = new URLSearchParams("country=GA");
+  });
+
   it("asks the server for this customer in this country", async () => {
     const fetchMock = serve(detail);
 
@@ -49,7 +56,7 @@ describe("CustomerDetailPage", () => {
     expect(String(fetchMock.mock.calls[0][0])).toBe("/api/admin/customers/GA/c1");
   });
 
-  it("shows identity, wallet and charging activity", async () => {
+  it("opens on an overview with the key figures, the identity and the wallet", async () => {
     serve(detail);
 
     renderConsole(<CustomerDetailPage />);
@@ -57,11 +64,30 @@ describe("CustomerDetailPage", () => {
     const identity = (await screen.findByRole("heading", { name: "Identité" })).closest("section") as HTMLElement;
     expect(within(identity).getByText("aline@example.com")).toBeInTheDocument();
     expect(within(identity).getByText("Vérifié")).toBeInTheDocument();
-    expect(within(identity).getByText("Non vérifié")).toBeInTheDocument();
     const wallet = screen.getByRole("heading", { name: "Portefeuille" }).closest("section") as HTMLElement;
-    expect(wallet.textContent?.replace(/[  ]/g, " ")).toContain("5 000 FCFA");
-    const activity = screen.getByRole("heading", { name: "Activité de charge" }).closest("section") as HTMLElement;
-    expect(within(activity).getByText("31,5 kWh")).toBeInTheDocument();
+    expect(wallet.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("5 000 FCFA");
+    expect(screen.getByText("31,5 kWh")).toBeInTheDocument();
+    expect(screen.getByText("Total dépensé").nextElementSibling?.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("4 725 FCFA");
+  });
+
+  it("offers the history as tabs and loads the wallet movements of this customer only when opened", async () => {
+    const fetchMock = vi.fn<typeof fetch>(async (input) =>
+      String(input).includes("/ledger")
+        ? Response.json({ total: 1, page: 0, size: 20, currency: "XAF", decimals: 0, items: [{ id: "l1", type: "TOPUP", amountMinor: 5000, sessionId: null, topupId: "t1", createdAt: "2026-10-20T08:30:00Z" }] })
+        : Response.json(detail),
+    );
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+
+    renderConsole(<CustomerDetailPage />, { ...profileOf(), permissions: ["OVERVIEW_READ", "SESSIONS_READ", "PAYMENTS_READ", "AUDIT_READ"] });
+
+    for (const name of ["Aperçu", "Recharges", "Paiements", "Portefeuille", "Activité"]) {
+      expect(await screen.findByRole("tab", { name })).toBeInTheDocument();
+    }
+    expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/ledger"))).toBe(false);
+    navigation.search = new URLSearchParams("country=GA&tab=wallet");
+    await user.click(screen.getByRole("tab", { name: "Portefeuille" }));
+    expect(navigation.replace).toHaveBeenCalledWith(expect.stringContaining("tab=wallet"));
   });
 
   it("handles a customer without a wallet", async () => {

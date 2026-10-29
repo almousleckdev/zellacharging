@@ -17,6 +17,10 @@ abstract final class ErrorText {
       fr: 'Veuillez d’abord vérifier votre compte.',
       en: 'Please verify your account first.',
     ),
+    'ACCOUNT_SUSPENDED': AppLanguage.pick(
+      fr: 'Votre compte est suspendu. Contactez le support.',
+      en: 'Your account is suspended. Contact support.',
+    ),
     'ACCOUNT_LOCKED': AppLanguage.pick(
       fr: 'Trop de tentatives. Réessayez dans quelques minutes.',
       en: 'Too many attempts. Try again in a few minutes.',

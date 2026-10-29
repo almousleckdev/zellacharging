@@ -1,4 +1,6 @@
 package com.evcharge.customer.account;
 
-public record CustomerQuery(String text, String status, int limit, int offset) {
+import com.evcharge.customer.shared.Sort;
+
+public record CustomerQuery(String text, String status, Sort sort, int limit, int offset) {
 }

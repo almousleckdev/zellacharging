@@ -30,6 +30,7 @@ export const countryFiguresSchema = z.object({
   name: z.string(),
   currency: z.string(),
   currencyDecimals: z.number(),
+  phoneRegion: z.string().optional(),
   customers: customersSchema,
   sessions: sessionsSchema,
   wallets: walletsSchema,

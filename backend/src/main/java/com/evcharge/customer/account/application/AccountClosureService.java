@@ -1,56 +1,30 @@
 package com.evcharge.customer.account.application;
 
-import com.evcharge.customer.account.ClosureBlocker;
-import com.evcharge.customer.account.application.port.AvatarRepository;
-import com.evcharge.customer.account.application.port.CustomerRepository;
-import com.evcharge.customer.account.application.port.PasswordHasher;
-import com.evcharge.customer.account.application.port.RefreshTokenRepository;
+import com.evcharge.customer.account.CustomerModeration;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.AuditTrail;
-import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
-import java.util.List;
-import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class AccountClosureService {
 
     private final PasswordConfirmation passwords;
-    private final PasswordHasher hasher;
-    private final CustomerRepository customers;
-    private final RefreshTokenRepository refreshTokens;
-    private final AvatarRepository avatars;
-    private final List<ClosureBlocker> blockers;
-    private final Clock clock;
+    private final CustomerModeration moderation;
     private final AuditTrail audit;
 
-    public AccountClosureService(PasswordConfirmation passwords, PasswordHasher hasher, CustomerRepository customers,
-                                 RefreshTokenRepository refreshTokens, AvatarRepository avatars,
-                                 List<ClosureBlocker> blockers, Clock clock, AuditTrail audit) {
+    public AccountClosureService(PasswordConfirmation passwords, CustomerModeration moderation, AuditTrail audit) {
         this.passwords = passwords;
-        this.hasher = hasher;
-        this.customers = customers;
-        this.refreshTokens = refreshTokens;
-        this.avatars = avatars;
-        this.blockers = blockers;
-        this.clock = clock;
+        this.moderation = moderation;
         this.audit = audit;
     }
 
     @Transactional(noRollbackFor = ApiException.class)
     public void close(UUID customerId, String password) {
         passwords.confirm(customerId, password);
-        blockers.stream().map(blocker -> blocker.blockingCode(customerId)).flatMap(Optional::stream)
-                .findFirst().ifPresent(code -> {
-                    throw new ApiException(HttpStatus.CONFLICT, code, "The account cannot be closed yet");
-                });
-        customers.markDeleted(customerId, hasher.hash(UUID.randomUUID().toString()));
-        refreshTokens.revokeAllOf(customerId, clock.instant());
-        avatars.delete(customerId);
+        moderation.delete(customerId);
         audit.record("ACCOUNT_CLOSED", customerId, "customer", null);
     }
 }

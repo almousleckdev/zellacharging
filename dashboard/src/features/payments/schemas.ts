@@ -25,3 +25,11 @@ export const paymentListSchema = z.object({
 });
 
 export type PaymentItem = z.infer<typeof paymentItemSchema>;
+
+export const paymentDetailSchema = z.object({
+  payment: paymentItemSchema,
+  providerRef: z.string().nullable(),
+  updatedAt: z.string(),
+});
+
+export type PaymentDetail = z.infer<typeof paymentDetailSchema>;

@@ -18,6 +18,11 @@ final class CountryMerge {
 
     static <T> CountryListing<T> newestFirst(List<String> scope, PageWindow window, Function<Integer, Found<T>> search,
                                              Function<T, Instant> createdAt) {
+        return ordered(scope, window, search, createdAt, Comparator.comparing(createdAt).reversed());
+    }
+
+    static <T> CountryListing<T> ordered(List<String> scope, PageWindow window, Function<Integer, Found<T>> search,
+                                         Function<T, Instant> createdAt, Comparator<T> order) {
         long total = 0;
         List<CountryEntry<T>> merged = new ArrayList<>();
         for (String code : scope) {
@@ -25,7 +30,7 @@ final class CountryMerge {
             total += found.total();
             found.items().forEach(item -> merged.add(new CountryEntry<>(code, item, createdAt.apply(item))));
         }
-        merged.sort(Comparator.comparing((CountryEntry<T> entry) -> entry.createdAt()).reversed());
+        merged.sort(Comparator.comparing(CountryEntry<T>::item, order));
         int from = Math.min(window.offset(), merged.size());
         int to = Math.min(window.end(), merged.size());
         return new CountryListing<>(total, window.index(), window.size(), List.copyOf(merged.subList(from, to)));

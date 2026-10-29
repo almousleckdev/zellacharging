@@ -4,6 +4,7 @@ import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.PasswordHasher;
 import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
+import com.evcharge.customer.account.domain.CustomerStatus;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.AuditTrail;
 import org.springframework.http.HttpStatus;
@@ -42,6 +43,9 @@ public class LoginService {
             failures.registerFailure(customer.id());
             audit.record("LOGIN_FAILED", customer.id(), "customer", null);
             throw invalidCredentials();
+        }
+        if (customer.status() == CustomerStatus.BLOCKED) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "ACCOUNT_SUSPENDED", "Account is suspended");
         }
         if (!customer.canAuthenticate()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "ACCOUNT_NOT_VERIFIED", "Account is not verified");

@@ -10,6 +10,9 @@ import { enOnboarding } from "./onboarding";
 import { enPayments } from "./payments";
 import { enSessions } from "./sessions";
 import { enCommissions } from "./commissions";
+import { enIncidents } from "./incidents";
+import { enAudit } from "./audit";
+import { enPlatform } from "./platform";
 
 export const en: Dictionary = {
   ...enCommon,
@@ -23,4 +26,7 @@ export const en: Dictionary = {
   ...enPayments,
   ...enSessions,
   ...enCommissions,
+  ...enIncidents,
+  ...enAudit,
+  ...enPlatform,
 };

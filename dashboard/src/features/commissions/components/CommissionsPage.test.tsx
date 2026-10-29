@@ -43,7 +43,7 @@ describe("CommissionsPage", () => {
   });
 
   it("shows the commission earned and the fee of each billed charge", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ summaries: [summary], items: [item] })));
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ summaries: [summary], total: 1, page: 0, size: 20, items: [item] })));
 
     renderConsole(<CommissionsPage />);
 
@@ -52,11 +52,11 @@ describe("CommissionsPage", () => {
     expect(within(table).getByText(/138/)).toBeInTheDocument();
     const earned = (await screen.findByText("Commission gagnée (2 %)")).closest("article") as HTMLElement;
     expect(earned.textContent?.replace(/[  ]/g, " ")).toContain("15 FCFA");
-    expect(screen.queryByRole("columnheader", { name: "TVA" })).not.toBeInTheDocument();
+    expect(screen.getByRole("columnheader", { name: "TVA" })).toBeInTheDocument();
   });
 
   it("explains an empty list", async () => {
-    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ summaries: [{ ...summary, sessions: 0 }], items: [] })));
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ summaries: [{ ...summary, sessions: 0 }], total: 0, page: 0, size: 20, items: [] })));
 
     renderConsole(<CommissionsPage />);
 

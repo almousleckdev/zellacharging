@@ -19,4 +19,9 @@ public final class Timestamps {
         OffsetDateTime value = rs.getObject(column, OffsetDateTime.class);
         return value == null ? null : value.toInstant();
     }
+
+    public static Instant read(ResultSet rs, int column) throws SQLException {
+        OffsetDateTime value = rs.getObject(column, OffsetDateTime.class);
+        return value == null ? null : value.toInstant();
+    }
 }

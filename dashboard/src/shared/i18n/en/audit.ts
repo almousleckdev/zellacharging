@@ -1,0 +1,36 @@
+import type { Dictionary } from "../types";
+
+export const enAudit: Pick<Dictionary, "audit"> = {
+  audit: {
+    title: "Audit log",
+    subtitle: "Who did what in the console, newest first.",
+    results: "{count} entries",
+    loadError: "We couldn't load the log.",
+    emptyTitle: "No entries",
+    emptyText: "No action matches these filters.",
+    searchLabel: "Search the log",
+    searchPlaceholder: "Administrator, identifier or detail",
+    actionLabel: "Action",
+    allActions: "All actions",
+    columns: { date: "Date", admin: "Administrator", action: "Action", subject: "Subject", country: "Country", detail: "Detail" },
+    actions: {
+      ADMIN_LOGIN: "Administrator signed in",
+      ADMIN_INVITED: "Invitation sent",
+      ADMIN_INVITATION_RESENT: "Invitation resent",
+      ADMIN_INVITATION_ACCEPTED: "Invitation accepted",
+      ADMIN_ACCESS_CHANGED: "Access changed",
+      ADMIN_DISABLED: "Administrator disabled",
+      ADMIN_ENABLED: "Administrator re-enabled",
+      ADMIN_DELETED: "Administrator deleted",
+      ADMIN_PROFILE_UPDATED: "Profile updated",
+      ADMIN_PASSWORD_CHANGED: "Password changed",
+      ADMIN_PASSWORD_CHANGE_REFUSED: "Password change refused",
+      CUSTOMER_VIEWED: "Customer record viewed",
+      CUSTOMER_SUSPENDED: "Customer suspended",
+      CUSTOMER_REACTIVATED: "Customer reactivated",
+      CUSTOMER_DELETED: "Customer deleted",
+      INCIDENT_ACKNOWLEDGED: "Incident acknowledged",
+      INCIDENT_RESOLVED: "Incident resolved",
+    },
+  },
+};

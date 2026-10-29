@@ -1,4 +1,7 @@
 package com.evcharge.customer.charging;
 
-public record SessionLogQuery(String state, String text, int limit) {
+import com.evcharge.customer.shared.LogFilter;
+import com.evcharge.customer.shared.Sort;
+
+public record SessionLogQuery(String state, String text, LogFilter filter, Sort sort, int limit) {
 }

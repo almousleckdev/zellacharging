@@ -14,47 +14,48 @@ class StationHero extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final photo = StationImage.forCountry(station.isoCode);
-    return ClipRRect(
-      borderRadius: BorderRadius.circular(AppSpacing.radius),
-      child: AspectRatio(
-        aspectRatio: 16 / 9,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            photo == null
-                ? _placeholder()
-                : Image.asset(photo, fit: BoxFit.cover),
-            Positioned(
-              top: AppSpacing.sm,
-              left: AppSpacing.sm,
-              child: DecoratedBox(
-                decoration: BoxDecoration(
-                  color: AppColors.surface,
-                  borderRadius: BorderRadius.circular(AppSpacing.radius),
-                ),
-                child: StatusChip(
-                  label: station.online
-                      ? StationDetailText.online
-                      : StationText.stationOffline,
-                  color: station.online ? AppColors.success : AppColors.neutral,
-                ),
+    return AspectRatio(
+      aspectRatio: 4 / 3,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          Image.asset(
+            StationImage.forCountry(station.isoCode),
+            fit: BoxFit.cover,
+          ),
+          DecoratedBox(
+            decoration: BoxDecoration(
+              gradient: LinearGradient(
+                begin: Alignment.topCenter,
+                end: Alignment.bottomCenter,
+                colors: [
+                  AppColors.textPrimary.withValues(alpha: 0.25),
+                  AppColors.textPrimary.withValues(alpha: 0),
+                  AppColors.textPrimary.withValues(alpha: 0),
+                  AppColors.textPrimary.withValues(alpha: 0.35),
+                ],
+                stops: const [0, 0.3, 0.7, 1],
               ),
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            left: AppSpacing.md,
+            bottom: AppSpacing.md,
+            child: DecoratedBox(
+              decoration: BoxDecoration(
+                color: AppColors.surface,
+                borderRadius: BorderRadius.circular(AppSpacing.radius),
+              ),
+              child: StatusChip(
+                label: station.online
+                    ? StationDetailText.online
+                    : StationText.stationOffline,
+                color: station.online ? AppColors.success : AppColors.neutral,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }
-
-  Widget _placeholder() => const ColoredBox(
-    color: AppColors.primarySoft,
-    child: Center(
-      child: Image(
-        image: AssetImage(StationImage.fallback),
-        width: 96,
-        height: 96,
-      ),
-    ),
-  );
 }

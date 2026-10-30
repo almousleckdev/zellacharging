@@ -29,30 +29,37 @@ class StationDetailPage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final station = ref.watch(stationProvider(stationId));
     return Scaffold(
-      appBar: AppBar(title: Text(StationText.stationDetails)),
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(backgroundColor: Colors.transparent),
       body: AsyncBody(
         value: station,
         onRetry: () => ref.invalidate(stationProvider(stationId)),
         builder: (data) => RefreshIndicator.adaptive(
           onRefresh: () async => ref.invalidate(stationProvider(stationId)),
           child: ListView(
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: EdgeInsets.zero,
             children: [
               StationHero(station: data),
-              const SizedBox(height: AppSpacing.md),
-              StationSummary(station: data),
-              const SizedBox(height: AppSpacing.lg),
-              _connectors(context, data),
-              const SizedBox(height: AppSpacing.lg),
-              StationInfoCard(station: data),
-              if (data.latitude != null && data.longitude != null) ...[
-                const SizedBox(height: AppSpacing.md),
-                StationMapCard(
-                  latitude: data.latitude!,
-                  longitude: data.longitude!,
+              Padding(
+                padding: const EdgeInsets.all(AppSpacing.md),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    StationSummary(station: data),
+                    const SizedBox(height: AppSpacing.lg),
+                    _connectors(context, data),
+                    const SizedBox(height: AppSpacing.lg),
+                    StationInfoCard(station: data),
+                    if (data.latitude != null && data.longitude != null) ...[
+                      const SizedBox(height: AppSpacing.md),
+                      StationMapCard(
+                        latitude: data.latitude!,
+                        longitude: data.longitude!,
+                      ),
+                    ],
+                  ],
                 ),
-              ],
-              const SizedBox(height: AppSpacing.lg),
+              ),
             ],
           ),
         ),

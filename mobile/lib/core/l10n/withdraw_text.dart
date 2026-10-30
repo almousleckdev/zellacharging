@@ -84,6 +84,11 @@ abstract final class WithdrawText {
     en: 'Verification in progress',
   );
 
+  static String get unavailable => AppLanguage.pick(
+    fr: 'Les retraits seront bientôt disponibles.',
+    en: 'Withdrawals will be available soon.',
+  );
+
   static String get action => AppLanguage.pick(fr: 'Retirer', en: 'Withdraw');
 
   static String get hubTitle =>

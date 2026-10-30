@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zella/core/l10n/strings.dart';
 import 'package:zella/features/wallet/domain/mobile_operator.dart';
+import 'package:zella/features/wallet/domain/wallet.dart';
 import 'package:zella/features/wallet/domain/withdraw_money.dart';
 import 'package:zella/features/wallet/domain/withdrawal_result.dart';
 import 'package:zella/features/wallet/presentation/wallet_page.dart';
@@ -138,7 +139,7 @@ void main() {
     await closeApp(tester);
   });
 
-  testWidgets('the wallet shows Retirer only when withdrawals are on', (
+  testWidgets('the wallet shows Retirer next to Créditer', (
     tester,
   ) async {
     await pumpApp(
@@ -150,4 +151,35 @@ void main() {
     expect(find.text(WithdrawText.entryLabel('CAPTURE')), findsOneWidget);
     await closeApp(tester);
   });
+
+  testWidgets('the withdraw button stays visible and explains when it is off', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      const WalletPage(),
+      overrides: overridesWith(wallet: _WithdrawalsOff()),
+    );
+
+    expect(find.text(WithdrawText.action), findsOneWidget);
+    await tester.tap(find.text(WithdrawText.action));
+    await tester.pump(const Duration(milliseconds: 300));
+
+    expect(find.text(WithdrawText.unavailable), findsOneWidget);
+    await closeApp(tester);
+  });
+}
+
+class _WithdrawalsOff extends FakeWallet {
+  @override
+  Future<Wallet> fetch() async {
+    final base = await super.fetch();
+    return Wallet(
+      balanceMinor: base.balanceMinor,
+      reservedMinor: base.reservedMinor,
+      availableMinor: base.availableMinor,
+      currency: base.currency,
+      decimals: base.decimals,
+    );
+  }
 }

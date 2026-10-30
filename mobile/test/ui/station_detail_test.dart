@@ -91,6 +91,26 @@ void main() {
     expect(android.queryParameters['destination'], '0.4162,9.4673');
   });
 
+  testWidgets(
+    'a station the server sent without a country still shows the photo',
+    (tester) async {
+      await pumpApp(
+        tester,
+        StationDetailPage(stationId: stations.last.id),
+        overrides: overridesWith(stationRepo: _Unlocated()),
+      );
+
+      final assets = tester
+          .widgetList<Image>(find.byType(Image))
+          .map((image) => image.image)
+          .whereType<AssetImage>()
+          .map((image) => image.assetName);
+      expect(assets, contains('assets/images/stationgabon.png'));
+      expect(assets, isNot(contains('assets/images/bornes.png')));
+      await closeApp(tester);
+    },
+  );
+
   testWidgets('a station without coordinates has no map', (tester) async {
     await pumpApp(
       tester,

@@ -33,7 +33,7 @@ export const deleteAccountEn: LegalDocument = {
     },
     {
       heading: "Can’t use the app?",
-      paragraphs: ["Write to us from your account email address through the Support page with the subject “Account deletion”. We will process your request after verifying your identity."],
+      paragraphs: ["Write to us from your account email address at contact@zella-tech.com or through the Contact page with the subject “Account deletion”. We will process your request after verifying your identity."],
     },
   ],
 };

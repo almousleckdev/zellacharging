@@ -8,7 +8,7 @@ export const privacyEn: LegalDocument = {
   sections: [
     {
       heading: "1. Who is responsible for your data",
-      paragraphs: ["The data controller is the publisher of the Zella Charging app. For any question, write to us at the address given in the Contact section."],
+      paragraphs: ["The data controller is the publisher of the Zella Charging app. For any question, write to us at confidentialite@zella-tech.com."],
     },
     {
       heading: "2. Data we collect",
@@ -62,7 +62,7 @@ export const privacyEn: LegalDocument = {
     },
     {
       heading: "7. Security",
-      paragraphs: ["Traffic is encrypted (HTTPS). Passwords are irreversibly encrypted, sessions expire and access is limited to authorised staff. No system is perfect, so please report any incident to the contact address."],
+      paragraphs: ["Traffic is encrypted (HTTPS). Passwords are irreversibly encrypted, sessions expire and access is limited to authorised staff. No system is perfect, so please report any incident to confidentialite@zella-tech.com."],
     },
     {
       heading: "8. International transfers",
@@ -76,6 +76,6 @@ export const privacyEn: LegalDocument = {
       heading: "10. Changes",
       paragraphs: ["We may update this policy. The last update date is shown at the top of the page; for important changes we will tell you in the app."],
     },
-    { heading: "11. Contact", paragraphs: ["For any question about your data, write to us at the address on the Support page."] },
+    { heading: "11. Contact", paragraphs: ["For any question about your data, write to us at confidentialite@zella-tech.com or use the Contact page."] },
   ],
 };

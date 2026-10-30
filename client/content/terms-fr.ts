@@ -66,7 +66,7 @@ export const termsFr: LegalDocument = {
     },
     {
       heading: "10. Droit applicable et contact",
-      paragraphs: ["Ces conditions sont régies par le droit gabonais. Pour toute question, contactez-nous via la page Support."],
+      paragraphs: ["Ces conditions sont régies par le droit gabonais. Pour toute question, contactez-nous via la page Contact."],
     },
   ],
 };

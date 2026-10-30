@@ -1,5 +1,6 @@
 import type { Copy } from "@/content/types";
 import { Icon, type IconName } from "./Icon";
+import { Screenshot } from "./Screenshot";
 
 const icons: IconName[] = ["map", "scan", "bolt", "wallet", "bell", "shield"];
 
@@ -11,14 +12,19 @@ export function Features({ copy }: { copy: Copy["features"] }) {
           <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{copy.title}</h2>
           <p className="mt-4 text-lg text-muted">{copy.text}</p>
         </div>
-        <div className="mt-14 grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+        <div className="mt-16 space-y-20 md:space-y-28">
           {copy.items.map((item, index) => (
-            <article key={item.title} className="rounded-2xl border border-line bg-white p-6 transition-colors hover:border-brand">
-              <span className="inline-flex h-11 w-11 items-center justify-center rounded-xl border border-line text-brand">
-                <Icon name={icons[index]} />
-              </span>
-              <h3 className="mt-5 text-lg font-semibold">{item.title}</h3>
-              <p className="mt-2 leading-relaxed text-muted">{item.text}</p>
+            <article key={item.title} className="grid items-center gap-10 md:grid-cols-2 md:gap-16">
+              <div className={index % 2 === 1 ? "md:order-2" : ""}>
+                <span className="inline-flex h-12 w-12 items-center justify-center rounded-xl border border-line text-brand">
+                  <Icon name={icons[index]} className="h-6 w-6" />
+                </span>
+                <h3 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">{item.title}</h3>
+                <p className="mt-4 max-w-md text-lg leading-relaxed text-muted">{item.text}</p>
+              </div>
+              <div className="mx-auto w-full max-w-[260px]">
+                <Screenshot slot={index + 2} />
+              </div>
             </article>
           ))}
         </div>

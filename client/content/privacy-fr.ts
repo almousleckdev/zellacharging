@@ -8,7 +8,7 @@ export const privacyFr: LegalDocument = {
   sections: [
     {
       heading: "1. Qui est responsable de vos données",
-      paragraphs: ["Le responsable du traitement est l’éditeur de l’application Zella Charging. Pour toute question, écrivez-nous à l’adresse indiquée dans la section Contact."],
+      paragraphs: ["Le responsable du traitement est l’éditeur de l’application Zella Charging. Pour toute question, écrivez-nous à confidentialite@zella-tech.com."],
     },
     {
       heading: "2. Les données que nous collectons",
@@ -62,7 +62,7 @@ export const privacyFr: LegalDocument = {
     },
     {
       heading: "7. Sécurité",
-      paragraphs: ["Les échanges sont chiffrés (HTTPS). Les mots de passe sont chiffrés de façon irréversible, les sessions expirent et les accès sont limités au personnel autorisé. Aucun système n’étant infaillible, signalez-nous tout incident à l’adresse de contact."],
+      paragraphs: ["Les échanges sont chiffrés (HTTPS). Les mots de passe sont chiffrés de façon irréversible, les sessions expirent et les accès sont limités au personnel autorisé. Aucun système n’étant infaillible, signalez-nous tout incident à confidentialite@zella-tech.com."],
     },
     {
       heading: "8. Transferts internationaux",
@@ -76,6 +76,6 @@ export const privacyFr: LegalDocument = {
       heading: "10. Modifications",
       paragraphs: ["Nous pouvons mettre à jour cette politique. La date de dernière mise à jour figure en haut de la page ; en cas de changement important, nous vous en informerons dans l’application."],
     },
-    { heading: "11. Contact", paragraphs: ["Pour toute question sur vos données, écrivez-nous à l’adresse indiquée sur la page Support."] },
+    { heading: "11. Contact", paragraphs: ["Pour toute question sur vos données, écrivez-nous à confidentialite@zella-tech.com ou utilisez la page Contact."] },
   ],
 };

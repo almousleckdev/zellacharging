@@ -6,7 +6,7 @@ export const en: Copy = {
     description:
       "Find a charger, scan the QR code, start and pay with Airtel Money or Moov Money. The Zella Charging app for iOS and Android.",
   },
-  nav: { features: "Features", how: "How it works", faq: "FAQ", support: "Support" },
+  nav: { features: "Features", how: "How it works", faq: "FAQ", contact: "Contact" },
   hero: {
     title: "Charge your electric vehicle,",
     highlight: "simply.",
@@ -19,8 +19,6 @@ export const en: Copy = {
     playStoreLead: "Get it on",
     soon: "Coming soon",
   },
-  charge: { title: "Follow your charge live", text: "Energy delivered, duration, battery and cost updated during the charge." },
-  gallery: { title: "The app in pictures", text: "A look at the Zella Charging screens." },
   features: {
     title: "Everything for a calm charge",
     text: "An app built for electric vehicle drivers in Gabon.",
@@ -62,7 +60,7 @@ export const en: Copy = {
     privacy: "Privacy policy",
     terms: "Terms of use",
     deleteAccount: "Delete my account",
-    support: "Support",
+    contact: "Contact",
     rights: "All rights reserved.",
   },
   switchTo: { label: "Français", locale: "fr" },

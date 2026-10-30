@@ -66,7 +66,7 @@ export const termsEn: LegalDocument = {
     },
     {
       heading: "10. Governing law and contact",
-      paragraphs: ["These terms are governed by the law of Gabon. For any question, contact us through the Support page."],
+      paragraphs: ["These terms are governed by the law of Gabon. For any question, contact us through the Contact page."],
     },
   ],
 };

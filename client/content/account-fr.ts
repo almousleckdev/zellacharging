@@ -33,7 +33,7 @@ export const deleteAccountFr: LegalDocument = {
     },
     {
       heading: "Vous ne pouvez pas utiliser l’application ?",
-      paragraphs: ["Écrivez-nous depuis l’adresse e-mail de votre compte via la page Support en indiquant « Suppression de compte ». Nous traiterons votre demande après vérification de votre identité."],
+      paragraphs: ["Écrivez-nous depuis l’adresse e-mail de votre compte à contact@zella-tech.com ou via la page Contact en indiquant « Suppression de compte ». Nous traiterons votre demande après vérification de votre identité."],
     },
   ],
 };

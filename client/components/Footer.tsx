@@ -19,7 +19,7 @@ export function Footer({ lang, copy }: { lang: Locale; copy: Copy }) {
         { href: `/${lang}/privacy`, label: copy.footer.privacy },
         { href: `/${lang}/terms`, label: copy.footer.terms },
         { href: `/${lang}/delete-account`, label: copy.footer.deleteAccount },
-        { href: `/${lang}/support`, label: copy.footer.support },
+        { href: `/${lang}/contact`, label: copy.footer.contact },
       ],
     },
   ];

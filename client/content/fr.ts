@@ -6,7 +6,7 @@ export const fr: Copy = {
     description:
       "Trouvez une borne, scannez le QR code, démarrez et payez avec Airtel Money ou Moov Money. L’application Zella Charging pour iOS et Android.",
   },
-  nav: { features: "Fonctionnalités", how: "Comment ça marche", faq: "Questions", support: "Support" },
+  nav: { features: "Fonctionnalités", how: "Comment ça marche", faq: "Questions", contact: "Contact" },
   hero: {
     title: "Rechargez votre véhicule électrique,",
     highlight: "simplement.",
@@ -19,8 +19,6 @@ export const fr: Copy = {
     playStoreLead: "Disponible sur",
     soon: "Bientôt disponible",
   },
-  charge: { title: "Suivez votre recharge en direct", text: "Énergie délivrée, durée, batterie et coût mis à jour pendant la recharge." },
-  gallery: { title: "L’application en images", text: "Un aperçu des écrans de Zella Charging." },
   features: {
     title: "Tout pour recharger sereinement",
     text: "Une application pensée pour les conducteurs de véhicules électriques au Gabon.",
@@ -62,7 +60,7 @@ export const fr: Copy = {
     privacy: "Politique de confidentialité",
     terms: "Conditions d’utilisation",
     deleteAccount: "Supprimer mon compte",
-    support: "Support",
+    contact: "Contact",
     rights: "Tous droits réservés.",
   },
   switchTo: { label: "English", locale: "en" },

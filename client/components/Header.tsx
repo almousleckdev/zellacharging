@@ -8,7 +8,7 @@ export function Header({ lang, copy }: { lang: Locale; copy: Copy }) {
     { href: `/${lang}#features`, label: copy.nav.features },
     { href: `/${lang}#how`, label: copy.nav.how },
     { href: `/${lang}#faq`, label: copy.nav.faq },
-    { href: `/${lang}/support`, label: copy.nav.support },
+    { href: `/${lang}/contact`, label: copy.nav.contact },
   ];
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">

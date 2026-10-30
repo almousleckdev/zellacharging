@@ -3,8 +3,7 @@
 :root {
   --brand: #f97316;
   --brand-deep: #ea580c;
-    --charge: #22c55e;
-  --ink: #0f172a;
+    --ink: #0f172a;
   --muted: #64748b;
   --line: #e2e8f0;
   --surface: #ffffff;
@@ -13,7 +12,6 @@
 @theme inline {
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
-  --color-charge: var(--charge);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
@@ -39,19 +37,4 @@ body {
     animation: none !important;
     transition: none !important;
   }
-}
-
-@keyframes glow {
-  from { filter: drop-shadow(0 0 2px rgb(34 211 238 / 0.15)); }
-  to { filter: drop-shadow(0 0 22px rgb(34 211 238 / 0.55)); }
-}
-
-@keyframes fill {
-  0% { transform: scaleX(0); }
-  85%, 100% { transform: scaleX(1); }
-}
-
-@keyframes sweep {
-  from { transform: translateX(-100%); }
-  to { transform: translateX(400%); }
 }

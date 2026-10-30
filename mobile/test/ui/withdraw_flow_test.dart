@@ -139,9 +139,7 @@ void main() {
     await closeApp(tester);
   });
 
-  testWidgets('the wallet shows Retirer next to Créditer', (
-    tester,
-  ) async {
+  testWidgets('the wallet shows Retirer next to Créditer', (tester) async {
     await pumpApp(
       tester,
       const WalletPage(),

@@ -5,6 +5,7 @@ import '../../../core/format/money_format.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../shared/widgets/info_card.dart';
 import '../../../shared/widgets/info_row.dart';
+import '../domain/mobile_operator.dart';
 import '../domain/wallet_entry_detail.dart';
 
 class WalletEntryCards extends StatelessWidget {
@@ -18,9 +19,6 @@ class WalletEntryCards extends StatelessWidget {
   final WalletEntryDetail detail;
   final String currency;
   final int decimals;
-
-  String _operatorLabel(String code) =>
-      code == 'MOOV' ? 'Moov Money' : 'Airtel Money';
 
   @override
   Widget build(BuildContext context) {
@@ -60,7 +58,9 @@ class WalletEntryCards extends StatelessWidget {
             children: [
               InfoRow(
                 label: WalletHistoryText.operator,
-                value: _operatorLabel(detail.operator!),
+                value:
+                    MobileOperator.fromCode(detail.operator)?.label ??
+                    detail.operator!,
               ),
               if (detail.msisdn != null)
                 InfoRow(label: WalletHistoryText.number, value: detail.msisdn!),

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.UUID;
 
 @Component
 public class NotificationTexts {
@@ -14,12 +15,15 @@ public class NotificationTexts {
     private static final String ENGLISH = "en";
 
     public PushContent render(PendingNotification notification, String language) {
-        boolean english = ENGLISH.equalsIgnoreCase(language);
-        String[] text = textOf(notification.type(), english);
-        Map<String, String> data = new HashMap<>(notification.params());
-        data.put("type", notification.type().name());
-        data.put("notificationId", notification.id().toString());
-        return new PushContent(text[0], text[1], data);
+        return render(notification.id(), notification.type(), notification.params(), language);
+    }
+
+    public PushContent render(UUID id, NotificationType type, Map<String, String> params, String language) {
+        String[] text = textOf(type, ENGLISH.equalsIgnoreCase(language));
+        Map<String, String> data = new HashMap<>(params);
+        data.put("type", type.name());
+        data.put("notificationId", id.toString());
+        return new PushContent(text[0], text[1], data, 0);
     }
 
     private static String[] textOf(NotificationType type, boolean en) {

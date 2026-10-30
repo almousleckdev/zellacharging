@@ -7,6 +7,7 @@ import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/app_toast.dart';
 import '../../../shared/widgets/async_body.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../../shared/widgets/pay/wallet_balance_card.dart';
@@ -52,9 +53,9 @@ class WalletPage extends ConsumerWidget {
     final topUp = PrimaryButton(
       label: WalletText.topUp,
       icon: AppIcons.wallet,
+      height: AppSpacing.compactButtonHeight,
       onPressed: () => context.push(Routes.topup),
     );
-    if (!wallet.withdrawalsEnabled) return topUp;
     return Row(
       children: [
         Expanded(child: topUp),
@@ -63,7 +64,10 @@ class WalletPage extends ConsumerWidget {
           child: SecondaryButton(
             label: WithdrawText.action,
             icon: AppIcons.signOut,
-            onPressed: () => context.push(Routes.withdraw),
+            height: AppSpacing.compactButtonHeight,
+            onPressed: () => wallet.withdrawalsEnabled
+                ? context.push(Routes.withdraw)
+                : AppToast.info(context, WithdrawText.unavailable),
           ),
         ),
       ],

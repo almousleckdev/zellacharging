@@ -1,4 +1,6 @@
 import 'dart:convert';
+import 'package:flutter/painting.dart';
+import 'package:flutter_map/flutter_map.dart';
 import 'dart:typed_data';
 
 import 'package:zella/core/links/link_launcher.dart';
@@ -55,6 +57,11 @@ final stations = [
     totalConnectors: 2,
     connectors: connectors,
     distanceKm: 12.4,
+    latitude: 0.4162,
+    longitude: 9.4673,
+    isoCode: 'GA',
+    vendor: 'JC.DW',
+    model: 'V1.1',
   ),
   const Station(
     id: 'CP-SITE-001',
@@ -382,4 +389,10 @@ class FakeSession extends SessionController {
 class NoLocation implements LocationService {
   @override
   Future<Coordinates?> currentPosition() async => null;
+}
+
+class NoTiles extends TileProvider {
+  @override
+  ImageProvider getImage(TileCoordinates coordinates, TileLayer options) =>
+      MemoryImage(tinyPng);
 }

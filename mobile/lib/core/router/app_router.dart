@@ -34,6 +34,7 @@ import '../../features/history/presentation/activity_stats_page.dart';
 import '../../features/wallet/presentation/topup_page.dart';
 import '../../features/wallet/presentation/wallet_entry_page.dart';
 import '../../features/wallet/presentation/wallet_page.dart';
+import '../../features/notifications/presentation/notifications_page.dart';
 import '../../features/wallet/presentation/withdraw_page.dart';
 import '../../features/stations/presentation/station_detail_page.dart';
 import '../../features/charging/presentation/charging_page.dart';
@@ -158,6 +159,10 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.wallet, builder: (_, _) => const WalletPage()),
       GoRoute(path: Routes.topup, builder: (_, _) => const TopupPage()),
       GoRoute(path: Routes.withdraw, builder: (_, _) => const WithdrawPage()),
+      GoRoute(
+        path: Routes.notifications,
+        builder: (_, _) => const NotificationsPage(),
+      ),
       GoRoute(
         path: Routes.chargeSetup,
         builder: (_, state) => ChargeSetupPage(

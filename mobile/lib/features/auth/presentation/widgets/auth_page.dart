@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 const authContentWidth = 340.0;
@@ -32,10 +30,7 @@ class AuthPage extends StatelessWidget {
       appBar: showBack
           ? AppBar(
               backgroundColor: backgroundColor,
-              leading: IconButton(
-                onPressed: () => context.pop(),
-                icon: Icon(AppIcons.caretLeft),
-              ),
+              leading: const BackButton(),
             )
           : null,
       body: SafeArea(

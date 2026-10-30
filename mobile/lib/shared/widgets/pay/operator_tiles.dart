@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../operator_logo.dart';
 import '../../../features/wallet/domain/mobile_operator.dart';
 import '../../../features/wallet/domain/operator_hint.dart';
 
@@ -56,7 +57,6 @@ class _Tile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return Semantics(
       button: true,
       enabled: enabled,
@@ -78,30 +78,20 @@ class _Tile extends StatelessWidget {
                 width: active ? 2 : 1,
               ),
             ),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+            child: Stack(
+              alignment: Alignment.center,
               children: [
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    Icon(
-                      AppIcons.phone,
-                      color: active ? AppColors.primary : AppColors.neutral,
-                    ),
-                    Icon(
-                      active ? AppIcons.checkCircle : AppIcons.circle,
-                      size: 20,
-                      color: active ? AppColors.primary : AppColors.border,
-                    ),
-                  ],
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs),
+                  child: OperatorLogo(operator: operator, size: 52),
                 ),
-                const SizedBox(height: AppSpacing.sm),
-                Text(
-                  operator.label,
-                  maxLines: 2,
-                  overflow: TextOverflow.ellipsis,
-                  style: theme.textTheme.titleSmall?.copyWith(
-                    fontWeight: FontWeight.w700,
+                Positioned(
+                  top: 0,
+                  right: 0,
+                  child: Icon(
+                    active ? AppIcons.checkCircle : AppIcons.circle,
+                    size: 20,
+                    color: active ? AppColors.primary : AppColors.border,
                   ),
                 ),
               ],

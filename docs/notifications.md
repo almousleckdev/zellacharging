@@ -44,3 +44,18 @@ isolate is needed.
 Backend: `NotificationIntegrationTest` (delivery in each device language, dedupe, invalid token cleanup, retry then dead
 letter, no devices, ownership). Mobile: `push_notifications_test.dart` (routing, permission, refresh, failure, sign-out).
 **Real delivery to a phone has not been verified.**
+
+## Notification center and icon badge
+
+- Every event stays in `notification_outbox`, so it doubles as the customer's inbox (`read_at` marks it read).
+  The inbox does not depend on push delivery: it lists the event even when no device is registered.
+- API (customer token): `GET /v1/notifications` (localized from `Accept-Language`, newest first, with `unread`),
+  `GET /v1/notifications/unread-count`, `POST /v1/notifications/{id}/read`, `POST /v1/notifications/read`.
+  Only the owner can mark a notification read.
+- Each push carries the unread count: `aps.badge` on iOS and `notification_count` on Android.
+  iOS uses `apns-push-type: alert` with priority 10 and a sound, so it shows on a locked phone.
+  Android uses the high-importance `zella_alerts` channel with `visibility: PUBLIC`, so the content shows on the lock screen.
+- The app keeps the icon badge equal to the unread count (`app_badge_plus`), refreshing on foreground pushes, every 15 seconds
+  while open and on resume. Signing out resets it to zero.
+- Not verified on hardware: lock-screen display and launcher badges need a real iOS and Android device with the Firebase
+  service account and the APNs key. Android launchers differ: Pixel and Samsung show counts, some launchers only show a dot.

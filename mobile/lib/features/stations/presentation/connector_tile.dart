@@ -64,6 +64,15 @@ class ConnectorTile extends StatelessWidget {
           if (connector.available && onStart != null)
             FilledButton(
               onPressed: onStart,
+              style: FilledButton.styleFrom(
+                minimumSize: const Size(0, 34),
+                padding: const EdgeInsets.symmetric(horizontal: 14),
+                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                textStyle: const TextStyle(
+                  fontSize: 13,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
               child: Text(StationText.startCharging),
             )
           else

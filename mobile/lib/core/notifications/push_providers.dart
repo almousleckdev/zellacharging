@@ -2,6 +2,7 @@ import 'package:firebase_messaging/firebase_messaging.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../network/network_providers.dart';
+import 'app_badge.dart';
 import 'device_registry.dart';
 import 'firebase_push_messaging.dart';
 import 'push_messaging.dart';
@@ -17,3 +18,5 @@ final pushRegistrationProvider = Provider<PushRegistration>(
     DeviceRegistry(ref.watch(dioProvider)),
   ),
 );
+
+final appBadgeProvider = Provider<AppBadge>((ref) => PluginAppBadge());

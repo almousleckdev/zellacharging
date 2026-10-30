@@ -10,17 +10,19 @@ class SecondaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
+    this.height = AppSpacing.buttonHeight,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
+  final double height;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: AppSpacing.buttonHeight,
+      height: height,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(

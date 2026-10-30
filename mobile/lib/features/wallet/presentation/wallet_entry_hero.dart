@@ -6,8 +6,10 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/icon_badge.dart';
+import '../../../shared/widgets/operator_logo.dart';
 import '../../../shared/widgets/soft_card.dart';
 import '../../../shared/widgets/status_chip.dart';
+import '../domain/mobile_operator.dart';
 import '../domain/wallet_entry_detail.dart';
 
 class WalletEntryHero extends StatelessWidget {
@@ -28,6 +30,12 @@ class WalletEntryHero extends StatelessWidget {
     _ => AppIcons.wallet,
   };
 
+  Widget _mark(Color tone) {
+    final operator = MobileOperator.fromCode(detail.operator);
+    if (operator != null) return OperatorLogo(operator: operator, size: 56);
+    return IconBadge(icon: _icon, size: 56, color: tone);
+  }
+
   Color get _statusColor => detail.failed
       ? AppColors.danger
       : detail.inProgress || detail.needsReview
@@ -43,7 +51,7 @@ class WalletEntryHero extends StatelessWidget {
       padding: const EdgeInsets.all(AppSpacing.lg),
       child: Column(
         children: [
-          IconBadge(icon: _icon, size: 56, color: tone),
+          _mark(tone),
           const SizedBox(height: AppSpacing.md),
           Text(
             WithdrawText.entryLabel(entry.type),

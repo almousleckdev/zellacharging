@@ -22,7 +22,4 @@ abstract final class HomeText {
 
   static String get settings =>
       AppLanguage.pick(fr: 'Réglages', en: 'Settings');
-
-  static String get notifications =>
-      AppLanguage.pick(fr: 'Notifications', en: 'Notifications');
 }

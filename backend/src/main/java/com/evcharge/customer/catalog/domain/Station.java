@@ -1,6 +1,7 @@
 package com.evcharge.customer.catalog.domain;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.Optional;
@@ -8,7 +9,10 @@ import java.util.Optional;
 public record Station(
         String id,
         String isoCode,
+        String vendor,
+        String model,
         boolean online,
+        Instant lastSeenAt,
         BigDecimal latitude,
         BigDecimal longitude,
         List<StationConnector> connectors) {
@@ -23,7 +27,7 @@ public record Station(
         }
         List<StationConnector> marked = connectors.stream()
                 .map(c -> busy.contains(c.connectorId()) ? c.inUse() : c).toList();
-        return new Station(id, isoCode, online, latitude, longitude, marked);
+        return new Station(id, isoCode, vendor, model, online, lastSeenAt, latitude, longitude, marked);
     }
 
     public long availableConnectors() {

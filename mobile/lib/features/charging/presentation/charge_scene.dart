@@ -15,16 +15,16 @@ class ChargeScene extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        ChargeHero(session: session),
-        BatteryFreshness(session: session),
-        const SizedBox(height: AppSpacing.md),
-        CarStage(
-          level: session.chargeLevel,
-          charging: session.state == SessionState.active,
-        ),
-      ],
+    return CarStage(
+      level: session.chargeLevel,
+      charging: session.state == SessionState.active,
+      header: Column(
+        children: [
+          ChargeHero(session: session),
+          BatteryFreshness(session: session),
+          const SizedBox(height: AppSpacing.md),
+        ],
+      ),
     );
   }
 }

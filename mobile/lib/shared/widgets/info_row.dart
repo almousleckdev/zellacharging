@@ -21,29 +21,32 @@ class InfoRow extends StatelessWidget {
     final weight = emphasized ? FontWeight.w800 : FontWeight.w500;
     return Padding(
       padding: const EdgeInsets.symmetric(vertical: AppSpacing.xs + 2),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Expanded(
-            child: Text(
-              label,
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: emphasized
-                    ? AppColors.textPrimary
-                    : AppColors.textSecondary,
-                fontWeight: emphasized ? FontWeight.w700 : FontWeight.w400,
+      child: LayoutBuilder(
+        builder: (context, constraints) => Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ConstrainedBox(
+              constraints: BoxConstraints(maxWidth: constraints.maxWidth * 0.5),
+              child: Text(
+                label,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: emphasized
+                      ? AppColors.textPrimary
+                      : AppColors.textSecondary,
+                  fontWeight: emphasized ? FontWeight.w700 : FontWeight.w400,
+                ),
               ),
             ),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Flexible(
-            child: Text(
-              value,
-              textAlign: TextAlign.end,
-              style: theme.textTheme.bodyMedium?.copyWith(fontWeight: weight),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Text(
+                value,
+                textAlign: TextAlign.end,
+                style: theme.textTheme.bodyMedium?.copyWith(fontWeight: weight),
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

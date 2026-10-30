@@ -97,6 +97,26 @@ abstract final class ErrorText {
       fr: 'Mobile Money est momentanément indisponible.',
       en: 'Mobile money is temporarily unavailable.',
     ),
+    'SOCIAL_UNAVAILABLE': AppLanguage.pick(
+      fr: 'Cette méthode de connexion n’est pas disponible pour le moment.',
+      en: 'This sign-in method is not available right now.',
+    ),
+    'SOCIAL_TOKEN_INVALID': AppLanguage.pick(
+      fr: 'La connexion avec ce service a échoué. Réessayez.',
+      en: 'Signing in with this service failed. Try again.',
+    ),
+    'SOCIAL_EMAIL_UNVERIFIED': AppLanguage.pick(
+      fr: 'Ce service n’a pas fourni d’adresse e-mail vérifiée.',
+      en: 'This service did not provide a verified email address.',
+    ),
+    'SOCIAL_PROOF_REQUIRED': AppLanguage.pick(
+      fr: 'Reconnectez-vous avec votre service de connexion pour confirmer.',
+      en: 'Sign in again with your provider to confirm.',
+    ),
+    'SOCIAL_IDENTITY_MISMATCH': AppLanguage.pick(
+      fr: 'Ce compte Google ou Apple n’est pas lié à votre compte Zella.',
+      en: 'This Google or Apple account is not linked to your Zella account.',
+    ),
     'WRONG_PASSWORD': AppLanguage.pick(
       fr: 'Le mot de passe est incorrect.',
       en: 'The password is incorrect.',

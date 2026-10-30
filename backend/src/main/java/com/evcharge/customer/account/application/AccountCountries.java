@@ -29,6 +29,10 @@ public class AccountCountries {
         return directory.defaultCountry().code();
     }
 
+    public String forSocialSignIn() {
+        return directory.defaultCountry().code();
+    }
+
     public String forIdentifier(String identifier) {
         return forContact(contacts.resolve(identifier));
     }

@@ -1,7 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zella/core/l10n/strings.dart';
+import 'package:zella/features/auth/domain/social_provider.dart';
+import 'package:zella/features/auth/presentation/auth_providers.dart';
+import 'package:zella/features/auth/presentation/social_button.dart';
 import 'package:zella/features/charging/domain/session_state.dart';
+import 'package:zella/features/profile/domain/profile.dart';
 import 'package:zella/features/profile/presentation/change_password_page.dart';
 import 'package:zella/features/profile/presentation/delete_account_page.dart';
 import 'package:zella/features/profile/presentation/notifications_controller.dart';
@@ -175,6 +179,39 @@ void main() {
 
     expect(find.text(Strings.required), findsOneWidget);
     expect(find.text(ProfileText.deleteAccountTitle), findsNothing);
+    await closeApp(tester);
+  });
+
+  testWidgets('an account without a password is deleted with its provider', (
+    tester,
+  ) async {
+    final profile = FakeProfile()
+      ..served = const Profile(
+        firstName: 'A',
+        lastName: 'B',
+        email: 'a@b.c',
+        hasPassword: false,
+      );
+    final authenticator = FakeSocialAuthenticator();
+    await pumpApp(
+      tester,
+      const DeleteAccountPage(),
+      overrides: [
+        ...overrides(SessionState.active, profile),
+        socialAuthenticatorProvider.overrideWithValue(authenticator),
+      ],
+    );
+
+    expect(find.byType(TextFormField), findsNothing);
+    expect(find.byType(SocialButton), findsOneWidget);
+    await tester.tap(find.byType(SocialButton));
+    await settle(tester);
+    await tester.tap(find.text(ProfileText.deleteAccountConfirm).last);
+    await settle(tester);
+
+    expect(authenticator.asked, [SocialProvider.google]);
+    expect(profile.closedWith, ['GOOGLE']);
+    expect(FakeSession.signOuts, 1);
     await closeApp(tester);
   });
 }

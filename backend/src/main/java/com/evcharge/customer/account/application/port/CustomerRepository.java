@@ -22,4 +22,6 @@ public interface CustomerRepository {
     void attachPhone(UUID id, String phone);
     boolean updateStatus(UUID id, String from, String to);
     void markDeleted(UUID id, String unusablePasswordHash);
+    boolean hasPassword(UUID id);
+    void markPasswordless(UUID id, String unusablePasswordHash);
 }

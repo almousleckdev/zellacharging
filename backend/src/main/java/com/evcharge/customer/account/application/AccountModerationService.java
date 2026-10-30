@@ -3,6 +3,7 @@ package com.evcharge.customer.account.application;
 import com.evcharge.customer.account.ClosureBlocker;
 import com.evcharge.customer.account.CustomerModeration;
 import com.evcharge.customer.account.application.port.AvatarRepository;
+import com.evcharge.customer.account.application.port.CustomerIdentityRepository;
 import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.PasswordHasher;
 import com.evcharge.customer.account.application.port.RefreshTokenRepository;
@@ -24,16 +25,18 @@ class AccountModerationService implements CustomerModeration {
     private final CustomerRepository customers;
     private final RefreshTokenRepository refreshTokens;
     private final AvatarRepository avatars;
+    private final CustomerIdentityRepository identities;
     private final PasswordHasher hasher;
     private final List<ClosureBlocker> blockers;
     private final Clock clock;
 
     AccountModerationService(CustomerRepository customers, RefreshTokenRepository refreshTokens,
-                             AvatarRepository avatars, PasswordHasher hasher, List<ClosureBlocker> blockers,
-                             Clock clock) {
+                             AvatarRepository avatars, CustomerIdentityRepository identities,
+                             PasswordHasher hasher, List<ClosureBlocker> blockers, Clock clock) {
         this.customers = customers;
         this.refreshTokens = refreshTokens;
         this.avatars = avatars;
+        this.identities = identities;
         this.hasher = hasher;
         this.blockers = blockers;
         this.clock = clock;
@@ -73,6 +76,7 @@ class AccountModerationService implements CustomerModeration {
         customers.markDeleted(customerId, hasher.hash(UUID.randomUUID().toString()));
         refreshTokens.revokeAllOf(customerId, clock.instant());
         avatars.delete(customerId);
+        identities.deleteOf(customerId);
     }
 
     private Customer load(UUID customerId) {

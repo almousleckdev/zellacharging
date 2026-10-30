@@ -5,6 +5,7 @@ import com.evcharge.customer.account.application.LoginService;
 import com.evcharge.customer.account.application.RegisterCommand;
 import com.evcharge.customer.account.application.RegistrationService;
 import com.evcharge.customer.account.application.RefreshSessionService;
+import com.evcharge.customer.account.application.SocialLoginService;
 import com.evcharge.customer.account.application.VerificationService;
 import com.evcharge.customer.shared.TenantContext;
 import jakarta.validation.Valid;
@@ -22,14 +23,17 @@ class AuthController {
     private final RegistrationService registration;
     private final VerificationService verification;
     private final LoginService login;
+    private final SocialLoginService social;
     private final RefreshSessionService sessions;
     private final AccountCountries countries;
 
     AuthController(RegistrationService registration, VerificationService verification,
-                   LoginService login, RefreshSessionService sessions, AccountCountries countries) {
+                   LoginService login, SocialLoginService social, RefreshSessionService sessions,
+                   AccountCountries countries) {
         this.registration = registration;
         this.verification = verification;
         this.login = login;
+        this.social = social;
         this.sessions = sessions;
         this.countries = countries;
     }
@@ -60,6 +64,12 @@ class AuthController {
     TokensResponse login(@Valid @RequestBody LoginRequest request) {
         return TenantContext.callAs(countries.forIdentifier(request.identifier()),
                 () -> TokensResponse.from(login.login(request.identifier(), request.password())));
+    }
+
+    @PostMapping("/social")
+    TokensResponse social(@Valid @RequestBody SocialLoginRequest request) {
+        return TenantContext.callAs(countries.forSocialSignIn(), () -> TokensResponse.from(
+                social.signIn(request.provider(), request.idToken(), request.firstName(), request.lastName())));
     }
 
     @PostMapping("/refresh")

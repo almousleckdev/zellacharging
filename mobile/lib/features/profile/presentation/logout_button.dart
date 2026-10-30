@@ -26,11 +26,14 @@ class LogoutButton extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     return SizedBox(
       width: double.infinity,
-      height: AppSpacing.buttonHeight,
+      height: AppSpacing.compactButtonHeight,
       child: OutlinedButton.icon(
         onPressed: () => _logOut(context, ref),
-        icon: Icon(AppIcons.signOut, size: 20),
-        label: Text(ProfileText.logOut),
+        icon: Icon(AppIcons.signOut, size: 18),
+        label: Text(
+          ProfileText.logOut,
+          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
+        ),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.danger,
           side: BorderSide(color: AppColors.danger),

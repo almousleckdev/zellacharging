@@ -94,6 +94,7 @@ class StationMapCard extends ConsumerWidget {
           PrimaryButton(
             label: StationDetailText.directions,
             icon: AppIcons.navigation,
+            height: AppSpacing.compactButtonHeight,
             onPressed: () => _navigate(context, ref),
           ),
         ],

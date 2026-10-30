@@ -101,3 +101,18 @@ needed for now.
 
 Replace the sandbox provider with the PVit adapter, an SMS and email provider, and a
 production secret store. Those are not part of this staging build.
+
+
+## Environments, rollback and verification
+
+* Today there is one Railway environment (named `production`) that serves the real app. A separate staging environment
+  with its own database and PVit sandbox credentials is **recommended and not created**; create it before testing risky
+  changes such as withdrawals.
+* Deploy: merge to `main` after green checks, then `railway up -s backend --ci` (manual by design).
+* Verify after deploy: `GET /actuator/health` returns `UP`, the log shows Flyway applied the expected migration, a login and
+  a wallet read succeed from the app, no `ALERT` lines appear for ten minutes.
+* Roll back: redeploy the previous successful deployment in the Railway dashboard. Migrations are written to be additive,
+  so the previous version still runs. If a migration itself is wrong, restore from backup (`disaster-recovery.md`).
+* Backend variables added by this work: `ZELLA_FCM_CREDENTIALS_JSON` (optional), `ZELLA_NOTIFICATION_INTERVAL` (optional).
+  Migration V23 creates the notification tables. V21 and V22 (email change, password reset) must also be deployed before
+  the current mobile app.

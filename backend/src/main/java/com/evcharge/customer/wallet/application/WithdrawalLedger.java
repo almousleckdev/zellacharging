@@ -2,6 +2,8 @@ package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.AuditTrail;
+import com.evcharge.customer.shared.NotificationType;
+import com.evcharge.customer.shared.Notifier;
 import com.evcharge.customer.wallet.application.port.LedgerRepository;
 import com.evcharge.customer.wallet.application.port.WalletRepository;
 import com.evcharge.customer.wallet.application.port.WithdrawalRepository;
@@ -15,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -28,9 +31,11 @@ class WithdrawalLedger {
     private final WalletSettings settings;
     private final DailyWithdrawalLimit dailyLimit;
     private final Clock clock;
+    private final Notifier notifier;
 
     WithdrawalLedger(WithdrawalRepository withdrawals, WalletRepository wallets, LedgerRepository ledger,
-                     AuditTrail audit, WalletSettings settings, DailyWithdrawalLimit dailyLimit, Clock clock) {
+                     AuditTrail audit, WalletSettings settings, DailyWithdrawalLimit dailyLimit, Clock clock,
+                     Notifier notifier) {
         this.withdrawals = withdrawals;
         this.wallets = wallets;
         this.ledger = ledger;
@@ -38,6 +43,7 @@ class WithdrawalLedger {
         this.settings = settings;
         this.dailyLimit = dailyLimit;
         this.clock = clock;
+        this.notifier = notifier;
     }
 
     @Transactional
@@ -55,6 +61,7 @@ class WithdrawalLedger {
             ledger.append(entry(withdrawal, LedgerType.WITHDRAWAL, "withdrawal:" + withdrawal.id()));
             audit.record("WITHDRAWAL_REQUESTED", withdrawal.customerId(), withdrawal.reference(),
                     Long.toString(withdrawal.amountMinor()));
+            announce(withdrawal, NotificationType.WITHDRAWAL_STARTED);
         }
         return inserted;
     }
@@ -70,8 +77,27 @@ class WithdrawalLedger {
             wallets.apply(withdrawal.customerId(), withdrawal.amountMinor(), 0);
             ledger.append(entry(withdrawal, LedgerType.WITHDRAWAL_REVERSAL, "withdrawal-reversal:" + withdrawal.id()));
             audit.record("WITHDRAWAL_REVERSED", withdrawal.customerId(), withdrawal.reference(), failureCode);
+            announce(withdrawal, NotificationType.WITHDRAWAL_FAILED);
         }
         return moved;
+    }
+
+    @Transactional
+    boolean markPaid(Withdrawal withdrawal, String providerRef) {
+        boolean moved = withdrawals.transition(withdrawal.id(), WithdrawalState.PROCESSING, WithdrawalState.PAID,
+                providerRef, null)
+                || withdrawals.transition(withdrawal.id(), WithdrawalState.REQUESTED, WithdrawalState.PAID,
+                providerRef, null);
+        if (moved) {
+            audit.record("WITHDRAWAL_PAID", withdrawal.customerId(), withdrawal.reference(), providerRef);
+            announce(withdrawal, NotificationType.WITHDRAWAL_SUCCEEDED);
+        }
+        return moved;
+    }
+
+    private void announce(Withdrawal withdrawal, NotificationType type) {
+        notifier.notify(withdrawal.customerId(), type, "withdrawal:" + withdrawal.id() + ":" + type,
+                Map.of("screen", "wallet"));
     }
 
     private LedgerEntry entry(Withdrawal withdrawal, LedgerType type, String key) {

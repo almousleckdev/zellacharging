@@ -11,11 +11,14 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
 @EnableConfigurationProperties(RateLimitSettings.class)
 class SecurityConfiguration {
+
+    private static final long MAX_REQUEST_BYTES = 2_000_000;
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityProblemHandler problems,
@@ -24,6 +27,11 @@ class SecurityConfiguration {
                                             RateLimitSettings rateLimits) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
+                .headers(headers -> headers
+                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'"))
+                        .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
+                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(63072000))
+                        .permissionsPolicyHeader(permissions -> permissions.policy("camera=(), microphone=(), geolocation=()")))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v1/auth/**", "/v1/admin/auth/**", "/v1/payments/callback").permitAll()
@@ -31,6 +39,7 @@ class SecurityConfiguration {
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> { }).authenticationEntryPoint(problems)
                         .accessDeniedHandler(problems))
+                .addFilterBefore(new RequestSizeFilter(resolver, MAX_REQUEST_BYTES), BearerTokenAuthenticationFilter.class)
                 .addFilterAfter(new TenantFilter(countries, problems), BearerTokenAuthenticationFilter.class)
                 .addFilterAfter(new RateLimitFilter(limiter, resolver, rateLimits), TenantFilter.class)
                 .exceptionHandling(errors -> errors.authenticationEntryPoint(problems)

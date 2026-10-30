@@ -1,6 +1,7 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../network/network_providers.dart';
+import '../notifications/push_providers.dart';
 import '../storage/preference_providers.dart';
 import 'stay_signed_in.dart';
 
@@ -27,6 +28,7 @@ class SessionController extends Notifier<SessionStatus> {
   void expire() => state = SessionStatus.unauthenticated;
 
   Future<void> signOut() async {
+    await ref.read(pushRegistrationProvider).stop();
     await ref.read(tokenStoreProvider).clear();
     state = SessionStatus.unauthenticated;
   }

@@ -1,5 +1,20 @@
 # Architecture
 
+## Current implementation (read this first)
+
+The sections below are the original design. What exists today differs in these points:
+
+* Backend modules actually present: `account`, `admin`, `catalog`, `charging`, `coupon`, `notification`, `wallet`, `shared`
+  (Spring Modulith, `ModuleStructureTest` enforces boundaries). There are no separate `payment`, `booking`, `pricing`,
+  `session`, `ocppclient`, `receipt` or `audit` modules: payments live in `wallet`, sessions in `charging`, the OCPP client
+  in `catalog` and `charging` infrastructure, audit in `shared`.
+* `notification` is a transactional outbox with FCM delivery (`notifications.md`).
+* Wallet, ledger and withdrawals: `wallet-and-ledger.md`, `wallet-withdrawals.md`, `payment-architecture.md`.
+* Tenancy is per country with PostgreSQL row-level security (`TENANCY.md`).
+* The dashboard (`dashboard/`) is a Next.js backend-for-frontend: the browser holds only HttpOnly cookies and the Next
+  server calls `/v1/admin/**`.
+* Security, database, CI/CD and recovery: `security.md`, `database.md`, `ci-cd.md`, `disaster-recovery.md`.
+
 Tags: **[V]** verified existing · **[P]** proposed · **[A]** assumption · **[U]** unresolved (see `PROJECT_OVERVIEW.md`).
 
 ## 1. Existing OCPP platform (verified)

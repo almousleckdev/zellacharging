@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/notifications/push_listener.dart';
 import '../../../core/refresh/live_data_refresher.dart';
 import 'bottom_bar_item.dart';
 import '../../../core/theme/app_icons.dart';
@@ -26,23 +27,25 @@ class ShellPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return LiveDataRefresher(
-      child: Scaffold(
-        backgroundColor: AppColors.surfaceMuted,
-        body: navigationShell,
-        bottomNavigationBar: DecoratedBox(
-          decoration: const BoxDecoration(
-            color: AppColors.surface,
-            border: Border(top: BorderSide(color: AppColors.border)),
-          ),
-          child: SafeArea(
-            child: Row(
-              children: [
-                _item(0, AppIcons.house, Strings.home),
-                _item(1, AppIcons.mapPin, Strings.locations),
-                _item(2, AppIcons.chart, Strings.history),
-                _item(3, AppIcons.user, Strings.profile),
-              ],
+    return PushListener(
+      child: LiveDataRefresher(
+        child: Scaffold(
+          backgroundColor: AppColors.surfaceMuted,
+          body: navigationShell,
+          bottomNavigationBar: DecoratedBox(
+            decoration: const BoxDecoration(
+              color: AppColors.surface,
+              border: Border(top: BorderSide(color: AppColors.border)),
+            ),
+            child: SafeArea(
+              child: Row(
+                children: [
+                  _item(0, AppIcons.house, Strings.home),
+                  _item(1, AppIcons.mapPin, Strings.locations),
+                  _item(2, AppIcons.chart, Strings.history),
+                  _item(3, AppIcons.user, Strings.profile),
+                ],
+              ),
             ),
           ),
         ),

@@ -57,7 +57,7 @@ public class SessionReconciler {
                 .orElseGet(() -> expireIfStale(session, now));
         if (!next.equals(session)) {
             sessions.update(next);
-            settlement.settle(next);
+            settlement.onChange(session, next);
         }
         return next;
     }

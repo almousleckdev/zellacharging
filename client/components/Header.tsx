@@ -8,7 +8,6 @@ export function Header({ lang, copy }: { lang: Locale; copy: Copy }) {
     { href: `/${lang}#features`, label: copy.nav.features },
     { href: `/${lang}#how`, label: copy.nav.how },
     { href: `/${lang}#faq`, label: copy.nav.faq },
-    { href: `/${lang}/contact`, label: copy.nav.contact },
   ];
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-white/85 backdrop-blur">
@@ -23,6 +22,13 @@ export function Header({ lang, copy }: { lang: Locale; copy: Copy }) {
             </Link>
           ))}
         </nav>
+        <div className="flex items-center gap-3">
+        <Link
+          href={`/${lang}/contact`}
+          className="rounded-lg bg-brand px-4 py-2 text-sm font-semibold text-white transition-colors hover:bg-brand-deep"
+        >
+          {copy.nav.contact}
+        </Link>
         <Link
           href={`/${copy.switchTo.locale}`}
           className="rounded-lg border border-line px-3 py-1.5 text-sm font-medium text-ink transition-colors hover:border-brand hover:text-brand-deep"
@@ -30,6 +36,7 @@ export function Header({ lang, copy }: { lang: Locale; copy: Copy }) {
         >
           {copy.switchTo.label}
         </Link>
+        </div>
       </div>
     </header>
   );

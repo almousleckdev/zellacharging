@@ -53,6 +53,7 @@ export const fr: Copy = {
       { question: "Mes données sont-elles protégées ?", answer: "Nous collectons le minimum nécessaire et ne vendons jamais vos données. Consultez notre politique de confidentialité." },
     ],
   },
+  contactBand: { title: "Une question ?", text: "Notre équipe vous répond par téléphone ou par e-mail.", button: "Nous contacter" },
   cta: { title: "Prêt à recharger ?", text: "Téléchargez Zella Charging et démarrez votre prochaine recharge en quelques secondes." },
   footer: {
     product: "Produit",

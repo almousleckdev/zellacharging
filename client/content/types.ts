@@ -11,6 +11,7 @@ export type Copy = {
   how: { title: string; steps: Step[] };
   payments: { title: string; text: string };
   faq: { title: string; items: Faq[] };
+  contactBand: { title: string; text: string; button: string };
   cta: { title: string; text: string };
   footer: { product: string; legal: string; privacy: string; terms: string; deleteAccount: string; contact: string; rights: string };
   switchTo: { label: string; locale: "fr" | "en" };

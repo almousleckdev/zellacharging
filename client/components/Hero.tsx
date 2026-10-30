@@ -1,3 +1,4 @@
+import Image from "next/image";
 import type { Copy } from "@/content/types";
 import { Screenshot } from "./Screenshot";
 import { StoreButtons } from "./StoreButtons";
@@ -12,6 +13,11 @@ export function Hero({ copy }: { copy: Copy }) {
           </h1>
           <p className="max-w-xl text-lg leading-relaxed text-muted">{copy.hero.text}</p>
           <StoreButtons copy={copy.stores} />
+          <div className="flex items-center gap-3 text-sm text-muted">
+            <Image src="/airtel.png" alt="Airtel Money" width={36} height={36} className="h-9 w-9 rounded-lg" />
+            <Image src="/moov.png" alt="Moov Money" width={36} height={36} className="h-9 w-9 rounded-lg" />
+            <span>Airtel Money · Moov Money</span>
+          </div>
         </div>
         <div className="mx-auto w-full max-w-[280px]">
           <Screenshot slot={1} />

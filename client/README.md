@@ -27,3 +27,9 @@ The home page has 7 screenshot slots: `1` in the hero and `2` to `7`, one beside
 charger, scan, live tracking, wallet, notifications, security). Drop PNG files named `public/screens/1.png` to
 `public/screens/7.png` (portrait phone screenshots, about 1170 x 2532) and rebuild. A slot without a file stays an
 empty frame.
+
+## Contact form
+
+The form on `/<lang>/contact` posts from the server to the backend `POST /v1/contact`, which emails
+`ZELLA_CONTACT_INBOX` (set it on the backend) with the visitor as reply-to. Set `API_BASE_URL` on the website
+(defaults to the production API). The endpoint is rate limited to 5 messages per IP per hour.

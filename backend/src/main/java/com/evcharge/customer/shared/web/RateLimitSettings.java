@@ -5,6 +5,7 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 @ConfigurationProperties("zella.rate-limit")
 record RateLimitSettings(
         int loginPerIpPerMinute,
+        int contactPerIpPerHour,
         int registerPerIpPerHour,
         int resendPerIpPerHour,
         int verifyPerIpPerMinute,

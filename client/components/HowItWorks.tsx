@@ -1,7 +1,7 @@
 import Image from "next/image";
 import type { Copy } from "@/content/types";
 
-export function HowItWorks({ copy }: { copy: Copy["how"] }) {
+export function HowItWorks({ copy, eyebrow }: { copy: Copy["how"]; eyebrow: string }) {
   return (
     <section id="how" className="scroll-mt-20 border-t border-line py-20">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
@@ -15,7 +15,8 @@ export function HowItWorks({ copy }: { copy: Copy["how"] }) {
           />
         </div>
         <div>
-          <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">{copy.title}</h2>
+          <p className="text-sm font-semibold uppercase tracking-wider text-brand">{eyebrow}</p>
+          <h2 className="mt-2 text-3xl font-bold tracking-tight sm:text-4xl">{copy.title}</h2>
           <ol className="mt-10 space-y-8">
             {copy.steps.map((step, index) => (
               <li key={step.title} className="flex gap-5">

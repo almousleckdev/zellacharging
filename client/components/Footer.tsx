@@ -25,7 +25,7 @@ export function Footer({ lang, copy }: { lang: Locale; copy: Copy }) {
   ];
   return (
     <footer className="border-t border-line bg-white">
-      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.4fr_1fr_1fr_1.3fr]">
         <div className="space-y-4">
           <Image src="/logo.png" alt="Zella" width={118} height={27} className="h-6 w-auto" />
           <p className="max-w-xs text-sm text-muted">{copy.meta.description}</p>
@@ -44,6 +44,23 @@ export function Footer({ lang, copy }: { lang: Locale; copy: Copy }) {
             </ul>
           </div>
         ))}
+        <div>
+          <h3 className="text-sm font-semibold">{copy.nav.contact}</h3>
+          <ul className="mt-4 space-y-3 text-sm text-muted">
+            {[
+              { href: `tel:${site.phone}`, label: site.phone },
+              { href: `mailto:${site.contactEmail}`, label: site.contactEmail },
+              { href: `mailto:${site.teamEmail}`, label: site.teamEmail },
+              { href: `mailto:${site.privacyEmail}`, label: site.privacyEmail },
+            ].map((item) => (
+              <li key={item.href} className="break-words">
+                <a href={item.href} className="transition-colors hover:text-brand-deep">
+                  {item.label}
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
       <div className="border-t border-line py-5 text-center text-xs text-muted">
         © {site.copyrightYear} {site.legalName}. {copy.footer.rights}

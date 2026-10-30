@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { ContactBand } from "@/components/ContactBand";
 import { DownloadBand } from "@/components/DownloadBand";
 import { FaqSection } from "@/components/FaqSection";
 import { Features } from "@/components/Features";
@@ -15,11 +16,12 @@ export default async function Home({ params }: PageProps<"/[lang]">) {
   return (
     <>
       <Hero copy={copy} />
-      <Features copy={copy.features} />
-      <HowItWorks copy={copy.how} />
+      <Features copy={copy.features} eyebrow={copy.nav.features} />
+      <HowItWorks copy={copy.how} eyebrow={copy.nav.how} />
       <Payments copy={copy.payments} />
-      <FaqSection copy={copy.faq} />
+      <FaqSection copy={copy.faq} eyebrow={copy.nav.faq} />
       <DownloadBand copy={copy} />
+      <ContactBand lang={lang} copy={copy.contactBand} />
     </>
   );
 }

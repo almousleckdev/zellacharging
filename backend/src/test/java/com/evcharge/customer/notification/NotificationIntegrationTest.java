@@ -61,6 +61,8 @@ class NotificationIntegrationTest extends PostgresTestBase {
     void newCustomer() {
         reset(sender);
         when(sender.available()).thenReturn(true);
+        jdbc.update("delete from notification_outbox");
+        jdbc.update("delete from device_token");
         customer = UUID.randomUUID();
         jdbc.update("insert into customer (id, first_name, last_name, email, email_verified_at, password_hash, "
                 + "status, created_at) values (?, 'A', 'B', ?, now(), 'x', 'ACTIVE', now())", customer,

@@ -5,29 +5,40 @@ import '../../../core/theme/app_spacing.dart';
 import 'car_scene.dart';
 
 class CarStage extends StatelessWidget {
-  const CarStage({super.key, required this.level, required this.charging});
+  const CarStage({
+    super.key,
+    required this.level,
+    required this.charging,
+    this.header,
+    this.fadeTo = AppColors.surface,
+  });
 
   final double level;
   final bool charging;
+  final Widget? header;
+  final Color fadeTo;
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(
-        horizontal: AppSpacing.sm,
-        vertical: AppSpacing.lg,
-      ),
+    final top = MediaQuery.paddingOf(context).top + kToolbarHeight;
+    return DecoratedBox(
       decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(AppSpacing.radiusLarge),
-        gradient: const LinearGradient(
+        gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.surface, AppColors.surfaceMuted],
+          colors: [AppColors.primarySoft, fadeTo],
         ),
-        border: Border.all(color: AppColors.border),
       ),
-      child: CarScene(level: level, charging: charging),
+      child: Padding(
+        padding: EdgeInsets.only(top: top, bottom: AppSpacing.lg),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            ?header,
+            CarScene(level: level, charging: charging),
+          ],
+        ),
+      ),
     );
   }
 }

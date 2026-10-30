@@ -61,7 +61,9 @@ class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
     final finished = session != null && !session.state.isLive;
     return Scaffold(
       backgroundColor: finished ? AppColors.surfaceMuted : null,
+      extendBodyBehindAppBar: true,
       appBar: AppBar(
+        backgroundColor: Colors.transparent,
         title: Text(
           finished ? HistoryText.detailsTitle : ChargeText.chargingTitle,
         ),
@@ -88,11 +90,13 @@ class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
     children: [
       Expanded(
         child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.md),
+          padding: EdgeInsets.zero,
           children: [
             ChargeScene(session: session),
-            const SizedBox(height: AppSpacing.lg),
-            ChargingMetrics(session: session),
+            Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: ChargingMetrics(session: session),
+            ),
           ],
         ),
       ),

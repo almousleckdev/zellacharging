@@ -17,7 +17,6 @@ import 'fake_notifications.dart';
 import 'screens.dart';
 import 'test_app.dart';
 import 'test_fonts.dart';
-import 'ui_fakes.dart';
 
 void main() {
   setUpAll(loadTestFonts);

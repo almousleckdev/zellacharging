@@ -13,7 +13,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 class StationOccupancyTest {
 
     private Station station(String first, String second) {
-        return new Station("CP-1", "GA", true, null, null, List.of(
+        return new Station("CP-1", "GA", null, null, true, null, null, null, List.of(
                 new StationConnector(1, first, "Type2", new BigDecimal("22")),
                 new StationConnector(2, second, "Type2", new BigDecimal("22"))));
     }

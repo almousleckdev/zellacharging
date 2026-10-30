@@ -10,6 +10,10 @@ class Station {
     this.distanceKm,
     this.latitude,
     this.longitude,
+    this.isoCode,
+    this.vendor,
+    this.model,
+    this.lastSeenAt,
   });
 
   final String id;
@@ -19,6 +23,10 @@ class Station {
   final double? distanceKm;
   final double? latitude;
   final double? longitude;
+  final String? isoCode;
+  final String? vendor;
+  final String? model;
+  final DateTime? lastSeenAt;
   final List<StationConnector> connectors;
 
   double? get maxPowerKw => connectors

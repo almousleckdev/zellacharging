@@ -14,6 +14,8 @@ abstract final class AppIcons {
   static const user = PhosphorIconsRegular.user;
   static const gear = PhosphorIconsRegular.gear;
   static const mapPin = PhosphorIconsRegular.mapPin;
+  static const mapPinFill = PhosphorIconsFill.mapPin;
+  static const navigation = PhosphorIconsRegular.navigationArrow;
   static const crosshair = PhosphorIconsRegular.crosshair;
   static const search = PhosphorIconsRegular.magnifyingGlass;
   static const phone = PhosphorIconsRegular.phone;
@@ -38,6 +40,7 @@ abstract final class AppIcons {
   static const warning = PhosphorIconsRegular.warningCircle;
   static const close = PhosphorIconsRegular.x;
   static const plus = PhosphorIconsRegular.plus;
+  static const arrowLeft = PhosphorIconsBold.arrowLeft;
   static const check = PhosphorIconsBold.check;
   static const checkCircle = PhosphorIconsFill.checkCircle;
   static const circle = PhosphorIconsRegular.circle;

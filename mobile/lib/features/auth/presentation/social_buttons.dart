@@ -2,12 +2,16 @@ import 'package:flutter/material.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/app_toast.dart';
 
 class SocialButtons extends StatelessWidget {
   const SocialButtons({super.key});
+
+  bool _showsApple(BuildContext context) {
+    final platform = Theme.of(context).platform;
+    return platform == TargetPlatform.iOS || platform == TargetPlatform.macOS;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -39,17 +43,19 @@ class SocialButtons extends StatelessWidget {
           children: [
             Expanded(
               child: _SocialButton(
-                icon: AppIcons.googleLogo,
+                logo: 'assets/icons/google.png',
                 label: AuthText.google,
               ),
             ),
-            const SizedBox(width: AppSpacing.md),
-            Expanded(
-              child: _SocialButton(
-                icon: AppIcons.appleLogo,
-                label: AuthText.apple,
+            if (_showsApple(context)) ...[
+              const SizedBox(width: AppSpacing.md),
+              Expanded(
+                child: _SocialButton(
+                  logo: 'assets/icons/apple.png',
+                  label: AuthText.apple,
+                ),
               ),
-            ),
+            ],
           ],
         ),
       ],
@@ -58,9 +64,9 @@ class SocialButtons extends StatelessWidget {
 }
 
 class _SocialButton extends StatelessWidget {
-  const _SocialButton({required this.icon, required this.label});
+  const _SocialButton({required this.logo, required this.label});
 
-  final IconData icon;
+  final String logo;
   final String label;
 
   @override
@@ -69,7 +75,7 @@ class _SocialButton extends StatelessWidget {
       height: 40,
       child: OutlinedButton.icon(
         onPressed: () => AppToast.info(context, AuthText.comingSoon),
-        icon: Icon(icon, size: 18, color: AppColors.textPrimary),
+        icon: Image.asset(logo, width: 18, height: 18),
         label: Text(label, style: const TextStyle(fontSize: 13)),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,

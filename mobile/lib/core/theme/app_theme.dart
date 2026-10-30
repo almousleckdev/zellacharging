@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 
 import 'app_colors.dart';
+import 'back_arrow.dart';
 import 'app_spacing.dart';
 
 abstract final class AppTheme {
@@ -22,6 +23,9 @@ abstract final class AppTheme {
       scaffoldBackgroundColor: AppColors.background,
       canvasColor: AppColors.background,
       textTheme: textTheme,
+      actionIconTheme: ActionIconThemeData(
+        backButtonIconBuilder: (_) => const BackArrow(),
+      ),
       appBarTheme: AppBarTheme(
         backgroundColor: AppColors.background,
         surfaceTintColor: Colors.transparent,

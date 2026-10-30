@@ -50,6 +50,7 @@ import 'package:zella/features/wallet/presentation/withdraw_page.dart';
 import 'package:zella/features/wallet/presentation/wallet_providers.dart';
 import 'package:zella/features/notifications/presentation/notification_providers.dart';
 import 'package:zella/features/notifications/presentation/notifications_page.dart';
+import 'package:zella/features/stations/presentation/detail/map_providers.dart';
 import 'fake_notifications.dart';
 import 'ui_fakes.dart';
 
@@ -182,6 +183,7 @@ List<Override> overridesWith({
   ),
   walletRepositoryProvider.overrideWithValue(wallet ?? FakeWallet()),
   notificationRepositoryProvider.overrideWithValue(FakeNotifications()),
+  mapTileProvider.overrideWithValue(NoTiles()),
   profileRepositoryProvider.overrideWithValue(profile ?? FakeProfile()),
   locationServiceProvider.overrideWithValue(NoLocation()),
   couponRepositoryProvider.overrideWithValue(

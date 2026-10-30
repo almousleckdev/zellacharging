@@ -20,6 +20,10 @@ abstract final class StationMapper {
     distanceKm: (json['distanceKm'] as num?)?.toDouble(),
     latitude: (json['latitude'] as num?)?.toDouble(),
     longitude: (json['longitude'] as num?)?.toDouble(),
+    isoCode: json['isoCode'] as String?,
+    vendor: json['vendor'] as String?,
+    model: json['model'] as String?,
+    lastSeenAt: DateTime.tryParse(json['lastSeenAt'] as String? ?? ''),
     connectors: (json['connectors'] as List<dynamic>)
         .map((c) => connector(c as Map<String, dynamic>))
         .toList(),

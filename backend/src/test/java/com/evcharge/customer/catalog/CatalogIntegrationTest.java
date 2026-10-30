@@ -23,7 +23,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class CatalogIntegrationTest extends PostgresTestBase {
 
     private static final String STATION = """
-            {"id":"CP-1","isoCode":"GA","vendor":"JC.DW","model":"V1","online":true,"lastSeenAt":null,
+            {"id":"CP-1","isoCode":"GA","vendor":"JC.DW","model":"V1","online":true,"lastSeenAt":"2026-10-30T09:00:00Z",
              "latitude":0.4162,"longitude":9.4673,"unknownField":1,
              "connectors":[{"connectorId":1,"status":"Available","connectorType":"GBT_DC","maxPowerKw":60.0},
                            {"connectorId":2,"status":"Charging","connectorType":"GBT_DC","maxPowerKw":60.0}]}
@@ -61,6 +61,10 @@ class CatalogIntegrationTest extends PostgresTestBase {
                 .andExpect(jsonPath("$[0].id").value("CP-1"))
                 .andExpect(jsonPath("$[0].availableConnectors").value(1))
                 .andExpect(jsonPath("$[0].totalConnectors").value(2))
+                .andExpect(jsonPath("$[0].isoCode").value("GA"))
+                .andExpect(jsonPath("$[0].vendor").value("JC.DW"))
+                .andExpect(jsonPath("$[0].model").value("V1"))
+                .andExpect(jsonPath("$[0].lastSeenAt").value("2026-10-30T09:00:00Z"))
                 .andExpect(jsonPath("$[0].distanceKm").isNumber());
     }
 

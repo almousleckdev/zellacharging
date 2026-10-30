@@ -19,36 +19,39 @@ class LoginOptionsRow extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
+    return Wrap(
+      alignment: WrapAlignment.spaceBetween,
+      crossAxisAlignment: WrapCrossAlignment.center,
       children: [
-        SizedBox(
-          width: 24,
-          height: 24,
-          child: Checkbox.adaptive(
-            value: remember,
-            onChanged: (value) => onRememberChanged(value ?? false),
-          ),
-        ),
-        const SizedBox(width: AppSpacing.sm),
-        Expanded(
-          child: Text(
-            AuthText.rememberMe,
-            style: theme.textTheme.bodyMedium?.copyWith(
-              color: AppColors.textSecondary,
-            ),
-          ),
-        ),
-        Flexible(
-          child: TextButton(
-            onPressed: onForgot,
-            child: Text(
-              AuthText.forgotPassword,
-              maxLines: 1,
-              overflow: TextOverflow.ellipsis,
-              style: const TextStyle(
-                color: AppColors.primary,
-                fontWeight: FontWeight.w500,
+        Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            SizedBox(
+              width: 24,
+              height: 24,
+              child: Checkbox.adaptive(
+                value: remember,
+                onChanged: (value) => onRememberChanged(value ?? false),
               ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Flexible(
+              child: Text(
+                AuthText.rememberMe,
+                style: theme.textTheme.bodyMedium?.copyWith(
+                  color: AppColors.textSecondary,
+                ),
+              ),
+            ),
+          ],
+        ),
+        TextButton(
+          onPressed: onForgot,
+          child: Text(
+            AuthText.forgotPassword,
+            style: const TextStyle(
+              color: AppColors.primary,
+              fontWeight: FontWeight.w500,
             ),
           ),
         ),

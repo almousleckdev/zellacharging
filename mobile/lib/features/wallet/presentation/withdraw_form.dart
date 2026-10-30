@@ -10,13 +10,14 @@ import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/pay/amount_card.dart';
+import '../../../shared/widgets/pay/mobile_money_card.dart';
 import '../../../shared/widgets/pay/pay_card.dart';
 import '../../../shared/widgets/pay/secure_note.dart';
 import '../../../shared/widgets/pay/summary_card.dart';
 import '../../../shared/widgets/pay/summary_line.dart';
 import '../../../shared/widgets/pay/wallet_balance_card.dart';
+import '../domain/mobile_operator.dart';
 import '../domain/wallet.dart';
-import 'withdraw_destination.dart';
 
 class WithdrawForm extends StatelessWidget {
   const WithdrawForm({
@@ -26,6 +27,8 @@ class WithdrawForm extends StatelessWidget {
     required this.amount,
     required this.password,
     required this.phone,
+    required this.operator,
+    required this.onOperator,
     required this.onAmountChanged,
   });
 
@@ -34,6 +37,8 @@ class WithdrawForm extends StatelessWidget {
   final TextEditingController amount;
   final TextEditingController password;
   final TextEditingController phone;
+  final MobileOperator operator;
+  final ValueChanged<MobileOperator> onOperator;
   final VoidCallback onAmountChanged;
 
   @override
@@ -64,7 +69,20 @@ class WithdrawForm extends StatelessWidget {
           onChanged: onAmountChanged,
         ),
         const SizedBox(height: AppSpacing.lg),
-        WithdrawDestination(phone: phone, numbers: wallet.payoutNumbers),
+        MobileMoneyCard(
+          title: WithdrawText.destinationTitle,
+          phone: phone,
+          operator: operator,
+          onOperator: onOperator,
+          validator: (value) => Validators.payoutNumber(
+            value,
+            wallet.payoutNumbers.map((number) => number.msisdn),
+          ),
+          known: wallet.payoutNumbers,
+          note: wallet.payoutNumbers.isEmpty
+              ? WithdrawText.noPayoutNumber
+              : WithdrawText.destinationNote,
+        ),
         const SizedBox(height: AppSpacing.lg),
         PayCard(
           child: AppTextField(

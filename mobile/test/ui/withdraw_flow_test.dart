@@ -71,12 +71,18 @@ Future<_ScriptedWithdrawals> _openWithdraw(
 }
 
 Future<void> _typePassword(WidgetTester tester) async {
+  final field = find.widgetWithText(TextFormField, WithdrawText.passwordHint);
   await tester.dragUntilVisible(
-    find.byType(TextFormField).last,
+    field,
     find.byType(ListView),
     const Offset(0, -300),
   );
-  await tester.enterText(find.byType(TextFormField).last, 'MyPassword1');
+  await tester.enterText(field, 'MyPassword1');
+}
+
+Future<void> _toTop(WidgetTester tester) async {
+  await tester.drag(find.byType(ListView).first, const Offset(0, 3000));
+  await tester.pump(const Duration(milliseconds: 300));
 }
 
 Future<void> _tapWithdraw(WidgetTester tester) async {
@@ -115,6 +121,7 @@ void main() {
     tester,
   ) async {
     final wallet = await _openWithdraw(tester, ['PAID']);
+    await _toTop(tester);
     await tester.enterText(find.byType(TextFormField).at(1), '077999999');
     await _tapWithdraw(tester);
 
@@ -124,16 +131,19 @@ void main() {
   });
 
   testWidgets('tapping a known number fills the field', (tester) async {
-    await _openWithdraw(tester, ['PAID']);
+    await pumpApp(
+      tester,
+      const WithdrawPage(),
+      overrides: overridesWith(wallet: _ScriptedWithdrawals(['PAID'])),
+    );
+    await tester.pump(const Duration(milliseconds: 500));
     await tester.enterText(find.byType(TextFormField).at(1), '');
+    await tester.pump();
     await tester.tap(find.text('+24177••••56').first);
     await tester.pump();
 
     expect(
-      tester
-          .widget<TextFormField>(find.byType(TextFormField).at(1))
-          .controller
-          ?.text,
+      tester.widget<TextField>(find.byType(TextField).at(1)).controller?.text,
       '+24177123456',
     );
     await closeApp(tester);
@@ -150,11 +160,13 @@ void main() {
 
   testWidgets('the smallest withdrawal is 500', (tester) async {
     final wallet = await _openWithdraw(tester, ['PAID']);
+    await _toTop(tester);
     await tester.enterText(find.byType(TextFormField).first, '499');
     await _tapWithdraw(tester);
     expect(find.text(WithdrawText.invalidAmount), findsOneWidget);
     expect(wallet.created, 0);
 
+    await _toTop(tester);
     await tester.enterText(find.byType(TextFormField).first, '500');
     await _tapWithdraw(tester);
     expect(wallet.created, 1);
@@ -200,6 +212,7 @@ void main() {
     await tester.tap(find.byType(FilledButton));
     await tester.pump(const Duration(milliseconds: 300));
 
+    await _toTop(tester);
     expect(find.text(WithdrawText.invalidAmount), findsOneWidget);
     expect(wallet.created, 0);
     await closeApp(tester);

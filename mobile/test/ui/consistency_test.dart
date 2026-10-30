@@ -8,7 +8,10 @@ import 'package:zella/features/notifications/presentation/notification_groups.da
 import 'package:zella/features/stations/presentation/locations_page.dart';
 import 'package:zella/features/wallet/presentation/topup_page.dart';
 import 'package:zella/features/wallet/presentation/withdraw_page.dart';
+import 'package:zella/features/wallet/domain/mobile_operator.dart';
 import 'package:zella/shared/widgets/pay/amount_card.dart';
+import 'package:zella/shared/widgets/pay/mobile_money_card.dart';
+import 'package:zella/shared/widgets/pay/operator_tiles.dart';
 import 'package:zella/shared/widgets/primary_button.dart';
 import 'package:zella/shared/widgets/search_field.dart';
 import 'package:zella/shared/widgets/secondary_button.dart';
@@ -37,6 +40,32 @@ void main() {
       expect(find.byType(AmountCard), findsOneWidget);
       await closeApp(tester);
     });
+  }
+
+  for (final entry in {
+    'top-up': const TopupPage(),
+    'withdraw': const WithdrawPage(),
+  }.entries) {
+    testWidgets(
+      '${entry.key} picks the number and operator with the shared card',
+      (tester) async {
+        await pumpApp(tester, entry.value, overrides: overrides());
+        await tester.pump(const Duration(milliseconds: 300));
+
+        expect(find.byType(MobileMoneyCard), findsOneWidget);
+        expect(find.byType(OperatorTiles), findsOneWidget);
+        final logos = tester
+            .widgetList<Image>(find.byType(Image))
+            .map((image) => image.image)
+            .whereType<AssetImage>()
+            .map((image) => image.assetName);
+        expect(
+          logos,
+          containsAll([MobileOperator.airtel.logo, MobileOperator.moov.logo]),
+        );
+        await closeApp(tester);
+      },
+    );
   }
 
   testWidgets('primary and secondary buttons share one height', (tester) async {

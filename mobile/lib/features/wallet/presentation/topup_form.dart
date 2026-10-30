@@ -4,13 +4,10 @@ import 'package:flutter/material.dart';
 import '../../../core/format/amount_input.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
-import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/pay/amount_card.dart';
-import '../../../shared/widgets/pay/operator_tiles.dart';
-import '../../../shared/widgets/pay/pay_card.dart';
+import '../../../shared/widgets/pay/mobile_money_card.dart';
 import '../../../shared/widgets/pay/secure_note.dart';
 import '../../../shared/widgets/pay/wallet_balance_card.dart';
 import '../domain/mobile_operator.dart';
@@ -63,30 +60,12 @@ class TopupForm extends StatelessWidget {
           onChanged: onAmountChanged,
         ),
         const SizedBox(height: AppSpacing.lg),
-        PayCard(
+        MobileMoneyCard(
           title: PayText.methodTitle,
-          child: Column(
-            children: [
-              AppTextField(
-                controller: phone,
-                label: WalletText.mobileMoneyNumberLabel,
-                hint: WalletText.mobileMoneyNumberHint,
-                icon: AppIcons.phone,
-                validator: Validators.mobileMoneyNumber,
-                keyboardType: TextInputType.phone,
-                textInputAction: TextInputAction.done,
-              ),
-              const SizedBox(height: AppSpacing.md),
-              ListenableBuilder(
-                listenable: phone,
-                builder: (context, _) => OperatorTiles(
-                  selected: operator,
-                  phone: phone.text,
-                  onSelected: onOperator,
-                ),
-              ),
-            ],
-          ),
+          phone: phone,
+          operator: operator,
+          onOperator: onOperator,
+          validator: Validators.mobileMoneyNumber,
         ),
         const SizedBox(height: AppSpacing.lg),
         TopupSummary(

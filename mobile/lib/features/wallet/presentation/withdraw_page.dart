@@ -9,6 +9,7 @@ import '../../../core/l10n/strings.dart';
 import '../../../shared/widgets/async_body.dart';
 import '../../../shared/widgets/pay/action_bar.dart';
 import '../domain/mobile_operator.dart';
+import '../domain/operator_hint.dart';
 import '../domain/wallet.dart';
 import 'wallet_providers.dart';
 import 'withdraw_flow_controller.dart';
@@ -28,6 +29,7 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
   final _amount = TextEditingController();
   final _password = TextEditingController();
   final _phone = TextEditingController();
+  MobileOperator _operator = MobileOperator.airtel;
   late String _attempt = _newAttempt();
 
   String _newAttempt() => DateTime.now().microsecondsSinceEpoch.toString();
@@ -43,16 +45,11 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
   void _submit(Wallet? wallet) {
     if (wallet == null || !_formKey.currentState!.validate()) return;
     final number = Msisdn.normalize(_phone.text);
-    final operator = wallet.payoutNumbers
-        .where((known) => known.msisdn == number)
-        .map((known) => known.operator)
-        .firstOrNull;
-    if (operator == null) return;
     ref
         .read(withdrawFlowProvider.notifier)
         .withdraw(
           amountMinor: AmountInput.parse(_amount.text) ?? 0,
-          operator: operator,
+          operator: OperatorHint.resolve(_phone.text, _operator),
           msisdn: number,
           password: _password.text,
           idempotencyKey: _attempt,
@@ -71,12 +68,7 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
     final wallet = ref.watch(walletProvider);
     final current = wallet.asData?.value;
     final number = Msisdn.normalize(_phone.text);
-    final operator =
-        current?.payoutNumbers
-            .where((known) => known.msisdn == number)
-            .map((known) => known.operator)
-            .firstOrNull ??
-        MobileOperator.airtel;
+    final operator = OperatorHint.resolve(_phone.text, _operator);
     final idle = flow.phase == WithdrawPhase.idle;
     return Scaffold(
       appBar: AppBar(title: Text(WithdrawText.title)),
@@ -112,6 +104,7 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
   Widget _form(Wallet wallet) {
     if (_phone.text.isEmpty && wallet.payoutNumber != null) {
       _phone.text = wallet.payoutNumber!;
+      _operator = wallet.payoutOperator ?? _operator;
     }
     return WithdrawForm(
       formKey: _formKey,
@@ -119,6 +112,8 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
       amount: _amount,
       password: _password,
       phone: _phone,
+      operator: OperatorHint.resolve(_phone.text, _operator),
+      onOperator: (value) => setState(() => _operator = value),
       onAmountChanged: () => setState(() {}),
     );
   }

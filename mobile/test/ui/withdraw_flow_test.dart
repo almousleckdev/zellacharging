@@ -69,11 +69,11 @@ Future<_ScriptedWithdrawals> _openWithdraw(
 
 Future<void> _typePassword(WidgetTester tester) async {
   await tester.dragUntilVisible(
-    find.byType(TextFormField),
+    find.byType(TextFormField).last,
     find.byType(ListView),
     const Offset(0, -300),
   );
-  await tester.enterText(find.byType(TextFormField), 'MyPassword1');
+  await tester.enterText(find.byType(TextFormField).last, 'MyPassword1');
 }
 
 Future<void> _tapWithdraw(WidgetTester tester) async {

@@ -72,7 +72,7 @@ class _SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: 40,
+      height: AppSpacing.buttonHeight,
       child: OutlinedButton.icon(
         onPressed: () => AppToast.info(context, AuthText.comingSoon),
         icon: Image.asset(logo, width: 18, height: 18),
@@ -82,7 +82,7 @@ class _SocialButton extends StatelessWidget {
           backgroundColor: AppColors.surface,
           side: const BorderSide(color: AppColors.border),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
         ),
       ),

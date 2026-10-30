@@ -9,8 +9,12 @@ abstract final class NotificationText {
     en: 'No notifications yet.',
   );
 
+  static String get today => AppLanguage.pick(fr: "Aujourd'hui", en: 'Today');
+
+  static String get yesterday => AppLanguage.pick(fr: 'Hier', en: 'Yesterday');
+
   static String get markAllRead =>
-      AppLanguage.pick(fr: 'Tout marquer comme lu', en: 'Mark all as read');
+      AppLanguage.pick(fr: 'Tout lire', en: 'Read all');
 
   static String unread(int count) => AppLanguage.pick(
     fr: count == 1 ? '1 non lue' : '$count non lues',

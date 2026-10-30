@@ -5,11 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/notifications/push_message.dart';
 import '../../../core/notifications/push_route.dart';
+import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/async_body.dart';
 import '../../../shared/widgets/empty_state.dart';
+import '../../../shared/widgets/section_label.dart';
 import '../domain/app_notification.dart';
+import 'notification_groups.dart';
 import 'notification_providers.dart';
 import 'notification_tile.dart';
 
@@ -48,6 +51,33 @@ class NotificationsPage extends ConsumerWidget {
     if (context.mounted && route != null) context.push(route);
   }
 
+  Widget _groupCard(
+    BuildContext context,
+    WidgetRef ref,
+    NotificationGroup group,
+  ) {
+    return DecoratedBox(
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(AppSpacing.radius),
+        border: Border.all(color: AppColors.border),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(AppSpacing.radius),
+        child: Column(
+          children: [
+            for (var i = 0; i < group.items.length; i++) ...[
+              if (i > 0) const Divider(height: 1, color: AppColors.border),
+              NotificationTile(
+                notification: group.items[i],
+                onTap: () => _open(context, ref, group.items[i]),
+              ),
+            ],
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     final feed = ref.watch(notificationFeedProvider);
@@ -78,15 +108,22 @@ class NotificationsPage extends ConsumerWidget {
                     ),
                   ],
                 )
-              : ListView.separated(
-                  padding: const EdgeInsets.all(AppSpacing.lg),
-                  itemCount: data.items.length,
-                  separatorBuilder: (_, _) =>
-                      const SizedBox(height: AppSpacing.sm),
-                  itemBuilder: (context, index) => NotificationTile(
-                    notification: data.items[index],
-                    onTap: () => _open(context, ref, data.items[index]),
+              : ListView(
+                  padding: const EdgeInsets.fromLTRB(
+                    AppSpacing.md,
+                    0,
+                    AppSpacing.md,
+                    AppSpacing.lg,
                   ),
+                  children: [
+                    for (final group in NotificationGroups.of(
+                      data.items,
+                      DateTime.now(),
+                    )) ...[
+                      SectionLabel(group.label),
+                      _groupCard(context, ref, group),
+                    ],
+                  ],
                 ),
         ),
       ),

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/primary_button.dart';
 
 class HomeHeroCard extends StatelessWidget {
   const HomeHeroCard({super.key, required this.onFindStation});
@@ -40,18 +41,10 @@ class HomeHeroCard extends StatelessWidget {
                       ),
                     ),
                   ),
-                  SizedBox(
-                    height: 32,
-                    child: FilledButton(
-                      onPressed: onFindStation,
-                      style: FilledButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: AppSpacing.md,
-                        ),
-                        textStyle: const TextStyle(fontSize: 12),
-                      ),
-                      child: Text(HomeText.findStation),
-                    ),
+                  PrimaryButton(
+                    label: HomeText.findStation,
+                    expand: false,
+                    onPressed: onFindStation,
                   ),
                 ],
               ),

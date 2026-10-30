@@ -75,7 +75,6 @@ class _OnboardingPageState extends ConsumerState<OnboardingPage> {
               ConstrainedBox(
                 constraints: const BoxConstraints(maxWidth: authContentWidth),
                 child: PrimaryButton(
-                  height: authButtonHeight,
                   label: _isLast ? Strings.getStarted : AuthText.next,
                   onPressed: _next,
                 ),

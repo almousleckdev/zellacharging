@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/status_chip.dart';
 import '../domain/station_connector.dart';
 import 'connector_status_style.dart';
@@ -62,18 +63,10 @@ class ConnectorTile extends StatelessWidget {
             ),
           ),
           if (connector.available && onStart != null)
-            FilledButton(
+            PrimaryButton(
+              label: StationText.startCharging,
+              expand: false,
               onPressed: onStart,
-              style: FilledButton.styleFrom(
-                minimumSize: const Size(0, 34),
-                padding: const EdgeInsets.symmetric(horizontal: 14),
-                tapTargetSize: MaterialTapTargetSize.shrinkWrap,
-                textStyle: const TextStyle(
-                  fontSize: 13,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
-              child: Text(StationText.startCharging),
             )
           else
             StatusChip(

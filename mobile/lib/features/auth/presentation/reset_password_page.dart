@@ -82,7 +82,6 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage>
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          height: authButtonHeight,
           label: AuthText.resetPassword,
           loading: loading,
           onPressed: _reset,

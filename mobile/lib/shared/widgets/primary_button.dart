@@ -13,7 +13,7 @@ class PrimaryButton extends StatelessWidget {
     this.loading = false,
     this.icon,
     this.destructive = false,
-    this.height = AppSpacing.buttonHeight,
+    this.expand = true,
   });
 
   final String label;
@@ -21,15 +21,15 @@ class PrimaryButton extends StatelessWidget {
   final bool loading;
   final IconData? icon;
   final bool destructive;
-  final double height;
+  final bool expand;
 
   Color get color => destructive ? AppColors.danger : AppColors.primary;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
-      height: height,
+      width: expand ? double.infinity : null,
+      height: AppSpacing.buttonHeight,
       child: FilledButton(
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(
@@ -41,7 +41,7 @@ class PrimaryButton extends StatelessWidget {
           ),
         ),
         child: loading
-            ? const AdaptiveSpinner(color: AppColors.onPrimary, size: 20)
+            ? const AdaptiveSpinner(color: AppColors.onPrimary, size: 18)
             : ButtonLabel(label: label, color: AppColors.onPrimary, icon: icon),
       ),
     );

@@ -68,7 +68,6 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          height: authButtonHeight,
           label: AuthText.sendCode,
           loading: loading,
           onPressed: _send,

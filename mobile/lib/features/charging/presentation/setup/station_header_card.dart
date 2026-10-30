@@ -2,11 +2,11 @@ import 'package:flutter/material.dart';
 
 import '../../../../core/l10n/strings.dart';
 import '../../../../core/theme/app_colors.dart';
-import '../../../../core/theme/app_icons.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/pay/pay_card.dart';
 import '../../../../shared/widgets/status_chip.dart';
 import '../../../stations/domain/station.dart';
+import '../../../stations/presentation/detail/station_image.dart';
 
 class StationHeaderCard extends StatelessWidget {
   const StationHeaderCard({super.key, required this.station});
@@ -20,16 +20,13 @@ class StationHeaderCard extends StatelessWidget {
     return PayCard(
       child: Row(
         children: [
-          Container(
-            width: 48,
-            height: 48,
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: AppColors.primarySoft,
-            ),
-            child: const Icon(
-              AppIcons.chargingStation,
-              color: AppColors.primary,
+          ClipRRect(
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            child: Image.asset(
+              StationImage.forCountry(station.isoCode),
+              width: 56,
+              height: 56,
+              fit: BoxFit.cover,
             ),
           ),
           const SizedBox(width: AppSpacing.md),

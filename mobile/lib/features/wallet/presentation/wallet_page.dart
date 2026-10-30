@@ -53,7 +53,6 @@ class WalletPage extends ConsumerWidget {
     final topUp = PrimaryButton(
       label: WalletText.topUp,
       icon: AppIcons.wallet,
-      height: AppSpacing.compactButtonHeight,
       onPressed: () => context.push(Routes.topup),
     );
     return Row(
@@ -64,7 +63,6 @@ class WalletPage extends ConsumerWidget {
           child: SecondaryButton(
             label: WithdrawText.action,
             icon: AppIcons.signOut,
-            height: AppSpacing.compactButtonHeight,
             onPressed: () => wallet.withdrawalsEnabled
                 ? context.push(Routes.withdraw)
                 : AppToast.info(context, WithdrawText.unavailable),

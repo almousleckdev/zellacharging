@@ -3,10 +3,9 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/session/session_controller.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
-import '../../../core/theme/app_spacing.dart';
 import '../../../shared/adaptive_dialog.dart';
+import '../../../shared/widgets/secondary_button.dart';
 
 class LogoutButton extends ConsumerWidget {
   const LogoutButton({super.key});
@@ -24,24 +23,11 @@ class LogoutButton extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return SizedBox(
-      width: double.infinity,
-      height: AppSpacing.compactButtonHeight,
-      child: OutlinedButton.icon(
-        onPressed: () => _logOut(context, ref),
-        icon: Icon(AppIcons.signOut, size: 18),
-        label: Text(
-          ProfileText.logOut,
-          style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600),
-        ),
-        style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.danger,
-          side: BorderSide(color: AppColors.danger),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
-          ),
-        ),
-      ),
+    return SecondaryButton(
+      label: ProfileText.logOut,
+      icon: AppIcons.signOut,
+      destructive: true,
+      onPressed: () => _logOut(context, ref),
     );
   }
 }

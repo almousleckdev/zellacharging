@@ -10,7 +10,7 @@ import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/widgets/app_text_field.dart';
-import '../../../shared/widgets/pay/amount_hero.dart';
+import '../../../shared/widgets/pay/amount_card.dart';
 import '../../../shared/widgets/pay/pay_card.dart';
 import '../../../shared/widgets/pay/secure_note.dart';
 import '../../../shared/widgets/pay/summary_card.dart';
@@ -62,8 +62,9 @@ class WithdrawForm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        AmountHero(
-          title: WithdrawText.amountTitle,
+        AmountCard(
+          label: WithdrawText.amountLabel,
+          hint: WalletText.topupAmountHint,
           controller: amount,
           currency: wallet.currency,
           quickAmounts: _quick,

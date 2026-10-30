@@ -44,10 +44,15 @@ public class VerificationService {
 
     @Transactional
     public void issue(Customer customer, ContactPoint contact) {
+        issue(customer, contact, contact.channel());
+    }
+
+    @Transactional
+    public void issue(Customer customer, ContactPoint contact, Channel stream) {
         String code = "%06d".formatted(random.nextInt(1_000_000));
         Instant now = clock.instant();
-        codes.save(new VerificationCode(UUID.randomUUID(), customer.id(), contact.channel(),
-                hash(customer.id(), contact.channel(), code),
+        codes.save(new VerificationCode(UUID.randomUUID(), customer.id(), stream,
+                hash(customer.id(), stream, code),
                 now.plus(settings.verification().codeTtl()), 0, null, now));
         sender.send(contact.channel(), contact.target(), code);
     }
@@ -84,7 +89,11 @@ public class VerificationService {
     }
 
     public void reissue(Customer customer, ContactPoint contact) {
-        boolean tooSoon = codes.findLatest(customer.id(), contact.channel())
+        reissue(customer, contact, contact.channel());
+    }
+
+    public void reissue(Customer customer, ContactPoint contact, Channel stream) {
+        boolean tooSoon = codes.findLatest(customer.id(), stream)
                 .filter(previous -> previous.createdAt()
                         .plus(settings.verification().resendCooldown()).isAfter(clock.instant()))
                 .isPresent();
@@ -92,7 +101,7 @@ public class VerificationService {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "VERIFICATION_COOLDOWN",
                     "Please wait before requesting another code");
         }
-        issue(customer, contact);
+        issue(customer, contact, stream);
     }
 
     private String hash(UUID customerId, Channel channel, String code) {

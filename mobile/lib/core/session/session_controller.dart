@@ -1,6 +1,8 @@
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../network/network_providers.dart';
+import '../storage/preference_providers.dart';
+import 'stay_signed_in.dart';
 
 enum SessionStatus { unknown, authenticated, unauthenticated }
 
@@ -12,6 +14,8 @@ class SessionController extends Notifier<SessionStatus> {
   }
 
   Future<void> _restore() async {
+    final stay = await ref.read(preferenceStoreProvider).read(stayKey);
+    if (stay == '0') await ref.read(tokenStoreProvider).clear();
     final token = await ref.read(tokenStoreProvider).readRefreshToken();
     state = token == null
         ? SessionStatus.unauthenticated

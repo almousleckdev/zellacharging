@@ -1,5 +1,7 @@
 import '../format/amount_input.dart';
 import '../format/msisdn.dart';
+import 'package:flutter/widgets.dart';
+
 import '../l10n/strings.dart';
 
 abstract final class Validators {
@@ -27,6 +29,21 @@ abstract final class Validators {
   static String? password(String? value) {
     if (value == null || value.isEmpty) return Strings.required;
     return value.length < 8 ? Strings.shortPassword : null;
+  }
+
+  static String? newPassword(String? value) {
+    if (value == null || value.isEmpty) return Strings.required;
+    final strong = value.length >= 8 && RegExp(r'\d').hasMatch(value);
+    return strong ? null : AuthText.weakPassword;
+  }
+
+  static String? Function(String?) sameAs(TextEditingController other) =>
+      (value) => value == other.text ? null : AuthText.passwordsDiffer;
+
+  static String? emailForSignUp(String? value) {
+    final text = (value ?? '').trim();
+    if (text.isEmpty) return Strings.required;
+    return _email.hasMatch(text) ? null : AuthText.phoneNeedsEmail;
   }
 
   static String? otp(String? value) =>

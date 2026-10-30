@@ -2,6 +2,7 @@ export 'auth_text.dart';
 export 'charge_text.dart';
 export 'error_text.dart';
 export 'history_text.dart';
+export 'home_text.dart';
 export 'pay_flow_text.dart';
 export 'payment_text.dart';
 export 'profile_text.dart';

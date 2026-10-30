@@ -1,16 +1,13 @@
-import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:phosphor_icons/phosphor_icons.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/app_toast.dart';
 
 class SocialButtons extends StatelessWidget {
   const SocialButtons({super.key});
-
-  bool get _showApple => defaultTargetPlatform == TargetPlatform.iOS;
 
   @override
   Widget build(BuildContext context) {
@@ -42,19 +39,17 @@ class SocialButtons extends StatelessWidget {
           children: [
             Expanded(
               child: _SocialButton(
-                icon: PhosphorIconsBold.googleLogo,
+                icon: AppIcons.googleLogo,
                 label: AuthText.google,
               ),
             ),
-            if (_showApple) ...[
-              const SizedBox(width: AppSpacing.md),
-              Expanded(
-                child: _SocialButton(
-                  icon: PhosphorIconsFill.appleLogo,
-                  label: AuthText.apple,
-                ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: _SocialButton(
+                icon: AppIcons.appleLogo,
+                label: AuthText.apple,
               ),
-            ],
+            ),
           ],
         ),
       ],
@@ -71,17 +66,17 @@ class _SocialButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      height: AppSpacing.buttonHeight - 6,
+      height: 40,
       child: OutlinedButton.icon(
         onPressed: () => AppToast.info(context, AuthText.comingSoon),
-        icon: Icon(icon, size: 20, color: AppColors.textPrimary),
-        label: Text(label),
+        icon: Icon(icon, size: 18, color: AppColors.textPrimary),
+        label: Text(label, style: const TextStyle(fontSize: 13)),
         style: OutlinedButton.styleFrom(
           foregroundColor: AppColors.textPrimary,
           backgroundColor: AppColors.surface,
           side: const BorderSide(color: AppColors.border),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),
         ),
       ),

@@ -1,33 +1,31 @@
 import '../../../core/l10n/strings.dart';
 
-enum OnboardingArt { find, scan, track }
-
 class OnboardingSlide {
   const OnboardingSlide({
+    required this.image,
     required this.title,
     required this.body,
-    required this.art,
   });
 
+  final String image;
   final String title;
   final String body;
-  final OnboardingArt art;
 
-  static final all = [
+  static List<OnboardingSlide> get all => [
     OnboardingSlide(
-      title: AuthText.slideFindTitle,
-      body: AuthText.slideFindBody,
-      art: OnboardingArt.find,
+      image: 'assets/images/onboarding1.png',
+      title: AuthText.slide1Title,
+      body: AuthText.slide1Body,
     ),
     OnboardingSlide(
-      title: AuthText.slideScanTitle,
-      body: AuthText.slideScanBody,
-      art: OnboardingArt.scan,
+      image: 'assets/images/onboarding2.png',
+      title: AuthText.slide2Title,
+      body: AuthText.slide2Body,
     ),
     OnboardingSlide(
-      title: AuthText.slideTrackTitle,
-      body: AuthText.slideTrackBody,
-      art: OnboardingArt.track,
+      image: 'assets/images/onboarding3.png',
+      title: AuthText.slide3Title,
+      body: AuthText.slide3Body,
     ),
   ];
 }

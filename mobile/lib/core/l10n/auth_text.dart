@@ -1,17 +1,18 @@
 import 'app_language.dart';
 
 abstract final class AuthText {
-  static String get signIn => AppLanguage.pick(fr: 'Connexion', en: 'Login');
+  static String get signIn =>
+      AppLanguage.pick(fr: 'Se connecter', en: 'Sign In');
 
   static String get createAccount =>
-      AppLanguage.pick(fr: 'Créer un compte', en: 'Create account');
+      AppLanguage.pick(fr: 'Créer le compte', en: 'Create Account');
 
   static String get signInTitle =>
       AppLanguage.pick(fr: 'Bon retour', en: 'Welcome back');
 
   static String get signInSubtitle => AppLanguage.pick(
-    fr: 'Connectez-vous pour continuer à recharger.',
-    en: 'Sign in to keep charging.',
+    fr: 'Connectez-vous à votre compte',
+    en: 'Sign in to your account',
   );
 
   static String get registerSubtitle => AppLanguage.pick(
@@ -50,8 +51,7 @@ abstract final class AuthText {
     en: 'Don\'t have an account?',
   );
 
-  static String get signUp =>
-      AppLanguage.pick(fr: 'Inscription', en: 'Sign up');
+  static String get signUp => AppLanguage.pick(fr: 'S’inscrire', en: 'Sign Up');
 
   static String get haveAccount => AppLanguage.pick(
     fr: 'Vous avez déjà un compte ?',
@@ -120,5 +120,175 @@ abstract final class AuthText {
   static String get slideTrackBody => AppLanguage.pick(
     fr: 'Suivez la progression en temps réel et gardez la trace de votre historique et de votre consommation.',
     en: 'Follow your charging progress in real time and keep track of your history and energy usage.',
+  );
+
+  static String get tagline => AppLanguage.pick(
+    fr: 'Énergie propre. Un avenir meilleur.',
+    en: 'Clean energy. A better tomorrow.',
+  );
+
+  static String get skipLabel => AppLanguage.pick(fr: 'Passer', en: 'Skip');
+
+  static String get slide1Title => AppLanguage.pick(
+    fr: 'Rechargez votre véhicule électrique partout, à tout moment',
+    en: 'Charge your EV anywhere, anytime',
+  );
+
+  static String get slide1Body => AppLanguage.pick(
+    fr: 'Trouvez des bornes, payez en toute sécurité et gardez le cap.',
+    en: 'Find charging stations, pay securely, and keep moving.',
+  );
+
+  static String get slide2Title => AppLanguage.pick(
+    fr: 'Paiements simples et sécurisés',
+    en: 'Easy & secure payments',
+  );
+
+  static String get slide2Body => AppLanguage.pick(
+    fr: 'Payez avec votre moyen préféré et obtenez une confirmation instantanée.',
+    en: 'Pay with your preferred method and get instant confirmation.',
+  );
+
+  static String get slide3Title => AppLanguage.pick(
+    fr: 'Un avenir plus propre et plus vert',
+    en: 'A cleaner, greener future',
+  );
+
+  static String get slide3Body => AppLanguage.pick(
+    fr: 'Ensemble, nous accélérons la transition vers une énergie propre.',
+    en: 'Together we drive the transition to clean energy.',
+  );
+
+  static String get rememberMe =>
+      AppLanguage.pick(fr: 'Se souvenir de moi', en: 'Remember me');
+
+  static String get forgotPassword =>
+      AppLanguage.pick(fr: 'Mot de passe oublié ?', en: 'Forgot password?');
+
+  static String get registerTitle =>
+      AppLanguage.pick(fr: 'Créez votre compte', en: 'Create your account');
+
+  static String get registerSubtitleNew => AppLanguage.pick(
+    fr: 'Rejoignez Zella Charging et commencez votre aventure.',
+    en: 'Join Zella Charging and start your journey.',
+  );
+
+  static String get confirmPassword =>
+      AppLanguage.pick(fr: 'Confirmer le mot de passe', en: 'Confirm password');
+
+  static String get agreePrefix =>
+      AppLanguage.pick(fr: 'J’accepte les ', en: 'I agree to the ');
+
+  static String get terms =>
+      AppLanguage.pick(fr: 'Conditions d’utilisation', en: 'Terms of Service');
+
+  static String get agreeAnd => AppLanguage.pick(fr: ' et la ', en: ' and ');
+
+  static String get privacy => AppLanguage.pick(
+    fr: 'Politique de confidentialité',
+    en: 'Privacy Policy',
+  );
+
+  static String get mustAgree => AppLanguage.pick(
+    fr: 'Acceptez les conditions pour continuer.',
+    en: 'Accept the terms to continue.',
+  );
+
+  static String get passwordsDiffer => AppLanguage.pick(
+    fr: 'Les mots de passe ne correspondent pas.',
+    en: 'Passwords do not match.',
+  );
+
+  static String get phoneNeedsEmail => AppLanguage.pick(
+    fr: 'Saisissez votre e-mail. Vous pourrez ajouter votre téléphone dans votre profil.',
+    en: 'Enter your email. You can add your phone number in your profile.',
+  );
+
+  static String get forgotTitle => AppLanguage.pick(
+    fr: 'Mot de passe oublié ?',
+    en: 'Forgot your password?',
+  );
+
+  static String get forgotBody => AppLanguage.pick(
+    fr: 'Saisissez votre e-mail et nous vous enverrons un code pour réinitialiser votre mot de passe.',
+    en: 'Enter your email and we’ll send you a code to reset your password.',
+  );
+
+  static String get sendCode =>
+      AppLanguage.pick(fr: 'Envoyer le code', en: 'Send OTP');
+
+  static String get backToLogin =>
+      AppLanguage.pick(fr: 'Retour à la connexion', en: 'Back to login');
+
+  static String get phoneResetSoon => AppLanguage.pick(
+    fr: 'La réinitialisation par SMS arrive bientôt. Utilisez votre e-mail.',
+    en: 'Reset by SMS is coming soon. Please use your email.',
+  );
+
+  static String get otpTitle =>
+      AppLanguage.pick(fr: 'Vérifiez votre code', en: 'Verify your code');
+
+  static String get otpSentTo => AppLanguage.pick(
+    fr: 'Nous avons envoyé un code à 6 chiffres à',
+    en: 'We’ve sent a 6-digit code to',
+  );
+
+  static String resendIn(String time) => AppLanguage.pick(
+    fr: 'Renvoyer le code dans $time',
+    en: 'Resend code in $time',
+  );
+
+  static String get changeEmail =>
+      AppLanguage.pick(fr: 'Changer d’e-mail', en: 'Change email');
+
+  static String get newPasswordTitle => AppLanguage.pick(
+    fr: 'Créez un nouveau mot de passe',
+    en: 'Create new password',
+  );
+
+  static String get newPasswordBody => AppLanguage.pick(
+    fr: 'Votre nouveau mot de passe doit contenir au moins 8 caractères dont un chiffre.',
+    en: 'Your new password must be at least 8 characters and include a number.',
+  );
+
+  static String get newPassword =>
+      AppLanguage.pick(fr: 'Nouveau mot de passe', en: 'New password');
+
+  static String get resetPassword => AppLanguage.pick(
+    fr: 'Réinitialiser le mot de passe',
+    en: 'Reset Password',
+  );
+
+  static String get resetDoneTitle => AppLanguage.pick(
+    fr: 'Mot de passe réinitialisé !',
+    en: 'Password reset successfully!',
+  );
+
+  static String get resetDoneBody => AppLanguage.pick(
+    fr: 'Votre mot de passe a été mis à jour. Vous pouvez maintenant vous connecter.',
+    en: 'Your password has been updated. You can now log in to your account.',
+  );
+
+  static String get goToLogin =>
+      AppLanguage.pick(fr: 'Aller à la connexion', en: 'Go to Login');
+
+  static String get welcomeBackTitle =>
+      AppLanguage.pick(fr: 'Bon retour !', en: 'Welcome back!');
+
+  static String get welcomeBackBody => AppLanguage.pick(
+    fr: 'Tout est prêt. Redirection vers votre tableau de bord…',
+    en: 'You’re all set. Redirecting to your dashboard…',
+  );
+
+  static String get next => AppLanguage.pick(fr: 'Suivant', en: 'Next');
+
+  static String get weakPassword => AppLanguage.pick(
+    fr: 'Au moins 8 caractères dont un chiffre',
+    en: 'At least 8 characters including a number',
+  );
+
+  static String get accountVerified => AppLanguage.pick(
+    fr: 'Compte vérifié. Connectez-vous.',
+    en: 'Account verified. Please sign in.',
   );
 }

@@ -22,6 +22,9 @@ abstract final class AppIcons {
   static const eye = PhosphorIconsRegular.eye;
   static const eyeSlash = PhosphorIconsRegular.eyeSlash;
   static const caretRight = PhosphorIconsRegular.caretRight;
+  static const caretLeft = PhosphorIconsRegular.caretLeft;
+  static const googleLogo = PhosphorIconsBold.googleLogo;
+  static const appleLogo = PhosphorIconsFill.appleLogo;
   static const headset = PhosphorIconsRegular.headset;
   static const globe = PhosphorIconsRegular.globe;
   static const document = PhosphorIconsRegular.fileText;

@@ -1,28 +1,32 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/router/routes.dart';
+import '../../../core/storage/preference_providers.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../shared/widgets/app_logo.dart';
 import '../../../shared/widgets/primary_button.dart';
 import 'onboarding_slide.dart';
 import 'onboarding_slide_view.dart';
-import 'page_dots.dart';
+import 'splash_state.dart';
+import 'widgets/auth_page.dart';
+import 'widgets/onboarding_progress.dart';
 
-class OnboardingPage extends StatefulWidget {
+class OnboardingPage extends ConsumerStatefulWidget {
   const OnboardingPage({super.key});
 
   @override
-  State<OnboardingPage> createState() => _OnboardingPageState();
+  ConsumerState<OnboardingPage> createState() => _OnboardingPageState();
 }
 
-class _OnboardingPageState extends State<OnboardingPage> {
+class _OnboardingPageState extends ConsumerState<OnboardingPage> {
   final _controller = PageController();
+  final _slides = OnboardingSlide.all;
   int _index = 0;
 
-  bool get _isLast => _index == OnboardingSlide.all.length - 1;
+  bool get _isLast => _index == _slides.length - 1;
 
   @override
   void dispose() {
@@ -30,13 +34,19 @@ class _OnboardingPageState extends State<OnboardingPage> {
     super.dispose();
   }
 
+  Future<void> _finish() async {
+    await ref.read(preferenceStoreProvider).save(onboardingSeenKey, '1');
+    ref.invalidate(onboardingSeenProvider);
+    if (mounted) context.go(Routes.register);
+  }
+
   void _next() {
     if (_isLast) {
-      context.go(Routes.register);
+      _finish();
       return;
     }
     _controller.nextPage(
-      duration: const Duration(milliseconds: 250),
+      duration: const Duration(milliseconds: 300),
       curve: Curves.easeOut,
     );
   }
@@ -49,40 +59,41 @@ class _OnboardingPageState extends State<OnboardingPage> {
           padding: const EdgeInsets.all(AppSpacing.lg),
           child: Column(
             children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  const AppLogo(size: 34, showName: false),
-                  TextButton(
-                    onPressed: () => context.go(Routes.register),
-                    child: Text(
-                      AuthText.skip,
-                      style: TextStyle(
-                        color: AppColors.primary,
-                        fontSize: 12,
-                        fontWeight: FontWeight.w800,
-                        letterSpacing: 0.6,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+              OnboardingProgress(index: _index, count: _slides.length),
+              const SizedBox(height: AppSpacing.lg),
               Expanded(
                 child: PageView(
                   controller: _controller,
                   onPageChanged: (value) => setState(() => _index = value),
                   children: [
-                    for (final slide in OnboardingSlide.all)
+                    for (final slide in _slides)
                       OnboardingSlideView(slide: slide),
                   ],
                 ),
               ),
-              const SizedBox(height: AppSpacing.md),
-              PageDots(count: OnboardingSlide.all.length, index: _index),
               const SizedBox(height: AppSpacing.lg),
-              PrimaryButton(
-                label: _isLast ? Strings.getStarted : Strings.next,
-                onPressed: _next,
+              ConstrainedBox(
+                constraints: const BoxConstraints(maxWidth: authContentWidth),
+                child: PrimaryButton(
+                  height: authButtonHeight,
+                  label: _isLast ? Strings.getStarted : AuthText.next,
+                  onPressed: _next,
+                ),
+              ),
+              SizedBox(
+                height: 44,
+                child: _isLast
+                    ? null
+                    : TextButton(
+                        onPressed: _finish,
+                        child: Text(
+                          AuthText.skipLabel,
+                          style: const TextStyle(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
               ),
             ],
           ),

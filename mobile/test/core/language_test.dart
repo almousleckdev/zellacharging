@@ -23,7 +23,7 @@ void main() {
 
   test('French is the default language', () {
     expect(AppLanguage.current, AppLanguage.fr);
-    expect(AuthText.signIn, 'Connexion');
+    expect(AuthText.signIn, 'Se connecter');
     expect(Strings.profile, 'Profil');
     expect(AppLanguage.fromCode(null), AppLanguage.fr);
     expect(AppLanguage.fromCode('de'), AppLanguage.fr);
@@ -32,7 +32,7 @@ void main() {
   test('English is available and texts switch with the language', () {
     AppLanguage.current = AppLanguage.en;
 
-    expect(AuthText.signIn, 'Login');
+    expect(AuthText.signIn, 'Sign In');
     expect(Strings.profile, 'Profile');
     expect(ProfileText.logOut, 'Log out');
     expect(HistoryText.filters.first, 'All');

@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
+import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../profile/presentation/user_avatar.dart';
 import '../../profile/domain/profile.dart';
+import 'home_search_bar.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key, this.profile});
@@ -14,31 +17,39 @@ class HomeHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return Row(
+    final name = profile?.firstName;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        UserAvatar(initials: profile?.initials ?? '', size: 46),
-        const SizedBox(width: AppSpacing.md),
-        Expanded(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                profile == null
-                    ? Strings.appName
-                    : '${Strings.greeting}, ${profile!.firstName}',
+        Row(
+          children: [
+            Expanded(
+              child: Text(
+                name == null ? Strings.appName : '${Strings.greeting}, $name',
                 style: theme.textTheme.titleMedium?.copyWith(
-                  fontWeight: FontWeight.w800,
+                  fontWeight: FontWeight.w600,
                 ),
               ),
-              Text(
-                Strings.tagline,
-                style: theme.textTheme.bodySmall?.copyWith(
-                  color: AppColors.textSecondary,
-                ),
+            ),
+            IconButton(
+              tooltip: HomeText.notifications,
+              onPressed: () => context.push(Routes.settings),
+              icon: const Icon(
+                AppIcons.bell,
+                color: AppColors.textPrimary,
+                size: 22,
               ),
-            ],
+            ),
+          ],
+        ),
+        Text(
+          HomeText.greetingSubtitle,
+          style: theme.textTheme.bodySmall?.copyWith(
+            color: AppColors.textSecondary,
           ),
         ),
+        const SizedBox(height: AppSpacing.md),
+        HomeSearchBar(onTap: () => context.go(Routes.locations)),
       ],
     );
   }

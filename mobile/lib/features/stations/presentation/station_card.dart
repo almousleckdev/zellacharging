@@ -4,7 +4,6 @@ import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../shared/widgets/icon_badge.dart';
 import '../../../shared/widgets/meta_pill.dart';
 import '../../../shared/widgets/soft_card.dart';
 import '../../../shared/widgets/status_chip.dart';
@@ -23,10 +22,13 @@ class StationCard extends StatelessWidget {
       onTap: onTap,
       child: Row(
         children: [
-          IconBadge(
-            icon: AppIcons.chargingStation,
-            size: 48,
-            color: station.online ? AppColors.chargeDeep : AppColors.neutral,
+          Opacity(
+            opacity: station.online ? 1 : 0.4,
+            child: Image.asset(
+              'assets/images/bornes.png',
+              width: 48,
+              height: 48,
+            ),
           ),
           const SizedBox(width: AppSpacing.md),
           Expanded(

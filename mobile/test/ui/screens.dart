@@ -8,10 +8,12 @@ import 'package:zella/core/network/api_error.dart';
 import 'package:zella/shared/widgets/pay/flow_panel.dart';
 import 'package:zella/shared/widgets/pay/payment_step.dart';
 import 'package:zella/core/location/location_providers.dart';
+import 'package:zella/features/auth/presentation/forgot_password_page.dart';
 import 'package:zella/features/auth/presentation/login_page.dart';
+import 'package:zella/features/auth/presentation/reset_success_page.dart';
+import 'package:zella/features/auth/presentation/splash_page.dart';
 import 'package:zella/features/auth/presentation/onboarding_page.dart';
 import 'package:zella/features/auth/presentation/register_page.dart';
-import 'package:zella/features/auth/presentation/welcome_page.dart';
 import 'package:zella/features/charging/domain/session_state.dart';
 import 'package:zella/features/charging/presentation/charging_page.dart';
 import 'package:zella/features/charging/presentation/session_providers.dart';
@@ -49,7 +51,9 @@ import 'package:zella/features/wallet/presentation/wallet_providers.dart';
 import 'ui_fakes.dart';
 
 final screens = <String, Widget Function()>{
-  'welcome': () => const WelcomePage(),
+  'splash': () => const SplashPage(),
+  'forgot': () => const ForgotPasswordPage(),
+  'reset-success': () => const ResetSuccessPage(),
   'onboarding': () => const OnboardingPage(),
   'login': () => const LoginPage(),
   'register': () => const RegisterPage(),

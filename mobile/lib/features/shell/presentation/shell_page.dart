@@ -2,11 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
-import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/refresh/live_data_refresher.dart';
 import 'bottom_bar_item.dart';
-import 'charge_bar_button.dart';
 import '../../../core/theme/app_icons.dart';
 
 class ShellPage extends StatelessWidget {
@@ -42,7 +40,6 @@ class ShellPage extends StatelessWidget {
               children: [
                 _item(0, AppIcons.house, Strings.home),
                 _item(1, AppIcons.mapPin, Strings.locations),
-                ChargeBarButton(onTap: () => context.push(Routes.scan)),
                 _item(2, AppIcons.chart, Strings.history),
                 _item(3, AppIcons.user, Strings.profile),
               ],

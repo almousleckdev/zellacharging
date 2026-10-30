@@ -20,11 +20,12 @@ Future<void> _submit(WidgetTester tester) async {
 void main() {
   setUpAll(loadTestFonts);
 
-  testWidgets('the email is required and the phone is not', (tester) async {
+  testWidgets('the contact is required', (tester) async {
     await pumpApp(tester, const RegisterPage(), overrides: overrides());
 
     await _type(tester, 0, 'Aline');
     await _type(tester, 1, 'Obame');
+    await _type(tester, 3, 'Secret123!');
     await _type(tester, 4, 'Secret123!');
     await _submit(tester);
 
@@ -32,30 +33,31 @@ void main() {
     await closeApp(tester);
   });
 
-  testWidgets('a malformed email is refused', (tester) async {
+  testWidgets('a phone number alone asks for an email for now', (tester) async {
     await pumpApp(tester, const RegisterPage(), overrides: overrides());
 
     await _type(tester, 0, 'Aline');
     await _type(tester, 1, 'Obame');
-    await _type(tester, 2, 'not-an-email');
+    await _type(tester, 2, '+24177123456');
+    await _type(tester, 3, 'Secret123!');
     await _type(tester, 4, 'Secret123!');
     await _submit(tester);
 
-    expect(find.text(Strings.invalidEmail), findsOneWidget);
+    expect(find.text(AuthText.phoneNeedsEmail), findsOneWidget);
     await closeApp(tester);
   });
 
-  testWidgets('a phone number with letters is refused', (tester) async {
+  testWidgets('different passwords are refused', (tester) async {
     await pumpApp(tester, const RegisterPage(), overrides: overrides());
 
     await _type(tester, 0, 'Aline');
     await _type(tester, 1, 'Obame');
     await _type(tester, 2, 'aline@example.com');
-    await _type(tester, 3, 'abc');
-    await _type(tester, 4, 'Secret123!');
+    await _type(tester, 3, 'Secret123!');
+    await _type(tester, 4, 'Other123!');
     await _submit(tester);
 
-    expect(find.text(Strings.invalidPhone), findsOneWidget);
+    expect(find.text(AuthText.passwordsDiffer), findsOneWidget);
     await closeApp(tester);
   });
 }

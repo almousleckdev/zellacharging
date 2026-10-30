@@ -1,9 +1,13 @@
 abstract final class Routes {
-  static const welcome = '/welcome';
+  static const splash = '/splash';
   static const onboarding = '/onboarding';
   static const login = '/login';
   static const register = '/register';
-  static const verify = '/verify';
+  static const otp = '/otp';
+  static const forgotPassword = '/forgot-password';
+  static const resetPassword = '/reset-password';
+  static const resetSuccess = '/reset-success';
+  static const welcomeBack = '/welcome-back';
   static const home = '/home';
   static const locations = '/locations';
   static const history = '/history';

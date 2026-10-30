@@ -2,12 +2,18 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../features/auth/domain/verification_target.dart';
 import '../../features/auth/presentation/login_page.dart';
 import '../../features/auth/presentation/onboarding_page.dart';
+import '../../features/auth/presentation/forgot_password_page.dart';
+import '../../features/auth/presentation/otp_args.dart';
+import '../../features/auth/presentation/otp_page.dart';
 import '../../features/auth/presentation/register_page.dart';
-import '../../features/auth/presentation/welcome_page.dart';
-import '../../features/auth/presentation/verify_page.dart';
+import '../../features/auth/presentation/reset_args.dart';
+import '../../features/auth/presentation/reset_password_page.dart';
+import '../../features/auth/presentation/reset_success_page.dart';
+import '../../features/auth/presentation/splash_page.dart';
+import '../../features/auth/presentation/splash_state.dart';
+import '../../features/auth/presentation/welcome_back_page.dart';
 import '../../features/history/presentation/history_page.dart';
 import '../../features/home/presentation/home_page.dart';
 import '../../features/stations/presentation/locations_page.dart';
@@ -36,32 +42,45 @@ import '../session/session_controller.dart';
 import 'routes.dart';
 
 const _publicRoutes = {
-  Routes.welcome,
+  Routes.splash,
   Routes.onboarding,
   Routes.login,
   Routes.register,
-  Routes.verify,
+  Routes.otp,
+  Routes.forgotPassword,
+  Routes.resetPassword,
+  Routes.resetSuccess,
+  Routes.welcomeBack,
 };
 
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
   ref.listen(sessionControllerProvider, (_, _) => refresh.value++);
+  ref.listen(splashDoneProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
-    initialLocation: Routes.welcome,
+    initialLocation: Routes.splash,
     refreshListenable: refresh,
     redirect: (context, state) {
       final status = ref.read(sessionControllerProvider);
-      if (status == SessionStatus.unknown) return null;
-      final isPublic = _publicRoutes.contains(state.matchedLocation);
+      final location = state.matchedLocation;
       final signedIn = status == SessionStatus.authenticated;
+      if (!ref.read(splashDoneProvider)) {
+        return location == Routes.splash ? null : Routes.splash;
+      }
+      if (location == Routes.splash) {
+        if (signedIn) return Routes.home;
+        final seen = ref.read(onboardingSeenProvider).value ?? false;
+        return seen ? Routes.login : Routes.onboarding;
+      }
+      final isPublic = _publicRoutes.contains(location);
       if (signedIn && isPublic) return Routes.home;
-      if (!signedIn && !isPublic) return Routes.welcome;
+      if (!signedIn && !isPublic) return Routes.login;
       return null;
     },
     routes: [
-      GoRoute(path: Routes.welcome, builder: (_, _) => const WelcomePage()),
+      GoRoute(path: Routes.splash, builder: (_, _) => const SplashPage()),
       GoRoute(
         path: Routes.onboarding,
         builder: (_, _) => const OnboardingPage(),
@@ -69,9 +88,25 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(path: Routes.login, builder: (_, _) => const LoginPage()),
       GoRoute(path: Routes.register, builder: (_, _) => const RegisterPage()),
       GoRoute(
-        path: Routes.verify,
+        path: Routes.otp,
+        builder: (_, state) => OtpPage(args: state.extra as OtpArgs),
+      ),
+      GoRoute(
+        path: Routes.forgotPassword,
+        builder: (_, _) => const ForgotPasswordPage(),
+      ),
+      GoRoute(
+        path: Routes.resetPassword,
         builder: (_, state) =>
-            VerifyPage(target: state.extra as VerificationTarget),
+            ResetPasswordPage(args: state.extra as ResetArgs),
+      ),
+      GoRoute(
+        path: Routes.resetSuccess,
+        builder: (_, _) => const ResetSuccessPage(),
+      ),
+      GoRoute(
+        path: Routes.welcomeBack,
+        builder: (_, _) => const WelcomeBackPage(),
       ),
       GoRoute(
         path: Routes.charging,

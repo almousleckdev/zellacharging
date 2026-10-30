@@ -13,6 +13,7 @@ class PrimaryButton extends StatelessWidget {
     this.loading = false,
     this.icon,
     this.destructive = false,
+    this.height = AppSpacing.buttonHeight,
   });
 
   final String label;
@@ -20,6 +21,7 @@ class PrimaryButton extends StatelessWidget {
   final bool loading;
   final IconData? icon;
   final bool destructive;
+  final double height;
 
   Color get color => destructive ? AppColors.danger : AppColors.primary;
 
@@ -27,7 +29,7 @@ class PrimaryButton extends StatelessWidget {
   Widget build(BuildContext context) {
     return SizedBox(
       width: double.infinity,
-      height: AppSpacing.buttonHeight,
+      height: height,
       child: FilledButton(
         onPressed: loading ? null : onPressed,
         style: FilledButton.styleFrom(

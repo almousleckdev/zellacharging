@@ -61,6 +61,23 @@ class AuthRepositoryImpl implements AuthRepository {
   );
 
   @override
+  Future<void> forgotPassword(String email) => _guard(
+    () => client.post<void>('/v1/auth/password/forgot', data: {'email': email}),
+  );
+
+  @override
+  Future<void> resetPassword({
+    required String email,
+    required String code,
+    required String newPassword,
+  }) => _guard(
+    () => client.post<void>(
+      '/v1/auth/password/reset',
+      data: {'email': email, 'code': code, 'newPassword': newPassword},
+    ),
+  );
+
+  @override
   Future<void> login({required String identifier, required String password}) =>
       _guard(() async {
         final response = await client.post<Map<String, dynamic>>(

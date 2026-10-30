@@ -5,16 +5,14 @@ import 'package:go_router/go_router.dart';
 import '../../../core/l10n/app_language.dart';
 import '../../../core/l10n/language_controller.dart';
 import '../../../core/l10n/strings.dart';
-import '../../../core/links/link_providers.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/adaptive_picker.dart';
-import '../../../shared/app_toast.dart';
 import '../../../shared/picker_option.dart';
 import '../../../shared/widgets/menu_tile.dart';
 import '../../../shared/widgets/soft_card.dart';
-import '../../support/presentation/support_providers.dart';
+import '../../support/presentation/open_agreement.dart';
 
 class ProfileMenu extends ConsumerWidget {
   const ProfileMenu({super.key});
@@ -32,16 +30,6 @@ class ProfileMenu extends ConsumerWidget {
     );
     if (picked == null) return;
     await ref.read(languageProvider.notifier).select(picked);
-  }
-
-  Future<void> _openAgreement(BuildContext context, WidgetRef ref) async {
-    final link = (await ref.read(supportProvider.future)).agreementUrl;
-    final opened =
-        link != null &&
-        await ref.read(linkLauncherProvider).open(Uri.parse(link));
-    if (!opened && context.mounted) {
-      AppToast.info(context, ProfileText.agreementUnavailable);
-    }
   }
 
   @override
@@ -65,7 +53,7 @@ class ProfileMenu extends ConsumerWidget {
           MenuTile(
             icon: AppIcons.document,
             label: ProfileText.agreement,
-            onTap: () => _openAgreement(context, ref),
+            onTap: () => openAgreement(context, ref),
           ),
           MenuTile(
             icon: AppIcons.sliders,

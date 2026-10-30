@@ -1,6 +1,5 @@
 import Image from "next/image";
 import type { Copy } from "@/content/types";
-import { Screenshot } from "./Screenshot";
 import { StoreButtons } from "./StoreButtons";
 
 export function Hero({ copy }: { copy: Copy }) {
@@ -19,9 +18,15 @@ export function Hero({ copy }: { copy: Copy }) {
             <span>Airtel Money · Moov Money</span>
           </div>
         </div>
-        <div className="mx-auto w-full max-w-[280px]">
-          <Screenshot slot={1} />
-        </div>
+        <Image
+          src="/screens/hero.png"
+          alt=""
+          width={751}
+          height={1257}
+          priority
+          sizes="(min-width: 768px) 420px, 80vw"
+          className="mx-auto h-auto w-full max-w-[300px] md:max-w-[400px]"
+        />
       </div>
     </section>
   );

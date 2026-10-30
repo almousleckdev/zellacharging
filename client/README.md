@@ -23,10 +23,9 @@ Set the backend `ZELLA_AGREEMENT_URL` to the terms page so the app links to it.
 
 ## App screenshots
 
-The home page has 7 screenshot slots: `1` in the hero and `2` to `7`, one beside each feature in order (find a
-charger, scan, live tracking, wallet, notifications, security). Drop PNG files named `public/screens/1.png` to
-`public/screens/7.png` (portrait phone screenshots, about 1170 x 2532) and rebuild. A slot without a file stays an
-empty frame.
+The hero uses `public/screens/hero.png` (a transparent phone mockup). The six feature sections each have a portrait
+slot: drop PNG files named `public/screens/2.png` to `7.png` (find a charger, scan, live tracking, wallet,
+notifications, security; about 1170 x 2532) and rebuild. A slot without a file stays an empty frame.
 
 ## Contact form
 

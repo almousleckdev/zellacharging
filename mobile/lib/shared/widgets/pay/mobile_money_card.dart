@@ -5,72 +5,92 @@ import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
-import '../../../core/validation/validators.dart';
-import '../../../shared/widgets/app_text_field.dart';
-import '../../../shared/widgets/operator_logo.dart';
-import '../../../shared/widgets/pay/pay_card.dart';
-import '../domain/payout_number.dart';
+import '../../../features/wallet/domain/mobile_operator.dart';
+import '../../../features/wallet/domain/payout_number.dart';
+import '../app_text_field.dart';
+import '../operator_logo.dart';
+import 'operator_tiles.dart';
+import 'pay_card.dart';
 
-class WithdrawDestination extends StatelessWidget {
-  const WithdrawDestination({
+class MobileMoneyCard extends StatelessWidget {
+  const MobileMoneyCard({
     super.key,
+    required this.title,
     required this.phone,
-    required this.numbers,
+    required this.operator,
+    required this.onOperator,
+    required this.validator,
+    this.known = const [],
+    this.note,
   });
 
+  final String title;
   final TextEditingController phone;
-  final List<PayoutNumber> numbers;
+  final MobileOperator operator;
+  final ValueChanged<MobileOperator> onOperator;
+  final String? Function(String?) validator;
+  final List<PayoutNumber> known;
+  final String? note;
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
     return PayCard(
-      title: WithdrawText.destinationTitle,
+      title: title,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           AppTextField(
             controller: phone,
-            label: WithdrawText.numberLabel,
+            label: WalletText.mobileMoneyNumberLabel,
             hint: WalletText.mobileMoneyNumberHint,
             icon: AppIcons.phone,
+            validator: validator,
             keyboardType: TextInputType.phone,
-            validator: (value) => Validators.payoutNumber(
-              value,
-              numbers.map((number) => number.msisdn),
-            ),
+            textInputAction: TextInputAction.done,
           ),
-          if (numbers.isNotEmpty) ...[
+          if (known.isNotEmpty) ...[
             const SizedBox(height: AppSpacing.sm),
             Wrap(
               spacing: AppSpacing.sm,
               runSpacing: AppSpacing.sm,
               children: [
-                for (final number in numbers)
-                  _NumberChip(
+                for (final number in known)
+                  _KnownNumber(
                     number: number,
-                    onTap: () => phone.text = number.msisdn,
+                    onTap: () {
+                      phone.text = number.msisdn;
+                      onOperator(number.operator);
+                    },
                   ),
               ],
             ),
           ],
-          const SizedBox(height: AppSpacing.sm),
-          Text(
-            numbers.isEmpty
-                ? WithdrawText.noPayoutNumber
-                : WithdrawText.destinationNote,
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.textSecondary,
+          const SizedBox(height: AppSpacing.md),
+          ListenableBuilder(
+            listenable: phone,
+            builder: (context, _) => OperatorTiles(
+              selected: operator,
+              phone: phone.text,
+              onSelected: onOperator,
             ),
           ),
+          if (note != null) ...[
+            const SizedBox(height: AppSpacing.sm),
+            Text(
+              note!,
+              style: Theme.of(
+                context,
+              ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
+            ),
+          ],
         ],
       ),
     );
   }
 }
 
-class _NumberChip extends StatelessWidget {
-  const _NumberChip({required this.number, required this.onTap});
+class _KnownNumber extends StatelessWidget {
+  const _KnownNumber({required this.number, required this.onTap});
 
   final PayoutNumber number;
   final VoidCallback onTap;

@@ -61,8 +61,8 @@ abstract final class WithdrawText {
       AppLanguage.pick(fr: 'Débité du portefeuille', en: 'Taken from wallet');
 
   static String get invalidAmount => AppLanguage.pick(
-    fr: 'Saisissez un montant d’au moins 1 000 et au plus votre solde disponible',
-    en: 'Enter an amount of at least 1,000 and at most your available balance',
+    fr: 'Saisissez un montant d’au moins 500 et au plus votre solde disponible',
+    en: 'Enter an amount of at least 500 and at most your available balance',
   );
 
   static String withdrawAmount(String amount) =>

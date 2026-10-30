@@ -30,14 +30,7 @@ class WalletRepositoryImpl implements WalletRepository {
       payoutOperator: MobileOperator.values
           .where((operator) => operator.code == json['payoutOperator'])
           .firstOrNull,
-      payoutNumbers: [
-        for (final item in json['payoutNumbers'] as List<dynamic>? ?? [])
-          if (MobileOperator.fromCode(
-                (item as Map<String, dynamic>)['operator'] as String?,
-              )
-              case final operator?)
-            PayoutNumber(msisdn: item['msisdn'] as String, operator: operator),
-      ],
+      payoutNumbers: _payoutNumbers(json),
     );
   });
 
@@ -152,6 +145,27 @@ class WalletRepositoryImpl implements WalletRepository {
     state: json['state'] as String,
     failureCode: json['failureCode'] as String?,
   );
+
+  List<PayoutNumber> _payoutNumbers(Map<String, dynamic> json) {
+    final listed = json['payoutNumbers'] as List<dynamic>?;
+    if (listed == null) return _legacyPayoutNumber(json);
+    return [
+      for (final item in listed)
+        if (MobileOperator.fromCode(
+              (item as Map<String, dynamic>)['operator'] as String?,
+            )
+            case final operator?)
+          PayoutNumber(msisdn: item['msisdn'] as String, operator: operator),
+    ];
+  }
+
+  List<PayoutNumber> _legacyPayoutNumber(Map<String, dynamic> json) {
+    final number = json['payoutNumber'] as String?;
+    final operator = MobileOperator.fromCode(json['payoutOperator'] as String?);
+    return number == null || operator == null
+        ? const []
+        : [PayoutNumber(msisdn: number, operator: operator)];
+  }
 
   Future<T> _guard<T>(Future<T> Function() call) async {
     try {

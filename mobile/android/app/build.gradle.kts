@@ -46,6 +46,12 @@ android {
         }
     }
 
+    gradle.taskGraph.whenReady {
+        if (signing.isEmpty() && allTasks.any { it.name == "bundleRelease" }) {
+            throw GradleException("android/key.properties is missing: a Play bundle needs the upload key")
+        }
+    }
+
     buildTypes {
         release {
             signingConfig = if (signing.isNotEmpty()) {

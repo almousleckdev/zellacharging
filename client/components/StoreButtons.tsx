@@ -20,7 +20,7 @@ function StoreButton({
   tone: "dark" | "light";
 }) {
   const palette =
-    tone === "dark" ? "bg-ink text-white hover:bg-slate-800" : "bg-white text-ink hover:bg-brand-soft";
+    tone === "dark" ? "bg-ink text-white hover:bg-slate-800" : "bg-white text-ink ring-1 ring-line hover:ring-brand";
   const body = (
     <>
       <Icon name={icon} className="h-7 w-7 shrink-0" />

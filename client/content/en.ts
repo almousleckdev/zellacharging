@@ -8,11 +8,9 @@ export const en: Copy = {
   },
   nav: { features: "Features", how: "How it works", faq: "FAQ", support: "Support" },
   hero: {
-    badge: "Available on iOS and Android",
     title: "Charge your electric vehicle,",
     highlight: "simply.",
     text: "Find a charger near you, scan the QR code, follow your charge live and pay with Airtel Money or Moov Money. All in one app.",
-    trust: ["Mobile money payments", "Real-time tracking", "Protected data"],
   },
   stores: {
     appStore: "App Store",
@@ -21,6 +19,8 @@ export const en: Copy = {
     playStoreLead: "Get it on",
     soon: "Coming soon",
   },
+  charge: { title: "Follow your charge live", text: "Energy delivered, duration, battery and cost updated during the charge." },
+  gallery: { title: "The app in pictures", text: "A look at the Zella Charging screens." },
   features: {
     title: "Everything for a calm charge",
     text: "An app built for electric vehicle drivers in Gabon.",
@@ -66,5 +66,4 @@ export const en: Copy = {
     rights: "All rights reserved.",
   },
   switchTo: { label: "Français", locale: "fr" },
-  phone: { balance: "Balance", charging: "Charging now", kwh: "kWh", station: "Libreville station" },
 };

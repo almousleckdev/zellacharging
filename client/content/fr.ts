@@ -8,11 +8,9 @@ export const fr: Copy = {
   },
   nav: { features: "Fonctionnalités", how: "Comment ça marche", faq: "Questions", support: "Support" },
   hero: {
-    badge: "Disponible sur iOS et Android",
     title: "Rechargez votre véhicule électrique,",
     highlight: "simplement.",
     text: "Trouvez une borne près de vous, scannez le QR code, suivez votre recharge en direct et payez avec Airtel Money ou Moov Money. Tout dans une seule application.",
-    trust: ["Paiement Mobile Money", "Suivi en temps réel", "Données protégées"],
   },
   stores: {
     appStore: "App Store",
@@ -21,6 +19,8 @@ export const fr: Copy = {
     playStoreLead: "Disponible sur",
     soon: "Bientôt disponible",
   },
+  charge: { title: "Suivez votre recharge en direct", text: "Énergie délivrée, durée, batterie et coût mis à jour pendant la recharge." },
+  gallery: { title: "L’application en images", text: "Un aperçu des écrans de Zella Charging." },
   features: {
     title: "Tout pour recharger sereinement",
     text: "Une application pensée pour les conducteurs de véhicules électriques au Gabon.",
@@ -66,5 +66,4 @@ export const fr: Copy = {
     rights: "Tous droits réservés.",
   },
   switchTo: { label: "English", locale: "en" },
-  phone: { balance: "Solde", charging: "Recharge en cours", kwh: "kWh", station: "Station Libreville" },
 };

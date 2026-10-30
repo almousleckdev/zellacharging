@@ -3,7 +3,7 @@ import type { Copy } from "@/content/types";
 
 export function Payments({ copy }: { copy: Copy["payments"] }) {
   return (
-    <section className="py-16">
+    <section className="border-t border-line py-16">
       <div className="mx-auto flex max-w-4xl flex-col items-center gap-6 px-4 text-center sm:px-6">
         <h2 className="text-2xl font-bold tracking-tight sm:text-3xl">{copy.title}</h2>
         <p className="max-w-xl text-muted">{copy.text}</p>

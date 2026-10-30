@@ -3,7 +3,7 @@ import type { Copy } from "@/content/types";
 
 export function HowItWorks({ copy }: { copy: Copy["how"] }) {
   return (
-    <section id="how" className="scroll-mt-20 bg-surface-muted py-20">
+    <section id="how" className="scroll-mt-20 border-t border-line py-20">
       <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 sm:px-6 lg:grid-cols-2">
         <div className="relative aspect-[4/3] overflow-hidden rounded-3xl">
           <Image

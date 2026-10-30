@@ -5,8 +5,10 @@ export type Faq = { question: string; answer: string };
 export type Copy = {
   meta: { title: string; description: string };
   nav: { features: string; how: string; faq: string; support: string };
-  hero: { badge: string; title: string; highlight: string; text: string; trust: string[] };
+  hero: { title: string; highlight: string; text: string };
   stores: { appStore: string; playStore: string; appStoreLead: string; playStoreLead: string; soon: string };
+  charge: { title: string; text: string };
+  gallery: { title: string; text: string };
   features: { title: string; text: string; items: Feature[] };
   how: { title: string; steps: Step[] };
   payments: { title: string; text: string };
@@ -14,5 +16,4 @@ export type Copy = {
   cta: { title: string; text: string };
   footer: { product: string; legal: string; privacy: string; terms: string; deleteAccount: string; support: string; rights: string };
   switchTo: { label: string; locale: "fr" | "en" };
-  phone: { balance: string; charging: string; kwh: string; station: string };
 };

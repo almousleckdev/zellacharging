@@ -21,3 +21,9 @@ Set these variables at build time (all optional, placeholders are used otherwise
 
 Store listings use `/<lang>/privacy`, `/<lang>/terms` and `/<lang>/delete-account`.
 Set the backend `ZELLA_AGREEMENT_URL` to the terms page so the app links to it.
+
+## App screenshots
+
+The home page has 7 screenshot slots: `1` in the hero and `2` to `7` in the gallery. Drop PNG files named
+`public/screens/1.png` to `public/screens/7.png` (portrait phone screenshots, about 1170 x 2532) and rebuild. A slot
+without a file stays an empty frame.

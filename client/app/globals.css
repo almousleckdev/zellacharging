@@ -3,24 +3,20 @@
 :root {
   --brand: #f97316;
   --brand-deep: #ea580c;
-  --brand-soft: #fff3e8;
+    --charge: #22c55e;
   --ink: #0f172a;
   --muted: #64748b;
   --line: #e2e8f0;
   --surface: #ffffff;
-  --surface-muted: #f8fafc;
-  --charge: #16a34a;
-}
+  }
 
 @theme inline {
   --color-brand: var(--brand);
   --color-brand-deep: var(--brand-deep);
-  --color-brand-soft: var(--brand-soft);
+  --color-charge: var(--charge);
   --color-ink: var(--ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
-  --color-surface-muted: var(--surface-muted);
-  --color-charge: var(--charge);
   --font-sans: var(--font-jakarta);
 }
 
@@ -45,12 +41,17 @@ body {
   }
 }
 
-@keyframes drift {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-10px); }
+@keyframes glow {
+  from { filter: drop-shadow(0 0 2px rgb(34 211 238 / 0.15)); }
+  to { filter: drop-shadow(0 0 22px rgb(34 211 238 / 0.55)); }
 }
 
-@keyframes pulse-bar {
-  0% { width: 62%; }
-  100% { width: 78%; }
+@keyframes fill {
+  0% { transform: scaleX(0); }
+  85%, 100% { transform: scaleX(1); }
+}
+
+@keyframes sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(400%); }
 }

@@ -24,7 +24,7 @@ export function Footer({ lang, copy }: { lang: Locale; copy: Copy }) {
     },
   ];
   return (
-    <footer className="border-t border-line bg-surface-muted">
+    <footer className="border-t border-line bg-white">
       <div className="mx-auto grid max-w-6xl gap-10 px-4 py-12 sm:px-6 md:grid-cols-[1.5fr_1fr_1fr]">
         <div className="space-y-4">
           <Image src="/logo.png" alt="Zella" width={118} height={27} className="h-6 w-auto" />

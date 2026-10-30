@@ -3,7 +3,7 @@ import { Icon } from "./Icon";
 
 export function FaqSection({ copy }: { copy: Copy["faq"] }) {
   return (
-    <section id="faq" className="scroll-mt-20 bg-surface-muted py-20">
+    <section id="faq" className="scroll-mt-20 border-t border-line py-20">
       <div className="mx-auto max-w-3xl px-4 sm:px-6">
         <h2 className="text-center text-3xl font-bold tracking-tight sm:text-4xl">{copy.title}</h2>
         <div className="mt-12 space-y-3">

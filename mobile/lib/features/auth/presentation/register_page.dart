@@ -132,7 +132,6 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
         ),
         const SizedBox(height: AppSpacing.lg),
         PrimaryButton(
-          height: authButtonHeight,
           label: AuthText.createAccount,
           loading: loading,
           onPressed: _submit,

@@ -1,13 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
-import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_spacing.dart';
 import '../../notifications/presentation/notification_bell.dart';
 import '../../profile/domain/profile.dart';
-import 'home_search_bar.dart';
 
 class HomeHeader extends StatelessWidget {
   const HomeHeader({super.key, this.profile});
@@ -40,8 +36,6 @@ class HomeHeader extends StatelessWidget {
             color: AppColors.textSecondary,
           ),
         ),
-        const SizedBox(height: AppSpacing.md),
-        HomeSearchBar(onTap: () => context.go(Routes.locations)),
       ],
     );
   }

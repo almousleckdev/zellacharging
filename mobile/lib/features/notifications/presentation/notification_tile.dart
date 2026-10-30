@@ -5,7 +5,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/icon_badge.dart';
-import '../../../shared/widgets/soft_card.dart';
 import '../domain/app_notification.dart';
 import 'notification_style.dart';
 
@@ -22,51 +21,70 @@ class NotificationTile extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    return SoftCard(
+    return InkWell(
       onTap: onTap,
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          IconBadge(
-            icon: NotificationStyle.icon(notification.type),
-            color: NotificationStyle.color(notification.type),
-          ),
-          const SizedBox(width: AppSpacing.md),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
+      child: Ink(
+        color: notification.read ? AppColors.surface : AppColors.primarySoft,
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.md,
+          vertical: AppSpacing.sm + 2,
+        ),
+        child: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            IconBadge(
+              icon: NotificationStyle.icon(notification.type),
+              color: NotificationStyle.color(notification.type),
+              size: 36,
+            ),
+            const SizedBox(width: AppSpacing.md),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    notification.title,
+                    style: theme.textTheme.bodyMedium?.copyWith(
+                      fontWeight: notification.read
+                          ? FontWeight.w600
+                          : FontWeight.w800,
+                    ),
+                  ),
+                  const SizedBox(height: 2),
+                  Text(
+                    notification.body,
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: AppSpacing.sm),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
               children: [
                 Text(
-                  notification.title,
-                  style: theme.textTheme.bodyMedium?.copyWith(
-                    fontWeight: notification.read
-                        ? FontWeight.w500
-                        : FontWeight.w700,
-                  ),
-                ),
-                const SizedBox(height: 2),
-                Text(
-                  notification.body,
-                  style: theme.textTheme.bodySmall?.copyWith(
+                  DateFormatter.time(notification.createdAt),
+                  style: theme.textTheme.labelSmall?.copyWith(
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: AppSpacing.xs),
-                Text(
-                  DateFormatter.dateTime(notification.createdAt),
-                  style: theme.textTheme.labelSmall?.copyWith(
-                    color: AppColors.neutral,
+                if (!notification.read)
+                  const Padding(
+                    padding: EdgeInsets.only(top: AppSpacing.xs),
+                    child: Icon(
+                      AppIcons.dot,
+                      size: 10,
+                      color: AppColors.primary,
+                    ),
                   ),
-                ),
               ],
             ),
-          ),
-          if (!notification.read)
-            const Padding(
-              padding: EdgeInsets.only(left: AppSpacing.sm, top: 4),
-              child: Icon(AppIcons.dot, size: 10, color: AppColors.primary),
-            ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -90,7 +90,6 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
         ),
         const SizedBox(height: AppSpacing.sm),
         PrimaryButton(
-          height: authButtonHeight,
           label: AuthText.signIn,
           loading: loading,
           onPressed: _submit,

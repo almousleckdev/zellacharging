@@ -4,7 +4,6 @@ import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 
 const authContentWidth = 340.0;
-const authButtonHeight = 44.0;
 
 class AuthPage extends StatelessWidget {
   const AuthPage({

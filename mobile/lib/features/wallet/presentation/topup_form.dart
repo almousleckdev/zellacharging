@@ -2,13 +2,13 @@ import '../../../shared/widgets/dismissible_form.dart';
 import 'package:flutter/material.dart';
 
 import '../../../core/format/amount_input.dart';
-import '../../../core/format/money_format.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/widgets/pay/amount_card.dart';
 import '../../../shared/widgets/pay/operator_tiles.dart';
 import '../../../shared/widgets/pay/pay_card.dart';
 import '../../../shared/widgets/pay/secure_note.dart';
@@ -54,19 +54,13 @@ class TopupForm extends StatelessWidget {
           ).textTheme.bodySmall?.copyWith(color: AppColors.textSecondary),
         ),
         const SizedBox(height: AppSpacing.lg),
-        PayCard(
-          title: PayText.amountTitle,
-          child: AppTextField(
-            controller: amount,
-            label: WalletText.topupAmountLabel,
-            hint: WalletText.topupAmountHint,
-            icon: AppIcons.wallet,
-            validator: Validators.topupAmount,
-            keyboardType: TextInputType.number,
-            inputFormatters: [AmountInput.formatter],
-            suffixText: MoneyFormat.symbol(currency),
-            onChanged: (_) => onAmountChanged(),
-          ),
+        AmountCard(
+          label: WalletText.topupAmountLabel,
+          hint: WalletText.topupAmountHint,
+          controller: amount,
+          currency: currency,
+          validator: Validators.topupAmount,
+          onChanged: onAmountChanged,
         ),
         const SizedBox(height: AppSpacing.lg),
         PayCard(

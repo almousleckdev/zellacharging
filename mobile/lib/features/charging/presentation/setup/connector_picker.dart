@@ -22,19 +22,27 @@ class ConnectorPicker extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      children: [
-        for (final connector in connectors) ...[
-          _Option(
-            connector: connector,
-            active: connector.connectorId == selected,
-            onTap: connector.startable
-                ? () => onSelected(connector.connectorId)
-                : null,
-          ),
-          const SizedBox(height: AppSpacing.sm),
-        ],
-      ],
+    return LayoutBuilder(
+      builder: (context, box) {
+        final width = (box.maxWidth - AppSpacing.sm) / 2;
+        return Wrap(
+          spacing: AppSpacing.sm,
+          runSpacing: AppSpacing.sm,
+          children: [
+            for (final connector in connectors)
+              SizedBox(
+                width: width,
+                child: _Option(
+                  connector: connector,
+                  active: connector.connectorId == selected,
+                  onTap: connector.startable
+                      ? () => onSelected(connector.connectorId)
+                      : null,
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 }
@@ -50,7 +58,7 @@ class _Option extends StatelessWidget {
     final power = connector.maxPowerKw;
     return [
       if (power != null) '${power.toStringAsFixed(0)} ${Strings.powerUnit}',
-      if (connector.connectorType != null) connector.connectorType!,
+      ?connector.connectorType,
     ].join(' · ');
   }
 
@@ -74,7 +82,7 @@ class _Option extends StatelessWidget {
           onTap: onTap,
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 160),
-            padding: const EdgeInsets.all(AppSpacing.md),
+            padding: const EdgeInsets.all(AppSpacing.sm + 2),
             decoration: BoxDecoration(
               color: active ? AppColors.primarySoft : AppColors.surface,
               borderRadius: BorderRadius.circular(AppSpacing.radius),
@@ -83,34 +91,36 @@ class _Option extends StatelessWidget {
                 width: active ? 2 : 1,
               ),
             ),
-            child: Row(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Icon(
-                  _icon,
-                  color: active ? AppColors.primary : AppColors.neutral,
-                ),
-                const SizedBox(width: AppSpacing.md),
-                Expanded(
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Text(
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
                         '${StationText.connector} ${connector.connectorId}',
-                        style: theme.textTheme.titleSmall?.copyWith(
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: theme.textTheme.bodyMedium?.copyWith(
                           fontWeight: FontWeight.w700,
                         ),
                       ),
-                      if (_details.isNotEmpty)
-                        Text(
-                          _details,
-                          style: theme.textTheme.bodySmall?.copyWith(
-                            color: AppColors.textSecondary,
-                          ),
-                        ),
-                    ],
-                  ),
+                    ),
+                    Icon(
+                      _icon,
+                      size: 18,
+                      color: active ? AppColors.primary : AppColors.neutral,
+                    ),
+                  ],
                 ),
-                const SizedBox(width: AppSpacing.sm),
+                if (_details.isNotEmpty)
+                  Text(
+                    _details,
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                const SizedBox(height: AppSpacing.xs + 2),
                 StatusChip(
                   label: ConnectorStatusStyle.label(connector.status),
                   color: ConnectorStatusStyle.color(connector.status),

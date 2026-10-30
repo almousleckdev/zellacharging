@@ -7,7 +7,6 @@ abstract final class AppSpacing {
   static const radius = 14.0;
   static const radiusSmall = 10.0;
   static const radiusLarge = 22.0;
-  static const buttonHeight = 52.0;
-  static const compactButtonHeight = 40.0;
+  static const buttonHeight = 40.0;
   static const buttonRadius = 16.0;
 }

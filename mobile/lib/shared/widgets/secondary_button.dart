@@ -10,30 +10,34 @@ class SecondaryButton extends StatelessWidget {
     required this.label,
     required this.onPressed,
     this.icon,
-    this.height = AppSpacing.buttonHeight,
+    this.destructive = false,
+    this.expand = true,
   });
 
   final String label;
   final VoidCallback? onPressed;
   final IconData? icon;
-  final double height;
+  final bool destructive;
+  final bool expand;
+
+  Color get color => destructive ? AppColors.danger : AppColors.primary;
 
   @override
   Widget build(BuildContext context) {
     return SizedBox(
-      width: double.infinity,
-      height: height,
+      width: expand ? double.infinity : null,
+      height: AppSpacing.buttonHeight,
       child: OutlinedButton(
         onPressed: onPressed,
         style: OutlinedButton.styleFrom(
-          foregroundColor: AppColors.primary,
-          side: const BorderSide(color: AppColors.primary),
+          foregroundColor: color,
+          side: BorderSide(color: color),
           padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.buttonRadius),
           ),
         ),
-        child: ButtonLabel(label: label, color: AppColors.primary, icon: icon),
+        child: ButtonLabel(label: label, color: color, icon: icon),
       ),
     );
   }

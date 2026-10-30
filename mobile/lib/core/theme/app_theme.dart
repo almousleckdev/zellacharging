@@ -39,7 +39,7 @@ abstract final class AppTheme {
       filledButtonTheme: FilledButtonThemeData(
         style: FilledButton.styleFrom(
           backgroundColor: AppColors.primary,
-          minimumSize: const Size(0, 40),
+          minimumSize: const Size(0, AppSpacing.buttonHeight),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
           ),

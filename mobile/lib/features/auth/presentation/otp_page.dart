@@ -95,7 +95,6 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
         ResendCountdown(onResend: _resend),
         const SizedBox(height: AppSpacing.xl),
         PrimaryButton(
-          height: authButtonHeight,
           label: AuthText.verify,
           loading: loading,
           onPressed: _verify,

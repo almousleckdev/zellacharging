@@ -84,6 +84,9 @@ abstract final class WithdrawText {
     en: 'Verification in progress',
   );
 
+  static String get amountLabel =>
+      AppLanguage.pick(fr: 'Montant à retirer', en: 'Amount to withdraw');
+
   static String get unavailable => AppLanguage.pick(
     fr: 'Les retraits seront bientôt disponibles.',
     en: 'Withdrawals will be available soon.',

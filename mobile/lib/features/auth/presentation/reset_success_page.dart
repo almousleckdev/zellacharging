@@ -7,7 +7,6 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/primary_button.dart';
-import 'widgets/auth_page.dart';
 
 class ResetSuccessPage extends StatelessWidget {
   const ResetSuccessPage({super.key});
@@ -68,7 +67,6 @@ class ResetSuccessPage extends StatelessWidget {
               ),
               const Spacer(flex: 2),
               PrimaryButton(
-                height: authButtonHeight,
                 label: AuthText.goToLogin,
                 onPressed: () => context.go(Routes.login),
               ),

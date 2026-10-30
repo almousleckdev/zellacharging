@@ -17,6 +17,16 @@ abstract final class StationText {
     en: 'No charging stations found nearby.',
   );
 
+  static String get filterAll => AppLanguage.pick(fr: 'Toutes', en: 'All');
+
+  static String get filterAvailable =>
+      AppLanguage.pick(fr: 'Disponibles', en: 'Available now');
+
+  static String count(int total) => AppLanguage.pick(
+    fr: total <= 1 ? '$total station' : '$total stations',
+    en: total == 1 ? '$total station' : '$total stations',
+  );
+
   static String get stationOffline =>
       AppLanguage.pick(fr: 'Hors ligne', en: 'Offline');
 

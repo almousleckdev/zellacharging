@@ -58,20 +58,10 @@ public class WithdrawalSettlement {
 
     private void apply(Withdrawal withdrawal, PayoutOutcome outcome) {
         switch (outcome.status()) {
-            case PAID -> markPaid(withdrawal, outcome.providerRef());
+            case PAID -> ledger.markPaid(withdrawal, outcome.providerRef());
             case FAILED -> ledger.reverse(withdrawal, outcome.failureCode());
             case PENDING -> {
             }
-        }
-    }
-
-    private void markPaid(Withdrawal withdrawal, String providerRef) {
-        boolean moved = withdrawals.transition(withdrawal.id(), WithdrawalState.PROCESSING, WithdrawalState.PAID,
-                providerRef, null)
-                || withdrawals.transition(withdrawal.id(), WithdrawalState.REQUESTED, WithdrawalState.PAID,
-                providerRef, null);
-        if (moved) {
-            audit.record("WITHDRAWAL_PAID", withdrawal.customerId(), withdrawal.reference(), providerRef);
         }
     }
 

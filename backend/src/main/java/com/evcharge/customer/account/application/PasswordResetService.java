@@ -9,11 +9,15 @@ import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.CustomerStatus;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.AuditTrail;
+import com.evcharge.customer.shared.NotificationType;
+import com.evcharge.customer.shared.Notifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Map;
+import java.util.UUID;
 
 @Service
 public class PasswordResetService {
@@ -25,10 +29,12 @@ public class PasswordResetService {
     private final RefreshTokenRepository refreshTokens;
     private final Clock clock;
     private final AuditTrail audit;
+    private final Notifier notifier;
 
     public PasswordResetService(CustomerRepository customers, VerificationService verification,
                                 ContactNormalizer contacts, PasswordHasher passwords,
-                                RefreshTokenRepository refreshTokens, Clock clock, AuditTrail audit) {
+                                RefreshTokenRepository refreshTokens, Clock clock, AuditTrail audit,
+                                Notifier notifier) {
         this.customers = customers;
         this.verification = verification;
         this.contacts = contacts;
@@ -36,6 +42,7 @@ public class PasswordResetService {
         this.refreshTokens = refreshTokens;
         this.clock = clock;
         this.audit = audit;
+        this.notifier = notifier;
     }
 
     @Transactional(noRollbackFor = ApiException.class)
@@ -62,6 +69,8 @@ public class PasswordResetService {
         customers.clearFailedLogins(customer.id());
         refreshTokens.revokeAllOf(customer.id(), clock.instant());
         audit.record("PASSWORD_RESET", customer.id(), "customer", null);
+        notifier.notify(customer.id(), NotificationType.PASSWORD_CHANGED, "password:" + UUID.randomUUID(),
+                Map.of("screen", "settings"));
     }
 
     private boolean eligible(Customer customer) {

@@ -8,6 +8,7 @@ import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.wallet.WalletFunding;
 import com.evcharge.customer.shared.Money;
+import com.evcharge.customer.shared.Notifier;
 import io.micrometer.core.instrument.simple.SimpleMeterRegistry;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -29,6 +30,7 @@ class SessionSettlementTest {
     private final WalletFunding funding = mock(WalletFunding.class);
     private final SimpleMeterRegistry registry = new SimpleMeterRegistry();
     private final ChargingMetrics metrics = new ChargingMetrics(registry);
+    private final Notifier notifier = mock(Notifier.class);
 
     @BeforeEach
     void reservation() {
@@ -43,7 +45,7 @@ class SessionSettlementTest {
     @Test
     void chargesTheElectricFeePlusVatAndServiceFee() {
         SessionSettlement settlement = new SessionSettlement(funding,
-                new FeeCalculator(new FeeSettings(new BigDecimal("18"), new BigDecimal("5"))), metrics);
+                new FeeCalculator(new FeeSettings(new BigDecimal("18"), new BigDecimal("5"))), metrics, notifier);
         ChargingSession session = completed(1000L);
 
         settlement.settle(session);
@@ -53,7 +55,7 @@ class SessionSettlementTest {
 
     @Test
     void settlesWithoutACostWhenNoneIsKnown() {
-        SessionSettlement settlement = new SessionSettlement(funding, new FeeCalculator(new FeeSettings(null, null)), metrics);
+        SessionSettlement settlement = new SessionSettlement(funding, new FeeCalculator(new FeeSettings(null, null)), metrics, notifier);
         ChargingSession session = completed(null);
 
         settlement.settle(session);
@@ -63,7 +65,7 @@ class SessionSettlementTest {
 
     @Test
     void aSessionWithoutACostIsFlaggedForReviewAndChargesNothing() {
-        SessionSettlement settlement = new SessionSettlement(funding, new FeeCalculator(new FeeSettings(null, null)), metrics);
+        SessionSettlement settlement = new SessionSettlement(funding, new FeeCalculator(new FeeSettings(null, null)), metrics, notifier);
 
         settlement.settle(completed(null));
 
@@ -72,7 +74,7 @@ class SessionSettlementTest {
 
     @Test
     void aCostAboveTheAuthorizedAmountIsRecordedAsOvershootAndTheAuthorizedAmountIsStillTheCeiling() {
-        SessionSettlement settlement = new SessionSettlement(funding, new FeeCalculator(new FeeSettings(null, null)), metrics);
+        SessionSettlement settlement = new SessionSettlement(funding, new FeeCalculator(new FeeSettings(null, null)), metrics, notifier);
         ChargingSession session = completed(6200L);
 
         settlement.settle(session);

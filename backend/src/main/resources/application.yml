@@ -88,6 +88,15 @@ zella:
     refresh-token-ttl: 12h
     max-failed-logins: 5
     lockout: 15m
+  notifications:
+    dispatch-interval: ${ZELLA_NOTIFICATION_INTERVAL:10s}
+    batch-size: 50
+    max-attempts: 6
+    retry-base: 30s
+    retention: 30d
+    fcm:
+      credentials-json: ${ZELLA_FCM_CREDENTIALS_JSON:}
+      android-channel: zella_alerts
   verification:
     code-ttl: 5m
     resend-cooldown: 60s

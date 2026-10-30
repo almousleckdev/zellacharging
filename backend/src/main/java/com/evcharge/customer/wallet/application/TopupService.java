@@ -1,6 +1,8 @@
 package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.NotificationType;
+import com.evcharge.customer.shared.Notifier;
 import com.evcharge.customer.wallet.application.port.TopupRepository;
 import com.evcharge.customer.wallet.domain.CollectionRequest;
 import com.evcharge.customer.wallet.domain.MobileOperator;
@@ -13,6 +15,7 @@ import org.springframework.stereotype.Service;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 import java.util.regex.Pattern;
@@ -30,16 +33,18 @@ public class TopupService {
     private final TopupSettlement settlement;
     private final PaymentSettings payments;
     private final Clock clock;
+    private final Notifier notifier;
 
     public TopupService(WalletSettings settings, TopupRepository topups, PaymentGateways gateways,
                         TopupSettlement settlement, PaymentSettings payments,
-                        Clock clock) {
+                        Clock clock, Notifier notifier) {
         this.settings = settings;
         this.topups = topups;
         this.gateways = gateways;
         this.settlement = settlement;
         this.payments = payments;
         this.clock = clock;
+        this.notifier = notifier;
     }
 
     public Topup create(UUID customerId, MobileOperator operator, String msisdn, long amountMinor, String key) {
@@ -57,6 +62,8 @@ public class TopupService {
         if (topups.insertIfNew(pending).isEmpty()) {
             return topups.findByIdempotencyKey(customerId, key).orElseThrow();
         }
+        notifier.notify(customerId, NotificationType.TOPUP_STARTED, "topup:" + pending.id() + ":start",
+                Map.of("screen", "wallet"));
         collect(pending).ifPresent(outcome -> settlement.apply(pending, outcome));
         return topups.find(pending.id()).orElseThrow();
     }

@@ -1,6 +1,8 @@
 package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.shared.AuditTrail;
+import com.evcharge.customer.shared.NotificationType;
+import com.evcharge.customer.shared.Notifier;
 import com.evcharge.customer.wallet.application.port.LedgerRepository;
 import com.evcharge.customer.wallet.application.port.TopupRepository;
 import com.evcharge.customer.wallet.application.port.WalletRepository;
@@ -14,6 +16,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Map;
 import java.util.UUID;
 
 @Component
@@ -27,15 +30,17 @@ class TopupCredit {
     private final LedgerRepository ledger;
     private final Clock clock;
     private final AuditTrail audit;
+    private final Notifier notifier;
 
     TopupCredit(WalletSettings settings, TopupRepository topups, WalletRepository wallets,
-                LedgerRepository ledger, Clock clock, AuditTrail audit) {
+                LedgerRepository ledger, Clock clock, AuditTrail audit, Notifier notifier) {
         this.settings = settings;
         this.topups = topups;
         this.wallets = wallets;
         this.ledger = ledger;
         this.clock = clock;
         this.audit = audit;
+        this.notifier = notifier;
     }
 
     @Transactional
@@ -59,5 +64,15 @@ class TopupCredit {
         ledger.append(new LedgerEntry(UUID.randomUUID(), topup.customerId(), LedgerType.TOPUP, credited, null,
                 topup.id(), "topup:" + topup.id(), clock.instant()));
         audit.record("WALLET_CREDITED", topup.customerId(), topup.reference(), Long.toString(credited));
+        notifier.notify(topup.customerId(), NotificationType.TOPUP_SUCCEEDED, "topup:" + topup.id() + ":done",
+                Map.of("screen", "wallet"));
+    }
+
+    @Transactional
+    public void fail(Topup topup, String failureCode) {
+        if (topups.transition(topup.id(), TopupState.PENDING, TopupState.FAILED, null, failureCode)) {
+            notifier.notify(topup.customerId(), NotificationType.TOPUP_FAILED, "topup:" + topup.id() + ":done",
+                    Map.of("screen", "wallet"));
+        }
     }
 }

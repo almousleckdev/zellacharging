@@ -68,8 +68,7 @@ public class TopupSettlement {
     void apply(Topup topup, PaymentOutcome outcome) {
         switch (outcome.state()) {
             case SUCCEEDED -> credit.succeed(topup, outcome.providerRef(), outcome.confirmedMinor());
-            case FAILED -> topups.transition(topup.id(), TopupState.PENDING, TopupState.FAILED, null,
-                    outcome.failureCode());
+            case FAILED -> credit.fail(topup, outcome.failureCode());
             case PENDING, EXPIRED -> topups.transition(topup.id(), topup.state(), topup.state(),
                     outcome.providerRef(), null);
         }

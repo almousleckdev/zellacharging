@@ -23,21 +23,28 @@ class WithdrawFlowController extends Notifier<WithdrawFlowState> {
   Future<void> withdraw({
     required int amountMinor,
     required MobileOperator operator,
+    required String msisdn,
     required String password,
     required String idempotencyKey,
   }) async {
     state = const WithdrawFlowState.running(WithdrawStage.requesting);
     try {
-      await ref
+      final result = await ref
           .read(withdrawMoneyProvider)
           .call(
             amountMinor: amountMinor,
             operator: operator,
+            msisdn: msisdn,
             password: password,
             idempotencyKey: idempotencyKey,
             onStage: _advance,
           );
-      if (ref.mounted) state = WithdrawFlowState.done(amountMinor);
+      if (ref.mounted) {
+        state = WithdrawFlowState.done(
+          amountMinor,
+          awaitingApproval: result.awaitingApproval,
+        );
+      }
     } on ApiError catch (error) {
       if (ref.mounted) state = WithdrawFlowState.failed(error);
     } finally {

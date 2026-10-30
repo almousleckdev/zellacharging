@@ -22,5 +22,8 @@ public interface WithdrawalRepository {
 
     long requestedSince(UUID customerId, Instant since);
 
+    boolean review(UUID id, WithdrawalState from, WithdrawalState to, UUID adminId, String note,
+                   String failureCode, Instant now);
+
     boolean transition(UUID id, WithdrawalState from, WithdrawalState to, String providerRef, String failureCode);
 }

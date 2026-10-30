@@ -81,6 +81,9 @@ export const enCommon: Pick<Dictionary, "language" | "brand" | "common" | "error
     INVALID_RANGE: "This date range is not valid.",
     INVALID_INCIDENT_STATUS: "This status is not valid.",
     CUSTOMER_NOT_FOUND: "Customer not found.",
+    WITHDRAWAL_NOT_FOUND: "Withdrawal not found.",
+    WITHDRAWAL_NOT_PENDING: "This withdrawal has already been handled.",
+    WITHDRAWALS_UNAVAILABLE: "Withdrawals are unavailable: the payment service is not configured.",
   },
   validation: {
     emailRequired: "Enter your email address.",

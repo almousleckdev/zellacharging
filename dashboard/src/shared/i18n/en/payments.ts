@@ -18,6 +18,7 @@ export const enPayments: Pick<Dictionary, "payments"> = {
     states: {
       SUCCEEDED: "Succeeded",
       PAID: "Paid",
+      PENDING_APPROVAL: "To approve",
       PENDING: "Pending",
       PROCESSING: "Processing",
       REQUESTED: "Requested",

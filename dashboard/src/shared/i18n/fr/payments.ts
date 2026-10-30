@@ -16,6 +16,7 @@ export const frPayments = {
     states: {
       SUCCEEDED: "Réussie",
       PAID: "Versé",
+      PENDING_APPROVAL: "À valider",
       PENDING: "En attente",
       PROCESSING: "En cours",
       REQUESTED: "Demandé",

@@ -18,6 +18,7 @@ class WithdrawMoney {
   Future<WithdrawalResult> call({
     required int amountMinor,
     required MobileOperator operator,
+    required String msisdn,
     required String password,
     required String idempotencyKey,
     void Function(WithdrawStage stage)? onStage,
@@ -26,9 +27,11 @@ class WithdrawMoney {
     var result = await _wallets.withdraw(
       amountMinor: amountMinor,
       operator: operator,
+      msisdn: msisdn,
       password: password,
       idempotencyKey: idempotencyKey,
     );
+    if (result.awaitingApproval) return result;
     if (!result.settled) onStage?.call(WithdrawStage.processing);
     for (var poll = 0; !result.settled; poll++) {
       if (poll >= maxPolls) break;

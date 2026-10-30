@@ -49,6 +49,7 @@ export const frProfile = {
       CUSTOMERS_READ: "Consulter les clients",
       CUSTOMERS_MANAGE: "Suspendre et supprimer des clients",
       PAYMENTS_READ: "Consulter les paiements",
+      WITHDRAWALS_REVIEW: "Valider ou refuser les retraits",
       AUDIT_READ: "Consulter le journal d'audit",
       ADMINS_MANAGE: "Gérer les administrateurs",
     },

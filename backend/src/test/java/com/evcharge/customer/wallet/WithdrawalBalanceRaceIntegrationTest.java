@@ -41,6 +41,9 @@ class WithdrawalBalanceRaceIntegrationTest extends PostgresTestBase {
     WithdrawalService withdrawals;
 
     @Autowired
+    WithdrawalReviews reviews;
+
+    @Autowired
     JdbcTemplate jdbc;
 
     @Autowired
@@ -72,7 +75,7 @@ class WithdrawalBalanceRaceIntegrationTest extends PostgresTestBase {
     private boolean attempt(String key) {
         try {
             TenantContext.callAs(TENANT,
-                    () -> withdrawals.request(customer, MobileOperator.AIRTEL, AMOUNT, PASSWORD, key));
+                    () -> withdrawals.request(customer, MobileOperator.AIRTEL, null, AMOUNT, PASSWORD, key));
             return true;
         } catch (ApiException e) {
             assertThat(e.code()).isEqualTo("INSUFFICIENT_FUNDS");
@@ -96,6 +99,11 @@ class WithdrawalBalanceRaceIntegrationTest extends PostgresTestBase {
         return accepted;
     }
 
+    private void approveAll() {
+        jdbc.queryForList("select id from withdrawal where customer_id = ?", UUID.class, customer)
+                .forEach(id -> TenantContext.runAs(TENANT, () -> reviews.approve(UUID.randomUUID(), id, null)));
+    }
+
     private long balance() {
         return jdbc.queryForObject("select balance_minor from wallet where customer_id = ?", Long.class, customer);
     }
@@ -106,6 +114,7 @@ class WithdrawalBalanceRaceIntegrationTest extends PostgresTestBase {
 
         assertThat(accepted).isEqualTo(BALANCE / AMOUNT);
         assertThat(balance()).isEqualTo(BALANCE - accepted * AMOUNT).isGreaterThanOrEqualTo(0);
+        approveAll();
         assertThat(gateway.sent).hasSize((int) accepted);
     }
 
@@ -116,6 +125,7 @@ class WithdrawalBalanceRaceIntegrationTest extends PostgresTestBase {
         assertThat(jdbc.queryForObject("select count(*) from withdrawal where customer_id = ?", Integer.class,
                 customer)).isOne();
         assertThat(balance()).isEqualTo(BALANCE - AMOUNT);
+        approveAll();
         assertThat(gateway.sent).hasSize(1);
     }
 }

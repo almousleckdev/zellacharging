@@ -37,8 +37,24 @@ class RedisRateLimitWiringIntegrationTest extends PostgresTestBase {
     @Autowired
     StringRedisTemplate redis;
 
+    private void waitUntilRedisAnswers() throws InterruptedException {
+        long deadline = System.nanoTime() + Duration.ofSeconds(20).toNanos();
+        while (true) {
+            try {
+                redis.opsForValue().get("warm-up");
+                return;
+            } catch (RuntimeException e) {
+                if (System.nanoTime() > deadline) {
+                    throw e;
+                }
+                Thread.sleep(250);
+            }
+        }
+    }
+
     @Test
-    void theApplicationCountsInRedisWhenTheRedisStoreIsSelected() {
+    void theApplicationCountsInRedisWhenTheRedisStoreIsSelected() throws InterruptedException {
+        waitUntilRedisAnswers();
         String bucket = "wiring-" + UUID.randomUUID();
 
         assertThat(limiter).isInstanceOf(FailoverRateLimiter.class);

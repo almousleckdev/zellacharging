@@ -2,6 +2,7 @@ package com.evcharge.customer.wallet;
 
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.TestTenants;
+import com.evcharge.customer.shared.TenantContext;
 import com.evcharge.customer.account.application.port.PasswordHasher;
 import com.evcharge.customer.wallet.application.LedgerReconciliationJob;
 import com.evcharge.customer.wallet.application.WithdrawalReconciliationJob;
@@ -56,6 +57,9 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     @Autowired
     LedgerReconciliationJob ledgerCheck;
 
+    @Autowired
+    WithdrawalReviews reviews;
+
     private UUID customer;
 
     @BeforeEach
@@ -90,6 +94,22 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
         return mvc.perform(key == null ? request : request.header("Idempotency-Key", key));
     }
 
+    private ResultActions withdrawTo(UUID who, long amount, String msisdn, String key) throws Exception {
+        return mvc.perform(post("/v1/wallet/withdrawals").with(TestTenants.customer(who))
+                .contentType(MediaType.APPLICATION_JSON).header("Idempotency-Key", key)
+                .content("{\"amountMinor\":" + amount + ",\"operator\":\"AIRTEL\",\"msisdn\":\"" + msisdn
+                        + "\",\"password\":\"" + PASSWORD + "\"}"));
+    }
+
+    private void approve(UUID who) {
+        UUID id = jdbc.queryForObject("select id from withdrawal where customer_id = ?", UUID.class, who);
+        TenantContext.runAs("GA", () -> reviews.approve(UUID.randomUUID(), id, null));
+    }
+
+    private String phoneOf(UUID who) {
+        return jdbc.queryForObject("select phone_e164 from customer where id = ?", String.class, who);
+    }
+
     private long balance(UUID who) {
         return jdbc.queryForObject("select balance_minor from wallet where customer_id = ?", Long.class, who);
     }
@@ -109,8 +129,11 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     @Test
     void aWithdrawalDebitsTheWalletAtOnceAndIsPaidOnlyWhenTheProviderConfirms() throws Exception {
         withdraw(customer, 4000, PASSWORD, "w1").andExpect(status().isCreated())
-                .andExpect(jsonPath("$.state").value("PROCESSING"));
+                .andExpect(jsonPath("$.state").value("PENDING_APPROVAL"));
         assertThat(balance(customer)).isEqualTo(6000);
+        assertThat(gateway.sent).isEmpty();
+        approve(customer);
+        assertThat(stateOf(customer)).isEqualTo("PROCESSING");
         assertThat(gateway.sent).hasSize(1);
         assertThat(gateway.sent.get(0).msisdn()).startsWith("+24177");
         gateway.reportStatus(referenceOf(customer), PayoutOutcome.paid("pp-1"));
@@ -138,6 +161,49 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void aTypedNumberThatNeverToppedUpTheWalletIsRefusedAndMovesNothing() throws Exception {
+        withdrawTo(customer, 4000, "+24177999999", "n1").andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("PAYOUT_NUMBER_NOT_ALLOWED"));
+
+        assertThat(balance(customer)).isEqualTo(10000);
+        assertThat(rows("withdrawal", customer)).isZero();
+        assertThat(gateway.sent).isEmpty();
+    }
+
+    @Test
+    void aTypedNumberThatToppedUpTheWalletIsPaid() throws Exception {
+        withdrawTo(customer, 4000, phoneOf(customer), "n2").andExpect(status().isCreated());
+        approve(customer);
+
+        assertThat(gateway.sent.get(0).msisdn()).isEqualTo(phoneOf(customer));
+        assertThat(balance(customer)).isEqualTo(6000);
+    }
+
+    @Test
+    void aNumberThatToppedUpWithAnotherOperatorCannotBeUsedForThisOne() throws Exception {
+        String other = phoneOf(customer);
+        jdbc.update("update topup set operator = 'MOOV' where customer_id = ?", customer);
+
+        withdrawTo(customer, 4000, other, "n3").andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("PAYOUT_NUMBER_NOT_ALLOWED"));
+    }
+
+    @Test
+    void theWalletListsEveryNumberThatToppedItUp() throws Exception {
+        mvc.perform(get("/v1/wallet").with(TestTenants.customer(customer)))
+                .andExpect(jsonPath("$.payoutNumbers.length()").value(1))
+                .andExpect(jsonPath("$.payoutNumbers[0].msisdn").value(phoneOf(customer)))
+                .andExpect(jsonPath("$.payoutNumbers[0].operator").value("AIRTEL"));
+    }
+
+    @Test
+    void theSmallestWithdrawalIsFiveHundred() throws Exception {
+        withdraw(customer, 499, PASSWORD, "m1").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_AMOUNT"));
+        withdraw(customer, 500, PASSWORD, "m2").andExpect(status().isCreated());
+    }
+
+    @Test
     void youCannotWithdrawMoreThanYouHaveOrWhatIsReservedForACharge() throws Exception {
         withdraw(customer, 20000, PASSWORD, "w4").andExpect(status().isPaymentRequired());
         jdbc.update("update wallet set reserved_minor = 8000 where customer_id = ?", customer);
@@ -149,8 +215,9 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     @Test
     void aRefusedPayoutIsReversedImmediately() throws Exception {
         gateway.answerWith(PayoutOutcome.failed("PROVIDER_REFUSED"));
-        withdraw(customer, 4000, PASSWORD, "w6").andExpect(status().isCreated())
-                .andExpect(jsonPath("$.state").value("FAILED"));
+        withdraw(customer, 4000, PASSWORD, "w6").andExpect(status().isCreated());
+        approve(customer);
+        assertThat(stateOf(customer)).isEqualTo("FAILED");
         assertThat(balance(customer)).isEqualTo(10000);
         assertThat(rows("ledger_entry", customer)).isEqualTo(3);
     }
@@ -158,6 +225,7 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     @Test
     void aFailureConfirmedLaterIsReversedExactlyOnce() throws Exception {
         withdraw(customer, 4000, PASSWORD, "w7");
+        approve(customer);
         gateway.reportStatus(referenceOf(customer), PayoutOutcome.failed("DECLINED"));
         reconciliation.run();
         reconciliation.run();
@@ -170,8 +238,9 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     @Test
     void anUnknownOutcomeKeepsTheFundsHeldAndGoesToManualReview() throws Exception {
         gateway.failWith(new IllegalStateException("timeout"));
-        withdraw(customer, 4000, PASSWORD, "w8").andExpect(status().isCreated())
-                .andExpect(jsonPath("$.state").value("REQUESTED"));
+        withdraw(customer, 4000, PASSWORD, "w8").andExpect(status().isCreated());
+        approve(customer);
+        assertThat(stateOf(customer)).isEqualTo("REQUESTED");
         assertThat(balance(customer)).isEqualTo(6000);
         jdbc.update("update withdrawal set created_at = now() - interval '3 hours' where customer_id = ?", customer);
         reconciliation.run();
@@ -183,9 +252,51 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     void repeatingTheSameKeyPaysOnce() throws Exception {
         withdraw(customer, 4000, PASSWORD, "same").andExpect(status().isCreated());
         withdraw(customer, 4000, PASSWORD, "same").andExpect(status().isCreated());
+        approve(customer);
         assertThat(gateway.sent).hasSize(1);
         assertThat(balance(customer)).isEqualTo(6000);
         assertThat(rows("withdrawal", customer)).isOne();
+    }
+
+    @Test
+    void nothingIsSentToTheProviderUntilAnAdminApproves() throws Exception {
+        withdraw(customer, 4000, PASSWORD, "p1").andExpect(status().isCreated());
+
+        assertThat(stateOf(customer)).isEqualTo("PENDING_APPROVAL");
+        assertThat(gateway.sent).isEmpty();
+        reconciliation.run();
+        assertThat(stateOf(customer)).isEqualTo("PENDING_APPROVAL");
+        assertThat(gateway.sent).isEmpty();
+    }
+
+    @Test
+    void anApprovalCanOnlyHappenOnce() throws Exception {
+        withdraw(customer, 4000, PASSWORD, "p2");
+        approve(customer);
+
+        UUID id = jdbc.queryForObject("select id from withdrawal where customer_id = ?", UUID.class, customer);
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> TenantContext.runAs("GA",
+                        () -> reviews.approve(UUID.randomUUID(), id, null)))
+                .hasMessageContaining("already been handled");
+        assertThat(gateway.sent).hasSize(1);
+    }
+
+    @Test
+    void aRejectedWithdrawalReturnsTheMoneyOnceAndSendsNothing() throws Exception {
+        withdraw(customer, 4000, PASSWORD, "p3");
+        UUID id = jdbc.queryForObject("select id from withdrawal where customer_id = ?", UUID.class, customer);
+
+        TenantContext.runAs("GA", () -> reviews.reject(UUID.randomUUID(), id, "Suspicious activity"));
+
+        assertThat(stateOf(customer)).isEqualTo("FAILED");
+        assertThat(balance(customer)).isEqualTo(10000);
+        assertThat(gateway.sent).isEmpty();
+        assertThat(jdbc.queryForObject("select review_note from withdrawal where id = ?", String.class, id))
+                .isEqualTo("Suspicious activity");
+        org.assertj.core.api.Assertions.assertThatThrownBy(() -> TenantContext.runAs("GA",
+                () -> reviews.reject(UUID.randomUUID(), id, "again"))).hasMessageContaining("already been handled");
+        assertThat(jdbc.queryForObject("select count(*) from ledger_entry where customer_id = ? and "
+                + "type = 'WITHDRAWAL_REVERSAL'", Integer.class, customer)).isOne();
     }
 
     @Test

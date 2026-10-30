@@ -24,7 +24,10 @@ class WalletEntryDetail {
   bool get hasMobileMoney => operator != null;
 
   bool get inProgress =>
-      state == 'PENDING' || state == 'REQUESTED' || state == 'PROCESSING';
+      state == 'PENDING' ||
+      state == 'PENDING_APPROVAL' ||
+      state == 'REQUESTED' ||
+      state == 'PROCESSING';
 
   bool get needsReview => state == 'REVIEW';
 

@@ -73,6 +73,13 @@ abstract final class Validators {
     return valid ? null : WithdrawText.invalidAmount;
   }
 
+  static String? payoutNumber(String? value, Iterable<String> allowed) {
+    final format = mobileMoneyNumber(value);
+    if (format != null) return format;
+    final number = Msisdn.normalize(value!);
+    return allowed.contains(number) ? null : WithdrawText.numberNotAllowed;
+  }
+
   static String? topupAmount(String? value) {
     final amount = AmountInput.parse(value);
     return amount != null && amount >= WalletText.minimumTopupMinor

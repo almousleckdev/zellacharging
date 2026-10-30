@@ -83,6 +83,31 @@ class WithdrawalLedger {
     }
 
     @Transactional
+    boolean reject(Withdrawal withdrawal, UUID adminId, String note) {
+        boolean moved = withdrawals.review(withdrawal.id(), WithdrawalState.PENDING_APPROVAL, WithdrawalState.FAILED,
+                adminId, note, "REJECTED", clock.instant());
+        if (moved) {
+            wallets.lock(withdrawal.customerId());
+            wallets.apply(withdrawal.customerId(), withdrawal.amountMinor(), 0);
+            ledger.append(entry(withdrawal, LedgerType.WITHDRAWAL_REVERSAL, "withdrawal-reversal:" + withdrawal.id()));
+            audit.record("WITHDRAWAL_REJECTED", withdrawal.customerId(), withdrawal.reference(), note);
+            announce(withdrawal, NotificationType.WITHDRAWAL_REJECTED);
+        }
+        return moved;
+    }
+
+    @Transactional
+    boolean approve(Withdrawal withdrawal, UUID adminId, String note) {
+        boolean moved = withdrawals.review(withdrawal.id(), WithdrawalState.PENDING_APPROVAL,
+                WithdrawalState.REQUESTED, adminId, note, null, clock.instant());
+        if (moved) {
+            audit.record("WITHDRAWAL_APPROVED", withdrawal.customerId(), withdrawal.reference(), note);
+            announce(withdrawal, NotificationType.WITHDRAWAL_APPROVED);
+        }
+        return moved;
+    }
+
+    @Transactional
     boolean markPaid(Withdrawal withdrawal, String providerRef) {
         boolean moved = withdrawals.transition(withdrawal.id(), WithdrawalState.PROCESSING, WithdrawalState.PAID,
                 providerRef, null)

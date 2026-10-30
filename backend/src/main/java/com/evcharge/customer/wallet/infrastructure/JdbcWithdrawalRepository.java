@@ -75,6 +75,16 @@ class JdbcWithdrawalRepository implements WithdrawalRepository {
     }
 
     @Override
+    public boolean review(UUID id, WithdrawalState from, WithdrawalState to, UUID adminId, String note,
+                          String failureCode, Instant now) {
+        return jdbc.sql("update withdrawal set state = :to, failure_code = :failure, reviewed_by = :admin, "
+                        + "reviewed_at = :now, review_note = :note, updated_at = :now where id = :id and state = :from")
+                .param("to", to.name()).param("failure", failureCode).param("admin", adminId)
+                .param("now", Timestamps.toDb(now)).param("note", note).param("id", id).param("from", from.name())
+                .update() == 1;
+    }
+
+    @Override
     public boolean transition(UUID id, WithdrawalState from, WithdrawalState to, String providerRef,
                               String failureCode) {
         return jdbc.sql("update withdrawal set state = :to, provider_ref = coalesce(:ref, provider_ref), "

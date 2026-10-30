@@ -18,6 +18,7 @@ class _ScriptedWithdrawals extends FakeWallet {
   _ScriptedWithdrawals(this.states);
 
   final List<String> states;
+  String? lastMsisdn;
   var polls = 0;
   var created = 0;
   String? lastPassword;
@@ -26,11 +27,13 @@ class _ScriptedWithdrawals extends FakeWallet {
   Future<WithdrawalResult> withdraw({
     required int amountMinor,
     required MobileOperator operator,
+    required String msisdn,
     required String password,
     required String idempotencyKey,
   }) async {
     created++;
     lastPassword = password;
+    lastMsisdn = msisdn;
     return WithdrawalResult(id: 'w', state: states.first);
   }
 
@@ -92,6 +95,69 @@ void main() {
 
     expect(find.text(WithdrawText.doneTitle), findsOneWidget);
     expect(wallet.lastPassword, 'MyPassword1');
+    await closeApp(tester);
+  });
+
+  testWidgets('a request waits for approval instead of polling the provider', (
+    tester,
+  ) async {
+    final wallet = await _openWithdraw(tester, ['PENDING_APPROVAL']);
+    await _tapWithdraw(tester);
+
+    expect(find.text(WithdrawText.pendingTitle), findsOneWidget);
+    expect(find.text(WithdrawText.doneTitle), findsNothing);
+    expect(wallet.polls, 0);
+    expect(wallet.lastMsisdn, '+24177123456');
+    await closeApp(tester);
+  });
+
+  testWidgets('a number that never topped up the wallet is refused', (
+    tester,
+  ) async {
+    final wallet = await _openWithdraw(tester, ['PAID']);
+    await tester.enterText(find.byType(TextFormField).at(1), '077999999');
+    await _tapWithdraw(tester);
+
+    expect(find.text(WithdrawText.numberNotAllowed), findsOneWidget);
+    expect(wallet.created, 0);
+    await closeApp(tester);
+  });
+
+  testWidgets('tapping a known number fills the field', (tester) async {
+    await _openWithdraw(tester, ['PAID']);
+    await tester.enterText(find.byType(TextFormField).at(1), '');
+    await tester.tap(find.text('+24177••••56').first);
+    await tester.pump();
+
+    expect(
+      tester
+          .widget<TextFormField>(find.byType(TextFormField).at(1))
+          .controller
+          ?.text,
+      '+24177123456',
+    );
+    await closeApp(tester);
+  });
+
+  testWidgets('there are no preset amounts', (tester) async {
+    await _openWithdraw(tester, ['PAID']);
+
+    expect(find.text('1 000'), findsNothing);
+    expect(find.text('5 000'), findsNothing);
+    expect(find.text('10 000'), findsNothing);
+    await closeApp(tester);
+  });
+
+  testWidgets('the smallest withdrawal is 500', (tester) async {
+    final wallet = await _openWithdraw(tester, ['PAID']);
+    await tester.enterText(find.byType(TextFormField).first, '499');
+    await _tapWithdraw(tester);
+    expect(find.text(WithdrawText.invalidAmount), findsOneWidget);
+    expect(wallet.created, 0);
+
+    await tester.enterText(find.byType(TextFormField).first, '500');
+    await _tapWithdraw(tester);
+    expect(wallet.created, 1);
     await closeApp(tester);
   });
 

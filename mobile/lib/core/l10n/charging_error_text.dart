@@ -26,6 +26,10 @@ abstract final class ChargingErrorText {
       fr: 'Rechargez d’abord avec ce service pour pouvoir retirer.',
       en: 'Top up with this service first to be able to withdraw.',
     ),
+    'PAYOUT_NUMBER_NOT_ALLOWED': AppLanguage.pick(
+      fr: 'Ce numéro n’a jamais servi à recharger votre portefeuille.',
+      en: 'This number has never topped up your wallet.',
+    ),
     'STATION_NOT_FOUND': AppLanguage.pick(
       fr: 'Cette station est introuvable.',
       en: 'This station could not be found.',

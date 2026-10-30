@@ -23,6 +23,10 @@ public interface TopupRepository {
 
     Optional<Topup> lastSucceeded(UUID customerId);
 
+    List<Topup> succeededSources(UUID customerId);
+
+    boolean hasSucceeded(UUID customerId, MobileOperator operator, String msisdn);
+
     boolean hasPending(UUID customerId, Instant createdAfter);
 
     List<Topup> findUnsettled(Instant createdAfter, Instant createdBefore);

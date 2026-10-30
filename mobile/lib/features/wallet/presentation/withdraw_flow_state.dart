@@ -9,21 +9,24 @@ class WithdrawFlowState {
     this.stage,
     this.error,
     this.amountMinor,
+    this.awaitingApproval,
   );
 
-  const WithdrawFlowState.idle() : this._(WithdrawPhase.idle, null, null, 0);
+  const WithdrawFlowState.idle()
+    : this._(WithdrawPhase.idle, null, null, 0, false);
 
   const WithdrawFlowState.running(WithdrawStage stage)
-    : this._(WithdrawPhase.running, stage, null, 0);
+    : this._(WithdrawPhase.running, stage, null, 0, false);
 
-  const WithdrawFlowState.done(int amountMinor)
-    : this._(WithdrawPhase.done, null, null, amountMinor);
+  const WithdrawFlowState.done(int amountMinor, {bool awaitingApproval = false})
+    : this._(WithdrawPhase.done, null, null, amountMinor, awaitingApproval);
 
   const WithdrawFlowState.failed(ApiError error)
-    : this._(WithdrawPhase.failed, null, error, 0);
+    : this._(WithdrawPhase.failed, null, error, 0, false);
 
   final WithdrawPhase phase;
   final WithdrawStage? stage;
   final ApiError? error;
   final int amountMinor;
+  final bool awaitingApproval;
 }

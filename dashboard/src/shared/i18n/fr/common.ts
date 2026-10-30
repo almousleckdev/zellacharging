@@ -79,6 +79,9 @@ export const frCommon = {
     INVALID_RANGE: "Cette période n'est pas valide.",
     INVALID_INCIDENT_STATUS: "Ce statut n'est pas valide.",
     CUSTOMER_NOT_FOUND: "Client introuvable.",
+    WITHDRAWAL_NOT_FOUND: "Retrait introuvable.",
+    WITHDRAWAL_NOT_PENDING: "Ce retrait a déjà été traité.",
+    WITHDRAWALS_UNAVAILABLE: "Les retraits ne sont pas disponibles : le service de paiement n'est pas configuré.",
   },
   validation: {
     emailRequired: "Saisissez votre adresse e-mail.",

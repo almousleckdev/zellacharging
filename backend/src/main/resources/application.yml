@@ -158,7 +158,7 @@ zella:
     ledger-check-interval: 10m
     withdrawal:
       enabled: ${ZELLA_WITHDRAWALS_ENABLED:${NDZELA_WITHDRAWALS_ENABLED:false}}
-      minimum-minor: 1000
+      minimum-minor: 500
       maximum-minor: 200000
       daily-maximum-minor: 500000
       recheck-after: 2m

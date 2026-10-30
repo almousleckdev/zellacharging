@@ -1,0 +1,30 @@
+export const frWithdrawals = {
+  withdrawals: {
+    title: "Retraits à valider",
+    subtitle: "Chaque retrait demandé par un client attend votre validation. Rien n'est envoyé à l'opérateur avant votre accord.",
+    results: "{count} retraits",
+    loadError: "Impossible de charger les retraits.",
+    emptyTitle: "Aucun retrait en attente",
+    emptyText: "Tous les retraits ont été traités.",
+    searchLabel: "Rechercher un retrait",
+    searchPlaceholder: "Référence, numéro ou nom du client",
+    actions: { approve: "Valider", reject: "Refuser" },
+    approve: {
+      title: "Valider ce retrait ?",
+      description: "{amount} seront envoyés à {customer} sur le {operator} {number}.",
+      confirm: "Valider et envoyer",
+      noteLabel: "Note (facultative)",
+      notePlaceholder: "Ajoutez une précision pour le journal d'audit",
+      saved: "Retrait validé : l'envoi est en cours.",
+    },
+    reject: {
+      title: "Refuser ce retrait ?",
+      description: "{amount} seront remis dans le portefeuille de {customer}. Il sera prévenu.",
+      confirm: "Refuser le retrait",
+      noteLabel: "Motif du refus",
+      notePlaceholder: "Expliquez pourquoi ce retrait est refusé",
+      noteRequired: "Indiquez le motif du refus.",
+      saved: "Retrait refusé : le montant est revenu dans le portefeuille.",
+    },
+  },
+} as const;

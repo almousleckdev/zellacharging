@@ -13,6 +13,7 @@ import { frIncidents } from "./incidents";
 import { frAudit } from "./audit";
 import { frPlatform } from "./platform";
 import { frStations } from "./stations";
+import { frWithdrawals } from "./withdrawals";
 
 export const fr = {
   ...frCommon,
@@ -30,4 +31,5 @@ export const fr = {
   ...frAudit,
   ...frPlatform,
   ...frStations,
+  ...frWithdrawals,
 } as const;

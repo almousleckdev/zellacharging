@@ -34,8 +34,12 @@ public class NotificationTexts {
                     "Top-up successful", "Your wallet has been credited.");
             case TOPUP_FAILED -> pick(en, "Recharge échouée", "Le paiement n'a pas abouti.",
                     "Top-up failed", "The payment did not go through.");
-            case WITHDRAWAL_STARTED -> pick(en, "Retrait en cours", "Votre retrait est en cours de traitement.",
-                    "Withdrawal in progress", "Your withdrawal is being processed.");
+            case WITHDRAWAL_STARTED -> pick(en, "Demande de retrait envoyée", "Votre retrait est en attente de validation.",
+                    "Withdrawal request sent", "Your withdrawal is awaiting approval.");
+            case WITHDRAWAL_APPROVED -> pick(en, "Retrait validé", "Votre retrait a été validé et est en cours d'envoi.",
+                    "Withdrawal approved", "Your withdrawal was approved and is being sent.");
+            case WITHDRAWAL_REJECTED -> pick(en, "Retrait refusé", "Le montant a été remis dans votre portefeuille.",
+                    "Withdrawal declined", "The amount is back in your wallet.");
             case WITHDRAWAL_SUCCEEDED -> pick(en, "Retrait effectué", "L'argent a été envoyé sur votre compte.",
                     "Withdrawal completed", "The money was sent to your account.");
             case WITHDRAWAL_FAILED -> pick(en, "Retrait échoué", "Le montant a été remis dans votre portefeuille.",

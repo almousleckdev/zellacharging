@@ -18,8 +18,27 @@ abstract final class WithdrawText {
       AppLanguage.pick(fr: 'Destination', en: 'Destination');
 
   static String get destinationNote => AppLanguage.pick(
-    fr: 'L’argent est renvoyé uniquement sur le numéro qui a servi à recharger.',
-    en: 'Money is only sent back to the number you topped up with.',
+    fr: 'Seuls les numéros déjà utilisés pour recharger votre portefeuille sont acceptés.',
+    en: 'Only numbers that already topped up your wallet are accepted.',
+  );
+
+  static String get numberLabel =>
+      AppLanguage.pick(fr: 'Numéro Mobile Money', en: 'Mobile money number');
+
+  static String get numberNotAllowed => AppLanguage.pick(
+    fr: 'Ce numéro n’a jamais servi à recharger votre portefeuille.',
+    en: 'This number has never topped up your wallet.',
+  );
+
+  static String get minimumHint =>
+      AppLanguage.pick(fr: 'Minimum 500 FCFA', en: 'Minimum 500 FCFA');
+
+  static String get pendingTitle =>
+      AppLanguage.pick(fr: 'Demande envoyée', en: 'Request sent');
+
+  static String pendingBody(String amount) => AppLanguage.pick(
+    fr: 'Votre retrait de $amount est en attente de validation. Vous serez notifié dès qu’il sera traité.',
+    en: 'Your withdrawal of $amount is awaiting approval. You will be notified as soon as it is handled.',
   );
 
   static String get noPayoutNumber => AppLanguage.pick(

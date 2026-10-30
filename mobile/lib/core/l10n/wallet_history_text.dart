@@ -64,6 +64,10 @@ abstract final class WalletHistoryText {
   static String statusLabel(String? state) => switch (state) {
     'PAID' => AppLanguage.pick(fr: 'Envoyé', en: 'Sent'),
     'SUCCEEDED' => AppLanguage.pick(fr: 'Confirmé', en: 'Confirmed'),
+    'PENDING_APPROVAL' => AppLanguage.pick(
+      fr: 'En attente de validation',
+      en: 'Awaiting approval',
+    ),
     'PENDING' ||
     'REQUESTED' ||
     'PROCESSING' => AppLanguage.pick(fr: 'En cours', en: 'In progress'),

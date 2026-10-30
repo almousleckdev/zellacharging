@@ -2,6 +2,7 @@ import 'package:dio/dio.dart';
 
 import '../../../core/network/api_error.dart';
 import '../domain/mobile_operator.dart';
+import '../domain/payout_number.dart';
 import '../domain/topup_result.dart';
 import '../domain/wallet.dart';
 import '../domain/wallet_entry.dart';
@@ -29,6 +30,14 @@ class WalletRepositoryImpl implements WalletRepository {
       payoutOperator: MobileOperator.values
           .where((operator) => operator.code == json['payoutOperator'])
           .firstOrNull,
+      payoutNumbers: [
+        for (final item in json['payoutNumbers'] as List<dynamic>? ?? [])
+          if (MobileOperator.fromCode(
+                (item as Map<String, dynamic>)['operator'] as String?,
+              )
+              case final operator?)
+            PayoutNumber(msisdn: item['msisdn'] as String, operator: operator),
+      ],
     );
   });
 
@@ -63,6 +72,7 @@ class WalletRepositoryImpl implements WalletRepository {
   Future<WithdrawalResult> withdraw({
     required int amountMinor,
     required MobileOperator operator,
+    required String msisdn,
     required String password,
     required String idempotencyKey,
   }) => _guard(() async {
@@ -71,6 +81,7 @@ class WalletRepositoryImpl implements WalletRepository {
       data: {
         'amountMinor': amountMinor,
         'operator': operator.code,
+        'msisdn': msisdn,
         'password': password,
       },
       options: Options(headers: {'Idempotency-Key': idempotencyKey}),

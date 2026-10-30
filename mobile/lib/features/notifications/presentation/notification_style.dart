@@ -13,7 +13,9 @@ abstract final class NotificationStyle {
   };
 
   static Color color(String type) {
-    if (type.endsWith('FAILED') || type.endsWith('INTERRUPTED')) {
+    if (type.endsWith('FAILED') ||
+        type.endsWith('INTERRUPTED') ||
+        type.endsWith('REJECTED')) {
       return AppColors.danger;
     }
     if (type.endsWith('SUCCEEDED') || type.endsWith('COMPLETED')) {

@@ -30,12 +30,15 @@ class WithdrawFlowView extends StatelessWidget {
   Widget build(BuildContext context) {
     final error = flow.error;
     if (flow.phase == WithdrawPhase.done) {
+      final amount = MoneyFormat.format(flow.amountMinor, currency, 0);
       return FlowPanel(
         kind: FlowKind.success,
-        title: WithdrawText.doneTitle,
-        message: WithdrawText.doneBody(
-          MoneyFormat.format(flow.amountMinor, currency, 0),
-        ),
+        title: flow.awaitingApproval
+            ? WithdrawText.pendingTitle
+            : WithdrawText.doneTitle,
+        message: flow.awaitingApproval
+            ? WithdrawText.pendingBody(amount)
+            : WithdrawText.doneBody(amount),
         primaryLabel: PayFlowText.done,
         onPrimary: onClose,
       );

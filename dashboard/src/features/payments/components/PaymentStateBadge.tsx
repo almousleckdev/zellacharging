@@ -6,6 +6,7 @@ import { Badge } from "@/shared/ui/Badge";
 const TONES: Record<string, "success" | "warning" | "danger"> = {
   SUCCEEDED: "success",
   PAID: "success",
+  PENDING_APPROVAL: "warning",
   PENDING: "warning",
   REQUESTED: "warning",
   PROCESSING: "warning",

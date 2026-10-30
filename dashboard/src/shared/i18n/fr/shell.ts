@@ -33,6 +33,7 @@ export const frShell = {
     incidents: "Incidents",
     customers: "Clients",
     payments: "Paiements",
+    withdrawals: "Retraits à valider",
     commissions: "Commissions",
     tariffs: "Tarifs",
     reports: "Rapports",

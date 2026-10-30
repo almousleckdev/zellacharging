@@ -9,5 +9,6 @@ import jakarta.validation.constraints.Size;
 record WithdrawalRequest(
         @Positive long amountMinor,
         @NotNull MobileOperator operator,
+        @Size(max = 20) String msisdn,
         @NotBlank @Size(max = 72) String password) {
 }

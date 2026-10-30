@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/format/amount_input.dart';
 import '../../../core/format/money_format.dart';
+import '../../../core/format/msisdn.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../shared/widgets/async_body.dart';
 import '../../../shared/widgets/pay/action_bar.dart';
@@ -26,6 +27,7 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
   final _formKey = GlobalKey<FormState>();
   final _amount = TextEditingController();
   final _password = TextEditingController();
+  final _phone = TextEditingController();
   late String _attempt = _newAttempt();
 
   String _newAttempt() => DateTime.now().microsecondsSinceEpoch.toString();
@@ -34,17 +36,24 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
   void dispose() {
     _amount.dispose();
     _password.dispose();
+    _phone.dispose();
     super.dispose();
   }
 
   void _submit(Wallet? wallet) {
-    final operator = wallet?.payoutOperator;
-    if (operator == null || !_formKey.currentState!.validate()) return;
+    if (wallet == null || !_formKey.currentState!.validate()) return;
+    final number = Msisdn.normalize(_phone.text);
+    final operator = wallet.payoutNumbers
+        .where((known) => known.msisdn == number)
+        .map((known) => known.operator)
+        .firstOrNull;
+    if (operator == null) return;
     ref
         .read(withdrawFlowProvider.notifier)
         .withdraw(
           amountMinor: AmountInput.parse(_amount.text) ?? 0,
           operator: operator,
+          msisdn: number,
           password: _password.text,
           idempotencyKey: _attempt,
         );
@@ -61,8 +70,13 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
     final flow = ref.watch(withdrawFlowProvider);
     final wallet = ref.watch(walletProvider);
     final current = wallet.asData?.value;
-    final phone = current?.payoutNumber ?? '';
-    final operator = current?.payoutOperator ?? MobileOperator.airtel;
+    final number = Msisdn.normalize(_phone.text);
+    final operator =
+        current?.payoutNumbers
+            .where((known) => known.msisdn == number)
+            .map((known) => known.operator)
+            .firstOrNull ??
+        MobileOperator.airtel;
     final idle = flow.phase == WithdrawPhase.idle;
     return Scaffold(
       appBar: AppBar(title: Text(WithdrawText.title)),
@@ -76,7 +90,7 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
               flow: flow,
               currency: wallet.asData?.value.currency ?? '',
               operator: operator,
-              phone: phone,
+              phone: number,
               onRetry: _retry,
               onClose: () => context.pop(),
             ),
@@ -95,11 +109,17 @@ class _WithdrawPageState extends ConsumerState<WithdrawPage> {
     );
   }
 
-  Widget _form(Wallet wallet) => WithdrawForm(
-    formKey: _formKey,
-    wallet: wallet,
-    amount: _amount,
-    password: _password,
-    onAmountChanged: () => setState(() {}),
-  );
+  Widget _form(Wallet wallet) {
+    if (_phone.text.isEmpty && wallet.payoutNumber != null) {
+      _phone.text = wallet.payoutNumber!;
+    }
+    return WithdrawForm(
+      formKey: _formKey,
+      wallet: wallet,
+      amount: _amount,
+      password: _password,
+      phone: _phone,
+      onAmountChanged: () => setState(() {}),
+    );
+  }
 }

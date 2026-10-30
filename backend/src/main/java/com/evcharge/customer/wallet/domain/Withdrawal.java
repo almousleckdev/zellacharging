@@ -22,7 +22,7 @@ public record Withdrawal(
     public static Withdrawal requested(UUID customerId, MobileOperator operator, String msisdn, long amountMinor,
                                        String idempotencyKey, Instant now) {
         UUID id = UUID.randomUUID();
-        return new Withdrawal(id, customerId, operator, msisdn, amountMinor, WithdrawalState.REQUESTED,
+        return new Withdrawal(id, customerId, operator, msisdn, amountMinor, WithdrawalState.PENDING_APPROVAL,
                 TopupReference.forWithdrawal(TenantContext.require()), null, null, idempotencyKey, now, now);
     }
 }

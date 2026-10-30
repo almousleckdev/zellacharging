@@ -22,6 +22,7 @@ class _Wallets implements WalletRepository {
   Future<WithdrawalResult> withdraw({
     required int amountMinor,
     required MobileOperator operator,
+    required String msisdn,
     required String password,
     required String idempotencyKey,
   }) async {
@@ -68,6 +69,7 @@ Future<List<WithdrawStage>> _run(_Wallets wallets) async {
   await WithdrawMoney(wallets, pollInterval: Duration.zero, maxPolls: 3)(
     amountMinor: 2000,
     operator: MobileOperator.moov,
+    msisdn: '+24162000000',
     password: 'secret123',
     idempotencyKey: 'k',
     onStage: stages.add,

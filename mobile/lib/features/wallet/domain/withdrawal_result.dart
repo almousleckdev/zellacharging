@@ -9,6 +9,8 @@ class WithdrawalResult {
   final String state;
   final String? failureCode;
 
+  bool get awaitingApproval => state == 'PENDING_APPROVAL';
+
   bool get paid => state == 'PAID';
 
   bool get failed => state == 'FAILED';

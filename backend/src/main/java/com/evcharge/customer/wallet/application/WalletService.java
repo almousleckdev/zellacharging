@@ -44,4 +44,8 @@ public class WalletService {
     public Optional<Topup> payoutSource(UUID customerId) {
         return topups.lastSucceeded(customerId);
     }
+
+    public List<Topup> payoutSources(UUID customerId) {
+        return topups.succeededSources(customerId);
+    }
 }

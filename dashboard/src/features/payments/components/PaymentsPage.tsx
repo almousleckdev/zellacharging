@@ -7,7 +7,7 @@ import { paymentListSchema } from "../schemas";
 import { usePaymentColumns } from "./usePaymentColumns";
 
 const KINDS = ["TOPUP", "WITHDRAWAL"] as const;
-const STATES = ["SUCCEEDED", "PAID", "PENDING", "PROCESSING", "REQUESTED", "REVIEW", "FAILED"] as const;
+const STATES = ["SUCCEEDED", "PAID", "PENDING_APPROVAL", "PENDING", "PROCESSING", "REQUESTED", "REVIEW", "FAILED"] as const;
 
 export function PaymentsPage({ customerId }: { customerId?: string }) {
   const { t } = useI18n();

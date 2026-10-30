@@ -29,6 +29,7 @@ import 'package:zella/features/stations/domain/station.dart';
 import 'package:zella/features/stations/domain/station_connector.dart';
 import 'package:zella/features/stations/domain/station_repository.dart';
 import 'package:zella/features/wallet/domain/mobile_operator.dart';
+import 'package:zella/features/wallet/domain/payout_number.dart';
 import 'package:zella/features/wallet/domain/topup_result.dart';
 import 'package:zella/features/wallet/domain/wallet.dart';
 import 'package:zella/features/wallet/domain/wallet_entry.dart';
@@ -174,6 +175,9 @@ class FakeWallet implements WalletRepository {
     withdrawalsEnabled: true,
     payoutNumber: '+24177123456',
     payoutOperator: MobileOperator.airtel,
+    payoutNumbers: [
+      PayoutNumber(msisdn: '+24177123456', operator: MobileOperator.airtel),
+    ],
   );
 
   @override
@@ -192,6 +196,7 @@ class FakeWallet implements WalletRepository {
   Future<WithdrawalResult> withdraw({
     required int amountMinor,
     required MobileOperator operator,
+    required String msisdn,
     required String password,
     required String idempotencyKey,
   }) async => const WithdrawalResult(id: 'w', state: 'PAID');

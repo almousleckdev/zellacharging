@@ -1,6 +1,7 @@
 package com.evcharge.customer.wallet.domain;
 
 public enum WithdrawalState {
+    PENDING_APPROVAL,
     REQUESTED,
     PROCESSING,
     PAID,

@@ -58,6 +58,7 @@ class _FakeWallets implements WalletRepository {
   Future<WithdrawalResult> withdraw({
     required int amountMinor,
     required MobileOperator operator,
+    required String msisdn,
     required String password,
     required String idempotencyKey,
   }) => throw UnimplementedError();

@@ -2,17 +2,12 @@ package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.account.CustomerVerification;
 import com.evcharge.customer.shared.ApiException;
-import com.evcharge.customer.wallet.application.port.PayoutGateway;
 import com.evcharge.customer.wallet.application.port.TopupRepository;
 import com.evcharge.customer.wallet.application.port.WithdrawalRepository;
 import com.evcharge.customer.wallet.domain.MobileOperator;
-import com.evcharge.customer.wallet.domain.PayoutOutcome;
-import com.evcharge.customer.wallet.domain.PayoutRequest;
 import com.evcharge.customer.wallet.domain.Topup;
 import com.evcharge.customer.wallet.domain.Withdrawal;
 import com.evcharge.customer.wallet.domain.WithdrawalState;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -25,12 +20,10 @@ import java.util.UUID;
 @Service
 public class WithdrawalService {
 
-    private static final Logger log = LoggerFactory.getLogger(WithdrawalService.class);
     private static final Duration REFRESH_AFTER = Duration.ofSeconds(5);
     private static final int RECENT_LIMIT = 20;
 
     private final WithdrawalSettings settings;
-    private final WalletSettings wallet;
     private final WithdrawalRepository withdrawals;
     private final TopupRepository topups;
     private final WithdrawalLedger ledger;
@@ -39,11 +32,10 @@ public class WithdrawalService {
     private final CustomerVerification verification;
     private final Clock clock;
 
-    public WithdrawalService(WithdrawalSettings settings, WalletSettings wallet, WithdrawalRepository withdrawals,
+    public WithdrawalService(WithdrawalSettings settings, WithdrawalRepository withdrawals,
                              TopupRepository topups, WithdrawalLedger ledger, WithdrawalSettlement settlement, PayoutGateways gateways,
                              CustomerVerification verification, Clock clock) {
         this.settings = settings;
-        this.wallet = wallet;
         this.withdrawals = withdrawals;
         this.topups = topups;
         this.ledger = ledger;
@@ -53,8 +45,8 @@ public class WithdrawalService {
         this.clock = clock;
     }
 
-    public Withdrawal request(UUID customerId, MobileOperator operator, long amountMinor, String password,
-                              String key) {
+    public Withdrawal request(UUID customerId, MobileOperator operator, String requestedNumber, long amountMinor,
+                              String password, String key) {
         if (!settings.enabled()) {
             throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "WITHDRAWALS_UNAVAILABLE",
                     "Withdrawals are not available yet");
@@ -65,13 +57,12 @@ public class WithdrawalService {
         }
         verification.confirmPassword(customerId, password);
         requireAllowedAmount(amountMinor);
-        PayoutGateway gateway = gateways.forOperator(operator);
-        Withdrawal pending = Withdrawal.requested(customerId, operator, payoutNumber(customerId, operator),
+        gateways.forOperator(operator);
+        Withdrawal pending = Withdrawal.requested(customerId, operator, payoutNumber(customerId, operator, requestedNumber),
                 amountMinor, key, clock.instant());
         if (ledger.debit(pending).isEmpty()) {
             return withdrawals.findByIdempotencyKey(customerId, key).orElseThrow();
         }
-        dispatch(gateway, pending);
         return withdrawals.find(pending.id()).orElseThrow();
     }
 
@@ -87,25 +78,18 @@ public class WithdrawalService {
         return withdrawals.recent(customerId, RECENT_LIMIT);
     }
 
-    private String payoutNumber(UUID customerId, MobileOperator operator) {
+    private String payoutNumber(UUID customerId, MobileOperator operator, String requested) {
+        if (requested != null && !requested.isBlank()) {
+            String number = requested.trim();
+            if (!topups.hasSucceeded(customerId, operator, number)) {
+                throw new ApiException(HttpStatus.FORBIDDEN, "PAYOUT_NUMBER_NOT_ALLOWED",
+                        "Money can only be sent to a number that already topped up this wallet");
+            }
+            return number;
+        }
         return topups.lastSucceeded(customerId, operator).map(Topup::msisdn).orElseThrow(
                 () -> new ApiException(HttpStatus.CONFLICT, "NO_PAYOUT_NUMBER",
                         "Top up with this operator first: money goes back to the number that paid"));
-    }
-
-    private void dispatch(PayoutGateway gateway, Withdrawal withdrawal) {
-        PayoutRequest request = new PayoutRequest(withdrawal.reference(), withdrawal.amountMinor(),
-                wallet.currency(), withdrawal.operator(), withdrawal.msisdn());
-        try {
-            PayoutOutcome outcome = gateway.payout(request);
-            switch (outcome.status()) {
-                case PENDING, PAID -> withdrawals.transition(withdrawal.id(), WithdrawalState.REQUESTED,
-                        WithdrawalState.PROCESSING, outcome.providerRef(), null);
-                case FAILED -> ledger.reverse(withdrawal, outcome.failureCode());
-            }
-        } catch (RuntimeException e) {
-            log.warn("Payout {} was sent but its outcome is unknown: {}", withdrawal.reference(), e.getMessage());
-        }
     }
 
     private void requireAllowedAmount(long amountMinor) {

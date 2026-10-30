@@ -35,8 +35,8 @@ class WithdrawalController {
             throw new ApiException(HttpStatus.BAD_REQUEST, "IDEMPOTENCY_KEY_REQUIRED",
                     "An Idempotency-Key header is required");
         }
-        return WithdrawalResponse.from(withdrawals.request(me.id(), request.operator(), request.amountMinor(),
-                request.password(), key.trim()));
+        return WithdrawalResponse.from(withdrawals.request(me.id(), request.operator(), request.msisdn(),
+                request.amountMinor(), request.password(), key.trim()));
     }
 
     @GetMapping

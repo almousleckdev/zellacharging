@@ -72,7 +72,7 @@ class WithdrawalDailyLimitIntegrationTest extends PostgresTestBase {
 
     private Withdrawal request(long amount, String key) {
         return TenantContext.callAs(TENANT,
-                () -> withdrawals.request(customer, MobileOperator.AIRTEL, amount, PASSWORD, key));
+                () -> withdrawals.request(customer, MobileOperator.AIRTEL, null, amount, PASSWORD, key));
     }
 
     private boolean granted(long amount, String key) {

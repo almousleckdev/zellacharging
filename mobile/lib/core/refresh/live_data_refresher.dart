@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../features/charging/presentation/session_providers.dart';
+import '../../features/notifications/presentation/notification_providers.dart';
 import '../../features/wallet/presentation/wallet_providers.dart';
 
 const _interval = Duration(seconds: 15);
@@ -37,6 +38,7 @@ class _LiveDataRefresherState extends ConsumerState<LiveDataRefresher>
     ref.invalidate(activeSessionProvider);
     ref.invalidate(walletProvider);
     ref.invalidate(walletEntriesProvider);
+    ref.invalidate(unreadCountProvider);
   }
 
   @override

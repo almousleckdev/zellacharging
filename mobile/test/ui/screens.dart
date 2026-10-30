@@ -48,6 +48,9 @@ import 'package:zella/features/wallet/presentation/wallet_entry_page.dart';
 import 'package:zella/features/wallet/presentation/wallet_page.dart';
 import 'package:zella/features/wallet/presentation/withdraw_page.dart';
 import 'package:zella/features/wallet/presentation/wallet_providers.dart';
+import 'package:zella/features/notifications/presentation/notification_providers.dart';
+import 'package:zella/features/notifications/presentation/notifications_page.dart';
+import 'fake_notifications.dart';
 import 'ui_fakes.dart';
 
 final screens = <String, Widget Function()>{
@@ -73,6 +76,7 @@ final screens = <String, Widget Function()>{
   'stats-energy': () => const ActivityStatsPage(metric: StatMetric.energy),
   'stats-spent': () => const ActivityStatsPage(metric: StatMetric.spent),
   'withdraw': () => const WithdrawPage(),
+  'notifications': () => const NotificationsPage(),
   'station': () => const StationDetailPage(
     stationId: 'DY202609110007-VERY-LONG-STATION-IDENTIFIER',
   ),
@@ -177,6 +181,7 @@ List<Override> overridesWith({
     sessionRepo ?? FakeSessions(state),
   ),
   walletRepositoryProvider.overrideWithValue(wallet ?? FakeWallet()),
+  notificationRepositoryProvider.overrideWithValue(FakeNotifications()),
   profileRepositoryProvider.overrideWithValue(profile ?? FakeProfile()),
   locationServiceProvider.overrideWithValue(NoLocation()),
   couponRepositoryProvider.overrideWithValue(

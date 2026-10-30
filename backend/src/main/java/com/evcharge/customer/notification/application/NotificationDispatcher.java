@@ -1,6 +1,7 @@
 package com.evcharge.customer.notification.application;
 
 import com.evcharge.customer.notification.application.port.DeviceTokenRepository;
+import com.evcharge.customer.notification.application.port.NotificationInbox;
 import com.evcharge.customer.notification.application.port.NotificationOutbox;
 import com.evcharge.customer.notification.application.port.PushSender;
 import com.evcharge.customer.notification.domain.DeviceToken;
@@ -24,6 +25,7 @@ public class NotificationDispatcher {
     private static final Logger log = LoggerFactory.getLogger(NotificationDispatcher.class);
 
     private final NotificationOutbox outbox;
+    private final NotificationInbox inbox;
     private final DeviceTokenRepository devices;
     private final PushSender sender;
     private final NotificationTexts texts;
@@ -31,10 +33,11 @@ public class NotificationDispatcher {
     private final CountryDirectory countries;
     private final Clock clock;
 
-    public NotificationDispatcher(NotificationOutbox outbox, DeviceTokenRepository devices, PushSender sender,
-                                  NotificationTexts texts, NotificationSettings settings,
+    public NotificationDispatcher(NotificationOutbox outbox, NotificationInbox inbox, DeviceTokenRepository devices,
+                                  PushSender sender, NotificationTexts texts, NotificationSettings settings,
                                   CountryDirectory countries, Clock clock) {
         this.outbox = outbox;
+        this.inbox = inbox;
         this.devices = devices;
         this.sender = sender;
         this.texts = texts;
@@ -71,8 +74,9 @@ public class NotificationDispatcher {
         List<DeviceToken> targets = devices.forCustomer(notification.customerId());
         int delivered = 0;
         boolean retry = false;
+        int unread = targets.isEmpty() ? 0 : inbox.unread(notification.customerId());
         for (DeviceToken device : targets) {
-            PushResult result = sender.send(device, texts.render(notification, device.language()));
+            PushResult result = sender.send(device, texts.render(notification, device.language()).withBadge(unread));
             switch (result) {
                 case DELIVERED -> delivered++;
                 case INVALID_TOKEN -> devices.removeToken(device.token());

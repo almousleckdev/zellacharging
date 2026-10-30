@@ -29,6 +29,7 @@ class SessionController extends Notifier<SessionStatus> {
 
   Future<void> signOut() async {
     await ref.read(pushRegistrationProvider).stop();
+    await ref.read(appBadgeProvider).set(0);
     await ref.read(tokenStoreProvider).clear();
     state = SessionStatus.unauthenticated;
   }

@@ -4,8 +4,8 @@ import 'package:go_router/go_router.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../notifications/presentation/notification_bell.dart';
 import '../../profile/domain/profile.dart';
 import 'home_search_bar.dart';
 
@@ -31,15 +31,7 @@ class HomeHeader extends StatelessWidget {
                 ),
               ),
             ),
-            IconButton(
-              tooltip: HomeText.notifications,
-              onPressed: () => context.push(Routes.settings),
-              icon: const Icon(
-                AppIcons.bell,
-                color: AppColors.textPrimary,
-                size: 22,
-              ),
-            ),
+            const NotificationBell(),
           ],
         ),
         Text(

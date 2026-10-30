@@ -22,6 +22,7 @@ abstract final class Routes {
   static const deleteAccount = '/profile/settings/delete';
   static const contact = '/profile/contact';
   static const coupons = '/profile/coupons';
+  static const notifications = '/notifications';
   static const scan = '/scan';
   static const wallet = '/wallet';
   static const topup = '/wallet/topup';

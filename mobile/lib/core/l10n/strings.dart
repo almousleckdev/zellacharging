@@ -3,6 +3,7 @@ export 'charge_text.dart';
 export 'error_text.dart';
 export 'history_text.dart';
 export 'home_text.dart';
+export 'notification_text.dart';
 export 'pay_flow_text.dart';
 export 'payment_text.dart';
 export 'profile_text.dart';

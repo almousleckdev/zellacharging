@@ -14,7 +14,6 @@ import org.springframework.web.client.RestClientResponseException;
 import tools.jackson.databind.ObjectMapper;
 
 import java.time.Clock;
-import java.util.LinkedHashMap;
 import java.util.Map;
 
 @Component
@@ -50,7 +49,7 @@ class FcmPushSender implements PushSender {
         try {
             client.post().uri(sendUrl).contentType(MediaType.APPLICATION_JSON)
                     .headers(headers -> headers.setBearerAuth(accessToken.get()))
-                    .body(Map.of("message", message(device, content))).retrieve().toBodilessEntity();
+                    .body(Map.of("message", FcmMessage.of(device, content, settings.androidChannel()))).retrieve().toBodilessEntity();
             return PushResult.DELIVERED;
         } catch (RestClientResponseException e) {
             return classify(e.getStatusCode(), e.getResponseBodyAsString());
@@ -58,18 +57,6 @@ class FcmPushSender implements PushSender {
             log.warn("Push delivery could not reach Firebase: {}", e.getMessage());
             return PushResult.RETRY;
         }
-    }
-
-    private Map<String, Object> message(DeviceToken device, PushContent content) {
-        Map<String, Object> message = new LinkedHashMap<>();
-        message.put("token", device.token());
-        message.put("notification", Map.of("title", content.title(), "body", content.body()));
-        message.put("data", content.data());
-        message.put("android", Map.of("priority", "HIGH",
-                "notification", Map.of("channel_id", settings.androidChannel())));
-        message.put("apns", Map.of("headers", Map.of("apns-priority", "10"),
-                "payload", Map.of("aps", Map.of("sound", "default"))));
-        return message;
     }
 
     private PushResult classify(HttpStatusCode status, String body) {

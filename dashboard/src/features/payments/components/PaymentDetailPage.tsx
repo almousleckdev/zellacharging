@@ -9,9 +9,13 @@ import { CellLink } from "@/shared/ui/CellLink";
 import { DetailShell } from "@/shared/ui/DetailShell";
 import { RelatedLinks } from "@/shared/ui/RelatedLinks";
 import { FactList } from "@/shared/ui/FactList";
+import { DecisionButtons } from "@/features/withdrawals/components/DecisionButtons";
+import type { PaymentItem } from "../schemas";
 import { usePaymentDetail } from "../api/usePaymentDetail";
 import { signedAmount } from "../format";
 import { PaymentStateBadge } from "./PaymentStateBadge";
+
+const awaitingApproval = (payment: PaymentItem) => payment.kind === "WITHDRAWAL" && payment.state === "PENDING_APPROVAL";
 
 export function PaymentDetailPage() {
   const { t } = useI18n();
@@ -46,6 +50,7 @@ export function PaymentDetailPage() {
       notFound={labels.notFound}
       loadError={labels.loadError}
       badge={payment && <PaymentStateBadge state={payment.state} />}
+      actions={payment && awaitingApproval(payment) && <DecisionButtons withdrawal={payment} />}
     >
       {data && payment && (
         <div className="grid items-start gap-6 lg:grid-cols-2">

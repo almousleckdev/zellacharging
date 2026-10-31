@@ -3,6 +3,10 @@ import type { Dictionary } from "../types";
 export const enOverview: Pick<Dictionary, "overview"> = {
   overview: {
     title: "Overview",
+    greeting: "Hello, {name}",
+    pending: { title: "Withdrawals to approve", all: "See all", empty: "No withdrawal is waiting." },
+    quick: { title: "Quick access" },
+    activity: { title: "Recent activity", all: "See all", empty: "No operation yet." },
     subtitle: "Sales and activity · {scope}",
     loadError: "We couldn't load the indicators.",
     unitKwh: "kWh",
@@ -24,12 +28,6 @@ export const enOverview: Pick<Dictionary, "overview"> = {
       revenueText: "Sales and commission, day by day.",
       sales: "Sales",
       commission: "Commission",
-      chargesTitle: "Charges per day",
-      chargesText: "Number of charges started.",
-      charges: "Charges",
-      energyTitle: "Energy per day",
-      energyText: "Energy delivered by completed charges.",
-      energy: "Energy",
     },
     attention: {
       title: "Needs attention",
@@ -40,6 +38,6 @@ export const enOverview: Pick<Dictionary, "overview"> = {
     },
     countries: { title: "Sales by country", text: "Comparison over the chosen period.", charges: "{count} charges", new: "New" },
     network: { title: "Station network", all: "See stations", online: "online", charges: "{count} charges", unavailable: "Stations are temporarily unavailable." },
-    recent: { charges: "Latest charges", all: "See all" },
+    recent: { charges: "Latest charges", all: "See all", empty: "No charge yet." },
   },
 };

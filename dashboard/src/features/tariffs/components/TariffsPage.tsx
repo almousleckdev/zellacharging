@@ -2,15 +2,15 @@
 
 import { useSession } from "@/features/session/SessionProvider";
 import { SettingsCard } from "@/features/platform/components/SettingsCard";
+import { TariffSummary } from "@/features/platform/components/TariffSummary";
 import { useTariffs } from "@/features/platform/api/usePlatform";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { Card } from "@/shared/ui/Card";
 import { DataTable } from "@/shared/ui/DataTable";
 import type { Column } from "@/shared/ui/DataTable";
-import { ErrorState } from "@/shared/ui/ErrorState";
 import { PageHeader } from "@/shared/ui/PageHeader";
-import { Skeleton } from "@/shared/ui/Skeleton";
+import { QueryStatus } from "@/shared/ui/QueryStatus";
 
 type Price = { stationId: string; pricePerKwhMinor: number; sessions: number; lastUsedAt: string | null };
 
@@ -38,20 +38,20 @@ export function TariffsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader title={labels.title} subtitle={labels.subtitle} trail={[t.shell.breadcrumbRoot, labels.title]} />
-      {query.isPending && <Skeleton className="h-48" />}
-      {query.isError && <ErrorState message={labels.loadError} onRetry={() => void query.refetch()} />}
+      <PageHeader title={labels.title} subtitle={labels.subtitle} />
+      <QueryStatus pending={query.isPending} failed={query.isError} loadError={labels.loadError} onRetry={() => void query.refetch()} />
       {query.data && (
         <>
+          <TariffSummary sections={query.data.settings} currency={currency} decimals={decimals} />
           <div className="grid items-start gap-6 lg:grid-cols-2">
             {query.data.settings.map((section) => (
               <SettingsCard key={section.section} section={section} currency={currency} decimals={decimals} />
             ))}
           </div>
           {query.data.stations.map((entry) => (
-            <Card key={entry.country.code} title={`${labels.applied} · ${entry.country.name}`} description={labels.appliedText}>
+            <Card key={entry.country.code} title={`${labels.applied} · ${entry.country.name}`} description={labels.appliedText} flush>
               {entry.prices.length === 0 ? (
-                <p className="text-sm text-muted">{labels.noPrices}</p>
+                <p className="px-5 pb-5 text-sm text-muted">{labels.noPrices}</p>
               ) : (
                 <DataTable caption={labels.applied} columns={columns(entry.country)} rows={entry.prices} rowKey={(row) => `${row.stationId}-${row.pricePerKwhMinor}`} />
               )}

@@ -2,7 +2,7 @@ package com.evcharge.customer.charging.infrastructure;
 
 import com.evcharge.customer.charging.ActivityFlows;
 import com.evcharge.customer.charging.DailyActivity;
-import com.evcharge.customer.charging.application.FeeSettings;
+import com.evcharge.customer.charging.application.FeeRates;
 import com.evcharge.customer.shared.Bucket;
 import com.evcharge.customer.shared.ReportingWindow;
 import com.evcharge.customer.shared.Timestamps;
@@ -19,10 +19,10 @@ class JdbcActivityFlows implements ActivityFlows {
     private static final String BILLED = "state in ('COMPLETED', 'ABANDONED') and cost_minor > 0";
 
     private final JdbcClient jdbc;
-    private final FeeSettings fees;
+    private final FeeRates fees;
     private final ReportingWindow reporting;
 
-    JdbcActivityFlows(JdbcClient jdbc, FeeSettings fees, ReportingWindow reporting) {
+    JdbcActivityFlows(JdbcClient jdbc, FeeRates fees, ReportingWindow reporting) {
         this.jdbc = jdbc;
         this.fees = fees;
         this.reporting = reporting;

@@ -9,18 +9,18 @@ import { Pagination } from "./Pagination";
 import { TableSkeleton } from "./TableSkeleton";
 
 type ListPanelProps = {
-  toolbar: ReactNode;
+  toolbar?: ReactNode;
   pending: boolean;
   failed: boolean;
   onRetry: () => void;
   loadError: string;
   empty: { icon: IconName; title: string; text: string };
   isEmpty: boolean;
-  page: number;
-  size: number;
-  total: number;
-  onPage: (page: number) => void;
-  onSize: (size: number) => void;
+  page?: number;
+  size?: number;
+  total?: number;
+  onPage?: (page: number) => void;
+  onSize?: (size: number) => void;
   children: ReactNode;
 };
 
@@ -32,9 +32,9 @@ export function ListPanel({
   loadError,
   empty,
   isEmpty,
-  page,
-  size,
-  total,
+  page = 0,
+  size = 20,
+  total = 0,
   onPage,
   onSize,
   children,
@@ -42,7 +42,7 @@ export function ListPanel({
   const { t } = useI18n();
 
   return (
-    <section className="overflow-hidden rounded-card border border-border bg-background shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
+    <section className="overflow-hidden rounded-card border border-border bg-background shadow-card">
       {toolbar}
       {pending && (
         <div role="status" aria-busy="true">
@@ -61,7 +61,7 @@ export function ListPanel({
         </div>
       )}
       {children}
-      <Pagination page={page} size={size} total={total} onPage={onPage} onSize={onSize} />
+      {onPage && <Pagination page={page} size={size} total={total} onPage={onPage} onSize={onSize} />}
     </section>
   );
 }

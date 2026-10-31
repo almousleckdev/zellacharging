@@ -1,5 +1,6 @@
 "use client";
 
+import { PendingWithdrawalsPanel } from "@/features/withdrawals/components/PendingWithdrawalsPanel";
 import { countryLabel } from "@/features/session/countryScope";
 import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
@@ -7,18 +8,22 @@ import { interpolate } from "@/shared/i18n/interpolate";
 import { useUrlParams } from "@/shared/lib/useUrlParams";
 import { ErrorState } from "@/shared/ui/ErrorState";
 import { PageHeader } from "@/shared/ui/PageHeader";
+import { PillTabs } from "@/shared/ui/PillTabs";
 import { useOverview } from "../api/useOverview";
 import { useSeries } from "../api/useSeries";
 import { periodsByCurrency } from "../seriesMath";
 import { overviewTotals } from "../totals";
-import { AttentionStrip } from "./AttentionStrip";
+import { AttentionCard } from "./AttentionCard";
 import { CountryRevenue } from "./CountryRevenue";
 import { NetworkHealth } from "./NetworkHealth";
 import { OverviewSkeleton } from "./OverviewSkeleton";
-import { PERIODS, PeriodSwitch } from "./PeriodSwitch";
+import { QuickAccess } from "./QuickAccess";
+import { RecentActivity } from "./RecentActivity";
 import { RecentCharges } from "./RecentCharges";
-import { ActivityBars, RevenueChart } from "./RevenueCharts";
+import { RevenueChart } from "./RevenueCharts";
 import { RevenueKpis } from "./RevenueKpis";
+
+const PERIODS = [7, 30, 90] as const;
 
 export function OverviewPage() {
   const { t } = useI18n();
@@ -32,40 +37,48 @@ export function OverviewPage() {
   const periods = series.data ? periodsByCurrency(series.data, days) : [];
   const active = periods.filter((item) => item.current.sessions + item.previous.sessions + item.current.topupCount > 0);
   const primary = active[0] ?? periods[0];
+  const name = profile.firstName ?? profile.email;
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t.overview.title}
-        subtitle={interpolate(t.overview.subtitle, { scope })}
-        trail={[t.shell.breadcrumbRoot, t.overview.title]}
-        actions={<PeriodSwitch days={days} onChange={(value) => update({ days: value === 30 ? null : String(value) }, false)} />}
-      />
-      {(overview.isPending || series.isPending) && (
-        <div role="status" aria-busy="true">
-          <span className="sr-only">{t.common.loading}</span>
-          <OverviewSkeleton />
-        </div>
-      )}
-      {(overview.isError || series.isError) && <ErrorState message={t.overview.loadError} onRetry={() => void overview.refetch()} />}
-      {overview.data && series.data && primary && (
-        <>
-          <AttentionStrip totals={overviewTotals(overview.data.countries)} />
-          <RevenueKpis period={primary} days={days} />
-          <div className="grid items-start gap-6 xl:grid-cols-3">
-            <div className="xl:col-span-2">
-              <RevenueChart period={primary} />
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+      <div className="flex min-w-0 flex-col gap-6">
+        <PageHeader
+          title={interpolate(t.overview.greeting, { name })}
+          subtitle={interpolate(t.overview.subtitle, { scope })}
+          actions={
+            <PillTabs
+              label={t.overview.period.label}
+              options={PERIODS.map((value) => ({ value, label: `${value} ${t.overview.period.days}` }))}
+              value={days as (typeof PERIODS)[number]}
+              onChange={(value) => update({ days: value === 30 ? null : String(value) }, false)}
+            />
+          }
+        />
+        {(overview.isPending || series.isPending) && (
+          <div role="status" aria-busy="true">
+            <span className="sr-only">{t.common.loading}</span>
+            <OverviewSkeleton />
+          </div>
+        )}
+        {(overview.isError || series.isError) && <ErrorState message={t.overview.loadError} onRetry={() => void overview.refetch()} />}
+        {overview.data && series.data && primary && (
+          <>
+            <RevenueKpis period={primary} days={days} />
+            <RevenueChart period={primary} days={days} />
+            <RecentCharges />
+            <div className="grid items-start gap-6 lg:grid-cols-2">
+              <NetworkHealth />
+              {series.data.countries.length > 1 && <CountryRevenue series={series.data} days={days} />}
             </div>
-            <CountryRevenue series={series.data} days={days} />
-          </div>
-          <div className="grid items-start gap-6 xl:grid-cols-3">
-            <ActivityBars period={primary} metric="sessions" />
-            <ActivityBars period={primary} metric="energy" />
-            <NetworkHealth />
-          </div>
-          <RecentCharges />
-        </>
-      )}
+          </>
+        )}
+      </div>
+      <aside className="flex min-w-0 flex-col gap-6">
+        <PendingWithdrawalsPanel />
+        {overview.data && <AttentionCard totals={overviewTotals(overview.data.countries)} />}
+        <QuickAccess />
+        <RecentActivity />
+      </aside>
     </div>
   );
 }

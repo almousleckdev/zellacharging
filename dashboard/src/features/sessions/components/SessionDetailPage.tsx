@@ -31,17 +31,6 @@ export function SessionDetailPage() {
       backHref="/sessions"
       backLabel={labels.back}
       title={session ? `${session.stationId} · ${t.sessions.connector} ${session.connectorId}` : t.sessions.title}
-      trail={[
-        t.shell.breadcrumbRoot,
-        ...(session
-          ? [
-              { label: t.customers.title, href: "/customers" },
-              { label: session.customerName, href: `/customers/${session.country}/${session.customerId}` },
-              { label: t.sessions.title, href: `/customers/${session.country}/${session.customerId}?tab=sessions` },
-              session.stationId,
-            ]
-          : [t.sessions.title, "…"]),
-      ]}
       icon="bolt"
       query={query}
       notFound={labels.notFound}

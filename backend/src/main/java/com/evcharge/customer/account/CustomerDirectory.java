@@ -8,4 +8,6 @@ public interface CustomerDirectory {
     CustomerPage search(CustomerQuery query);
 
     Optional<CustomerRecord> find(UUID id);
+
+    Optional<CustomerPicture> picture(UUID id);
 }

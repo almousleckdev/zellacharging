@@ -13,5 +13,5 @@ public record SessionSettings(
         int stopThresholdPercent,
         Duration stopLeadTime,
         Duration userRefreshInterval,
-        Duration meteringInterval) {
+        Duration meteringInterval) implements PriceList {
 }

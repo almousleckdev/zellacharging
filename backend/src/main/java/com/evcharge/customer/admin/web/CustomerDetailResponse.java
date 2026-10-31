@@ -10,13 +10,13 @@ import java.util.UUID;
 
 record CustomerDetailResponse(UUID id, String country, String firstName, String lastName, String email,
                               String phone, String status, boolean emailVerified, boolean phoneVerified,
-                              Instant createdAt, Wallet wallet, Sessions sessions) {
+                              Instant createdAt, Long avatarVersion, Wallet wallet, Sessions sessions) {
 
     static CustomerDetailResponse from(CustomerDetail detail) {
         var customer = detail.customer();
         return new CustomerDetailResponse(customer.id(), detail.country(), customer.firstName(), customer.lastName(),
                 customer.email(), customer.phone(), customer.status(), customer.emailVerified(),
-                customer.phoneVerified(), customer.createdAt(), Wallet.from(detail.wallet()),
+                customer.phoneVerified(), customer.createdAt(), customer.avatarVersion(), Wallet.from(detail.wallet()),
                 Sessions.from(detail.sessions()));
     }
 

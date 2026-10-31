@@ -39,7 +39,7 @@ function SortHeader({ column, label, sort }: { column: string; label: string; so
       type="button"
       onClick={() => sort.onChange(nextSort(sort.value, column))}
       aria-label={label}
-      className="inline-flex items-center gap-1 uppercase tracking-wide hover:text-foreground"
+      className="inline-flex items-center gap-1 hover:text-foreground"
     >
       {label}
       <span aria-hidden="true" className={direction ? "text-primary-text" : "text-border-strong"}>
@@ -57,12 +57,12 @@ export function DataTable<Row>({ caption, columns, rows, rowKey, rowHref, sort }
       <table className="w-full min-w-[40rem] border-collapse text-sm">
         <caption className="sr-only">{caption}</caption>
         <thead>
-          <tr className="border-b border-border bg-surface/60 text-left">
+          <tr className="border-b border-border bg-surface text-left">
             {columns.map((column) => (
               <th
                 key={column.key}
                 scope="col"
-                className={cn("px-5 py-3 text-xs font-medium uppercase tracking-wide text-subtle", column.align === "right" && "text-right")}
+                className={cn("px-5 py-3 text-xs font-medium text-subtle", column.align === "right" && "text-right")}
               >
                 {column.sortKey && sort ? <SortHeader column={column.sortKey} label={column.header} sort={sort} /> : column.header}
               </th>
@@ -75,12 +75,12 @@ export function DataTable<Row>({ caption, columns, rows, rowKey, rowHref, sort }
               key={rowKey(row)}
               onClick={rowHref ? () => router.push(rowHref(row)) : undefined}
               className={cn(
-                "border-b border-border transition-colors last:border-b-0 hover:bg-surface/60",
+                "border-b border-border transition-colors last:border-b-0 hover:bg-surface",
                 rowHref && "cursor-pointer",
               )}
             >
               {columns.map((column) => (
-                <td key={column.key} className={cn("px-5 py-3.5 text-foreground", column.align === "right" && "whitespace-nowrap text-right tabular-nums")}>
+                <td key={column.key} className={cn("px-5 py-3 text-foreground", column.align === "right" && "whitespace-nowrap text-right tabular-nums")}>
                   {column.cell(row)}
                 </td>
               ))}

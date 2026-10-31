@@ -17,8 +17,8 @@ export function ProfilePage() {
   const { profile } = useSession();
 
   return (
-    <div className="mx-auto max-w-6xl">
-      <PageHeader title={t.profile.title} subtitle={t.profile.subtitle} trail={[t.shell.breadcrumbRoot, t.profile.title]} />
+    <div className="flex flex-col gap-6">
+      <PageHeader title={t.profile.title} subtitle={t.profile.subtitle} />
       <div className="grid items-start gap-6 lg:grid-cols-3">
         <div className="flex flex-col gap-6">
           <AccountCard />

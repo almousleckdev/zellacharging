@@ -7,6 +7,7 @@ import { useFormatters } from "@/shared/i18n/useFormatters";
 import { Card } from "@/shared/ui/Card";
 import { CellLink } from "@/shared/ui/CellLink";
 import { DetailShell } from "@/shared/ui/DetailShell";
+import { OperatorBadge } from "@/shared/ui/OperatorBadge";
 import { RelatedLinks } from "@/shared/ui/RelatedLinks";
 import { FactList } from "@/shared/ui/FactList";
 import { DecisionButtons } from "@/features/withdrawals/components/DecisionButtons";
@@ -31,17 +32,6 @@ export function PaymentDetailPage() {
       backHref="/payments"
       backLabel={labels.back}
       title={title}
-      trail={[
-        t.shell.breadcrumbRoot,
-        ...(payment
-          ? [
-              { label: t.customers.title, href: "/customers" },
-              { label: payment.customerName, href: `/customers/${payment.country}/${payment.customerId}` },
-              { label: t.payments.title, href: `/customers/${payment.country}/${payment.customerId}?tab=payments` },
-              payment.reference,
-            ]
-          : [t.payments.title, "…"]),
-      ]}
       icon="wallet"
       query={query}
       notFound={labels.notFound}
@@ -73,7 +63,7 @@ export function PaymentDetailPage() {
                     </CellLink>
                   ),
                 },
-                { label: labels.operator, value: payment.operator },
+                { label: labels.operator, value: <OperatorBadge operator={payment.operator} showName /> },
                 { label: labels.number, value: payment.msisdn },
               ]}
             />

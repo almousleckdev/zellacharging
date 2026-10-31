@@ -25,7 +25,7 @@ export function TextField({ label, error, hint, trailing, className, ...rest }: 
           aria-invalid={error ? true : undefined}
           aria-describedby={message ? messageId : undefined}
           className={cn(
-            "h-11 w-full rounded-control border bg-background px-3.5 text-sm text-foreground",
+            "h-10 w-full rounded-control border bg-background px-3.5 text-sm text-foreground",
             "placeholder:text-subtle disabled:bg-surface disabled:text-subtle",
             error ? "border-danger" : "border-border-strong hover:border-subtle focus:border-primary",
             trailing ? "pr-11" : undefined,

@@ -1,6 +1,6 @@
 import type { Dictionary } from "../types";
 
-export const enAuth: Pick<Dictionary, "login" | "totp" | "panel"> = {
+export const enAuth: Pick<Dictionary, "login" | "totp"> = {
   login: {
     title: "Sign in to the console",
     subtitle: "Access the Zella Charging platform administration.",
@@ -27,23 +27,5 @@ export const enAuth: Pick<Dictionary, "login" | "totp" | "panel"> = {
     verify: "Verify and continue",
     verifying: "Verifying…",
     back: "Back to sign in",
-  },
-  panel: {
-    title: "Run your charging network with confidence",
-    items: [
-      {
-        title: "Real-time monitoring",
-        text: "Stations, charging sessions and incidents together on a single screen.",
-      },
-      {
-        title: "Gabon and Mali",
-        text: "One console, data strictly separated by country.",
-      },
-      {
-        title: "Finance under control",
-        text: "Wallets, payments, withdrawals and reconciliation under control.",
-      },
-    ],
-    security: "Access is restricted to authorized administrators. Every action is logged.",
   },
 };

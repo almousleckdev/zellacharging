@@ -11,9 +11,9 @@ public class FeeCalculator {
 
     private static final BigDecimal HUNDRED = BigDecimal.valueOf(100);
 
-    private final FeeSettings settings;
+    private final FeeRates settings;
 
-    public FeeCalculator(FeeSettings settings) {
+    public FeeCalculator(FeeRates settings) {
         this.settings = settings;
     }
 

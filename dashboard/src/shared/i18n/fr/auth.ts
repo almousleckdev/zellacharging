@@ -27,22 +27,4 @@ export const frAuth = {
     verifying: "Vérification…",
     back: "Retour à la connexion",
   },
-  panel: {
-    title: "Pilotez votre réseau de recharge en toute confiance",
-    items: [
-      {
-        title: "Supervision en temps réel",
-        text: "Bornes, sessions de charge et incidents réunis sur un seul écran.",
-      },
-      {
-        title: "Gabon et Mali",
-        text: "Une console unique, des données strictement cloisonnées par pays.",
-      },
-      {
-        title: "Finance maîtrisée",
-        text: "Portefeuilles, paiements, retraits et réconciliation sous contrôle.",
-      },
-    ],
-    security: "Accès réservé aux administrateurs autorisés. Chaque action est journalisée.",
-  },
 } as const;

@@ -16,6 +16,7 @@ export const customerItemSchema = z.object({
   spentMinor: z.number().optional(),
   energyKwh: z.number().optional(),
   lastSessionAt: z.string().nullable().optional(),
+  avatarVersion: z.number().nullable().optional(),
 });
 
 export const customerListSchema = z.object({

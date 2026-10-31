@@ -24,7 +24,6 @@ export function CustomerDetailPage() {
       backHref="/customers"
       backLabel={labels.back}
       title={name}
-      trail={[t.shell.breadcrumbRoot, t.customers.title, name]}
       icon="users"
       query={customer}
       notFound={labels.notFound}

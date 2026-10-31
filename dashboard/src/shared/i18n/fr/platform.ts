@@ -1,5 +1,8 @@
 export const frPlatform = {
   platform: {
+    edit: "Modifier",
+    save: "Enregistrer",
+    saved: "Réglages enregistrés.",
     on: "Activé",
     off: "Désactivé",
     sections: { charging: "Prix et frais", wallet: "Portefeuille et paiements", reporting: "Période de reporting" },
@@ -41,7 +44,6 @@ export const frPlatform = {
     refresh: "Actualiser",
     loadError: "Impossible de charger l'état du système.",
     health: "Santé des services",
-    runtime: "Exécution",
     startedAt: "Démarré le",
     java: "Version Java",
     up: "Opérationnel",
@@ -68,7 +70,6 @@ export const frPlatform = {
     subtitle: "Synthèse financière et d'activité par période, exportable.",
     loadError: "Impossible de charger le rapport.",
     empty: "Aucune donnée sur cette période.",
-    table: "Synthèse",
     bucketLabel: "Regroupement",
     weekOf: "Sem. du",
     buckets: { day: "Par jour", week: "Par semaine", month: "Par mois" },

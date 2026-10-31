@@ -2,15 +2,14 @@ import type { Dictionary } from "../types";
 
 export const enShell: Pick<Dictionary, "shell" | "nav" | "dialogs"> = {
   shell: {
-    breadcrumb: "Breadcrumb",
     mainNavigation: "Main navigation",
     openMenu: "Open menu",
     closeMenu: "Close menu",
     accountMenu: "Account menu",
     settings: "Settings",
+    product: "Admin console",
+    notifications: "To review",
     profileLink: "My profile",
-    breadcrumbRoot: "Console",
-    comingSoon: "Soon",
     loadError: "We couldn't load your session.",
     country: { label: "Country", all: "All countries" },
     logout: "Sign out",
@@ -35,7 +34,7 @@ export const enShell: Pick<Dictionary, "shell" | "nav" | "dialogs"> = {
     incidents: "Incidents",
     customers: "Customers",
     payments: "Payments",
-    withdrawals: "Withdrawals to approve",
+    withdrawals: "Withdrawals",
     commissions: "Commissions",
     tariffs: "Tariffs",
     reports: "Reports",

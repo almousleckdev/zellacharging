@@ -86,6 +86,8 @@ export const enCommon: Pick<Dictionary, "language" | "brand" | "common" | "error
     WITHDRAWAL_NOT_REFUNDABLE: "This withdrawal cannot be refunded: it is already finished or too recent.",
     WITHDRAWAL_PAYOUT_SENT: "The operator has this payout: it cannot be refunded.",
     PAYOUT_STATUS_UNAVAILABLE: "The operator did not answer: try again in a moment.",
+    INVALID_SETTING: "This value is not valid.",
+    SETTING_RANGE_INVALID: "The minimum cannot exceed the maximum.",
     WITHDRAWALS_UNAVAILABLE: "Withdrawals are unavailable: the payment service is not configured.",
   },
   validation: {

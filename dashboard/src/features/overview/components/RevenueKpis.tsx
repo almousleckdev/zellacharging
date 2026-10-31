@@ -5,9 +5,16 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { deltaPercent } from "../seriesMath";
 import type { CurrencyPeriod, Totals } from "../seriesMath";
-import { Kpi } from "./Kpi";
+import { MetricCard } from "@/shared/ui/MetricCard";
 
-type Tile = { key: "sales" | "commission" | "energy" | "charges"; icon: "chart" | "bolt" | "percent" | "station"; value: string; hint: string; pick: (totals: Totals) => number };
+type Tile = {
+  key: "sales" | "commission" | "energy" | "charges";
+  icon: "chart" | "bolt" | "percent" | "station";
+  value: string;
+  hint: string;
+  pick: (totals: Totals) => number;
+  spark: (day: CurrencyPeriod["daily"][number]) => number;
+};
 
 export function RevenueKpis({ period, days }: { period: CurrencyPeriod; days: number }) {
   const { t } = useI18n();
@@ -18,11 +25,12 @@ export function RevenueKpis({ period, days }: { period: CurrencyPeriod; days: nu
   const rate = current.sessions === 0 ? 0 : (current.completed / current.sessions) * 100;
 
   const tiles: Tile[] = [
-    { key: "sales", icon: "chart", value: money(current.capturedMinor), hint: labels.salesHint, pick: (totals) => totals.capturedMinor },
-    { key: "commission", icon: "percent", value: money(current.serviceFeeMinor), hint: labels.commissionHint, pick: (totals) => totals.serviceFeeMinor },
+    { key: "sales", icon: "chart", spark: (day) => day.capturedMinor, value: money(current.capturedMinor), hint: labels.salesHint, pick: (totals) => totals.capturedMinor },
+    { key: "commission", icon: "percent", spark: (day) => day.serviceFeeMinor, value: money(current.serviceFeeMinor), hint: labels.commissionHint, pick: (totals) => totals.serviceFeeMinor },
     {
       key: "energy",
       icon: "station",
+      spark: (day) => day.energyKwh,
       value: `${format.number(current.energyKwh, 1)} ${t.overview.unitKwh}`,
       hint: interpolate(labels.energyHint, { count: format.number(current.completed) }),
       pick: (totals) => totals.energyKwh,
@@ -30,6 +38,7 @@ export function RevenueKpis({ period, days }: { period: CurrencyPeriod; days: nu
     {
       key: "charges",
       icon: "bolt",
+      spark: (day) => day.sessions,
       value: format.number(current.sessions),
       hint: interpolate(labels.chargesHint, { rate: format.number(rate, 1), failed: format.number(current.failed) }),
       pick: (totals) => totals.sessions,
@@ -37,17 +46,20 @@ export function RevenueKpis({ period, days }: { period: CurrencyPeriod; days: nu
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 min-[1700px]:grid-cols-4">
       {tiles.map((tile) => (
-        <Kpi
+        <MetricCard
           key={tile.key}
           label={labels[tile.key]}
           icon={tile.icon}
+          spark={period.daily.map(tile.spark)}
           value={tile.value}
           hint={tile.hint}
-          delta={deltaPercent(tile.pick(current), tile.pick(previous))}
-          deltaLabel={interpolate(labels.versus, { days })}
-          newLabel={labels.new}
+          trend={{
+            delta: deltaPercent(tile.pick(current), tile.pick(previous)),
+            label: interpolate(labels.versus, { days }),
+            newLabel: labels.new,
+          }}
         />
       ))}
     </div>

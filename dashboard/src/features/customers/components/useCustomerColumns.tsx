@@ -1,8 +1,10 @@
 "use client";
 
+import { customerAvatarUrl, initialsOf } from "@/features/session/avatarUrl";
 import { useSession } from "@/features/session/SessionProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { useI18n } from "@/shared/i18n/I18nProvider";
+import { Avatar } from "@/shared/ui/Avatar";
 import { CellLink } from "@/shared/ui/CellLink";
 import type { Column } from "@/shared/ui/DataTable";
 import type { CustomerItem } from "../schemas";
@@ -31,9 +33,12 @@ export function useCustomerColumns(): Column<CustomerItem>[] {
       sortKey: "name",
       text: (row) => `${name(row)} <${row.email ?? "—"}> ${row.phone ?? ""}`,
       cell: (row) => (
-        <CellLink href={scopedHref(`/customers/${row.country}/${row.id}`)} className="flex flex-col">
-          <span className="font-medium text-foreground">{name(row)}</span>
-          <span className="text-xs text-subtle">{[row.email, row.phone].filter(Boolean).join(" · ") || "—"}</span>
+        <CellLink href={scopedHref(`/customers/${row.country}/${row.id}`)} className="flex items-center gap-3">
+          <Avatar initials={initialsOf(row.firstName, row.lastName, row.email ?? "")} src={customerAvatarUrl(row.country, row.id, row.avatarVersion)} />
+          <span className="flex flex-col">
+            <span className="font-medium text-foreground">{name(row)}</span>
+            <span className="text-xs text-subtle">{[row.email, row.phone].filter(Boolean).join(" · ") || "—"}</span>
+          </span>
         </CellLink>
       ),
     },

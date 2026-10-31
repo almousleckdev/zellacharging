@@ -10,14 +10,14 @@ import java.util.UUID;
 public class SessionTariff {
 
     private final SessionTelemetry telemetry;
-    private final SessionSettings settings;
+    private final PriceList prices;
 
-    public SessionTariff(SessionTelemetry telemetry, SessionSettings settings) {
+    public SessionTariff(SessionTelemetry telemetry, PriceList prices) {
         this.telemetry = telemetry;
-        this.settings = settings;
+        this.prices = prices;
     }
 
     public Optional<Long> pricePerKwhMinor(UUID sessionId) {
-        return telemetry.priceOf(sessionId).or(() -> Optional.ofNullable(settings.pricePerKwhMinor()));
+        return telemetry.priceOf(sessionId).or(() -> Optional.ofNullable(prices.pricePerKwhMinor()));
     }
 }

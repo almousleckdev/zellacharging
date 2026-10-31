@@ -1,9 +1,9 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { ChartFrame } from "./ChartFrame";
 import type { ChartSeries } from "./ChartFrame";
-import { CHART_HEIGHT, PAD, niceMax, tickIndexes, xScale, yScale } from "./geometry";
+import { CHART_HEIGHT, PAD, niceMax, smoothPath, tickIndexes, xScale, yScale } from "./geometry";
 import { useChartWidth } from "./useChartWidth";
 
 export type ChartPoint = { label: string; values: number[] };
@@ -18,6 +18,7 @@ type LineChartProps = {
 
 export function LineChart({ label, locale, series, points, format }: LineChartProps) {
   const [hover, setHover] = useState<number | null>(null);
+  const gradientId = useId();
   const { ref, width } = useChartWidth();
   const max = niceMax(Math.max(0, ...points.flatMap((point) => point.values)));
   const total = points.length;
@@ -55,17 +56,27 @@ export function LineChart({ label, locale, series, points, format }: LineChartPr
         </text>
       ))}
     >
-      {series.map((item, seriesIndex) => (
-        <polyline
-          key={item.name}
-          fill="none"
-          stroke={item.color}
-          strokeWidth="2"
-          strokeLinejoin="round"
-          strokeLinecap="round"
-          points={points.map((point, index) => `${xScale(index, total, width)},${yScale(point.values[seriesIndex], max)}`).join(" ")}
-        />
-      ))}
+      <defs>
+        {series.map((item, seriesIndex) => (
+          <linearGradient key={item.name} id={`${gradientId}-${seriesIndex}`} x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stopColor={item.color} stopOpacity="0.22" />
+            <stop offset="100%" stopColor={item.color} stopOpacity="0" />
+          </linearGradient>
+        ))}
+      </defs>
+      {series.map((item, seriesIndex) => {
+        const coordinates = points.map((point, index) => ({ x: xScale(index, total, width), y: yScale(point.values[seriesIndex], max) }));
+        const line = smoothPath(coordinates);
+        const baseline = CHART_HEIGHT - PAD.bottom;
+        return (
+          <g key={item.name}>
+            {coordinates.length > 1 && (
+              <path d={`${line} L${coordinates[coordinates.length - 1].x},${baseline} L${coordinates[0].x},${baseline} Z`} fill={`url(#${gradientId}-${seriesIndex})`} />
+            )}
+            <path d={line} fill="none" stroke={item.color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" />
+          </g>
+        );
+      })}
       {hover !== null && active && (
         <g>
           <line x1={xScale(hover, total, width)} x2={xScale(hover, total, width)} y1={PAD.top} y2={CHART_HEIGHT - PAD.bottom} stroke="var(--color-border-strong)" />

@@ -2,6 +2,7 @@ package com.evcharge.customer.account.infrastructure;
 
 import com.evcharge.customer.account.CustomerDirectory;
 import com.evcharge.customer.account.CustomerPage;
+import com.evcharge.customer.account.CustomerPicture;
 import com.evcharge.customer.account.CustomerQuery;
 import com.evcharge.customer.account.CustomerRecord;
 import com.evcharge.customer.shared.Timestamps;
@@ -24,13 +25,14 @@ class JdbcCustomerDirectory implements CustomerDirectory {
             + "or lower(coalesce(email, '')) like :pattern escape '\\' "
             + "or coalesce(phone_e164, '') like :pattern escape '\\')";
     private static final String COLUMNS = "id, first_name, last_name, email, phone_e164, status, "
-            + "email_verified_at, phone_verified_at, created_at";
+            + "email_verified_at, phone_verified_at, created_at, (select (extract(epoch from a.updated_at) * 1000)::bigint "
+            + "from customer_avatar a where a.customer_id = customer.id) as avatar_version";
 
     private static final RowMapper<CustomerRecord> MAPPER = (rs, rowNum) -> new CustomerRecord(
             rs.getObject("id", UUID.class), rs.getString("first_name"), rs.getString("last_name"),
             rs.getString("email"), rs.getString("phone_e164"), rs.getString("status"),
             rs.getObject("email_verified_at") != null, rs.getObject("phone_verified_at") != null,
-            Timestamps.read(rs, "created_at"));
+            Timestamps.read(rs, "created_at"), (Long) rs.getObject("avatar_version"));
 
     private final JdbcClient jdbc;
 
@@ -52,6 +54,14 @@ class JdbcCustomerDirectory implements CustomerDirectory {
     public Optional<CustomerRecord> find(UUID id) {
         return jdbc.sql("select " + COLUMNS + " from customer where " + SCOPE + " and id = :id")
                 .param("id", id).query(MAPPER).optional();
+    }
+
+    @Override
+    public Optional<CustomerPicture> picture(UUID id) {
+        return jdbc.sql("select content_type, data from customer_avatar where customer_id = :id and customer_id in "
+                        + "(select id from customer where " + SCOPE + ")")
+                .param("id", id).query((rs, rowNum) -> new CustomerPicture(rs.getString("content_type"), rs.getBytes("data")))
+                .optional();
     }
 
     private static String statusFilter(CustomerQuery query) {

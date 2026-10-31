@@ -5,6 +5,7 @@ import { useFormatters } from "@/shared/i18n/useFormatters";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { CellLink } from "@/shared/ui/CellLink";
 import type { Column } from "@/shared/ui/DataTable";
+import { OperatorBadge } from "@/shared/ui/OperatorBadge";
 import { signedAmount } from "../format";
 import type { PaymentDigest } from "../schemas";
 import { PaymentStateBadge } from "./PaymentStateBadge";
@@ -29,8 +30,9 @@ export function usePaymentDigestColumns(): Column<PaymentDigest>[] {
       cell: (row) => (
         <CellLink href={scopedHref(`/customers/${row.country}/${row.customerId}`)} className="flex flex-col">
           <span className="font-medium text-foreground">{row.customerName}</span>
-          <span className="text-xs text-subtle">
-            {row.last.operator} · {row.last.msisdn}
+          <span className="flex items-center gap-1.5 text-xs text-subtle">
+            <OperatorBadge operator={row.last.operator} />
+            {row.last.msisdn}
           </span>
         </CellLink>
       ),

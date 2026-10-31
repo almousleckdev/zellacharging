@@ -5,7 +5,7 @@ import com.evcharge.customer.charging.CommissionLog;
 import com.evcharge.customer.charging.CommissionPage;
 import com.evcharge.customer.charging.CommissionQuery;
 import com.evcharge.customer.charging.CommissionTotals;
-import com.evcharge.customer.charging.application.FeeSettings;
+import com.evcharge.customer.charging.application.FeeRates;
 import com.evcharge.customer.shared.LikePattern;
 import com.evcharge.customer.shared.ReportingWindow;
 import com.evcharge.customer.shared.Timestamps;
@@ -26,10 +26,10 @@ class JdbcCommissionLog implements CommissionLog {
     private static final String VAT = "coalesce(sum(round(s.cost_minor * :vat / 100)), 0)::bigint";
 
     private final JdbcClient jdbc;
-    private final FeeSettings settings;
+    private final FeeRates settings;
     private final ReportingWindow reporting;
 
-    JdbcCommissionLog(JdbcClient jdbc, FeeSettings settings, ReportingWindow reporting) {
+    JdbcCommissionLog(JdbcClient jdbc, FeeRates settings, ReportingWindow reporting) {
         this.jdbc = jdbc;
         this.settings = settings;
         this.reporting = reporting;

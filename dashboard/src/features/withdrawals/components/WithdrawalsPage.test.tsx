@@ -4,10 +4,10 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 import { gabon, profileOf, renderConsole } from "@/test/renderConsole";
 import { WithdrawalsPage } from "./WithdrawalsPage";
 
-const navigation = vi.hoisted(() => ({ search: new URLSearchParams() }));
+const navigation = vi.hoisted(() => ({ search: new URLSearchParams(), replace: vi.fn() }));
 
 vi.mock("next/navigation", () => ({
-  useRouter: () => ({ replace: vi.fn() }),
+  useRouter: () => ({ replace: navigation.replace }),
   usePathname: () => "/withdrawals",
   useSearchParams: () => navigation.search,
 }));
@@ -46,6 +46,7 @@ function decisions(fetchMock: ReturnType<typeof serve>) {
 describe("WithdrawalsPage", () => {
   beforeEach(() => {
     navigation.search = new URLSearchParams("country=GA");
+    navigation.replace.mockClear();
   });
 
   it("lists only the withdrawals waiting for approval", async () => {
@@ -58,6 +59,32 @@ describe("WithdrawalsPage", () => {
     const url = String(fetchMock.mock.calls[0][0]);
     expect(url).toContain("kind=WITHDRAWAL");
     expect(url).toContain("state=PENDING_APPROVAL");
+  });
+
+  it("keeps the history one tab away, with every withdrawal and its state", async () => {
+    navigation.search = new URLSearchParams("country=GA&tab=history");
+    const fetchMock = serve();
+
+    renderConsole(<WithdrawalsPage />, reviewer);
+
+    const table = await screen.findByRole("table");
+    expect(within(table).getByText("Aline Obame")).toBeInTheDocument();
+    expect(within(table).getByText("À valider")).toBeInTheDocument();
+    const url = String(fetchMock.mock.calls[0][0]);
+    expect(url).toContain("kind=WITHDRAWAL");
+    expect(url).not.toContain("state=PENDING_APPROVAL");
+    expect(screen.getByRole("combobox", { name: "État" })).toBeInTheDocument();
+  });
+
+  it("switches between the waiting list and the history", async () => {
+    serve();
+    const user = userEvent.setup();
+    renderConsole(<WithdrawalsPage />, reviewer);
+
+    expect(screen.getByRole("button", { name: "À valider" })).toHaveAttribute("aria-pressed", "true");
+    await user.click(screen.getByRole("button", { name: "Historique" }));
+
+    expect(navigation.replace).toHaveBeenCalledWith(expect.stringContaining("tab=history"));
   });
 
   it("approves after a confirmation and tells the admin the payout is on its way", async () => {

@@ -3,6 +3,7 @@ package com.evcharge.customer.admin.application;
 import com.evcharge.customer.account.CustomerDirectory;
 import com.evcharge.customer.account.CustomerModeration;
 import com.evcharge.customer.account.CustomerPage;
+import com.evcharge.customer.account.CustomerPicture;
 import com.evcharge.customer.account.CustomerQuery;
 import com.evcharge.customer.account.CustomerRecord;
 import com.evcharge.customer.admin.domain.AdminAccess;
@@ -18,6 +19,7 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -85,6 +87,11 @@ public class AdminCustomerService {
         });
         audit.record(admin.id(), code, "CUSTOMER_VIEWED", id.toString(), null);
         return detail;
+    }
+
+    public Optional<CustomerPicture> picture(AdminAccess admin, String country, UUID id) {
+        String code = AdminCountries.single(access.scope(admin, Permission.CUSTOMERS_READ, country));
+        return TenantContext.callAs(code, () -> customers.picture(id));
     }
 
     public void suspend(AdminAccess admin, String country, UUID id) {

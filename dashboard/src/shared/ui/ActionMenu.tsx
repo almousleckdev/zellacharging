@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { cn } from "@/shared/lib/cn";
+import { useDismiss } from "@/shared/lib/useDismiss";
 import { Icon } from "./Icon";
 
 export type ActionItem = {
@@ -15,22 +16,7 @@ export function ActionMenu({ label, items, trigger }: { label: string; items: Ac
   const root = useRef<HTMLDivElement>(null);
   const menuId = useId();
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const close = (event: MouseEvent | KeyboardEvent) => {
-      if (event instanceof KeyboardEvent ? event.key === "Escape" : !root.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", close);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", close);
-    };
-  }, [open]);
+  useDismiss(open, root, () => setOpen(false));
 
   return (
     <div ref={root} className="relative inline-block text-left">

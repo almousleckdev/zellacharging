@@ -4,14 +4,15 @@ import { useSession } from "@/features/session/SessionProvider";
 import { mergeByCurrency } from "@/features/overview/seriesMath";
 import { ExportMenu } from "@/shared/export/ExportMenu";
 import { useI18n } from "@/shared/i18n/I18nProvider";
+import { ListToolbar } from "@/shared/lists/ListToolbar";
 import { presetRange } from "@/shared/lib/dateRange";
 import { useUrlParams } from "@/shared/lib/useUrlParams";
 import { DateRangeFilter } from "@/shared/ui/DateRangeFilter";
-import { ErrorState } from "@/shared/ui/ErrorState";
+import { ListPanel } from "@/shared/ui/ListPanel";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { Select } from "@/shared/ui/Select";
-import { Skeleton } from "@/shared/ui/Skeleton";
 import { useReport } from "../api/useReport";
+import { ReportSummary } from "./ReportSummary";
 import { ReportTable } from "./ReportTable";
 import { useReportSheet } from "./useReportSheet";
 
@@ -33,28 +34,36 @@ export function ReportsPage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <PageHeader
-        title={t.reports.title}
-        subtitle={t.reports.subtitle}
-        trail={[t.shell.breadcrumbRoot, t.reports.title]}
-        actions={group && <ExportMenu load={async () => ({ rows: group.points, truncated: false })} sheet={sheet} limit={0} />}
-      />
-      <div className="flex flex-wrap items-center gap-4 rounded-card border border-border bg-background px-5 py-4">
-        <DateRangeFilter from={from} to={to} onChange={(start, end) => update({ from: start, to: end }, false)} />
-        <div className="w-44">
-          <Select
-            label={t.reports.bucketLabel}
-            hideLabel
-            options={BUCKETS.map((value) => ({ value, label: buckets[value] }))}
-            value={bucket}
-            onChange={(event) => update({ bucket: event.target.value }, false)}
+      <PageHeader title={t.reports.title} subtitle={t.reports.subtitle} />
+      {group && <ReportSummary group={group} bucket={bucket} />}
+      <ListPanel
+        toolbar={
+          <ListToolbar
+            search={null}
+            range={<DateRangeFilter from={from} to={to} onChange={(start, end) => update({ from: start, to: end }, false)} />}
+            filters={
+              <div className="w-full sm:w-44">
+                <Select
+                  label={t.reports.bucketLabel}
+                  hideLabel
+                  options={BUCKETS.map((value) => ({ value, label: buckets[value] }))}
+                  value={bucket}
+                  onChange={(event) => update({ bucket: event.target.value }, false)}
+                />
+              </div>
+            }
+            actions={group && <ExportMenu load={async () => ({ rows: group.points, truncated: false })} sheet={sheet} limit={0} />}
           />
-        </div>
-      </div>
-      {report.isPending && <Skeleton className="h-64" />}
-      {report.isError && <ErrorState message={t.reports.loadError} onRetry={() => void report.refetch()} />}
-      {report.data && !group && <p className="text-sm text-muted">{t.reports.empty}</p>}
-      {group && <ReportTable group={group} bucket={bucket} />}
+        }
+        pending={report.isPending}
+        failed={report.isError}
+        onRetry={() => void report.refetch()}
+        loadError={t.reports.loadError}
+        empty={{ icon: "chart", title: t.reports.empty, text: "" }}
+        isEmpty={report.data !== undefined && !group}
+      >
+        {group && <ReportTable group={group} bucket={bucket} caption={t.reports.title} />}
+      </ListPanel>
     </div>
   );
 }

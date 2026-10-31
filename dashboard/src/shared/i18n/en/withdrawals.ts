@@ -2,8 +2,13 @@ import type { Dictionary } from "../types";
 
 export const enWithdrawals: Pick<Dictionary, "withdrawals"> = {
   withdrawals: {
-    title: "Withdrawals to approve",
-    subtitle: "Every withdrawal a customer requests waits for your approval. Nothing is sent to the operator before you agree.",
+    title: "Withdrawals",
+    subtitle: "Approve customer withdrawal requests and browse the history. Nothing is sent to the operator before you agree.",
+    tabs: { label: "View", pending: "To approve", history: "History" },
+    stateLabel: "State",
+    allStates: "All states",
+    historyEmptyTitle: "No withdrawal",
+    historyEmptyText: "Customer withdrawals will appear here.",
     results: "{count} withdrawals",
     loadError: "Unable to load withdrawals.",
     emptyTitle: "No withdrawal waiting",

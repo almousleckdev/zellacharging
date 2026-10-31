@@ -41,7 +41,6 @@ export function StationDetailPage() {
       backHref="/stations"
       backLabel={labels.back}
       title={id}
-      trail={[t.shell.breadcrumbRoot, { label: t.stations.title, href: "/stations" }, id]}
       icon="station"
       query={query}
       notFound={labels.notFound}
@@ -93,7 +92,7 @@ export function StationDetailPage() {
             <DataTable caption={labels.connectors} columns={columns} rows={station.connectors} rowKey={(row) => String(row.connectorId)} />
           </Card>
           <section className="flex flex-col gap-3">
-            <h2 className="font-display text-base font-semibold text-foreground">{labels.customers}</h2>
+            <h2 className="text-base font-semibold text-foreground">{labels.customers}</h2>
             <SessionsByCustomerPage stationId={id} />
           </section>
         </div>

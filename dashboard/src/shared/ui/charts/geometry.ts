@@ -41,3 +41,17 @@ export function tickIndexes(total: number, wanted = 6): number[] {
   }
   return indexes;
 }
+
+export function smoothPath(points: { x: number; y: number }[]): string {
+  if (points.length === 0) {
+    return "";
+  }
+  return points.reduce((path, point, index) => {
+    if (index === 0) {
+      return `M${point.x},${point.y}`;
+    }
+    const previous = points[index - 1];
+    const middle = (previous.x + point.x) / 2;
+    return `${path} C${middle},${previous.y} ${middle},${point.y} ${point.x},${point.y}`;
+  }, "");
+}

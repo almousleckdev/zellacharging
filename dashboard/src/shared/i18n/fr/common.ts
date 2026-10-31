@@ -84,6 +84,8 @@ export const frCommon = {
     WITHDRAWAL_NOT_REFUNDABLE: "Ce retrait ne peut pas être remboursé : il est déjà terminé ou trop récent.",
     WITHDRAWAL_PAYOUT_SENT: "L'opérateur a reçu ce retrait : il ne peut pas être remboursé.",
     PAYOUT_STATUS_UNAVAILABLE: "L'opérateur ne répond pas : réessayez dans un instant.",
+    INVALID_SETTING: "Cette valeur n'est pas valide.",
+    SETTING_RANGE_INVALID: "Le minimum ne peut pas dépasser le maximum.",
     WITHDRAWALS_UNAVAILABLE: "Les retraits ne sont pas disponibles : le service de paiement n'est pas configuré.",
   },
   validation: {

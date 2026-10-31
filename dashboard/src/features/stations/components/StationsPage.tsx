@@ -11,12 +11,9 @@ import { FilterSelect } from "@/shared/lists/FilterSelect";
 import { ListToolbar } from "@/shared/lists/ListToolbar";
 import { useUrlParams } from "@/shared/lib/useUrlParams";
 import { DataTable } from "@/shared/ui/DataTable";
-import { EmptyState } from "@/shared/ui/EmptyState";
-import { ErrorState } from "@/shared/ui/ErrorState";
+import { ListPanel } from "@/shared/ui/ListPanel";
 import { PageHeader } from "@/shared/ui/PageHeader";
-import { Pagination } from "@/shared/ui/Pagination";
 import { SearchInput } from "@/shared/ui/SearchInput";
-import { TableSkeleton } from "@/shared/ui/TableSkeleton";
 import { useStations } from "../api/useStations";
 import { useStationColumns } from "./useStationColumns";
 
@@ -55,40 +52,42 @@ export function StationsPage() {
       <PageHeader
         title={t.stations.title}
         subtitle={t.stations.subtitle}
-        trail={[t.shell.breadcrumbRoot, t.stations.title]}
         actions={query.data && <p className="text-sm text-muted">{interpolate(t.stations.results, { count: filtered.length })}</p>}
       />
-      <section className="overflow-hidden rounded-card border border-border bg-background shadow-[0_1px_2px_rgb(0_0_0/0.04)]">
-        <ListToolbar
-          search={<SearchInput label={t.stations.searchLabel} placeholder={t.stations.searchPlaceholder} value={text} onSearch={(value) => update({ q: value })} />}
-          filters={
-            <FilterSelect
-              config={{
-                key: "status",
-                label: t.stations.statusLabel,
-                allLabel: t.stations.allStatuses,
-                options: [
-                  { value: "online", label: t.stations.online },
-                  { value: "offline", label: t.stations.offline },
-                ],
-              }}
-              value={status}
-              onChange={(value) => update({ status: value })}
-            />
-          }
-          actions={<ExportMenu load={async () => ({ rows: filtered, truncated: false })} sheet={sheet} limit={0} />}
-        />
-        {query.isPending && <TableSkeleton />}
-        {query.isError && (
-          <div className="p-5">
-            <ErrorState message={t.stations.loadError} onRetry={() => void query.refetch()} />
-          </div>
-        )}
-        {query.data && filtered.length === 0 && (
-          <div className="p-5">
-            <EmptyState icon="station" title={t.stations.emptyTitle} text={t.stations.emptyText} />
-          </div>
-        )}
+      <ListPanel
+        toolbar={
+          <ListToolbar
+            search={<SearchInput label={t.stations.searchLabel} placeholder={t.stations.searchPlaceholder} value={text} onSearch={(value) => update({ q: value })} />}
+            filters={
+              <FilterSelect
+                config={{
+                  key: "status",
+                  label: t.stations.statusLabel,
+                  allLabel: t.stations.allStatuses,
+                  options: [
+                    { value: "online", label: t.stations.online },
+                    { value: "offline", label: t.stations.offline },
+                  ],
+                }}
+                value={status}
+                onChange={(value) => update({ status: value })}
+              />
+            }
+            actions={<ExportMenu load={async () => ({ rows: filtered, truncated: false })} sheet={sheet} limit={0} />}
+          />
+        }
+        pending={query.isPending}
+        failed={query.isError}
+        onRetry={() => void query.refetch()}
+        loadError={t.stations.loadError}
+        empty={{ icon: "station", title: t.stations.emptyTitle, text: t.stations.emptyText }}
+        isEmpty={query.data !== undefined && filtered.length === 0}
+        page={page}
+        size={size}
+        total={filtered.length}
+        onPage={(next) => update({ page: next === 0 ? null : String(next) }, false)}
+        onSize={(value) => update({ size: value === DEFAULT_PAGE_SIZE ? null : String(value) })}
+      >
         {visible.length > 0 && (
           <DataTable
             caption={t.stations.title}
@@ -98,14 +97,7 @@ export function StationsPage() {
             rowHref={(row) => scopedHref(`/stations/${encodeURIComponent(row.station.id)}`)}
           />
         )}
-        <Pagination
-          page={page}
-          size={size}
-          total={filtered.length}
-          onPage={(next) => update({ page: next === 0 ? null : String(next) }, false)}
-          onSize={(value) => update({ size: value === DEFAULT_PAGE_SIZE ? null : String(value) })}
-        />
-      </section>
+      </ListPanel>
     </div>
   );
 }

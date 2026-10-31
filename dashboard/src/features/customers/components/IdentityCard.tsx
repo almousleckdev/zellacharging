@@ -1,8 +1,10 @@
 "use client";
 
+import { customerAvatarUrl, initialsOf } from "@/features/session/avatarUrl";
 import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
+import { Avatar } from "@/shared/ui/Avatar";
 import { Badge } from "@/shared/ui/Badge";
 import { Card } from "@/shared/ui/Card";
 import { FactList } from "@/shared/ui/FactList";
@@ -32,6 +34,14 @@ export function IdentityCard({ customer }: { customer: CustomerDetail }) {
 
   return (
     <Card title={labels.identity}>
+      <div className="mb-4 flex items-center gap-4">
+        <Avatar
+          size={64}
+          initials={initialsOf(customer.firstName, customer.lastName, customer.email ?? "")}
+          src={customerAvatarUrl(customer.country, customer.id, customer.avatarVersion)}
+        />
+        <p className="text-lg font-semibold text-foreground">{`${customer.firstName} ${customer.lastName}`}</p>
+      </div>
       <FactList
         facts={[
           { label: labels.email, value: <Verification value={customer.email} verified={customer.emailVerified} /> },

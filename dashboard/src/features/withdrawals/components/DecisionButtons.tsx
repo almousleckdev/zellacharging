@@ -9,8 +9,9 @@ import type { WithdrawalAction } from "../api/useReviewWithdrawal";
 import { DecisionDialog } from "./DecisionDialog";
 
 const REFUNDABLE_STATES = ["REQUESTED", "PROCESSING", "REVIEW"];
+const COMPACT = "h-8 px-3";
 
-export function DecisionButtons({ withdrawal }: { withdrawal: PaymentItem }) {
+export function DecisionButtons({ withdrawal, compact = false }: { withdrawal: PaymentItem; compact?: boolean }) {
   const { t } = useI18n();
   const { profile } = useSession();
   const [action, setAction] = useState<WithdrawalAction | null>(null);
@@ -25,13 +26,13 @@ export function DecisionButtons({ withdrawal }: { withdrawal: PaymentItem }) {
     <div className="flex justify-end gap-2" onClick={(event) => event.stopPropagation()}>
       {awaitingApproval ? (
         <>
-          <Button variant="secondary" onClick={() => setAction("reject")}>
+          <Button variant="secondary" className={compact ? COMPACT : undefined} onClick={() => setAction("reject")}>
             {t.withdrawals.actions.reject}
           </Button>
-          <Button onClick={() => setAction("approve")}>{t.withdrawals.actions.approve}</Button>
+          <Button className={compact ? COMPACT : undefined} onClick={() => setAction("approve")}>{t.withdrawals.actions.approve}</Button>
         </>
       ) : (
-        <Button variant="secondary" onClick={() => setAction("refund")}>
+        <Button variant="secondary" className={compact ? COMPACT : undefined} onClick={() => setAction("refund")}>
           {t.withdrawals.actions.refund}
         </Button>
       )}

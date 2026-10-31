@@ -50,6 +50,23 @@ function point(scale: number) {
   };
 }
 
+const waiting = {
+  kind: "WITHDRAWAL",
+  id: "w1",
+  country: "GA",
+  customerId: "c1",
+  customerName: "Aline Obame",
+  operator: "AIRTEL",
+  msisdn: "+24177123456",
+  amountMinor: 3000,
+  currency: "XAF",
+  decimals: 0,
+  state: "PENDING_APPROVAL",
+  failureCode: null,
+  reference: "GAW1",
+  createdAt: new Date().toISOString(),
+};
+
 function serve(countries: ReturnType<typeof figures>[], since?: string) {
   const fetchMock = vi.fn(async (input: RequestInfo | URL) => {
     const url = String(input);
@@ -66,6 +83,9 @@ function serve(countries: ReturnType<typeof figures>[], since?: string) {
           points: [point(index + 1)],
         })),
       });
+    }
+    if (url.includes("state=PENDING_APPROVAL")) {
+      return Response.json({ total: 1, page: 0, size: 3, items: [waiting] });
     }
     if (url.includes("/incidents")) {
       return Response.json({ total: 4, open: 4, openHigh: 2, page: 0, size: 1, items: [] });
@@ -134,6 +154,29 @@ describe("OverviewPage", () => {
       "href",
       expect.stringContaining("severity=HIGH"),
     );
+  });
+
+  it("lists the withdrawals waiting for approval with the decision buttons for a reviewer", async () => {
+    navigation.search = new URLSearchParams("country=GA");
+    serve([figures("GA", "Gabon", "XAF", 3)]);
+    const reviewer = { ...profileOf(), permissions: ["OVERVIEW_READ", "WITHDRAWALS_REVIEW"] };
+
+    renderConsole(<OverviewPage />, reviewer);
+
+    const panel = (await screen.findByRole("heading", { name: "Retraits à valider" })).closest("section") as HTMLElement;
+    expect(await within(panel).findByText("Aline Obame")).toBeInTheDocument();
+    expect(within(panel).getByRole("button", { name: "Valider" })).toBeInTheDocument();
+    expect(within(panel).getByRole("button", { name: "Refuser" })).toBeInTheDocument();
+  });
+
+  it("shows no withdrawal panel to an admin who cannot review them", async () => {
+    navigation.search = new URLSearchParams("country=GA");
+    serve([figures("GA", "Gabon", "XAF", 3)]);
+
+    renderConsole(<OverviewPage />);
+
+    await screen.findByRole("region", { name: "À surveiller" });
+    expect(screen.queryByRole("heading", { name: "Retraits à valider" })).not.toBeInTheDocument();
   });
 
   it("compares the sales of each country in its own currency", async () => {

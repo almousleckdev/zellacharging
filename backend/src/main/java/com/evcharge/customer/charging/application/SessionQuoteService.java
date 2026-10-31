@@ -19,15 +19,15 @@ public class SessionQuoteService {
 
     private final StartableConnectors connectors;
     private final WalletFunding funding;
-    private final FeeSettings fees;
-    private final SessionSettings settings;
+    private final FeeRates fees;
+    private final PriceList prices;
 
-    public SessionQuoteService(StartableConnectors connectors, WalletFunding funding, FeeSettings fees,
-                               SessionSettings settings) {
+    public SessionQuoteService(StartableConnectors connectors, WalletFunding funding, FeeRates fees,
+                               PriceList prices) {
         this.connectors = connectors;
         this.funding = funding;
         this.fees = fees;
-        this.settings = settings;
+        this.prices = prices;
     }
 
     public SessionQuote quote(UUID customerId, String stationId, int connectorId, long amountMinor) {
@@ -39,11 +39,11 @@ public class SessionQuoteService {
         long available = funding.available(customerId).minor();
         return new SessionQuote(amountMinor, limits.currency(), limits.decimals(), available,
                 Math.max(0, amountMinor - available), limits.minimumMinor(), limits.maximumMinor(),
-                fees.vatPercent(), fees.serviceFeePercent(), settings.pricePerKwhMinor(), energyFor(amountMinor));
+                fees.vatPercent(), fees.serviceFeePercent(), prices.pricePerKwhMinor(), energyFor(amountMinor));
     }
 
     private BigDecimal energyFor(long amountMinor) {
-        Long price = settings.pricePerKwhMinor();
+        Long price = prices.pricePerKwhMinor();
         if (price == null || price <= 0) {
             return null;
         }

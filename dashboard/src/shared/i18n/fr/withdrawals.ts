@@ -1,7 +1,12 @@
 export const frWithdrawals = {
   withdrawals: {
-    title: "Retraits à valider",
-    subtitle: "Chaque retrait demandé par un client attend votre validation. Rien n'est envoyé à l'opérateur avant votre accord.",
+    title: "Retraits",
+    subtitle: "Validez les demandes de retrait des clients et consultez l'historique. Rien n'est envoyé à l'opérateur avant votre accord.",
+    tabs: { label: "Affichage", pending: "À valider", history: "Historique" },
+    stateLabel: "État",
+    allStates: "Tous les états",
+    historyEmptyTitle: "Aucun retrait",
+    historyEmptyText: "Les retraits des clients apparaîtront ici.",
     results: "{count} retraits",
     loadError: "Impossible de charger les retraits.",
     emptyTitle: "Aucun retrait en attente",

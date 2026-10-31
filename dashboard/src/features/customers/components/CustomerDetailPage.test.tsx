@@ -67,7 +67,7 @@ describe("CustomerDetailPage", () => {
     const wallet = screen.getByRole("heading", { name: "Portefeuille" }).closest("section") as HTMLElement;
     expect(wallet.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("5 000 FCFA");
     expect(screen.getByText("31,5 kWh")).toBeInTheDocument();
-    expect(screen.getByText("Total dépensé").nextElementSibling?.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("4 725 FCFA");
+    expect(screen.getByText("Total dépensé").closest("article")?.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("4 725 FCFA");
   });
 
   it("offers the history as tabs and loads the wallet movements of this customer only when opened", async () => {
@@ -82,11 +82,11 @@ describe("CustomerDetailPage", () => {
     renderConsole(<CustomerDetailPage />, { ...profileOf(), permissions: ["OVERVIEW_READ", "SESSIONS_READ", "PAYMENTS_READ", "AUDIT_READ"] });
 
     for (const name of ["Aperçu", "Recharges", "Paiements", "Portefeuille", "Activité"]) {
-      expect(await screen.findByRole("tab", { name })).toBeInTheDocument();
+      expect(await screen.findByRole("button", { name })).toBeInTheDocument();
     }
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/ledger"))).toBe(false);
     navigation.search = new URLSearchParams("country=GA&tab=wallet");
-    await user.click(screen.getByRole("tab", { name: "Portefeuille" }));
+    await user.click(screen.getByRole("button", { name: "Portefeuille" }));
     expect(navigation.replace).toHaveBeenCalledWith(expect.stringContaining("tab=wallet"));
   });
 

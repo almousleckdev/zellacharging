@@ -1,22 +1,16 @@
 import type { ReactNode } from "react";
 import { LanguageSwitch } from "@/shared/ui/LanguageSwitch";
 import { Logo } from "@/shared/ui/Logo";
-import { BrandPanel } from "./BrandPanel";
 
 export function AuthLayout({ children }: { children: ReactNode }) {
   return (
-    <div className="grid min-h-screen bg-background lg:grid-cols-[minmax(0,1.15fr)_minmax(0,1fr)]">
-      <BrandPanel />
-      <main className="flex flex-col px-6 py-6 sm:px-12">
-        <header className="flex items-center justify-between lg:justify-end">
-          <span className="lg:hidden">
-            <Logo height={26} />
-          </span>
-          <LanguageSwitch />
-        </header>
-        <div className="flex flex-1 items-center justify-center py-12">
-          <div className="w-full max-w-sm">{children}</div>
-        </div>
+    <div className="flex min-h-screen flex-col bg-canvas px-4 py-6 sm:px-10">
+      <header className="mx-auto flex w-full max-w-6xl items-center justify-between">
+        <Logo height={26} />
+        <LanguageSwitch />
+      </header>
+      <main className="flex flex-1 items-center justify-center py-10">
+        <div className="w-full max-w-md rounded-card border border-border bg-background p-8 shadow-card">{children}</div>
       </main>
     </div>
   );

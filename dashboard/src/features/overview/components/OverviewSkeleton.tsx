@@ -5,7 +5,7 @@ export function OverviewSkeleton() {
   return (
     <div aria-hidden="true" className="flex flex-col gap-6">
       <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        {Array.from({ length: 7 }, (_, index) => (
+        {Array.from({ length: 4 }, (_, index) => (
           <MetricCardSkeleton key={index} />
         ))}
       </div>

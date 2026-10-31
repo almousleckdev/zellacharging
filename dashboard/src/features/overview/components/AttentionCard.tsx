@@ -2,15 +2,17 @@
 
 import Link from "next/link";
 import { useIncidentSummary } from "@/features/incidents/api/useIncidentSummary";
-import { useStations } from "@/features/stations/api/useStations";
 import { useSession } from "@/features/session/SessionProvider";
+import { useStations } from "@/features/stations/api/useStations";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { cn } from "@/shared/lib/cn";
+import { Card } from "@/shared/ui/Card";
+import { Icon } from "@/shared/ui/Icon";
 import type { OverviewTotals } from "../totals";
 
 type Item = { key: string; count: number; label: string; href: string; urgent: boolean };
 
-export function AttentionStrip({ totals }: { totals: OverviewTotals }) {
+export function AttentionCard({ totals }: { totals: OverviewTotals }) {
   const { t } = useI18n();
   const { country, scopedHref } = useSession();
   const incidents = useIncidentSummary(country);
@@ -26,20 +28,25 @@ export function AttentionStrip({ totals }: { totals: OverviewTotals }) {
   ];
 
   return (
-    <section aria-label={labels.title} className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-      {items.map((item) => (
-        <Link
-          key={item.key}
-          href={scopedHref(item.href)}
-          className={cn(
-            "flex items-center justify-between gap-3 rounded-card border bg-background px-4 py-3 transition-colors hover:bg-surface",
-            item.urgent && item.count > 0 ? "border-danger-border bg-danger-soft" : "border-border",
-          )}
-        >
-          <span className="text-sm text-muted">{item.label}</span>
-          <span className={cn("figure text-xl font-semibold", item.urgent && item.count > 0 ? "text-danger" : "text-foreground")}>{item.count}</span>
-        </Link>
-      ))}
-    </section>
+    <Card title={labels.title} flush>
+      <ul className="flex flex-col divide-y divide-border border-t border-border">
+        {items.map((item) => (
+          <li key={item.key}>
+            <Link href={scopedHref(item.href)} className="flex items-center gap-3 px-5 py-3.5 text-sm transition-colors hover:bg-surface">
+              <span className="flex-1 text-foreground">{item.label}</span>
+              <span
+                className={cn(
+                  "figure min-w-7 rounded-full px-2 py-0.5 text-center text-xs font-semibold",
+                  item.urgent && item.count > 0 ? "bg-danger-soft text-danger" : "bg-surface-strong text-muted",
+                )}
+              >
+                {item.count}
+              </span>
+              <Icon name="chevronRight" className="size-4 text-subtle" />
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </Card>
   );
 }

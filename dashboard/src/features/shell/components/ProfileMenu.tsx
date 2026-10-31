@@ -1,10 +1,11 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useId, useRef, useState } from "react";
+import { useId, useRef, useState } from "react";
 import { displayName, initialsOf, ownAvatarUrl } from "@/features/session/avatarUrl";
 import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
+import { useDismiss } from "@/shared/lib/useDismiss";
 import { Avatar } from "@/shared/ui/Avatar";
 import { Icon } from "@/shared/ui/Icon";
 import { LogoutDialog } from "./LogoutDialog";
@@ -21,22 +22,7 @@ export function ProfileMenu() {
   const roles: Record<string, string> = t.shell.roles;
   const name = displayName(profile.firstName, profile.lastName, profile.email);
 
-  useEffect(() => {
-    if (!open) {
-      return;
-    }
-    const close = (event: MouseEvent | KeyboardEvent) => {
-      if (event instanceof KeyboardEvent ? event.key === "Escape" : !root.current?.contains(event.target as Node)) {
-        setOpen(false);
-      }
-    };
-    document.addEventListener("mousedown", close);
-    document.addEventListener("keydown", close);
-    return () => {
-      document.removeEventListener("mousedown", close);
-      document.removeEventListener("keydown", close);
-    };
-  }, [open]);
+  useDismiss(open, root, () => setOpen(false));
 
   return (
     <div ref={root} className="relative">
@@ -47,16 +33,20 @@ export function ProfileMenu() {
         aria-controls={open ? menuId : undefined}
         aria-label={t.shell.accountMenu}
         onClick={() => setOpen((current) => !current)}
-        className="flex size-10 items-center justify-center rounded-full ring-1 ring-border hover:ring-2 hover:ring-primary"
+        className="flex items-center gap-3 rounded-control p-1 pr-2 hover:bg-surface-strong"
       >
         <Avatar initials={initialsOf(profile.firstName, profile.lastName, profile.email)} src={ownAvatarUrl(profile.avatarVersion)} size={36} />
+        <span className="hidden min-w-0 flex-col text-left md:flex">
+          <span className="max-w-40 truncate text-sm font-semibold text-foreground">{name}</span>
+          <span className="text-xs text-subtle">{roles[profile.role] ?? profile.role}</span>
+        </span>
+        <Icon name="chevronDown" className="hidden size-4 text-subtle md:block" />
       </button>
       {open && (
         <div id={menuId} role="menu" className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-card border border-border bg-background shadow-lg">
           <div className="flex flex-col gap-0.5 border-b border-border px-4 py-3">
             <p className="truncate text-sm font-semibold text-foreground">{name}</p>
             <p className="truncate text-xs text-subtle">{profile.email}</p>
-            <p className="text-xs font-medium text-primary-text">{roles[profile.role] ?? profile.role}</p>
           </div>
           <Link role="menuitem" href={scopedHref("/profile")} onClick={() => setOpen(false)} className={ITEM}>
             <Icon name="user" className="size-4 text-subtle" />

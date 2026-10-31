@@ -100,14 +100,14 @@ describe("AppShell", () => {
     expect(screen.queryByRole("status")).not.toBeInTheDocument();
   });
 
-  it("shows the signed-in admin and the navigation with unfinished modules disabled", async () => {
+  it("shows the signed-in admin and the navigation", async () => {
     serve({ "/api/admin/me": () => Response.json(profile()) });
 
     renderShell();
 
     await openAccountMenu(userEvent.setup());
     expect(screen.getAllByText("Root Admin").length).toBeGreaterThan(0);
-    expect(screen.getByText("Super administrateur")).toBeInTheDocument();
+    expect(screen.getAllByText("Super administrateur").length).toBeGreaterThan(0);
     expect(screen.getByRole("menuitem", { name: "Paramètres" })).toHaveAttribute("href", "/profile#preferences");
     expect(screen.getByRole("link", { name: "Vue d'ensemble" })).toHaveAttribute("aria-current", "page");
     expect(screen.getByRole("link", { name: "Clients" })).toBeInTheDocument();
@@ -138,7 +138,7 @@ describe("AppShell", () => {
     renderShell();
 
     await openAccountMenu(userEvent.setup());
-    expect(screen.getByText("Administrateur")).toBeInTheDocument();
+    expect(screen.getAllByText("Administrateur").length).toBeGreaterThan(0);
     expect(screen.queryByLabelText("Pays")).not.toBeInTheDocument();
     expect(screen.getAllByText("Gabon").length).toBeGreaterThan(0);
   });
@@ -155,7 +155,7 @@ describe("AppShell", () => {
     expect(dialog).toBeInTheDocument();
     await user.click(within(dialog).getByRole("button", { name: "Annuler" }));
 
-    expect(fetchMock).toHaveBeenCalledTimes(1);
+    expect(fetchMock).not.toHaveBeenCalledWith("/api/auth/logout", expect.anything());
     expect(replaceLocation).not.toHaveBeenCalled();
   });
 

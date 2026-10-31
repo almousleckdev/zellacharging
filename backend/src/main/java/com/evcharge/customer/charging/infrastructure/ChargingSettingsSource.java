@@ -1,6 +1,7 @@
 package com.evcharge.customer.charging.infrastructure;
 
-import com.evcharge.customer.charging.application.FeeSettings;
+import com.evcharge.customer.charging.application.FeeRates;
+import com.evcharge.customer.charging.application.PriceList;
 import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.shared.SettingsSource;
 import org.springframework.stereotype.Component;
@@ -12,11 +13,13 @@ import java.util.Map;
 class ChargingSettingsSource implements SettingsSource {
 
     private final SessionSettings sessions;
-    private final FeeSettings fees;
+    private final FeeRates fees;
+    private final PriceList prices;
 
-    ChargingSettingsSource(SessionSettings sessions, FeeSettings fees) {
+    ChargingSettingsSource(SessionSettings sessions, FeeRates fees, PriceList prices) {
         this.sessions = sessions;
         this.fees = fees;
+        this.prices = prices;
     }
 
     @Override
@@ -27,7 +30,7 @@ class ChargingSettingsSource implements SettingsSource {
     @Override
     public Map<String, Object> values() {
         Map<String, Object> values = new LinkedHashMap<>();
-        values.put("pricePerKwhMinor", sessions.pricePerKwhMinor());
+        values.put("pricePerKwhMinor", prices.pricePerKwhMinor());
         values.put("serviceFeePercent", fees.serviceFeePercent());
         values.put("vatPercent", fees.vatPercent());
         values.put("stopThresholdPercent", sessions.stopThresholdPercent());

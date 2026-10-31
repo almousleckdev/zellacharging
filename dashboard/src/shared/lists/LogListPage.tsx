@@ -4,7 +4,6 @@ import type { ReactNode } from "react";
 import type { z } from "zod";
 import { ExportMenu } from "@/shared/export/ExportMenu";
 import { interpolate } from "@/shared/i18n/interpolate";
-import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { DataTable } from "@/shared/ui/DataTable";
 import type { Column } from "@/shared/ui/DataTable";
@@ -56,7 +55,6 @@ type LogListPageProps<Row, Out extends Listing<Row>> = {
 export function LogListPage<Row, Out extends Listing<Row>>(props: LogListPageProps<Row, Out>) {
   const { resource, schema, labels, icon, columns, rowKey, rowHref, fixed, above } = props;
   const selects = props.filters ?? [];
-  const { t } = useI18n();
   const format = useFormatters();
   const list = useListFilters(selects.map((select) => select.key), fixed);
   const { filters } = list;
@@ -112,7 +110,6 @@ export function LogListPage<Row, Out extends Listing<Row>>(props: LogListPagePro
       <PageHeader
         title={labels.title}
         subtitle={labels.subtitle}
-        trail={[t.shell.breadcrumbRoot, labels.title]}
         actions={data && <p className="text-sm text-muted">{interpolate(labels.results, { count: format.number(data.total) })}</p>}
       />
       {data && above?.(data)}

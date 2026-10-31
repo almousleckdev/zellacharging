@@ -6,6 +6,7 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { cn } from "@/shared/lib/cn";
 import { CellLink } from "@/shared/ui/CellLink";
 import type { Column } from "@/shared/ui/DataTable";
+import { OperatorBadge } from "@/shared/ui/OperatorBadge";
 import { isSettled, signedAmount } from "../format";
 import type { PaymentItem } from "../schemas";
 import { PaymentStateBadge } from "./PaymentStateBadge";
@@ -38,8 +39,9 @@ export function usePaymentColumns(): Column<PaymentItem>[] {
       cell: (row) => (
         <CellLink href={scopedHref(`/customers/${row.country}/${row.customerId}`)} className="flex flex-col">
           <span className="font-medium">{row.customerName}</span>
-          <span className="text-xs text-subtle">
-            {row.operator} · {row.msisdn}
+          <span className="flex items-center gap-1.5 text-xs text-subtle">
+            <OperatorBadge operator={row.operator} />
+            {row.msisdn}
           </span>
         </CellLink>
       ),

@@ -33,7 +33,7 @@ export function NetworkHealth() {
       {stations.isError && <p className="text-sm text-muted">{labels.unavailable}</p>}
       {stations.data && (
         <div className="flex flex-col gap-5">
-          <p className="figure font-display text-2xl font-semibold text-foreground">
+          <p className="figure text-2xl font-semibold text-foreground">
             {online} <span className="text-base font-normal text-subtle">/ {all.length} {labels.online}</span>
           </p>
           {top.length > 0 && (

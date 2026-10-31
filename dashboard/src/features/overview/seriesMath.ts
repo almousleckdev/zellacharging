@@ -54,9 +54,10 @@ export function seriesWindow(days: number, now = new Date()): { from: string; to
   };
 }
 
-export function periodsByCurrency(response: SeriesResponse, days: number, now = new Date()): CurrencyPeriod[] {
-  const today = new Date(`${isoDay(now)}T00:00:00Z`).getTime();
-  const groups = new Map<string, { decimals: number; byDay: Map<string, SeriesPoint> }>();
+type CurrencyGroup = { decimals: number; byDay: Map<string, SeriesPoint> };
+
+function groupByCurrency(response: SeriesResponse): Map<string, CurrencyGroup> {
+  const groups = new Map<string, CurrencyGroup>();
   for (const country of response.countries) {
     const group = groups.get(country.currency) ?? { decimals: country.decimals, byDay: new Map() };
     for (const point of country.points) {
@@ -65,6 +66,12 @@ export function periodsByCurrency(response: SeriesResponse, days: number, now = 
     }
     groups.set(country.currency, group);
   }
+  return groups;
+}
+
+export function periodsByCurrency(response: SeriesResponse, days: number, now = new Date()): CurrencyPeriod[] {
+  const today = new Date(`${isoDay(now)}T00:00:00Z`).getTime();
+  const groups = groupByCurrency(response);
   return [...groups.entries()].map(([currency, group]) => {
     const all = Array.from({ length: days * 2 }, (_, index) => {
       const day = isoDay(new Date(today - (days * 2 - 1 - index) * DAY_MS));
@@ -91,15 +98,7 @@ export function deltaPercent(current: number, previous: number): number | null {
 export type CurrencySeries = { currency: string; decimals: number; points: SeriesPoint[] };
 
 export function mergeByCurrency(response: SeriesResponse): CurrencySeries[] {
-  const groups = new Map<string, { decimals: number; byDay: Map<string, SeriesPoint> }>();
-  for (const country of response.countries) {
-    const group = groups.get(country.currency) ?? { decimals: country.decimals, byDay: new Map() };
-    for (const point of country.points) {
-      const known = group.byDay.get(point.day);
-      group.byDay.set(point.day, known ? { day: point.day, ...add(known, point) } : point);
-    }
-    groups.set(country.currency, group);
-  }
+  const groups = groupByCurrency(response);
   return [...groups.entries()].map(([currency, group]) => ({
     currency,
     decimals: group.decimals,

@@ -2,6 +2,9 @@ import type { Dictionary } from "../types";
 
 export const enPlatform: Pick<Dictionary, "platform" | "tariffs" | "system" | "countries" | "reports"> = {
   platform: {
+    edit: "Edit",
+    save: "Save",
+    saved: "Settings saved.",
     on: "On",
     off: "Off",
     sections: { charging: "Prices and fees", wallet: "Wallet and payments", reporting: "Reporting period" },
@@ -43,7 +46,6 @@ export const enPlatform: Pick<Dictionary, "platform" | "tariffs" | "system" | "c
     refresh: "Refresh",
     loadError: "We couldn't load the system status.",
     health: "Service health",
-    runtime: "Runtime",
     startedAt: "Started on",
     java: "Java version",
     up: "Operational",
@@ -70,7 +72,6 @@ export const enPlatform: Pick<Dictionary, "platform" | "tariffs" | "system" | "c
     subtitle: "Financial and activity summary by period, exportable.",
     loadError: "We couldn't load the report.",
     empty: "No data for this period.",
-    table: "Summary",
     bucketLabel: "Group by",
     weekOf: "Week of",
     buckets: { day: "By day", week: "By week", month: "By month" },

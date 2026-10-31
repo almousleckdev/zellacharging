@@ -22,7 +22,6 @@ export type NavItem = {
   id: NavId;
   href: string;
   icon: IconName;
-  available: boolean;
   permission?: string;
 };
 
@@ -35,33 +34,33 @@ export const NAV_GROUPS: NavGroup[] = [
   {
     id: "operations",
     items: [
-      { id: "overview", href: "/", icon: "overview", available: true, permission: "OVERVIEW_READ" },
-      { id: "stations", href: "/stations", icon: "station", available: true, permission: "STATIONS_READ" },
-      { id: "sessions", href: "/sessions", icon: "bolt", available: true, permission: "SESSIONS_READ" },
-      { id: "incidents", href: "/incidents", icon: "bell", available: true, permission: "OVERVIEW_READ" },
+      { id: "overview", href: "/", icon: "overview", permission: "OVERVIEW_READ" },
+      { id: "stations", href: "/stations", icon: "station", permission: "STATIONS_READ" },
+      { id: "sessions", href: "/sessions", icon: "bolt", permission: "SESSIONS_READ" },
+      { id: "incidents", href: "/incidents", icon: "bell", permission: "OVERVIEW_READ" },
     ],
   },
   {
     id: "customersFinance",
     items: [
-      { id: "customers", href: "/customers", icon: "users", available: true, permission: "CUSTOMERS_READ" },
-      { id: "payments", href: "/payments", icon: "wallet", available: true, permission: "PAYMENTS_READ" },
-      { id: "withdrawals", href: "/withdrawals", icon: "clipboard", available: true, permission: "WITHDRAWALS_REVIEW" },
-      { id: "commissions", href: "/commissions", icon: "percent", available: true, permission: "PAYMENTS_READ" },
-      { id: "tariffs", href: "/tariffs", icon: "tag", available: true, permission: "OVERVIEW_READ"},
+      { id: "customers", href: "/customers", icon: "users", permission: "CUSTOMERS_READ" },
+      { id: "payments", href: "/payments", icon: "wallet", permission: "PAYMENTS_READ" },
+      { id: "withdrawals", href: "/withdrawals", icon: "clipboard", permission: "WITHDRAWALS_REVIEW" },
+      { id: "commissions", href: "/commissions", icon: "percent", permission: "PAYMENTS_READ" },
+      { id: "tariffs", href: "/tariffs", icon: "tag", permission: "OVERVIEW_READ"},
     ],
   },
   {
     id: "insights",
-    items: [{ id: "reports", href: "/reports", icon: "chart", available: true, permission: "PAYMENTS_READ"}],
+    items: [{ id: "reports", href: "/reports", icon: "chart", permission: "PAYMENTS_READ"}],
   },
   {
     id: "administration",
     items: [
-      { id: "countries", href: "/countries", icon: "globe", available: true, permission: "OVERVIEW_READ"},
-      { id: "users", href: "/users", icon: "shield", available: true, permission: "ADMINS_MANAGE" },
-      { id: "audit", href: "/audit", icon: "clipboard", available: true, permission: "AUDIT_READ" },
-      { id: "system", href: "/system", icon: "sliders", available: true, permission: "ADMINS_MANAGE"},
+      { id: "countries", href: "/countries", icon: "globe", permission: "OVERVIEW_READ"},
+      { id: "users", href: "/users", icon: "shield", permission: "ADMINS_MANAGE" },
+      { id: "audit", href: "/audit", icon: "clipboard", permission: "AUDIT_READ" },
+      { id: "system", href: "/system", icon: "sliders", permission: "ADMINS_MANAGE"},
     ],
   },
 ];

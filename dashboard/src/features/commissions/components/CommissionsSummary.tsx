@@ -14,24 +14,24 @@ export function CommissionsSummary({ summary }: { summary: CommissionSummary }) 
   const rate = format.number(summary.serviceFeePercent, summary.serviceFeePercent % 1 === 0 ? 0 : 1);
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+    <div className="grid gap-4 sm:grid-cols-2 min-[1700px]:grid-cols-4">
       <MetricCard
         label={interpolate(labels.earned, { rate })}
         icon="percent"
-        values={[money(summary.serviceFeeMinor)]}
+        value={money(summary.serviceFeeMinor)}
         hint={interpolate(labels.earnedHint, { count: format.number(summary.sessions) })}
       />
-      <MetricCard label={labels.electric} icon="bolt" values={[money(summary.electricMinor)]} hint={labels.electricHint} />
+      <MetricCard label={labels.electric} icon="bolt" value={money(summary.electricMinor)} hint={labels.electricHint} />
       <MetricCard
         label={labels.vat}
         icon="tag"
-        values={[money(summary.vatMinor)]}
+        value={money(summary.vatMinor)}
         hint={interpolate(labels.vatHint, { rate: format.number(summary.vatPercent, summary.vatPercent % 1 === 0 ? 0 : 1) })}
       />
       <MetricCard
         label={labels.total}
         icon="wallet"
-        values={[money(summary.electricMinor + summary.serviceFeeMinor + summary.vatMinor)]}
+        value={money(summary.electricMinor + summary.serviceFeeMinor + summary.vatMinor)}
         hint={labels.totalHint}
       />
     </div>

@@ -3,6 +3,8 @@ package com.evcharge.customer.admin.web;
 import com.evcharge.customer.admin.application.AdminCustomerService;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,6 +49,15 @@ class AdminCustomerController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void delete(AdminAccess admin, @PathVariable String country, @PathVariable UUID id) {
         customers.delete(admin, country, id);
+    }
+
+    @GetMapping("/{country}/{id}/avatar")
+    ResponseEntity<byte[]> avatar(AdminAccess admin, @PathVariable String country, @PathVariable UUID id) {
+        return customers.picture(admin, country, id)
+                .map(picture -> ResponseEntity.ok().contentType(MediaType.parseMediaType(picture.contentType()))
+                        .header("Cache-Control", "private, max-age=300").header("X-Content-Type-Options", "nosniff")
+                        .body(picture.data()))
+                .orElseGet(() -> ResponseEntity.noContent().build());
     }
 
     @GetMapping("/{country}/{id}")

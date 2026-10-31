@@ -4,8 +4,8 @@ import { PaymentsPage } from "@/features/payments/components/PaymentsPage";
 import { SessionsPage } from "@/features/sessions/components/SessionsPage";
 import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
-import { cn } from "@/shared/lib/cn";
 import { useUrlParams } from "@/shared/lib/useUrlParams";
+import { PillTabs } from "@/shared/ui/PillTabs";
 import type { CustomerDetail } from "../schemas";
 import { CustomerActivityTab } from "./CustomerActivityTab";
 import { CustomerOverviewTab } from "./CustomerOverviewTab";
@@ -34,22 +34,13 @@ export function CustomerTabs({ customer }: { customer: CustomerDetail }) {
 
   return (
     <section className="flex flex-col gap-6">
-      <div role="tablist" aria-label={t.customers.detail.sections} className="flex gap-6 overflow-x-auto overflow-y-hidden border-b border-border">
-        {visible.map((tab) => (
-          <button
-            key={tab.id}
-            role="tab"
-            type="button"
-            aria-selected={active === tab.id}
-            onClick={() => update({ ...RESET, tab: tab.id === "overview" ? null : tab.id })}
-            className={cn(
-              "-mb-px whitespace-nowrap border-b-2 px-1 pb-3 text-sm font-medium",
-              active === tab.id ? "border-primary text-foreground" : "border-transparent text-muted hover:text-foreground",
-            )}
-          >
-            {labels[tab.id]}
-          </button>
-        ))}
+      <div>
+        <PillTabs
+          label={t.customers.detail.sections}
+          options={visible.map((tab) => ({ value: tab.id, label: labels[tab.id] }))}
+          value={active}
+          onChange={(id) => update({ ...RESET, tab: id === "overview" ? null : id })}
+        />
       </div>
       {active === "overview" && <CustomerOverviewTab customer={customer} />}
       {active === "sessions" && <SessionsPage customerId={customer.id} />}

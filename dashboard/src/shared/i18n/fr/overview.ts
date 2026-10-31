@@ -1,7 +1,11 @@
 export const frOverview = {
   overview: {
     title: "Vue d'ensemble",
-    subtitle: "Chiffres d'affaires et activité · {scope}",
+    greeting: "Bonjour, {name}",
+    pending: { title: "Retraits à valider", all: "Tout voir", empty: "Aucun retrait en attente." },
+    quick: { title: "Accès rapide" },
+    activity: { title: "Activité récente", all: "Tout voir", empty: "Aucune opération pour le moment." },
+    subtitle: "Voici l'aperçu de votre réseau · {scope}",
     loadError: "Impossible de charger les indicateurs.",
     unitKwh: "kWh",
     period: { label: "Période", days: "j" },
@@ -22,12 +26,6 @@ export const frOverview = {
       revenueText: "Ventes et commission, jour par jour.",
       sales: "Ventes",
       commission: "Commission",
-      chargesTitle: "Recharges par jour",
-      chargesText: "Nombre de recharges démarrées.",
-      charges: "Recharges",
-      energyTitle: "Énergie par jour",
-      energyText: "Énergie livrée par les recharges terminées.",
-      energy: "Énergie",
     },
     attention: {
       title: "À surveiller",
@@ -38,6 +36,6 @@ export const frOverview = {
     },
     countries: { title: "Ventes par pays", text: "Comparaison sur la période choisie.", charges: "{count} recharges", new: "Nouveau" },
     network: { title: "Réseau de bornes", all: "Voir les bornes", online: "en ligne", charges: "{count} recharges", unavailable: "Les bornes sont momentanément indisponibles." },
-    recent: { charges: "Dernières recharges", all: "Tout voir" },
+    recent: { charges: "Dernières recharges", all: "Tout voir", empty: "Aucune recharge pour le moment." },
   },
 };

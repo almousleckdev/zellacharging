@@ -1,16 +1,11 @@
 import type { Metadata } from "next";
-import { Figtree, Sora } from "next/font/google";
+import { Figtree } from "next/font/google";
 import type { ReactNode } from "react";
 import { I18nProvider } from "@/shared/i18n/I18nProvider";
 import "./globals.css";
 
 const figtree = Figtree({
   variable: "--font-figtree",
-  subsets: ["latin"],
-});
-
-const sora = Sora({
-  variable: "--font-sora",
   subsets: ["latin"],
 });
 
@@ -22,7 +17,7 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: ReactNode }) {
   return (
-    <html lang="fr" className={`${figtree.variable} ${sora.variable} h-full`}>
+    <html lang="fr" className={`${figtree.variable} h-full`}>
       <body className="min-h-full">
         <I18nProvider>{children}</I18nProvider>
       </body>

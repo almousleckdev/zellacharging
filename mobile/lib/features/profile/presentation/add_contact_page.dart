@@ -50,7 +50,7 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
       await repository.addPhone(value);
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      AppToast.info(context, ProfileText.phoneAdded);
+      AppToast.success(context, ProfileText.phoneAdded);
       context.pop();
     });
   }

@@ -14,6 +14,7 @@ abstract final class AppColors {
   static const border = Color(0xFFE2E8F0);
   static const success = Color(0xFF16A34A);
   static const danger = Color(0xFFDC2626);
+  static const warning = Color(0xFFD97706);
   static const chargeDeep = Color(0xFF15803D);
   static const chargeGreen = Color(0xFF22C55E);
   static const chargeGlow = Color(0xFF2DD4BF);
@@ -21,4 +22,6 @@ abstract final class AppColors {
   static const sceneDeep = Color(0xFF0B392F);
   static const sceneMid = Color(0xFF183C33);
   static const successSoft = Color(0xFFEAF7F0);
+  static const dangerSoft = Color(0xFFFDECEC);
+  static const warningSoft = Color(0xFFFEF3E2);
 }

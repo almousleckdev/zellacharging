@@ -7,12 +7,33 @@
   "client": [
     {
       "client_info": {
-        "mobilesdk_app_id": "1:445891709592:android:533da1c18f919d8d881eed",
+        "mobilesdk_app_id": "1:445891709592:android:a1254166b52428cc881eed",
         "android_client_info": {
-          "package_name": "com.zella.ocpp.mobile"
+          "package_name": "com.zella.ocpp.gabon"
         }
       },
-      "oauth_client": [],
+      "oauth_client": [
+        {
+          "client_id": "445891709592-frqa4hnsmh1f3fdg30rom29cbu9i1lao.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.ocpp.gabon",
+            "certificate_hash": "ec890c3b815dc5a0b695b7e640a8fb03389e6418"
+          }
+        },
+        {
+          "client_id": "445891709592-oh07ns7h36j6a28m018k33r0ia4dp7vp.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.ocpp.gabon",
+            "certificate_hash": "ef7d63e268f53be13d84872a733893a8bef80b93"
+          }
+        },
+        {
+          "client_id": "445891709592-395hn7fvie555fju0bk0j572b7qifkkq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
       "api_key": [
         {
           "current_key": "AIzaSyBYv-st2kDr79XHWowcsJodLr0zzXnqY2k"
@@ -20,7 +41,71 @@
       ],
       "services": {
         "appinvite_service": {
-          "other_platform_oauth_client": []
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445891709592-395hn7fvie555fju0bk0j572b7qifkkq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "445891709592-f00783vrqjlnvqp0qb2a2j74i1e5vnqb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zella.ocpp.gabon"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:445891709592:android:533da1c18f919d8d881eed",
+        "android_client_info": {
+          "package_name": "com.zella.ocpp.mobile"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445891709592-5cgub4bqvabtlosrnpgfvqiq7p4ffd5d.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.ocpp.mobile",
+            "certificate_hash": "ef7d63e268f53be13d84872a733893a8bef80b93"
+          }
+        },
+        {
+          "client_id": "445891709592-74kk9qrajb43rcqa7lu6rqojfd5002v3.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.ocpp.mobile",
+            "certificate_hash": "ec890c3b815dc5a0b695b7e640a8fb03389e6418"
+          }
+        },
+        {
+          "client_id": "445891709592-395hn7fvie555fju0bk0j572b7qifkkq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYv-st2kDr79XHWowcsJodLr0zzXnqY2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445891709592-395hn7fvie555fju0bk0j572b7qifkkq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "445891709592-f00783vrqjlnvqp0qb2a2j74i1e5vnqb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zella.ocpp.gabon"
+              }
+            }
+          ]
         }
       }
     }

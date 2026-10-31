@@ -12,6 +12,6 @@ Future<void> openAgreement(BuildContext context, WidgetRef ref) async {
       link != null &&
       await ref.read(linkLauncherProvider).open(Uri.parse(link));
   if (!opened && context.mounted) {
-    AppToast.info(context, ProfileText.agreementUnavailable);
+    AppToast.warning(context, ProfileText.agreementUnavailable);
   }
 }

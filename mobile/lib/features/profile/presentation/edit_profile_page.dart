@@ -57,7 +57,7 @@ class _EditProfilePageState extends ConsumerState<EditProfilePage>
           .updateName(_firstName.text.trim(), _lastName.text.trim());
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      AppToast.info(context, ProfileText.profileUpdated);
+      AppToast.success(context, ProfileText.profileUpdated);
       context.pop();
     });
   }

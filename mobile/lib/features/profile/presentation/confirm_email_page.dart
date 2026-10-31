@@ -39,7 +39,7 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage>
       await ref.read(profileRepositoryProvider).confirmEmail(_code.text.trim());
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      AppToast.info(context, ProfileText.emailAdded);
+      AppToast.success(context, ProfileText.emailAdded);
       context.pop();
     });
   }
@@ -47,7 +47,7 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage>
   void _resend() {
     submit(() async {
       await ref.read(profileRepositoryProvider).addEmail(widget.email);
-      if (mounted) AppToast.info(context, AuthText.codeResent);
+      if (mounted) AppToast.success(context, AuthText.codeResent);
     });
   }
 

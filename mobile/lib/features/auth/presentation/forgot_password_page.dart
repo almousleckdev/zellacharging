@@ -37,7 +37,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
     if (!_formKey.currentState!.validate()) return;
     final value = _identifier.text.trim();
     if (!value.contains('@')) {
-      AppToast.info(context, AuthText.phoneResetSoon);
+      AppToast.warning(context, AuthText.phoneResetSoon);
       return;
     }
     submit(() async {

@@ -28,6 +28,6 @@ Future<bool> confirmAndDeleteSession(
   }
   ref.invalidate(historyProvider);
   ref.invalidate(activeSessionProvider);
-  if (context.mounted) AppToast.info(context, HistoryText.chargeDeleted);
+  if (context.mounted) AppToast.success(context, HistoryText.chargeDeleted);
   return true;
 }

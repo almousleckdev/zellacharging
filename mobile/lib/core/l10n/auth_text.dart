@@ -20,10 +20,8 @@ abstract final class AuthText {
     en: 'Create your account to start charging.',
   );
 
-  static String get identifierLabel => AppLanguage.pick(
-    fr: 'E-mail ou numéro de téléphone',
-    en: 'Email or phone number',
-  );
+  static String get identifierLabel =>
+      AppLanguage.pick(fr: 'E-mail', en: 'Email');
 
   static String get emailLabel => AppLanguage.pick(fr: 'E-mail', en: 'Email');
 

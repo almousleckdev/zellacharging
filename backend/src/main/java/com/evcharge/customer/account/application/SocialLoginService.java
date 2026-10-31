@@ -28,18 +28,21 @@ public class SocialLoginService {
     private final PasswordHasher passwords;
     private final ContactNormalizer contacts;
     private final SessionIssuer sessions;
+    private final SocialAvatarImporter avatars;
     private final AuditTrail audit;
     private final Clock clock;
 
     public SocialLoginService(SocialTokenVerifier verifier, CustomerIdentityRepository identities,
                               CustomerRepository customers, PasswordHasher passwords, ContactNormalizer contacts,
-                              SessionIssuer sessions, AuditTrail audit, Clock clock) {
+                              SessionIssuer sessions, SocialAvatarImporter avatars, AuditTrail audit,
+                              Clock clock) {
         this.verifier = verifier;
         this.identities = identities;
         this.customers = customers;
         this.passwords = passwords;
         this.contacts = contacts;
         this.sessions = sessions;
+        this.avatars = avatars;
         this.audit = audit;
         this.clock = clock;
     }
@@ -56,6 +59,7 @@ public class SocialLoginService {
         if (!customer.canAuthenticate()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "ACCOUNT_NOT_VERIFIED", "Account is not verified");
         }
+        avatars.importIfMissing(customerId, profile.pictureUrl());
         audit.record("SOCIAL_LOGIN_SUCCEEDED", customerId, "customer", provider.name());
         return sessions.issue(customerId, customer.country(), UUID.randomUUID());
     }

@@ -27,6 +27,6 @@ Future<bool> confirmAndDeleteWalletEntry(
     return false;
   }
   ref.invalidate(walletEntriesProvider);
-  if (context.mounted) AppToast.info(context, WalletHistoryText.deleted);
+  if (context.mounted) AppToast.success(context, WalletHistoryText.deleted);
   return true;
 }

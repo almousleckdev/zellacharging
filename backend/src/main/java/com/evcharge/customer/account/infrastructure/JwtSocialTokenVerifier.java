@@ -45,7 +45,8 @@ class JwtSocialTokenVerifier implements SocialTokenVerifier {
     private static SocialProfile profileOf(SocialProvider provider, Jwt jwt) {
         return new SocialProfile(provider, jwt.getSubject(), jwt.getClaimAsString("email"),
                 "true".equalsIgnoreCase(String.valueOf((Object) jwt.getClaim("email_verified"))),
-                jwt.getClaimAsString("given_name"), jwt.getClaimAsString("family_name"));
+                jwt.getClaimAsString("given_name"), jwt.getClaimAsString("family_name"),
+                jwt.getClaimAsString("picture"));
     }
 
     private static Map<SocialProvider, JwtDecoder> configured(SocialSettings settings) {

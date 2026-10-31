@@ -39,7 +39,7 @@ class _ChangePasswordPageState extends ConsumerState<ChangePasswordPage>
           .read(profileRepositoryProvider)
           .changePassword(_current.text, _next.text);
       if (!mounted) return;
-      AppToast.info(context, ProfileText.passwordChanged);
+      AppToast.success(context, ProfileText.passwordChanged);
       await ref.read(sessionControllerProvider.notifier).signOut();
     });
   }

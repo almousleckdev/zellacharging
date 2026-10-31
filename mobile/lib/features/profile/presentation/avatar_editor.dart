@@ -43,7 +43,9 @@ class AvatarEditor extends ConsumerWidget {
     if (choice == null || !context.mounted) return;
     try {
       final message = await _apply(ref, choice);
-      if (message != null && context.mounted) AppToast.info(context, message);
+      if (message != null && context.mounted) {
+        AppToast.success(context, message);
+      }
     } on ApiError catch (error) {
       if (context.mounted) AppToast.error(context, error.message);
     } catch (_) {

@@ -13,7 +13,7 @@ Apple, the app also sends the `authorizationCode` so the backend can revoke the 
 | Where | Name | Value |
 |---|---|---|
 | backend | `ZELLA_GOOGLE_CLIENT_IDS` | Google **web** client ID (comma-separate extra IDs) |
-| backend | `ZELLA_APPLE_CLIENT_IDS` | `com.zella.ocpp.mobile` |
+| backend | `ZELLA_APPLE_CLIENT_IDS` | `com.zella.ocpp.gabon` |
 | backend | `ZELLA_APPLE_TEAM_ID` | `XB5CS344AV` |
 | backend | `ZELLA_APPLE_KEY_ID` | Key ID of the "Sign in with Apple" key |
 | backend | `ZELLA_APPLE_PRIVATE_KEY` | Contents of the `.p8` file (newlines may be written as `\n`) |
@@ -33,7 +33,7 @@ Without these values the buttons stay visible but the backend answers `SOCIAL_UN
 
 ## Apple
 
-1. developer.apple.com, Identifiers, `com.zella.ocpp.mobile`: enable **Sign in with Apple**.
+1. developer.apple.com, Identifiers, `com.zella.ocpp.gabon`: enable **Sign in with Apple**.
 2. Keys: create a key with Sign in with Apple, download the `.p8` once, note its Key ID.
 3. The entitlement is already in `Runner.entitlements`; Xcode signing adds it to the provisioning profile.
 

@@ -65,7 +65,7 @@ class WalletPage extends ConsumerWidget {
             icon: AppIcons.signOut,
             onPressed: () => wallet.withdrawalsEnabled
                 ? context.push(Routes.withdraw)
-                : AppToast.info(context, WithdrawText.unavailable),
+                : AppToast.warning(context, WithdrawText.unavailable),
           ),
         ),
       ],

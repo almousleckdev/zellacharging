@@ -70,7 +70,7 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   Future<void> _start(ChargePlan plan) async {
     final chosen = connector;
     if (chosen == null) {
-      AppToast.error(context, PayText.selectConnectorFirst);
+      AppToast.warning(context, PayText.selectConnectorFirst);
       return;
     }
     if (!_formKey.currentState!.validate()) return;

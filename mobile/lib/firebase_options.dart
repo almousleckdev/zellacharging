@@ -51,17 +51,17 @@ class DefaultFirebaseOptions {
 
   static const FirebaseOptions android = FirebaseOptions(
     apiKey: 'AIzaSyBYv-st2kDr79XHWowcsJodLr0zzXnqY2k',
-    appId: '1:445891709592:android:533da1c18f919d8d881eed',
+    appId: '1:445891709592:android:a1254166b52428cc881eed',
     messagingSenderId: '445891709592',
     projectId: 'charging-f975e',
     storageBucket: 'charging-f975e.firebasestorage.app',
   );
   static const FirebaseOptions ios = FirebaseOptions(
     apiKey: 'AIzaSyAihhokjJ5ruI_QJARdaJKb14ZU_Qw24HU',
-    appId: '1:445891709592:ios:4be7c4307c11eff7881eed',
+    appId: '1:445891709592:ios:f9c6ded59a233942881eed',
     messagingSenderId: '445891709592',
     projectId: 'charging-f975e',
     storageBucket: 'charging-f975e.firebasestorage.app',
-    iosBundleId: 'com.zella.ocpp.mobile',
+    iosBundleId: 'com.zella.ocpp.gabon',
   );
 }

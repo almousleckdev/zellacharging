@@ -6,5 +6,6 @@ public record SocialProfile(
         String email,
         boolean emailVerified,
         String firstName,
-        String lastName) {
+        String lastName,
+        String pictureUrl) {
 }

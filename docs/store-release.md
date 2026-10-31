@@ -1,6 +1,6 @@
 # Shipping to TestFlight and Google Play (internal)
 
-App id on both stores: `com.zella.ocpp.mobile`. Apple Team ID: `XB5CS344AV`.
+App id on both stores: `com.zella.ocpp.gabon`. Apple Team ID: `XB5CS344AV`.
 
 ## 0. Before building
 
@@ -43,7 +43,7 @@ flutter build ipa --release \
 - Set `GOOGLE_REVERSED_CLIENT_ID` in `ios/Flutter/Social.xcconfig` first.
 - Upload `build/ios/ipa/*.ipa` with Transporter, or open `ios/Runner.xcworkspace`, Product, Archive, Distribute.
 - Xcode signs with the production push environment automatically; the APNs key is already in Firebase.
-- App Store Connect: create the app with bundle id `com.zella.ocpp.mobile`, then TestFlight, add internal testers.
+- App Store Connect: create the app with bundle id `com.zella.ocpp.gabon`, then TestFlight, add internal testers.
 - Export compliance is pre-answered (`ITSAppUsesNonExemptEncryption = false`, HTTPS only).
 
 ## 3. Store answers

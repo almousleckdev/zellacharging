@@ -1,4 +1,4 @@
-package com.zella.ocpp.mobile
+package com.zella.ocpp.gabon
 
 import android.app.NotificationChannel
 import android.app.NotificationManager

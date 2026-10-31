@@ -4,7 +4,9 @@ import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.account.application.port.AppleTokenRevoker;
 import com.evcharge.customer.account.application.port.PasswordHasher;
+import com.evcharge.customer.account.application.port.ProfilePictureFetcher;
 import com.evcharge.customer.account.application.port.SocialTokenVerifier;
+import com.evcharge.customer.account.domain.Avatar;
 import com.evcharge.customer.account.domain.SocialProfile;
 import com.evcharge.customer.account.domain.SocialProvider;
 import org.junit.jupiter.api.Test;
@@ -17,6 +19,7 @@ import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.test.web.servlet.ResultActions;
 
+import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -47,13 +50,18 @@ class SocialLoginIntegrationTest extends PostgresTestBase {
     @MockitoBean
     AppleTokenRevoker revoker;
 
+    @MockitoBean
+    ProfilePictureFetcher pictures;
+
+    private static final String PICTURE = "https://lh3.googleusercontent.com/a/photo";
+
     private String email() {
         return "social-" + UUID.randomUUID() + "@example.com";
     }
 
     private void token(String token, SocialProvider provider, String subject, String email, boolean verified) {
         when(verifier.verify(provider, token))
-                .thenReturn(new SocialProfile(provider, subject, email, verified, "Aline", "Obame"));
+                .thenReturn(new SocialProfile(provider, subject, email, verified, "Aline", "Obame", PICTURE));
     }
 
     private ResultActions signIn(SocialProvider provider, String token) throws Exception {
@@ -79,6 +87,33 @@ class SocialLoginIntegrationTest extends PostgresTestBase {
                 Boolean.class, id)).isTrue();
         assertThat(jdbc.queryForObject("select password_login from customer where id = ?", Boolean.class, id))
                 .isFalse();
+    }
+
+    @Test
+    void aNewGoogleUserGetsTheirGooglePictureAsAvatar() throws Exception {
+        String email = email();
+        when(pictures.fetch(PICTURE)).thenReturn(Optional.of(new Avatar("image/jpeg", new byte[]{1, 2, 3})));
+        token("g3", SocialProvider.GOOGLE, "sub-" + email, email, true);
+
+        signIn(SocialProvider.GOOGLE, "g3").andExpect(status().isOk());
+
+        assertThat(jdbc.queryForObject("select count(*) from customer_avatar where customer_id = ?",
+                Integer.class, customerOf(email))).isEqualTo(1);
+    }
+
+    @Test
+    void aPictureAlreadyChosenIsNeverReplacedByTheGoogleOne() throws Exception {
+        String email = email();
+        token("g4", SocialProvider.GOOGLE, "sub-" + email, email, true);
+        signIn(SocialProvider.GOOGLE, "g4").andExpect(status().isOk());
+        jdbc.update("insert into customer_avatar (customer_id, content_type, data, updated_at) "
+                + "values (?, 'image/png', ?, now())", customerOf(email), new byte[]{9});
+        when(pictures.fetch(PICTURE)).thenReturn(Optional.of(new Avatar("image/jpeg", new byte[]{1, 2, 3})));
+
+        signIn(SocialProvider.GOOGLE, "g4").andExpect(status().isOk());
+
+        assertThat(jdbc.queryForObject("select content_type from customer_avatar where customer_id = ?",
+                String.class, customerOf(email))).isEqualTo("image/png");
     }
 
     @Test

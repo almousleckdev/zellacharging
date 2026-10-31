@@ -2,6 +2,12 @@
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
 <plist version="1.0">
 <dict>
+	<key>CLIENT_ID</key>
+	<string>445891709592-f00783vrqjlnvqp0qb2a2j74i1e5vnqb.apps.googleusercontent.com</string>
+	<key>REVERSED_CLIENT_ID</key>
+	<string>com.googleusercontent.apps.445891709592-f00783vrqjlnvqp0qb2a2j74i1e5vnqb</string>
+	<key>ANDROID_CLIENT_ID</key>
+	<string>445891709592-5cgub4bqvabtlosrnpgfvqiq7p4ffd5d.apps.googleusercontent.com</string>
 	<key>API_KEY</key>
 	<string>AIzaSyAihhokjJ5ruI_QJARdaJKb14ZU_Qw24HU</string>
 	<key>GCM_SENDER_ID</key>
@@ -9,7 +15,7 @@
 	<key>PLIST_VERSION</key>
 	<string>1</string>
 	<key>BUNDLE_ID</key>
-	<string>com.zella.ocpp.mobile</string>
+	<string>com.zella.ocpp.gabon</string>
 	<key>PROJECT_ID</key>
 	<string>charging-f975e</string>
 	<key>STORAGE_BUCKET</key>
@@ -25,6 +31,6 @@
 	<key>IS_SIGNIN_ENABLED</key>
 	<true></true>
 	<key>GOOGLE_APP_ID</key>
-	<string>1:445891709592:ios:4be7c4307c11eff7881eed</string>
+	<string>1:445891709592:ios:f9c6ded59a233942881eed</string>
 </dict>
 </plist>

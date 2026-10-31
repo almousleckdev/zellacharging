@@ -23,15 +23,15 @@ mixin ConnectorSelectionMixin<T extends ConsumerStatefulWidget>
     switch (decision.action) {
       case SelectionAction.dropBusyAtOpen:
         setState(() => connector = null);
-        AppToast.info(context, StationText.connectorBusy);
+        AppToast.warning(context, StationText.connectorBusy);
       case SelectionAction.dropTaken:
         setState(() => connector = null);
-        AppToast.info(context, StationText.connectorTaken);
+        AppToast.warning(context, StationText.connectorTaken);
       case SelectionAction.adoptPlugged:
         setState(() => connector = decision.connectorId);
         AppToast.info(context, PayText.cableDetected(decision.connectorId!));
       case SelectionAction.askWhichPlugged:
-        AppToast.info(context, PayText.cableSeveral);
+        AppToast.warning(context, PayText.cableSeveral);
       case SelectionAction.keep || SelectionAction.none:
     }
   }

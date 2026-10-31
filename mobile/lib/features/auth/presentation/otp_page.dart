@@ -60,7 +60,7 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
     await submit(() async {
       await ref.read(authRepositoryProvider).verify(_target, _code.text.trim());
       if (!mounted) return;
-      AppToast.info(context, AuthText.accountVerified);
+      AppToast.success(context, AuthText.accountVerified);
       context.go(Routes.login);
     });
   }
@@ -71,7 +71,7 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
       _isReset
           ? await repository.forgotPassword(widget.args.email)
           : await repository.resendCode(_target);
-      if (mounted) AppToast.info(context, AuthText.codeResent);
+      if (mounted) AppToast.success(context, AuthText.codeResent);
     });
   }
 

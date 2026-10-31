@@ -9,17 +9,44 @@ import '../core/theme/app_spacing.dart';
 abstract final class AppToast {
   static OverlayEntry? _current;
 
-  static void error(BuildContext context, String message) =>
-      _show(context, message, AppIcons.warning, AppColors.danger);
+  static void success(BuildContext context, String message) => _show(
+    context,
+    message,
+    AppIcons.checkCircle,
+    AppColors.success,
+    AppColors.successSoft,
+  );
 
-  static void info(BuildContext context, String message) =>
-      _show(context, message, AppIcons.info, AppColors.textPrimary);
+  static void error(BuildContext context, String message) => _show(
+    context,
+    message,
+    AppIcons.warning,
+    AppColors.danger,
+    AppColors.dangerSoft,
+  );
+
+  static void warning(BuildContext context, String message) => _show(
+    context,
+    message,
+    AppIcons.warning,
+    AppColors.warning,
+    AppColors.warningSoft,
+  );
+
+  static void info(BuildContext context, String message) => _show(
+    context,
+    message,
+    AppIcons.info,
+    AppColors.textPrimary,
+    AppColors.surface,
+  );
 
   static void _show(
     BuildContext context,
     String message,
     IconData icon,
     Color accent,
+    Color background,
   ) {
     _current?.remove();
     final overlay = Overlay.of(context, rootOverlay: true);
@@ -29,6 +56,7 @@ abstract final class AppToast {
         message: message,
         icon: icon,
         accent: accent,
+        background: background,
         onDone: () {
           if (_current == entry) _current = null;
           entry.remove();
@@ -45,12 +73,14 @@ class _ToastView extends StatefulWidget {
     required this.message,
     required this.icon,
     required this.accent,
+    required this.background,
     required this.onDone,
   });
 
   final String message;
   final IconData icon;
   final Color accent;
+  final Color background;
   final VoidCallback onDone;
 
   @override
@@ -116,9 +146,9 @@ class _ToastViewState extends State<_ToastView>
       vertical: AppSpacing.md - 2,
     ),
     decoration: BoxDecoration(
-      color: AppColors.surface,
+      color: widget.background,
       borderRadius: BorderRadius.circular(AppSpacing.radius),
-      border: Border.all(color: AppColors.border),
+      border: Border.all(color: widget.accent.withValues(alpha: 0.35)),
       boxShadow: [
         BoxShadow(
           color: AppColors.textPrimary.withValues(alpha: 0.12),

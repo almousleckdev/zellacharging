@@ -1,8 +1,9 @@
+import Image from "next/image";
 import type { Copy } from "@/content/types";
 import { Icon, type IconName } from "./Icon";
-import { Screenshot } from "./Screenshot";
 
-const icons: IconName[] = ["map", "scan", "bolt", "wallet", "bell", "shield"];
+const icons: IconName[] = ["map", "scan", "bolt", "wallet", "chart"];
+const screens = ["Findacharger", "BornesDetails", "Livetracking", "Mobilemoneywallet", "Activities"];
 
 export function Features({ copy, eyebrow }: { copy: Copy["features"]; eyebrow: string }) {
   return (
@@ -23,8 +24,16 @@ export function Features({ copy, eyebrow }: { copy: Copy["features"]; eyebrow: s
                 <h3 className="mt-6 text-2xl font-bold tracking-tight sm:text-3xl">{item.title}</h3>
                 <p className="mt-4 max-w-md text-lg leading-relaxed text-muted">{item.text}</p>
               </div>
-              <div className="mx-auto w-full max-w-[260px]">
-                <Screenshot slot={index + 2} />
+              <div className="mx-auto w-full max-w-[290px]">
+                <Image
+                  src={`/screens/${screens[index]}.png`}
+                  alt={item.title}
+                  width={701}
+                  height={1440}
+                  quality={95}
+                  sizes="(min-width: 768px) 290px, 80vw"
+                  className="h-auto w-full"
+                />
               </div>
             </article>
           ))}

@@ -31,7 +31,7 @@ export default async function RootLayout({ children, params }: LayoutProps<"/[la
   if (!isLocale(lang)) notFound();
   const copy = copyFor(lang);
   return (
-    <html lang={lang} className={jakarta.variable}>
+    <html lang={lang} className={jakarta.variable} data-scroll-behavior="smooth">
       <body className="flex min-h-screen flex-col">
         <Header lang={lang} copy={copy} />
         <main className="flex-1">{children}</main>

@@ -27,8 +27,7 @@ export const en: Copy = {
       { title: "Start with a scan", text: "Scan the charger QR code or pick a connector and the charge begins." },
       { title: "Live tracking", text: "Energy delivered, duration, battery and cost updated during the charge." },
       { title: "Mobile money wallet", text: "Top up with Airtel Money or Moov Money and withdraw your balance to numbers you already used." },
-      { title: "Useful notifications", text: "Charge finished, payment confirmed: the message arrives even when your phone is locked." },
-      { title: "Security and privacy", text: "Protected sign-in, minimal data and account deletion at any time." },
+      { title: "Charge history", text: "Duration, energy and cost of every charge, with the full fee breakdown." },
     ],
   },
   how: {

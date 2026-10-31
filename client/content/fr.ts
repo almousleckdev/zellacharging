@@ -27,8 +27,7 @@ export const fr: Copy = {
       { title: "Démarrez en un scan", text: "Scannez le QR code de la borne ou choisissez un connecteur, la recharge démarre." },
       { title: "Suivi en direct", text: "Énergie délivrée, durée, batterie et coût mis à jour pendant la recharge." },
       { title: "Portefeuille Mobile Money", text: "Créditez avec Airtel Money ou Moov Money et retirez votre solde vers les numéros déjà utilisés." },
-      { title: "Notifications utiles", text: "Recharge terminée, paiement confirmé : l’information arrive même téléphone verrouillé." },
-      { title: "Sécurité et confidentialité", text: "Connexion protégée, données minimales et suppression du compte à tout moment." },
+      { title: "Historique des recharges", text: "Durée, énergie et coût de chaque recharge, avec le détail de vos frais." },
     ],
   },
   how: {

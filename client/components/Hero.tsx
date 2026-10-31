@@ -4,9 +4,9 @@ import { StoreButtons } from "./StoreButtons";
 
 export function Hero({ copy }: { copy: Copy }) {
   return (
-    <section className="bg-white">
-      <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pb-20 pt-14 sm:px-6 md:grid-cols-[1.1fr_0.9fr] md:pt-20">
-        <div className="space-y-7">
+    <section className="overflow-hidden">
+      <div className="mx-auto grid max-w-6xl gap-12 px-4 sm:px-6 md:min-h-[calc(100svh-4rem)] md:grid-cols-[1.1fr_0.9fr]">
+        <div className="space-y-7 py-14 md:self-center">
           <h1 className="text-4xl font-extrabold leading-[1.1] tracking-tight sm:text-5xl lg:text-6xl">
             {copy.hero.title} <span className="text-brand">{copy.hero.highlight}</span>
           </h1>
@@ -18,15 +18,17 @@ export function Hero({ copy }: { copy: Copy }) {
             <span>Airtel Money · Moov Money</span>
           </div>
         </div>
-        <Image
-          src="/screens/hero.png"
-          alt=""
-          width={751}
-          height={1257}
-          priority
-          sizes="(min-width: 768px) 420px, 80vw"
-          className="mx-auto h-auto w-full max-w-[300px] md:max-w-[400px]"
-        />
+        <div className="relative h-[480px] md:my-12 md:h-[min(620px,calc(100svh-10rem))] md:self-center">
+          <Image
+            src="/screens/hero.png"
+            alt=""
+            fill
+            priority
+            quality={95}
+            sizes="(min-width: 768px) 320px, 80vw"
+            className="object-contain"
+          />
+        </div>
       </div>
     </section>
   );

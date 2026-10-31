@@ -10,23 +10,29 @@ class CarStage extends StatelessWidget {
     required this.level,
     required this.charging,
     this.header,
+    this.underAppBar = true,
+    this.startColor = AppColors.primarySoft,
     this.fadeTo = AppColors.surface,
   });
 
   final double level;
   final bool charging;
   final Widget? header;
+  final bool underAppBar;
+  final Color startColor;
   final Color fadeTo;
 
   @override
   Widget build(BuildContext context) {
-    final top = MediaQuery.paddingOf(context).top + kToolbarHeight;
+    final top = underAppBar
+        ? MediaQuery.paddingOf(context).top + kToolbarHeight
+        : 0.0;
     return DecoratedBox(
       decoration: BoxDecoration(
         gradient: LinearGradient(
           begin: Alignment.topCenter,
           end: Alignment.bottomCenter,
-          colors: [AppColors.primarySoft, fadeTo],
+          colors: [startColor, fadeTo],
         ),
       ),
       child: Padding(

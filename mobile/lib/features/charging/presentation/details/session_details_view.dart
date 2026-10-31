@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../../../core/l10n/strings.dart';
 import '../../../../core/theme/app_colors.dart';
 import '../../../../core/theme/app_spacing.dart';
 import '../../../stations/presentation/station_providers.dart';
@@ -23,32 +24,48 @@ class SessionDetailsView extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final station = ref.watch(stationProvider(session.stationId)).asData?.value;
     final message = session.statusMessage;
-    return ListView(
-      padding: EdgeInsets.zero,
-      children: [
-        CarStage(
-          level: session.chargeLevel,
-          charging: false,
-          fadeTo: AppColors.surfaceMuted,
+    return CustomScrollView(
+      slivers: [
+        SliverAppBar(
+          floating: true,
+          snap: true,
+          backgroundColor: AppColors.surface,
+          title: Text(HistoryText.detailsTitle),
         ),
-        Padding(
-          padding: const EdgeInsets.all(AppSpacing.md),
-          child: Column(
-            children: [
-              if (message != null) ...[
-                SessionMessageCard(message: message, color: session.stateColor),
+        SliverToBoxAdapter(
+          child: CarStage(
+            level: session.chargeLevel,
+            charging: false,
+            underAppBar: false,
+            startColor: AppColors.surface,
+            fadeTo: AppColors.surfaceMuted,
+          ),
+        ),
+        SliverPadding(
+          padding: const EdgeInsets.all(
+            AppSpacing.md,
+          ).copyWith(bottom: AppSpacing.xl),
+          sliver: SliverToBoxAdapter(
+            child: Column(
+              children: [
+                if (message != null) ...[
+                  SessionMessageCard(
+                    message: message,
+                    color: session.stateColor,
+                  ),
+                  const SizedBox(height: AppSpacing.md),
+                ],
+                DetailsSummary(session: session),
                 const SizedBox(height: AppSpacing.md),
+                BatteryLevelsCard(session: session),
+                const SizedBox(height: AppSpacing.md),
+                LocationCard(session: session, station: station),
+                const SizedBox(height: AppSpacing.md),
+                FeeDetailsCard(session: session),
+                const SizedBox(height: AppSpacing.md),
+                DeviceInfoCard(session: session, station: station),
               ],
-              DetailsSummary(session: session),
-              const SizedBox(height: AppSpacing.md),
-              BatteryLevelsCard(session: session),
-              const SizedBox(height: AppSpacing.md),
-              LocationCard(session: session, station: station),
-              const SizedBox(height: AppSpacing.md),
-              FeeDetailsCard(session: session),
-              const SizedBox(height: AppSpacing.md),
-              DeviceInfoCard(session: session, station: station),
-            ],
+            ),
           ),
         ),
       ],

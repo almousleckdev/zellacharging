@@ -102,6 +102,11 @@ abstract final class ProfileText {
     en: 'Your account and personal data will be permanently deleted. This cannot be undone. Your wallet must be empty and no charge may be in progress.',
   );
 
+  static String get deleteWithProvider => AppLanguage.pick(
+    fr: 'Confirmez avec le service que vous utilisez pour vous connecter.',
+    en: 'Confirm with the service you use to sign in.',
+  );
+
   static String get deleteAccountTitle => AppLanguage.pick(
     fr: 'Supprimer votre compte ?',
     en: 'Delete your account?',

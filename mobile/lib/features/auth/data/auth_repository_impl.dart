@@ -5,6 +5,7 @@ import '../../../core/storage/token_store.dart';
 import '../domain/auth_repository.dart';
 import '../domain/contact_channel.dart';
 import '../domain/registration_data.dart';
+import '../domain/social_credential.dart';
 import '../domain/verification_target.dart';
 
 class AuthRepositoryImpl implements AuthRepository {
@@ -84,9 +85,20 @@ class AuthRepositoryImpl implements AuthRepository {
           '/v1/auth/login',
           data: {'identifier': identifier, 'password': password},
         );
-        await store.save(
-          accessToken: response.data!['accessToken'] as String,
-          refreshToken: response.data!['refreshToken'] as String,
-        );
+        await _saveTokens(response.data!);
       });
+
+  @override
+  Future<void> socialLogin(SocialCredential credential) => _guard(() async {
+    final response = await client.post<Map<String, dynamic>>(
+      '/v1/auth/social',
+      data: credential.toJson(),
+    );
+    await _saveTokens(response.data!);
+  });
+
+  Future<void> _saveTokens(Map<String, dynamic> body) => store.save(
+    accessToken: body['accessToken'] as String,
+    refreshToken: body['refreshToken'] as String,
+  );
 }

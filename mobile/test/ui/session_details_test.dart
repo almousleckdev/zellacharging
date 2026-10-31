@@ -127,17 +127,43 @@ void main() {
     await _close(tester);
   });
 
-  testWidgets('deleting asks for confirmation first', (tester) async {
-    final sessions = await _open(tester);
+  testWidgets('has no delete action', (tester) async {
+    await _open(tester);
 
-    await tester.tap(find.byTooltip(HistoryText.deleteCharge));
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(find.text(HistoryText.deleteTitle), findsOneWidget);
-    expect(sessions.deleted, isEmpty);
+    expect(find.byTooltip(HistoryText.deleteCharge), findsNothing);
+    await _close(tester);
+  });
 
-    await tester.tap(find.text(Strings.cancel));
-    await tester.pump(const Duration(milliseconds: 400));
-    expect(sessions.deleted, isEmpty);
+  testWidgets('hides the app bar on scroll down and shows it on scroll up', (
+    tester,
+  ) async {
+    tester.view.physicalSize = const Size(780, 1000);
+    tester.view.devicePixelRatio = 2;
+    addTearDown(tester.view.reset);
+    await tester.pumpWidget(
+      ProviderScope(
+        overrides: [
+          ...overrides().skip(2),
+          sessionRepositoryProvider.overrideWithValue(_Sessions()),
+          ...overrides().take(1),
+        ],
+        child: MaterialApp(
+          theme: AppTheme.light(),
+          home: const ChargingPage(sessionId: 'a'),
+        ),
+      ),
+    );
+    await tester.pump(const Duration(milliseconds: 600));
+    final title = find.text(HistoryText.detailsTitle);
+    expect(title, findsOneWidget);
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, -400));
+    await tester.pumpAndSettle();
+    expect(title, findsNothing);
+
+    await tester.drag(find.byType(CustomScrollView), const Offset(0, 100));
+    await tester.pumpAndSettle();
+    expect(title, findsOneWidget);
     await _close(tester);
   });
 }

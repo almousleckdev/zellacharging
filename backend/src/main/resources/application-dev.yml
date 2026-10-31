@@ -4,6 +4,7 @@ spring:
 zella:
   rate-limit:
     login-per-ip-per-minute: 10000
+    contact-per-ip-per-hour: 10000
     register-per-ip-per-hour: 10000
     resend-per-ip-per-hour: 10000
     verify-per-ip-per-minute: 10000

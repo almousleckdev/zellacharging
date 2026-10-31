@@ -3,6 +3,7 @@ import 'dart:typed_data';
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_error.dart';
+import '../../auth/domain/social_credential.dart';
 import '../domain/profile.dart';
 import '../domain/profile_repository.dart';
 
@@ -29,6 +30,7 @@ class ProfileRepositoryImpl implements ProfileRepository {
           phone: json['phone'] as String?,
           emailVerified: json['emailVerified'] as bool? ?? false,
           phoneVerified: json['phoneVerified'] as bool? ?? false,
+          hasPassword: json['hasPassword'] as bool? ?? true,
         );
       });
 
@@ -100,7 +102,13 @@ class ProfileRepositoryImpl implements ProfileRepository {
       );
 
   @override
-  Future<void> deleteAccount(String password) => _guard(
-    () => _client.post<void>('/v1/me/delete', data: {'password': password}),
+  Future<void> deleteAccount({
+    String? password,
+    SocialCredential? credential,
+  }) => _guard(
+    () => _client.post<void>(
+      '/v1/me/delete',
+      data: credential?.toJson() ?? {'password': password},
+    ),
   );
 }

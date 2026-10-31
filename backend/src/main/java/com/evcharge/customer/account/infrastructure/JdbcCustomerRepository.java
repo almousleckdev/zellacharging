@@ -117,8 +117,8 @@ class JdbcCustomerRepository implements CustomerRepository {
 
     @Override
     public void updatePasswordHash(UUID id, String passwordHash) {
-        jdbc.sql("update customer set password_hash = :hash, failed_login_attempts = 0, locked_until = null "
-                        + "where id = :id")
+        jdbc.sql("update customer set password_hash = :hash, password_login = true, "
+                        + "failed_login_attempts = 0, locked_until = null where id = :id")
                 .param("hash", passwordHash).param("id", id).update();
     }
 
@@ -156,6 +156,18 @@ class JdbcCustomerRepository implements CustomerRepository {
                     password_hash = :hash
                 where id = :id
                 """)
+                .param("hash", unusablePasswordHash).param("id", id).update();
+    }
+
+    @Override
+    public boolean hasPassword(UUID id) {
+        return jdbc.sql("select password_login from customer where id = :id").param("id", id)
+                .query(Boolean.class).optional().orElse(false);
+    }
+
+    @Override
+    public void markPasswordless(UUID id, String unusablePasswordHash) {
+        jdbc.sql("update customer set password_hash = :hash, password_login = false where id = :id")
                 .param("hash", unusablePasswordHash).param("id", id).update();
     }
 }

@@ -1,4 +1,5 @@
 import 'registration_data.dart';
+import 'social_credential.dart';
 import 'verification_target.dart';
 
 abstract class AuthRepository {
@@ -12,4 +13,5 @@ abstract class AuthRepository {
     required String newPassword,
   });
   Future<void> login({required String identifier, required String password});
+  Future<void> socialLogin(SocialCredential credential);
 }

@@ -11,6 +11,9 @@ import '../../../shared/adaptive_dialog.dart';
 import '../../../shared/submit_mixin.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../auth/domain/social_provider.dart';
+import '../../auth/presentation/auth_providers.dart';
+import 'delete_with_provider.dart';
 import 'profile_providers.dart';
 
 class DeleteAccountPage extends ConsumerStatefulWidget {
@@ -31,25 +34,40 @@ class _DeleteAccountPageState extends ConsumerState<DeleteAccountPage>
     super.dispose();
   }
 
-  Future<void> _delete() async {
-    if (!_formKey.currentState!.validate()) return;
-    final confirmed = await showConfirmDialog(
-      context,
-      title: ProfileText.deleteAccountTitle,
-      message: ProfileText.deleteAccountBody,
-      confirmLabel: ProfileText.deleteAccountConfirm,
-      destructive: true,
-    );
-    if (!confirmed) return;
+  Future<bool> _confirmed() => showConfirmDialog(
+    context,
+    title: ProfileText.deleteAccountTitle,
+    message: ProfileText.deleteAccountBody,
+    confirmLabel: ProfileText.deleteAccountConfirm,
+    destructive: true,
+  );
+
+  Future<void> _close({String? password, SocialProvider? provider}) async {
     await submit(() async {
-      await ref.read(profileRepositoryProvider).deleteAccount(_password.text);
+      final credential = provider == null
+          ? null
+          : await ref.read(socialAuthenticatorProvider).authenticate(provider);
+      if (provider != null && credential == null) return;
+      await ref
+          .read(profileRepositoryProvider)
+          .deleteAccount(password: password, credential: credential);
       await ref.read(sessionControllerProvider.notifier).signOut();
     });
+  }
+
+  Future<void> _deleteWithPassword() async {
+    if (!_formKey.currentState!.validate() || !await _confirmed()) return;
+    await _close(password: _password.text);
+  }
+
+  Future<void> _deleteWithProvider(SocialProvider provider) async {
+    if (await _confirmed()) await _close(provider: provider);
   }
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final hasPassword = ref.watch(profileProvider).value?.hasPassword ?? true;
     return Scaffold(
       appBar: AppBar(title: Text(ProfileText.deleteAccount)),
       body: SafeArea(
@@ -77,25 +95,30 @@ class _DeleteAccountPageState extends ConsumerState<DeleteAccountPage>
               ),
             ),
             const SizedBox(height: AppSpacing.lg),
-            Form(
-              key: _formKey,
-              child: AppTextField(
-                controller: _password,
-                label: AuthText.passwordLabel,
-                icon: AppIcons.lock,
-                validator: Validators.required,
-                obscure: true,
-                textInputAction: TextInputAction.done,
+            if (hasPassword) ...[
+              Form(
+                key: _formKey,
+                child: AppTextField(
+                  controller: _password,
+                  label: AuthText.passwordLabel,
+                  icon: AppIcons.lock,
+                  validator: Validators.required,
+                  obscure: true,
+                  textInputAction: TextInputAction.done,
+                ),
               ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            PrimaryButton(
-              label: ProfileText.deleteAccountConfirm,
-              icon: AppIcons.trash,
-              destructive: true,
-              loading: loading,
-              onPressed: _delete,
-            ),
+              const SizedBox(height: AppSpacing.xl),
+              PrimaryButton(
+                label: ProfileText.deleteAccountConfirm,
+                icon: AppIcons.trash,
+                destructive: true,
+                loading: loading,
+                onPressed: _deleteWithPassword,
+              ),
+            ] else
+              DeleteWithProvider(
+                onPressed: loading ? null : _deleteWithProvider,
+              ),
           ],
         ),
       ),

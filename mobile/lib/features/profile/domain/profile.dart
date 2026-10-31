@@ -6,6 +6,7 @@ class Profile {
     this.phone,
     this.emailVerified = false,
     this.phoneVerified = false,
+    this.hasPassword = true,
   });
 
   final String firstName;
@@ -14,10 +15,15 @@ class Profile {
   final String? phone;
   final bool emailVerified;
   final bool phoneVerified;
+  final bool hasPassword;
 
-  String get fullName => '$firstName $lastName';
+  String get fullName => '$firstName $lastName'.trim();
 
-  String get initials => '${firstName[0]}${lastName[0]}'.toUpperCase();
+  String get initials => [firstName, lastName]
+      .where((name) => name.isNotEmpty)
+      .map((name) => name[0])
+      .join()
+      .toUpperCase();
 
   String get contact => email ?? phone ?? '';
 }

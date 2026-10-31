@@ -56,6 +56,7 @@ zella:
   rate-limit:
     store: ${ZELLA_RATE_LIMIT_STORE:memory}
     login-per-ip-per-minute: 20
+    contact-per-ip-per-hour: 5
     register-per-ip-per-hour: 10
     resend-per-ip-per-hour: 10
     verify-per-ip-per-minute: 30
@@ -64,6 +65,12 @@ zella:
     topup-per-customer-per-minute: 10
     session-start-per-customer-per-minute: 10
     withdrawal-per-customer-per-minute: 5
+  social:
+    google-client-ids: ${ZELLA_GOOGLE_CLIENT_IDS:}
+    apple-client-ids: ${ZELLA_APPLE_CLIENT_IDS:}
+    apple-team-id: ${ZELLA_APPLE_TEAM_ID:}
+    apple-key-id: ${ZELLA_APPLE_KEY_ID:}
+    apple-private-key: ${ZELLA_APPLE_PRIVATE_KEY:}
   tenancy:
     default-country: ${ZELLA_DEFAULT_COUNTRY:${NDZELA_DEFAULT_COUNTRY:GA}}
     require-restricted-role: ${ZELLA_TENANCY_REQUIRE_RESTRICTED_ROLE:${NDZELA_TENANCY_REQUIRE_RESTRICTED_ROLE:true}}
@@ -128,6 +135,7 @@ zella:
     phone: ${ZELLA_SUPPORT_PHONE:${NDZELA_SUPPORT_PHONE:}}
     whatsapp: ${ZELLA_SUPPORT_WHATSAPP:${NDZELA_SUPPORT_WHATSAPP:}}
     agreement-url: ${ZELLA_AGREEMENT_URL:${NDZELA_AGREEMENT_URL:}}
+    contact-inbox: ${ZELLA_CONTACT_INBOX:}
   payment:
     provider: ${ZELLA_PAYMENT_PROVIDER:${NDZELA_PAYMENT_PROVIDER:pvit}}
     allow-sandbox: ${ZELLA_PAYMENT_ALLOW_SANDBOX:${NDZELA_PAYMENT_ALLOW_SANDBOX:false}}

@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 
+import '../../auth/domain/social_credential.dart';
 import 'profile.dart';
 
 abstract class ProfileRepository {
@@ -12,5 +13,5 @@ abstract class ProfileRepository {
   Future<void> uploadAvatar(Uint8List bytes, String contentType);
   Future<void> deleteAvatar();
   Future<void> changePassword(String currentPassword, String newPassword);
-  Future<void> deleteAccount(String password);
+  Future<void> deleteAccount({String? password, SocialCredential? credential});
 }

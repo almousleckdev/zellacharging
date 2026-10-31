@@ -27,7 +27,7 @@ public class ProfileService {
     public ProfileView view(UUID customerId) {
         Customer customer = get(customerId);
         return new ProfileView(customer, customers.isVerified(customerId, Channel.EMAIL),
-                customers.isVerified(customerId, Channel.PHONE));
+                customers.isVerified(customerId, Channel.PHONE), customers.hasPassword(customerId));
     }
 
     public Customer updateName(UUID customerId, String firstName, String lastName) {

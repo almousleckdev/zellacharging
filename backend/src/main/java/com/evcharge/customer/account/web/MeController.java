@@ -48,7 +48,7 @@ class MeController {
 
     @PostMapping("/delete")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void deleteAccount(CustomerPrincipal me, @Valid @RequestBody DeleteAccountRequest request) {
-        closure.close(me.id(), request.password());
+    void deleteAccount(CustomerPrincipal me, @RequestBody DeleteAccountRequest request) {
+        closure.close(me.id(), request.proof());
     }
 }

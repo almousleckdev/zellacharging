@@ -11,6 +11,9 @@ import 'package:zella/core/media/picked_photo.dart';
 import 'package:zella/core/network/api_error.dart';
 import 'package:zella/core/session/session_controller.dart';
 import 'package:zella/core/storage/preference_store.dart';
+import 'package:zella/features/auth/domain/social_authenticator.dart';
+import 'package:zella/features/auth/domain/social_credential.dart';
+import 'package:zella/features/auth/domain/social_provider.dart';
 import 'package:zella/features/coupons/domain/coupon.dart';
 import 'package:zella/features/coupons/domain/coupon_repository.dart';
 import 'package:zella/features/support/domain/support_info.dart';
@@ -320,9 +323,12 @@ class FakeProfile implements ProfileRepository {
   }
 
   @override
-  Future<void> deleteAccount(String password) async {
+  Future<void> deleteAccount({
+    String? password,
+    SocialCredential? credential,
+  }) async {
     if (password == 'wrong') throw ApiError.fromCode('WRONG_PASSWORD');
-    closedWith.add(password);
+    closedWith.add(password ?? credential!.provider.apiName);
   }
 }
 
@@ -400,4 +406,18 @@ class NoTiles extends TileProvider {
   @override
   ImageProvider getImage(TileCoordinates coordinates, TileLayer options) =>
       MemoryImage(tinyPng);
+}
+
+class FakeSocialAuthenticator implements SocialAuthenticator {
+  FakeSocialAuthenticator({this.cancel = false});
+
+  final bool cancel;
+  final asked = <SocialProvider>[];
+
+  @override
+  Future<SocialCredential?> authenticate(SocialProvider provider) async {
+    asked.add(provider);
+    if (cancel) return null;
+    return SocialCredential(provider: provider, idToken: 'token');
+  }
 }

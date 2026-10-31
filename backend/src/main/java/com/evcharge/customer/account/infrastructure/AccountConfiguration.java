@@ -20,7 +20,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Clock;
 
 @Configuration
-@EnableConfigurationProperties({AccountSettings.class, SupportSettings.class})
+@EnableConfigurationProperties({AccountSettings.class, SupportSettings.class, SocialSettings.class})
 class AccountConfiguration {
 
     @Bean

@@ -7,6 +7,7 @@ import 'core/l10n/language_controller.dart';
 import 'core/l10n/strings.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
+import 'shared/widgets/bottom_system_inset.dart';
 
 class ZellaApp extends ConsumerWidget {
   const ZellaApp({super.key});
@@ -22,6 +23,7 @@ class ZellaApp extends ConsumerWidget {
       locale: language.locale,
       supportedLocales: [for (final item in AppLanguage.values) item.locale],
       localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      builder: (_, child) => BottomSystemInset(child: child!),
       routerConfig: ref.watch(routerProvider),
     );
   }

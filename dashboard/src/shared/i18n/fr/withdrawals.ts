@@ -8,7 +8,7 @@ export const frWithdrawals = {
     emptyText: "Tous les retraits ont été traités.",
     searchLabel: "Rechercher un retrait",
     searchPlaceholder: "Référence, numéro ou nom du client",
-    actions: { approve: "Valider", reject: "Refuser" },
+    actions: { approve: "Valider", reject: "Refuser", refund: "Rembourser" },
     approve: {
       title: "Valider ce retrait ?",
       description: "{amount} seront envoyés à {customer} sur le {operator} {number}.",
@@ -25,6 +25,15 @@ export const frWithdrawals = {
       notePlaceholder: "Expliquez pourquoi ce retrait est refusé",
       noteRequired: "Indiquez le motif du refus.",
       saved: "Retrait refusé : le montant est revenu dans le portefeuille.",
+    },
+    refund: {
+      title: "Rembourser ce retrait ?",
+      description: "L'opérateur n'a pas reçu ce retrait. {amount} seront remis dans le portefeuille de {customer}. Il sera prévenu.",
+      confirm: "Rembourser le client",
+      noteLabel: "Motif du remboursement",
+      notePlaceholder: "Expliquez pourquoi ce retrait est remboursé",
+      noteRequired: "Indiquez le motif du remboursement.",
+      saved: "Retrait remboursé : le montant est revenu dans le portefeuille.",
     },
   },
 } as const;

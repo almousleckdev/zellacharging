@@ -17,6 +17,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -73,9 +74,7 @@ class WithdrawalLedger {
                 || withdrawals.transition(withdrawal.id(), WithdrawalState.PROCESSING, WithdrawalState.FAILED,
                 null, failureCode);
         if (moved) {
-            wallets.lock(withdrawal.customerId());
-            wallets.apply(withdrawal.customerId(), withdrawal.amountMinor(), 0);
-            ledger.append(entry(withdrawal, LedgerType.WITHDRAWAL_REVERSAL, "withdrawal-reversal:" + withdrawal.id()));
+            restore(withdrawal);
             audit.record("WITHDRAWAL_REVERSED", withdrawal.customerId(), withdrawal.reference(), failureCode);
             announce(withdrawal, NotificationType.WITHDRAWAL_FAILED);
         }
@@ -87,11 +86,22 @@ class WithdrawalLedger {
         boolean moved = withdrawals.review(withdrawal.id(), WithdrawalState.PENDING_APPROVAL, WithdrawalState.FAILED,
                 adminId, note, "REJECTED", clock.instant());
         if (moved) {
-            wallets.lock(withdrawal.customerId());
-            wallets.apply(withdrawal.customerId(), withdrawal.amountMinor(), 0);
-            ledger.append(entry(withdrawal, LedgerType.WITHDRAWAL_REVERSAL, "withdrawal-reversal:" + withdrawal.id()));
+            restore(withdrawal);
             audit.record("WITHDRAWAL_REJECTED", withdrawal.customerId(), withdrawal.reference(), note);
             announce(withdrawal, NotificationType.WITHDRAWAL_REJECTED);
+        }
+        return moved;
+    }
+
+    @Transactional
+    boolean refund(Withdrawal withdrawal, UUID adminId, String note) {
+        boolean moved = Arrays.stream(WithdrawalState.values()).filter(WithdrawalState::isRefundable)
+                .anyMatch(from -> withdrawals.review(withdrawal.id(), from, WithdrawalState.FAILED, adminId, note,
+                        "REFUNDED", clock.instant()));
+        if (moved) {
+            restore(withdrawal);
+            audit.record("WITHDRAWAL_REFUNDED", withdrawal.customerId(), withdrawal.reference(), note);
+            announce(withdrawal, NotificationType.WITHDRAWAL_FAILED);
         }
         return moved;
     }
@@ -118,6 +128,12 @@ class WithdrawalLedger {
             announce(withdrawal, NotificationType.WITHDRAWAL_SUCCEEDED);
         }
         return moved;
+    }
+
+    private void restore(Withdrawal withdrawal) {
+        wallets.lock(withdrawal.customerId());
+        wallets.apply(withdrawal.customerId(), withdrawal.amountMinor(), 0);
+        ledger.append(entry(withdrawal, LedgerType.WITHDRAWAL_REVERSAL, "withdrawal-reversal:" + withdrawal.id()));
     }
 
     private void announce(Withdrawal withdrawal, NotificationType type) {

@@ -10,11 +10,11 @@ import { useFormatters } from "@/shared/i18n/useFormatters";
 import { Button } from "@/shared/ui/Button";
 import { Modal } from "@/shared/ui/Modal";
 import { useToast } from "@/shared/ui/ToastProvider";
-import { useReviewWithdrawal } from "../api/useReviewWithdrawal";
+import { useReviewWithdrawal, type WithdrawalAction } from "../api/useReviewWithdrawal";
 
 type DecisionDialogProps = {
   withdrawal: PaymentItem;
-  action: "approve" | "reject";
+  action: WithdrawalAction;
   onClose: () => void;
 };
 
@@ -25,8 +25,8 @@ export function DecisionDialog({ withdrawal, action, onClose }: DecisionDialogPr
   const review = useReviewWithdrawal();
   const [note, setNote] = useState("");
   const [missing, setMissing] = useState(false);
-  const labels = action === "approve" ? t.withdrawals.approve : t.withdrawals.reject;
-  const rejecting = action === "reject";
+  const labels = t.withdrawals[action];
+  const reasonRequired = action !== "approve";
 
   const amount = format.money([{ currency: withdrawal.currency, decimals: withdrawal.decimals, minor: withdrawal.amountMinor }])[0];
   const description = interpolate(labels.description, {
@@ -37,7 +37,7 @@ export function DecisionDialog({ withdrawal, action, onClose }: DecisionDialogPr
   });
 
   const submit = () => {
-    if (rejecting && note.trim() === "") {
+    if (reasonRequired && note.trim() === "") {
       setMissing(true);
       return;
     }
@@ -90,9 +90,9 @@ export function DecisionDialog({ withdrawal, action, onClose }: DecisionDialogPr
             className="rounded-control border border-border-strong bg-background p-3 text-sm font-normal"
           />
         </label>
-        {missing && rejecting && (
+        {missing && reasonRequired && (
           <span role="alert" className="text-xs text-danger">
-            {t.withdrawals.reject.noteRequired}
+            {action === "refund" ? t.withdrawals.refund.noteRequired : t.withdrawals.reject.noteRequired}
           </span>
         )}
       </div>

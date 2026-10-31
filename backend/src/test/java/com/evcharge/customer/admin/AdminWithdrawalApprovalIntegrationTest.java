@@ -123,6 +123,21 @@ class AdminWithdrawalApprovalIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void refundingNeedsAReasonAndTheReviewPermission() throws Exception {
+        String finance = fixtures.create(AdminRole.FINANCE, Set.of("GA")).accessToken();
+
+        review(root, "refund", "{\"note\":\" \"}").andExpect(status().isBadRequest());
+        review(finance, "refund", "{\"note\":\"x\"}").andExpect(status().isForbidden());
+        assertThat(stateOfWithdrawal()).isEqualTo("PENDING_APPROVAL");
+    }
+
+    @Test
+    void aWithdrawalWaitingForApprovalCannotBeRefunded() throws Exception {
+        review(root, "refund", "{\"note\":\"x\"}").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("WITHDRAWAL_NOT_REFUNDABLE"));
+    }
+
+    @Test
     void anonymousCallersAreRefused() throws Exception {
         mvc.perform(post("/v1/admin/withdrawals/GA/" + withdrawal + "/approve")).andExpect(status().isUnauthorized());
     }

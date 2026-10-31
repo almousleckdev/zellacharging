@@ -36,4 +36,11 @@ class AdminWithdrawalController {
                 @Valid @RequestBody RejectWithdrawalRequest request) {
         withdrawals.reject(admin, country, id, request.note());
     }
+
+    @PostMapping("/{country}/{id}/refund")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void refund(AdminAccess admin, @PathVariable String country, @PathVariable UUID id,
+                @Valid @RequestBody RefundWithdrawalRequest request) {
+        withdrawals.refund(admin, country, id, request.note());
+    }
 }

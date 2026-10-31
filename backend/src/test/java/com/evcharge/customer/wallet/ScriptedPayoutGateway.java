@@ -16,6 +16,7 @@ class ScriptedPayoutGateway implements PayoutGateway {
     private final Map<String, PayoutOutcome> statuses = new ConcurrentHashMap<>();
     private PayoutOutcome answer = PayoutOutcome.pending("p-1");
     private RuntimeException failure;
+    private RuntimeException statusFailure;
 
     void answerWith(PayoutOutcome outcome) {
         this.answer = outcome;
@@ -23,6 +24,10 @@ class ScriptedPayoutGateway implements PayoutGateway {
 
     void failWith(RuntimeException exception) {
         this.failure = exception;
+    }
+
+    void failStatusWith(RuntimeException exception) {
+        this.statusFailure = exception;
     }
 
     void reportStatus(String reference, PayoutOutcome outcome) {
@@ -34,6 +39,7 @@ class ScriptedPayoutGateway implements PayoutGateway {
         statuses.clear();
         answer = PayoutOutcome.pending("p-1");
         failure = null;
+        statusFailure = null;
     }
 
     @Override
@@ -52,6 +58,9 @@ class ScriptedPayoutGateway implements PayoutGateway {
 
     @Override
     public PayoutOutcome status(String reference) {
+        if (statusFailure != null) {
+            throw statusFailure;
+        }
         return statuses.getOrDefault(reference, PayoutOutcome.pending(null));
     }
 }

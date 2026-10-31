@@ -10,7 +10,7 @@ export const enWithdrawals: Pick<Dictionary, "withdrawals"> = {
     emptyText: "Every withdrawal has been handled.",
     searchLabel: "Search withdrawals",
     searchPlaceholder: "Reference, number or customer name",
-    actions: { approve: "Approve", reject: "Decline" },
+    actions: { approve: "Approve", reject: "Decline", refund: "Refund" },
     approve: {
       title: "Approve this withdrawal?",
       description: "{amount} will be sent to {customer} on {operator} {number}.",
@@ -27,6 +27,15 @@ export const enWithdrawals: Pick<Dictionary, "withdrawals"> = {
       notePlaceholder: "Explain why this withdrawal is declined",
       noteRequired: "Give the reason for declining.",
       saved: "Withdrawal declined: the amount is back in the wallet.",
+    },
+    refund: {
+      title: "Refund this withdrawal?",
+      description: "The operator did not receive this withdrawal. {amount} will go back to {customer}'s wallet. They will be notified.",
+      confirm: "Refund the customer",
+      noteLabel: "Reason for the refund",
+      notePlaceholder: "Explain why this withdrawal is refunded",
+      noteRequired: "Give the reason for the refund.",
+      saved: "Withdrawal refunded: the amount is back in the wallet.",
     },
   },
 };

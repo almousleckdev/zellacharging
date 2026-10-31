@@ -81,6 +81,9 @@ export const frCommon = {
     CUSTOMER_NOT_FOUND: "Client introuvable.",
     WITHDRAWAL_NOT_FOUND: "Retrait introuvable.",
     WITHDRAWAL_NOT_PENDING: "Ce retrait a déjà été traité.",
+    WITHDRAWAL_NOT_REFUNDABLE: "Ce retrait ne peut pas être remboursé : il est déjà terminé ou trop récent.",
+    WITHDRAWAL_PAYOUT_SENT: "L'opérateur a reçu ce retrait : il ne peut pas être remboursé.",
+    PAYOUT_STATUS_UNAVAILABLE: "L'opérateur ne répond pas : réessayez dans un instant.",
     WITHDRAWALS_UNAVAILABLE: "Les retraits ne sont pas disponibles : le service de paiement n'est pas configuré.",
   },
   validation: {

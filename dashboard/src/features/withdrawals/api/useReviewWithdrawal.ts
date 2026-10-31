@@ -4,7 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { adminFetch } from "@/shared/api/adminFetch";
 
-export type WithdrawalDecision = { country: string; id: string; action: "approve" | "reject"; note: string };
+export type WithdrawalAction = "approve" | "reject" | "refund";
+
+export type WithdrawalDecision = { country: string; id: string; action: WithdrawalAction; note: string };
 
 export function useReviewWithdrawal() {
   const client = useQueryClient();

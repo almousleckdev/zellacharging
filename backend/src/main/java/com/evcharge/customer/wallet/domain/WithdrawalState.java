@@ -11,4 +11,8 @@ public enum WithdrawalState {
     public boolean isUnsettled() {
         return this == REQUESTED || this == PROCESSING;
     }
+
+    public boolean isRefundable() {
+        return isUnsettled() || this == REVIEW;
+    }
 }

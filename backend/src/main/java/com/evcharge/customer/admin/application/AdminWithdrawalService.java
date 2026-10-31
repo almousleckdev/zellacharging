@@ -33,6 +33,12 @@ public class AdminWithdrawalService {
         audit.record(admin.id(), code, "WITHDRAWAL_REJECTED", id.toString(), clean(note));
     }
 
+    public void refund(AdminAccess admin, String country, UUID id, String note) {
+        String code = countryOf(admin, country);
+        TenantContext.runAs(code, () -> reviews.refund(admin.id(), id, clean(note)));
+        audit.record(admin.id(), code, "WITHDRAWAL_REFUNDED", id.toString(), clean(note));
+    }
+
     private String countryOf(AdminAccess admin, String country) {
         return AdminCountries.single(access.scope(admin, Permission.WITHDRAWALS_REVIEW, country));
     }

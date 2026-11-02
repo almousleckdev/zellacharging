@@ -4,6 +4,7 @@ import '../../../core/network/network_providers.dart';
 import '../data/auth_repository_impl.dart';
 import '../data/native_social_authenticator.dart';
 import '../domain/auth_repository.dart';
+import '../domain/sign_in_with_password.dart';
 import '../domain/sign_in_with_social.dart';
 import '../domain/social_authenticator.dart';
 
@@ -23,4 +24,8 @@ final signInWithSocialProvider = Provider<SignInWithSocial>(
     ref.watch(socialAuthenticatorProvider),
     ref.watch(authRepositoryProvider),
   ),
+);
+
+final signInWithPasswordProvider = Provider<SignInWithPassword>(
+  (ref) => SignInWithPassword(ref.watch(authRepositoryProvider)),
 );

@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
+import '../../../core/l10n/verification_text.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/session/session_controller.dart';
 import '../../../core/session/stay_signed_in.dart';
@@ -16,6 +17,7 @@ import '../../../shared/widgets/primary_button.dart';
 import 'auth_providers.dart';
 import 'auth_switch_link.dart';
 import 'login_options_row.dart';
+import 'otp_args.dart';
 import 'social_buttons.dart';
 import 'widgets/auth_field.dart';
 import 'widgets/auth_page.dart';
@@ -55,9 +57,16 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
   void _submit() {
     if (!_formKey.currentState!.validate()) return;
     submit(() async {
-      await ref
-          .read(authRepositoryProvider)
-          .login(identifier: _identifier.text.trim(), password: _password.text);
+      final identifier = _identifier.text.trim();
+      final unverified = await ref
+          .read(signInWithPasswordProvider)
+          .call(identifier: identifier, password: _password.text);
+      if (unverified != null) {
+        if (!mounted) return;
+        AppToast.info(context, VerificationText.resumed);
+        context.go(Routes.otp, extra: OtpArgs.registration(unverified.value));
+        return;
+      }
       await ref
           .read(preferenceStoreProvider)
           .save(stayKey, _remember ? '1' : '0');

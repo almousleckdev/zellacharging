@@ -1,5 +1,6 @@
 package com.evcharge.customer.shared.web;
 
+import com.evcharge.customer.shared.ActiveSessions;
 import com.evcharge.customer.shared.CountryDirectory;
 import com.evcharge.customer.shared.RateLimiter;
 import org.springframework.beans.factory.annotation.Qualifier;
@@ -22,7 +23,8 @@ class SecurityConfiguration {
 
     @Bean
     SecurityFilterChain securityFilterChain(HttpSecurity http, SecurityProblemHandler problems,
-                                            CountryDirectory countries, RateLimiter limiter,
+                                            CountryDirectory countries, ActiveSessions activeSessions,
+                                            RateLimiter limiter,
                                             @Qualifier("handlerExceptionResolver") HandlerExceptionResolver resolver,
                                             RateLimitSettings rateLimits) throws Exception {
         return http
@@ -42,6 +44,7 @@ class SecurityConfiguration {
                         .accessDeniedHandler(problems))
                 .addFilterBefore(new RequestSizeFilter(resolver, MAX_REQUEST_BYTES), BearerTokenAuthenticationFilter.class)
                 .addFilterAfter(new TenantFilter(countries, problems), BearerTokenAuthenticationFilter.class)
+                .addFilterAfter(new ActiveSessionFilter(activeSessions, resolver), TenantFilter.class)
                 .addFilterAfter(new RateLimitFilter(limiter, resolver, rateLimits), TenantFilter.class)
                 .exceptionHandling(errors -> errors.authenticationEntryPoint(problems)
                         .accessDeniedHandler(problems))

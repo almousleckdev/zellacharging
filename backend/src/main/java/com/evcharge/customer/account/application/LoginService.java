@@ -11,7 +11,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.UUID;
 
 @Service
 public class LoginService {
@@ -52,7 +51,7 @@ public class LoginService {
         }
         failures.clear(customer.id());
         audit.record("LOGIN_SUCCEEDED", customer.id(), "customer", null);
-        return sessions.issue(customer.id(), customer.country(), UUID.randomUUID());
+        return sessions.start(customer.id(), customer.country());
     }
 
     private static ApiException invalidCredentials() {

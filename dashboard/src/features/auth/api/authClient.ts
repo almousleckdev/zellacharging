@@ -10,6 +10,7 @@ const ERROR_CODES: readonly ErrorCode[] = [
   "NETWORK",
   "UNKNOWN",
   "INVITATION_INVALID",
+  "RESET_LINK_INVALID",
   "WEAK_PASSWORD",
 ];
 
@@ -78,4 +79,12 @@ export async function acceptInvitation(token: string, password: string): Promise
     throw new AuthApiError("UNKNOWN");
   }
   return parsed.data;
+}
+
+export async function requestPasswordReset(email: string): Promise<void> {
+  await post("/api/auth/password/forgot", { email });
+}
+
+export async function resetPassword(token: string, password: string): Promise<void> {
+  await post("/api/auth/password/reset", { token, password });
 }

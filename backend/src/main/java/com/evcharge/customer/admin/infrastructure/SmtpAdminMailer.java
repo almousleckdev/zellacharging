@@ -28,21 +28,40 @@ class SmtpAdminMailer implements AdminMailer {
     @Override
     public boolean sendInvitation(String email, String link, Instant expiresAt) {
         long hours = (Duration.between(Instant.now(), expiresAt).toMinutes() + 59) / 60;
-        SimpleMailMessage message = new SimpleMailMessage();
-        message.setFrom(settings.mailFrom());
-        message.setTo(email);
-        message.setSubject("Zella Charging : invitation à rejoindre la console / console invitation");
-        message.setText("Bonjour,\n\nVous avez été invité(e) à rejoindre la console d'administration Zella Charging.\n"
+        return deliver(email, "Zella Charging : invitation à rejoindre la console / console invitation",
+                "Bonjour,\n\nVous avez été invité(e) à rejoindre la console d'administration Zella Charging.\n"
                 + "Créez votre mot de passe, activez l'authentification à deux facteurs puis complétez votre profil :\n\n"
                 + link + "\n\nCe lien est valable " + hours + " heures et ne peut être utilisé qu'une fois.\n\n"
                 + "---\n\nHello,\n\nYou have been invited to join the Zella Charging admin console.\n"
                 + "Set your password, enable two-factor authentication, then complete your profile:\n\n"
                 + link + "\n\nThis link is valid for " + hours + " hours and can only be used once.\n");
+    }
+
+    @Override
+    public boolean sendPasswordReset(String email, String link, Instant expiresAt) {
+        long minutes = Math.max(1, Duration.between(Instant.now(), expiresAt).toMinutes());
+        return deliver(email, "Zella Charging : réinitialisation du mot de passe / password reset",
+                "Bonjour,\n\nUne réinitialisation du mot de passe de votre compte Zella Charging a été demandée.\n"
+                + "Choisissez un nouveau mot de passe :\n\n"
+                + link + "\n\nCe lien est valable " + minutes + " minutes et ne peut être utilisé qu'une fois.\n"
+                + "Si vous n'êtes pas à l'origine de cette demande, ignorez ce message.\n\n"
+                + "---\n\nHello,\n\nA password reset was requested for your Zella Charging account.\n"
+                + "Choose a new password:\n\n"
+                + link + "\n\nThis link is valid for " + minutes + " minutes and can only be used once.\n"
+                + "If you did not request this, ignore this message.\n");
+    }
+
+    private boolean deliver(String email, String subject, String text) {
+        SimpleMailMessage message = new SimpleMailMessage();
+        message.setFrom(settings.mailFrom());
+        message.setTo(email);
+        message.setSubject(subject);
+        message.setText(text);
         try {
             mail.send(message);
             return true;
         } catch (MailException e) {
-            log.warn("Invitation email could not be sent: {}", e.getMessage());
+            log.warn("Admin email could not be sent: {}", e.getMessage());
             return false;
         }
     }

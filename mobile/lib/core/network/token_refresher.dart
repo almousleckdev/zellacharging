@@ -1,21 +1,22 @@
 import 'package:dio/dio.dart';
 
 import '../storage/token_store.dart';
+import 'refresh_outcome.dart';
 
 class TokenRefresher {
   TokenRefresher({required this.plainClient, required this.store});
 
   final Dio plainClient;
   final TokenStore store;
-  Future<bool>? _inFlight;
+  Future<RefreshOutcome>? _inFlight;
 
-  Future<bool> refresh() => _inFlight ??= _run().whenComplete(() {
+  Future<RefreshOutcome> refresh() => _inFlight ??= _run().whenComplete(() {
     _inFlight = null;
   });
 
-  Future<bool> _run() async {
+  Future<RefreshOutcome> _run() async {
     final refreshToken = await store.readRefreshToken();
-    if (refreshToken == null) return false;
+    if (refreshToken == null) return RefreshOutcome.rejected;
     try {
       final response = await plainClient.post<Map<String, dynamic>>(
         '/v1/auth/refresh',
@@ -25,10 +26,16 @@ class TokenRefresher {
         accessToken: response.data!['accessToken'] as String,
         refreshToken: response.data!['refreshToken'] as String,
       );
-      return true;
-    } on DioException {
+      return RefreshOutcome.refreshed;
+    } on DioException catch (error) {
+      if (!_isRejection(error)) return RefreshOutcome.unavailable;
       await store.clear();
-      return false;
+      return RefreshOutcome.rejected;
     }
+  }
+
+  bool _isRejection(DioException error) {
+    final status = error.response?.statusCode;
+    return status != null && status >= 400 && status < 500 && status != 429;
   }
 }

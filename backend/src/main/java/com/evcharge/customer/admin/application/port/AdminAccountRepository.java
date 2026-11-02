@@ -20,4 +20,7 @@ public interface AdminAccountRepository {
     Optional<AdminUser> findByInvitation(String tokenHash, Instant now);
     void completeInvitation(UUID id, String passwordHash);
     boolean deleteInvited(UUID id);
+    void storePasswordReset(UUID id, String tokenHash, Instant expiresAt);
+    Optional<AdminUser> findByPasswordReset(String tokenHash, Instant now);
+    void completePasswordReset(UUID id, String passwordHash);
 }

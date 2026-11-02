@@ -1,6 +1,11 @@
 import 'app_language.dart';
 
 abstract final class AuthText {
+  static String get signedOutElsewhere => AppLanguage.pick(
+    fr: 'Vous avez été déconnecté : votre compte s’est connecté sur un autre téléphone.',
+    en: 'You were signed out: your account signed in on another phone.',
+  );
+
   static String get signIn =>
       AppLanguage.pick(fr: 'Se connecter', en: 'Sign In');
 

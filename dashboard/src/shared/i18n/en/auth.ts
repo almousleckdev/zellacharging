@@ -1,6 +1,6 @@
 import type { Dictionary } from "../types";
 
-export const enAuth: Pick<Dictionary, "login" | "totp"> = {
+export const enAuth: Pick<Dictionary, "login" | "totp" | "recovery"> = {
   login: {
     title: "Sign in to the console",
     subtitle: "Access the Zella Charging platform administration.",
@@ -11,6 +11,28 @@ export const enAuth: Pick<Dictionary, "login" | "totp"> = {
     hidePassword: "Hide password",
     submit: "Sign in",
     submitting: "Signing in…",
+    forgot: "Forgot your password?",
+  },
+  recovery: {
+    forgotTitle: "Forgot your password",
+    forgotSubtitle: "Enter your email address and we will send you a link to choose a new password.",
+    send: "Send the link",
+    sending: "Sending…",
+    sentTitle: "Check your inbox",
+    sentText: "If an account exists for this address, a reset link valid for 1 hour has just been sent.",
+    resetTitle: "New password",
+    resetSubtitle: "Choose a new password to access the console.",
+    password: "New password",
+    passwordHint: "At least 10 characters, with letters and numbers.",
+    confirm: "Confirm password",
+    reset: "Change password",
+    resetting: "Changing…",
+    doneTitle: "Password changed",
+    doneText: "You can now sign in with your new password.",
+    invalidTitle: "Invalid link",
+    invalidText: "This link has expired or has already been used. Request a new one.",
+    requestNew: "Request a new link",
+    backToLogin: "Back to sign in",
   },
   totp: {
     requiredTitle: "Two-step verification",

@@ -46,6 +46,8 @@
 	<string>The camera is used to scan charger QR codes and to take your profile picture.</string>
 	<key>NSLocalNetworkUsageDescription</key>
 	<string>Zella Charging connects to the charging server on your local network during development.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location is used to find charging stations near you.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location is used to find charging stations near you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>

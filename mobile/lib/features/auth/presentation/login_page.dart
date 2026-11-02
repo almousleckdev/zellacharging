@@ -4,11 +4,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/router/routes.dart';
+import '../../../core/session/session_controller.dart';
 import '../../../core/session/stay_signed_in.dart';
 import '../../../core/storage/preference_providers.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
+import '../../../shared/app_toast.dart';
 import '../../../shared/submit_mixin.dart';
 import '../../../shared/widgets/primary_button.dart';
 import 'auth_providers.dart';
@@ -30,6 +32,18 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
   final _identifier = TextEditingController();
   final _password = TextEditingController();
   var _remember = true;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _announceReplacement());
+  }
+
+  void _announceReplacement() {
+    if (!mounted || !ref.read(signedOutElsewhereProvider)) return;
+    ref.read(signedOutElsewhereProvider.notifier).acknowledge();
+    AppToast.warning(context, AuthText.signedOutElsewhere);
+  }
 
   @override
   void dispose() {

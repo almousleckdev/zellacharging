@@ -7,6 +7,19 @@ import 'stay_signed_in.dart';
 
 enum SessionStatus { unknown, authenticated, unauthenticated }
 
+class SignedOutElsewhere extends Notifier<bool> {
+  @override
+  bool build() => false;
+
+  void mark() => state = true;
+
+  void acknowledge() => state = false;
+}
+
+final signedOutElsewhereProvider = NotifierProvider<SignedOutElsewhere, bool>(
+  SignedOutElsewhere.new,
+);
+
 class SessionController extends Notifier<SessionStatus> {
   @override
   SessionStatus build() {
@@ -25,7 +38,10 @@ class SessionController extends Notifier<SessionStatus> {
 
   void signedIn() => state = SessionStatus.authenticated;
 
-  void expire() => state = SessionStatus.unauthenticated;
+  void expire({bool replaced = false}) {
+    if (replaced) ref.read(signedOutElsewhereProvider.notifier).mark();
+    state = SessionStatus.unauthenticated;
+  }
 
   Future<void> signOut() async {
     await ref.read(pushRegistrationProvider).stop();

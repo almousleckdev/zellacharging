@@ -89,6 +89,28 @@ class JdbcAdminAccountRepository implements AdminAccountRepository {
     }
 
     @Override
+    public void storePasswordReset(UUID id, String tokenHash, Instant expiresAt) {
+        jdbc.sql("update admin_user set password_reset_hash = :hash, password_reset_expires_at = :expires "
+                        + "where id = :id")
+                .param("hash", tokenHash).param("expires", Timestamps.toDb(expiresAt)).param("id", id).update();
+    }
+
+    @Override
+    public Optional<AdminUser> findByPasswordReset(String tokenHash, Instant now) {
+        return jdbc.sql("select * from admin_user where password_reset_hash = :hash "
+                        + "and password_reset_expires_at > :now and status = 'ACTIVE'")
+                .param("hash", tokenHash).param("now", Timestamps.toDb(now))
+                .query((rs, rowNum) -> AdminRows.map(rs)).optional().map(admin -> AdminRows.withAccess(jdbc, admin));
+    }
+
+    @Override
+    public void completePasswordReset(UUID id, String passwordHash) {
+        jdbc.sql("update admin_user set password_hash = :hash, password_reset_hash = null, "
+                        + "password_reset_expires_at = null, failed_attempts = 0, locked_until = null where id = :id")
+                .param("hash", passwordHash).param("id", id).update();
+    }
+
+    @Override
     public boolean deleteInvited(UUID id) {
         return jdbc.sql("delete from admin_user where id = :id and status = 'INVITED'").param("id", id)
                 .update() == 1;

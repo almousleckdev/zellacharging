@@ -81,7 +81,7 @@ zella:
     access-token-ttl: 15m
     refresh-token-ttl: 30d
     max-failed-logins: 5
-    lockout: 15m
+    lockout: 30m
   admin:
     bootstrap-email: ${ZELLA_ADMIN_EMAIL:}
     bootstrap-password: ${ZELLA_ADMIN_PASSWORD:}
@@ -94,7 +94,7 @@ zella:
     access-token-ttl: 10m
     refresh-token-ttl: 12h
     max-failed-logins: 5
-    lockout: 15m
+    lockout: 30m
   notifications:
     dispatch-interval: ${ZELLA_NOTIFICATION_INTERVAL:10s}
     batch-size: 50

@@ -62,6 +62,8 @@ class RateLimitFilter extends OncePerRequestFilter {
                 new RateRule("POST", "/v1/admin/auth/login", s.loginPerIpPerMinute(), minute, false),
                 new RateRule("POST", "/v1/admin/auth/totp", s.loginPerIpPerMinute(), minute, false),
                 new RateRule("POST", "/v1/admin/auth/refresh", s.refreshPerIpPerMinute(), minute, false),
+                new RateRule("POST", "/v1/admin/auth/password/forgot", s.resendPerIpPerHour(), hour, false),
+                new RateRule("POST", "/v1/admin/auth/password/reset", s.verifyPerIpPerMinute(), minute, false),
                 new RateRule("POST", "/v1/admin/me/password", s.loginPerIpPerMinute(), minute, false),
                 new RateRule("GET", "/v1/admin/auth/invitation", s.loginPerIpPerMinute(), minute, false),
                 new RateRule("POST", "/v1/admin/auth/invitation", s.loginPerIpPerMinute(), minute, false),

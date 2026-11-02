@@ -6,6 +6,7 @@ import '../storage/secure_token_store.dart';
 import '../storage/token_store.dart';
 import 'auth_interceptor.dart';
 import 'language_interceptor.dart';
+import 'retry_interceptor.dart';
 import 'token_refresher.dart';
 
 const _baseUrl = String.fromEnvironment(
@@ -34,9 +35,11 @@ final dioProvider = Provider<Dio>((ref) {
       store: store,
       refresher: refresher,
       client: client,
-      onSessionExpired: () =>
-          ref.read(sessionControllerProvider.notifier).expire(),
+      onSessionExpired: ({required replaced}) => ref
+          .read(sessionControllerProvider.notifier)
+          .expire(replaced: replaced),
     ),
   );
+  client.interceptors.add(RetryInterceptor(client: client));
   return client;
 });

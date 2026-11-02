@@ -45,7 +45,7 @@ export const frCommon = {
   errors: {
     INVALID_CREDENTIALS: "Adresse e-mail ou mot de passe incorrect.",
     INVALID_TOTP_CODE: "Code de vérification invalide ou expiré.",
-    ACCOUNT_LOCKED: "Compte temporairement verrouillé après trop de tentatives. Réessayez dans quelques minutes.",
+    ACCOUNT_LOCKED: "Compte temporairement verrouillé après trop de tentatives. Réessayez dans 30 minutes ou réinitialisez votre mot de passe.",
     TOO_MANY_REQUESTS: "Trop de tentatives. Patientez un instant avant de réessayer.",
     NETWORK: "Impossible de joindre le serveur. Vérifiez votre connexion.",
     UNKNOWN: "Une erreur est survenue. Réessayez.",
@@ -64,6 +64,7 @@ export const frCommon = {
     ADMIN_NOT_PENDING: "Cette invitation n'est plus en attente.",
     ADMIN_NOT_DELETABLE: "Seules les invitations en attente peuvent être supprimées.",
     INVITATION_INVALID: "Cette invitation est invalide ou a expiré.",
+    RESET_LINK_INVALID: "Ce lien est invalide ou a expiré.",
     PROFILE_INCOMPLETE: "Complétez votre profil pour continuer.",
     INVALID_NAME: "Le nom saisi n'est pas valide.",
     INVALID_PHONE: "Ce numéro n'est pas valide pour le Gabon ou le Mali.",

@@ -47,7 +47,7 @@ export const enCommon: Pick<Dictionary, "language" | "brand" | "common" | "error
   errors: {
     INVALID_CREDENTIALS: "Incorrect email address or password.",
     INVALID_TOTP_CODE: "Invalid or expired verification code.",
-    ACCOUNT_LOCKED: "Account temporarily locked after too many attempts. Try again in a few minutes.",
+    ACCOUNT_LOCKED: "Account temporarily locked after too many attempts. Try again in 30 minutes or reset your password.",
     TOO_MANY_REQUESTS: "Too many attempts. Please wait a moment before trying again.",
     NETWORK: "Unable to reach the server. Check your connection.",
     UNKNOWN: "Something went wrong. Please try again.",
@@ -65,6 +65,7 @@ export const enCommon: Pick<Dictionary, "language" | "brand" | "common" | "error
     ADMIN_NOT_FOUND: "User not found.",
     ADMIN_NOT_PENDING: "This invitation is no longer pending.",
     ADMIN_NOT_DELETABLE: "Only pending invitations can be deleted.",
+    RESET_LINK_INVALID: "This link is invalid or has expired.",
     INVITATION_INVALID: "This invitation is invalid or has expired.",
     PROFILE_INCOMPLETE: "Complete your profile to continue.",
     INVALID_NAME: "The name is not valid.",

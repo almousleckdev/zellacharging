@@ -61,7 +61,7 @@ public class SocialLoginService {
         }
         avatars.importIfMissing(customerId, profile.pictureUrl());
         audit.record("SOCIAL_LOGIN_SUCCEEDED", customerId, "customer", provider.name());
-        return sessions.issue(customerId, customer.country(), UUID.randomUUID());
+        return sessions.start(customerId, customer.country());
     }
 
     private UUID enroll(SocialProfile profile, String firstName, String lastName) {

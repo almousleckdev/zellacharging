@@ -8,6 +8,10 @@ export const credentialsSchema = z.object({
   password: z.string().min(1, "passwordRequired"),
 });
 
+export const forgotPasswordSchema = z.object({
+  email: credentialsSchema.shape.email,
+});
+
 export const totpCodeSchema = z.string().regex(/^\d{6}$/, "codeInvalid");
 
 export const totpSubmissionSchema = z.object({

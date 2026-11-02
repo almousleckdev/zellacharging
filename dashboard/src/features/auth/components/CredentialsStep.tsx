@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useState } from "react";
 import type { SubmitEvent } from "react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
@@ -56,6 +57,9 @@ export function CredentialsStep({ pending, onSubmit }: Props) {
         error={errors.password ? t.validation[errors.password] : undefined}
         disabled={pending}
       />
+      <Link href="/forgot-password" className="-mt-2 self-end text-sm font-medium text-primary-text hover:underline">
+        {t.login.forgot}
+      </Link>
       <Button type="submit" fullWidth loading={pending}>
         {pending ? t.login.submitting : t.login.submit}
       </Button>

@@ -25,9 +25,12 @@ export function TextField({ label, error, hint, trailing, className, ...rest }: 
           aria-invalid={error ? true : undefined}
           aria-describedby={message ? messageId : undefined}
           className={cn(
-            "h-10 w-full rounded-control border bg-background px-3.5 text-sm text-foreground",
+            "h-11 w-full rounded-control border bg-background px-3.5 text-sm text-foreground shadow-sm transition",
             "placeholder:text-subtle disabled:bg-surface disabled:text-subtle",
-            error ? "border-danger" : "border-border-strong hover:border-subtle focus:border-primary",
+            "focus:outline-none focus-visible:outline-none focus:ring-4",
+            error
+              ? "border-danger focus:ring-danger/10"
+              : "border-border-strong hover:border-subtle focus:border-foreground focus:ring-foreground/10",
             trailing ? "pr-11" : undefined,
             className,
           )}

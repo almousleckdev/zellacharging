@@ -159,4 +159,41 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
                 """.formatted(email)).andExpect(status().isTooManyRequests())
                 .andExpect(jsonPath("$.code").value("ACCOUNT_LOCKED"));
     }
+
+    @Test
+    void signingInOnASecondDeviceSignsTheFirstOneOut() throws Exception {
+        String email = "twodevices@example.com";
+        registerAndVerifyEmail(email);
+        String login = "{\"identifier\":\"%s\",\"password\":\"Secret123!\"}".formatted(email);
+
+        String first = postJson("/v1/auth/login", login).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        String firstAccess = JsonPath.read(first, "$.accessToken");
+        String firstRefresh = JsonPath.read(first, "$.refreshToken");
+        mvc.perform(get("/v1/me").header("Authorization", "Bearer " + firstAccess)).andExpect(status().isOk());
+
+        String second = postJson("/v1/auth/login", login).andExpect(status().isOk())
+                .andReturn().getResponse().getContentAsString();
+        String secondAccess = JsonPath.read(second, "$.accessToken");
+
+        mvc.perform(get("/v1/me").header("Authorization", "Bearer " + firstAccess))
+                .andExpect(status().isUnauthorized()).andExpect(jsonPath("$.code").value("SESSION_REPLACED"));
+        postJson("/v1/auth/refresh", "{\"refreshToken\":\"%s\"}".formatted(firstRefresh))
+                .andExpect(status().isUnauthorized());
+        mvc.perform(get("/v1/me").header("Authorization", "Bearer " + secondAccess)).andExpect(status().isOk());
+    }
+
+    @Test
+    void theLockoutLastsThirtyMinutes() throws Exception {
+        String email = "thirty@example.com";
+        registerAndVerifyEmail(email);
+        for (int i = 0; i < 5; i++) {
+            postJson("/v1/auth/login", "{\"identifier\":\"%s\",\"password\":\"wrong-password\"}"
+                    .formatted(email)).andExpect(status().isUnauthorized());
+        }
+        Long minutes = jdbc.queryForObject(
+                "select round(extract(epoch from (locked_until - now())) / 60) from customer where email = ?",
+                Long.class, email);
+        assertThat(minutes).isBetween(29L, 30L);
+    }
 }

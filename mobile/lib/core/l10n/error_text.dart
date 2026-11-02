@@ -34,8 +34,12 @@ abstract final class ErrorText {
       en: 'No email is waiting for confirmation. Please start again.',
     ),
     'ACCOUNT_LOCKED': AppLanguage.pick(
-      fr: 'Trop de tentatives. Réessayez dans quelques minutes.',
-      en: 'Too many attempts. Try again in a few minutes.',
+      fr: 'Trop de tentatives. Compte bloqué pendant 30 minutes.',
+      en: 'Too many attempts. Account locked for 30 minutes.',
+    ),
+    'SESSION_REPLACED': AppLanguage.pick(
+      fr: 'Votre compte est connecté sur un autre téléphone.',
+      en: 'Your account is signed in on another phone.',
     ),
     'CONTACT_ALREADY_USED': AppLanguage.pick(
       fr: 'Cet e-mail ou ce téléphone est déjà enregistré.',

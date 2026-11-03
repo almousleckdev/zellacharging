@@ -29,23 +29,26 @@ export function useStationColumns(): Column<StationView>[] {
     {
       key: "station",
       header: labels.station,
-      text: (row) => `${row.station.id} (${model(row)})`,
+      text: (row) => `${row.station.id} (${model(row)}) ${row.station.isoCode ?? ""}`.trim(),
       cell: (row) => (
         <span className="flex flex-col">
           <span className="font-medium text-foreground">{row.station.id}</span>
-          <span className="text-xs text-subtle">{model(row)}</span>
+          <span className="text-xs text-subtle">{[model(row), row.station.isoCode].filter(Boolean).join(" · ")}</span>
         </span>
       ),
     },
-    { key: "country", header: labels.country, text: (row) => row.station.isoCode ?? "", cell: (row) => row.station.isoCode ?? t.common.none },
     {
       key: "status",
       header: labels.status,
-      text: (row) => (row.station.online ? t.stations.online : t.stations.offline),
-      cell: (row) => <StationOnlineBadge online={row.station.online} />,
+      text: (row) => `${row.station.online ? t.stations.online : t.stations.offline} ${seen(row)}`.trim(),
+      cell: (row) => (
+        <span className="flex flex-col items-start gap-1">
+          <StationOnlineBadge online={row.station.online} />
+          <span className="text-xs text-subtle">{seen(row)}</span>
+        </span>
+      ),
     },
     { key: "connectors", header: labels.connectors, align: "right", text: connectors, cell: connectors },
-    { key: "seen", header: labels.lastSeen, align: "right", text: seen, cell: seen },
     { key: "sessions", header: labels.sessions, align: "right", text: (row) => row.activity.sessions, cell: (row) => format.number(row.activity.sessions) },
     {
       key: "energy",

@@ -37,13 +37,15 @@ describe("DataTable sorting", () => {
   });
 });
 
-describe("DataTable on a narrow screen", () => {
+describe("DataTable in a narrow container", () => {
   afterEach(() => {
     vi.unstubAllGlobals();
+    vi.restoreAllMocks();
   });
 
   it("stacks each row as a card instead of overflowing a table", () => {
-    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+    vi.stubGlobal("ResizeObserver", class { observe() {} disconnect() {} });
+    vi.spyOn(HTMLElement.prototype, "getBoundingClientRect").mockReturnValue({ width: 200 } as DOMRect);
 
     renderConsole(<DataTable caption="people" columns={columns} rows={[{ name: "Aline" }]} rowKey={(row) => row.name} />);
 

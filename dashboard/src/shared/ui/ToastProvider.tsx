@@ -17,8 +17,8 @@ const DISMISS_MS = 6000;
 const ToastContext = createContext<ToastApi | null>(null);
 
 const TONES: Record<Tone, string> = {
-  success: "border-border bg-background text-foreground",
-  error: "border-danger-border bg-danger-soft text-danger",
+  success: "border-success bg-success text-on-primary",
+  error: "border-danger bg-danger text-on-primary",
 };
 
 export function ToastProvider({ children }: { children: ReactNode }) {
@@ -56,7 +56,7 @@ export function ToastProvider({ children }: { children: ReactNode }) {
               type="button"
               onClick={() => dismiss(toast.id)}
               aria-label={t.dialogs.close}
-              className="rounded-control p-0.5 hover:bg-surface-strong"
+              className="rounded-control p-0.5 hover:bg-white/20"
             >
               <Icon name="close" className="size-4" />
             </button>

@@ -14,7 +14,6 @@ abstract final class AppToast {
     message,
     AppIcons.checkCircle,
     AppColors.success,
-    AppColors.successSoft,
   );
 
   static void error(BuildContext context, String message) => _show(
@@ -22,7 +21,6 @@ abstract final class AppToast {
     message,
     AppIcons.warning,
     AppColors.danger,
-    AppColors.dangerSoft,
   );
 
   static void warning(BuildContext context, String message) => _show(
@@ -30,7 +28,6 @@ abstract final class AppToast {
     message,
     AppIcons.warning,
     AppColors.warning,
-    AppColors.warningSoft,
   );
 
   static void info(BuildContext context, String message) => _show(
@@ -38,14 +35,12 @@ abstract final class AppToast {
     message,
     AppIcons.info,
     AppColors.primary,
-    AppColors.primarySoft,
   );
 
   static void _show(
     BuildContext context,
     String message,
     IconData icon,
-    Color accent,
     Color background,
   ) {
     _current?.remove();
@@ -55,7 +50,6 @@ abstract final class AppToast {
       builder: (_) => _ToastView(
         message: message,
         icon: icon,
-        accent: accent,
         background: background,
         onDone: () {
           if (_current == entry) _current = null;
@@ -72,14 +66,12 @@ class _ToastView extends StatefulWidget {
   const _ToastView({
     required this.message,
     required this.icon,
-    required this.accent,
     required this.background,
     required this.onDone,
   });
 
   final String message;
   final IconData icon;
-  final Color accent;
   final Color background;
   final VoidCallback onDone;
 
@@ -148,7 +140,6 @@ class _ToastViewState extends State<_ToastView>
     decoration: BoxDecoration(
       color: widget.background,
       borderRadius: BorderRadius.circular(AppSpacing.radius),
-      border: Border.all(color: widget.accent.withValues(alpha: 0.35)),
       boxShadow: [
         BoxShadow(
           color: AppColors.textPrimary.withValues(alpha: 0.12),
@@ -159,13 +150,13 @@ class _ToastViewState extends State<_ToastView>
     ),
     child: Row(
       children: [
-        Icon(widget.icon, size: 22, color: widget.accent),
+        Icon(widget.icon, size: 22, color: AppColors.onPrimary),
         const SizedBox(width: AppSpacing.sm + 2),
         Expanded(
           child: Text(
             widget.message,
             style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-              color: AppColors.textPrimary,
+              color: AppColors.onPrimary,
               fontWeight: FontWeight.w500,
             ),
           ),

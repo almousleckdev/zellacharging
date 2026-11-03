@@ -3,7 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { cn } from "@/shared/lib/cn";
-import { useMediaQuery } from "@/shared/lib/useMediaQuery";
+import { useElementWidth } from "@/shared/lib/useElementWidth";
 
 export type Column<Row> = {
   key: string;
@@ -50,7 +50,7 @@ function SortHeader({ column, label, sort }: { column: string; label: string; so
   );
 }
 
-const WIDE_COLUMNS = 5;
+const COLUMN_MIN_WIDTH = 140;
 
 function CardRow<Row>({ row, columns }: { row: Row; columns: Column<Row>[] }) {
   const [lead, ...rest] = columns;
@@ -75,28 +75,23 @@ function CardRow<Row>({ row, columns }: { row: Row; columns: Column<Row>[] }) {
   );
 }
 
-export function DataTable<Row>({ caption, columns, rows, rowKey, rowHref, sort }: DataTableProps<Row>) {
-  const router = useRouter();
-  const wide = columns.length > WIDE_COLUMNS;
-  const tabular = useMediaQuery(wide ? "(min-width: 1280px)" : "(min-width: 768px)", true);
-  const open = rowHref ? (row: Row) => router.push(rowHref(row)) : undefined;
+function CardList<Row>({ caption, columns, rows, rowKey, open }: { caption: string; columns: Column<Row>[]; rows: Row[]; rowKey: (row: Row) => string; open?: (row: Row) => void }) {
+  return (
+    <ul aria-label={caption} className="divide-y divide-border">
+      {rows.map((row) => (
+        <li
+          key={rowKey(row)}
+          onClick={open ? () => open(row) : undefined}
+          className={cn("px-4 py-4 transition-colors sm:px-5", open && "cursor-pointer hover:bg-surface")}
+        >
+          <CardRow row={row} columns={columns} />
+        </li>
+      ))}
+    </ul>
+  );
+}
 
-  if (!tabular) {
-    return (
-      <ul aria-label={caption} className="divide-y divide-border">
-        {rows.map((row) => (
-          <li
-            key={rowKey(row)}
-            onClick={open ? () => open(row) : undefined}
-            className={cn("px-4 py-4 transition-colors sm:px-5", open && "cursor-pointer hover:bg-surface")}
-          >
-            <CardRow row={row} columns={columns} />
-          </li>
-        ))}
-      </ul>
-    );
-  }
-
+function Grid<Row>({ caption, columns, rows, rowKey, open, sort }: { caption: string; columns: Column<Row>[]; rows: Row[]; rowKey: (row: Row) => string; open?: (row: Row) => void; sort?: TableSort }) {
   return (
     <table className="w-full border-collapse text-sm">
       <caption className="sr-only">{caption}</caption>
@@ -135,5 +130,19 @@ export function DataTable<Row>({ caption, columns, rows, rowKey, rowHref, sort }
         ))}
       </tbody>
     </table>
+  );
+}
+
+export function DataTable<Row>({ caption, columns, rows, rowKey, rowHref, sort }: DataTableProps<Row>) {
+  const router = useRouter();
+  const [ref, width] = useElementWidth<HTMLDivElement>();
+  const tabular = width === null || width >= columns.length * COLUMN_MIN_WIDTH;
+  const open = rowHref ? (row: Row) => router.push(rowHref(row)) : undefined;
+  const shared = { caption, columns, rows, rowKey, open };
+
+  return (
+    <div ref={ref} className="w-full min-w-0">
+      {tabular ? <Grid {...shared} sort={sort} /> : <CardList {...shared} />}
+    </div>
   );
 }

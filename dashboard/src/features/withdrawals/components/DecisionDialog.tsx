@@ -87,7 +87,7 @@ export function DecisionDialog({ withdrawal, action, onClose }: DecisionDialogPr
             }}
             placeholder={labels.notePlaceholder}
             aria-invalid={missing}
-            className="rounded-control border border-transparent bg-surface-strong p-3 text-sm font-normal focus:bg-background"
+            className="rounded-control border border-transparent bg-surface-strong p-3 text-sm font-normal focus:bg-surface-focus"
           />
         </label>
         {missing && reasonRequired && (

@@ -32,7 +32,7 @@ export function AttentionCard({ totals }: { totals: OverviewTotals }) {
       <ul className="flex flex-col divide-y divide-border border-t border-border">
         {items.map((item) => (
           <li key={item.key}>
-            <Link href={scopedHref(item.href)} className="flex items-center gap-3 px-5 py-3.5 text-sm transition-colors hover:bg-surface">
+            <Link href={scopedHref(item.href)} className="flex items-center gap-3 px-5 py-2.5 text-sm transition-colors hover:bg-surface">
               <span className="flex-1 text-foreground">{item.label}</span>
               <span
                 className={cn(

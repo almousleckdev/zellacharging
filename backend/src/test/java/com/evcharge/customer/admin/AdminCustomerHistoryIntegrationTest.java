@@ -89,12 +89,14 @@ class AdminCustomerHistoryIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void theLedgerAndTheActivityOfACustomerAreListedForSupport() throws Exception {
+    void theLedgerListsOnlyTopupsAndWithdrawalsAndTheActivityIsListedForSupport() throws Exception {
         UUID customer = data.customer("GA", "ACTIVE", marker + "Ledger", "Test", null, Instant.now());
         data.wallet("GA", customer, "XAF", 500, 0);
         TenantContext.runAs("GA", () -> {
             jdbc.update("insert into ledger_entry (id, customer_id, type, amount_minor, idempotency_key, created_at) "
                     + "values (?, ?, 'TOPUP', 500, ?, now())", UUID.randomUUID(), customer, UUID.randomUUID().toString());
+            jdbc.update("insert into ledger_entry (id, customer_id, type, amount_minor, idempotency_key, created_at) "
+                    + "values (?, ?, 'CAPTURE', 200, ?, now())", UUID.randomUUID(), customer, UUID.randomUUID().toString());
             jdbc.update("insert into audit_record (id, actor_id, action, subject, created_at) "
                     + "values (?, ?, 'LOGIN_SUCCEEDED', 'customer', now())", UUID.randomUUID(), customer);
         });

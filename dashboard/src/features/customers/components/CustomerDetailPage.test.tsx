@@ -65,7 +65,7 @@ describe("CustomerDetailPage", () => {
     expect(within(identity).getByText("aline@example.com")).toBeInTheDocument();
     expect(within(identity).getByText("Vérifié")).toBeInTheDocument();
     expect(screen.queryByText("Solde")).not.toBeInTheDocument();
-    expect(screen.queryByRole("heading", { name: "Portefeuille" })).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Rechargements du compte" })).not.toBeInTheDocument();
     expect(screen.getByText("31,5 kWh")).toBeInTheDocument();
     expect(screen.getByText("Total dépensé").closest("article")?.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("4 725 FCFA");
   });
@@ -81,13 +81,13 @@ describe("CustomerDetailPage", () => {
 
     renderConsole(<CustomerDetailPage />, { ...profileOf(), permissions: ["OVERVIEW_READ", "SESSIONS_READ", "PAYMENTS_READ", "AUDIT_READ"] });
 
-    for (const name of ["Aperçu", "Recharges", "Portefeuille", "Activité"]) {
+    for (const name of ["Aperçu", "Sessions de charge", "Rechargements", "Activité"]) {
       expect(await screen.findByRole("button", { name })).toBeInTheDocument();
     }
     expect(screen.queryByRole("button", { name: "Paiements" })).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/ledger"))).toBe(false);
     navigation.search = new URLSearchParams("country=GA&tab=wallet");
-    await user.click(screen.getByRole("button", { name: "Portefeuille" }));
+    await user.click(screen.getByRole("button", { name: "Rechargements" }));
     expect(navigation.replace).toHaveBeenCalledWith(expect.stringContaining("tab=wallet"));
   });
 

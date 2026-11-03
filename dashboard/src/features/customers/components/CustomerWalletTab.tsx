@@ -11,7 +11,7 @@ type CustomerWalletTabProps = { country: string; id: string; currency: string; d
 
 export function CustomerWalletTab({ country, id, currency, decimals, wallet }: CustomerWalletTabProps) {
   const { t } = useI18n();
-  const columns = useLedgerColumns(country, currency, decimals);
+  const columns = useLedgerColumns(currency, decimals);
 
   return (
     <div className="flex flex-col gap-6">

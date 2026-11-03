@@ -27,15 +27,15 @@ export function QuickAccess() {
 
   return (
     <Card title={t.overview.quick.title}>
-      <ul className="grid grid-cols-2 gap-3">
+      <ul className="grid grid-cols-4 gap-2">
         {visible.map((item) => (
           <li key={item.id}>
             <Link
               href={scopedHref(item.href)}
-              className="flex flex-col items-center gap-2 rounded-control border border-border p-3 text-sm font-medium text-foreground transition-colors hover:bg-surface"
+              className="flex flex-col items-center gap-1.5 rounded-control bg-surface p-2 text-center text-xs font-medium text-foreground transition-colors hover:bg-surface-strong"
             >
-              <span className="flex size-10 items-center justify-center rounded-control bg-primary-soft text-primary-text">
-                <Icon name={item.icon} className="size-5" />
+              <span className="flex size-8 items-center justify-center rounded-control bg-primary-soft text-primary-text">
+                <Icon name={item.icon} className="size-4" />
               </span>
               {t.nav[item.id]}
             </Link>

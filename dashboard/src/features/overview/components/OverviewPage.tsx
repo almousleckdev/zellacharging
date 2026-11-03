@@ -39,7 +39,7 @@ export function OverviewPage() {
   const name = profile.firstName ?? profile.email;
 
   return (
-    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_21rem]">
+    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
       <div className="flex min-w-0 flex-col gap-6">
         <PageHeader
           title={interpolate(t.overview.greeting, { name })}
@@ -60,20 +60,16 @@ export function OverviewPage() {
           </div>
         )}
         {(overview.isError || series.isError) && <ErrorState message={t.overview.loadError} onRetry={() => void overview.refetch()} />}
-        {overview.data && series.data && primary && (
-          <>
-            <RevenueKpis period={primary} days={days} />
-            <RevenueChart period={primary} days={days} />
-          </>
-        )}
+        {overview.data && series.data && primary && <RevenueKpis period={primary} days={days} />}
       </div>
-      <aside className="flex min-w-0 flex-col gap-6">
+      <aside className="flex min-w-0 flex-col gap-4">
         <PendingWithdrawalsPanel />
         {overview.data && <AttentionCard totals={overviewTotals(overview.data.countries)} />}
         <QuickAccess />
       </aside>
       {overview.data && series.data && primary && (
         <div className="flex min-w-0 flex-col gap-6 xl:col-span-2">
+          <RevenueChart period={primary} days={days} />
           <RecentCharges />
           <div className="grid items-start gap-6 lg:grid-cols-2">
             <TopCommissions />

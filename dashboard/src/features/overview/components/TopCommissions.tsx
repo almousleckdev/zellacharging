@@ -9,7 +9,7 @@ import { useLogList } from "@/shared/lists/useLogList";
 import { Card } from "@/shared/ui/Card";
 import { DataTable } from "@/shared/ui/DataTable";
 
-const TOP = 5;
+const TOP = 3;
 const SHOWN = ["customer", "charges", "commission"];
 
 function CommissionsCard() {

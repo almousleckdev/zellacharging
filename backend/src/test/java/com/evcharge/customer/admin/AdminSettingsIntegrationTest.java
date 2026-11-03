@@ -121,7 +121,7 @@ class AdminSettingsIntegrationTest extends PostgresTestBase {
         save(root, "wallet", "{\"values\":{\"minTopupMinor\":600000}}").andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("SETTING_RANGE_INVALID"));
 
-        assertThat(wallet.minTopupMinor()).isEqualTo(500);
+        assertThat(wallet.minTopupMinor()).isEqualTo(100);
     }
 
     @Test
@@ -135,6 +135,6 @@ class AdminSettingsIntegrationTest extends PostgresTestBase {
 
         save(admin, "wallet", "{\"values\":{\"minTopupMinor\":1000}}").andExpect(status().isForbidden());
 
-        assertThat(wallet.minTopupMinor()).isEqualTo(500);
+        assertThat(wallet.minTopupMinor()).isEqualTo(100);
     }
 }

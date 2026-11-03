@@ -63,7 +63,7 @@ body {
   select:focus-visible,
   textarea:focus-visible {
     outline: none;
-    box-shadow: 0 0 0 2px color-mix(in srgb, var(--color-foreground) 15%, transparent);
+    box-shadow: none;
   }
 
   input:-webkit-autofill,

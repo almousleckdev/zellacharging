@@ -27,8 +27,8 @@ export function TextField({ label, error, hint, trailing, className, ...rest }: 
           className={cn(
             "h-11 w-full rounded-control border border-transparent bg-surface-strong px-3.5 text-sm text-foreground transition",
             "placeholder:text-subtle disabled:opacity-60",
-            "focus:bg-background focus:outline-none focus:ring-2",
-            error ? "border-danger focus:ring-danger/20" : "hover:bg-surface-strong/70 focus:ring-foreground/15",
+            "focus:bg-background focus:shadow-card focus:outline-none",
+            error && "border-danger",
             trailing ? "pr-11" : undefined,
             className,
           )}

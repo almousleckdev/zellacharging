@@ -15,7 +15,8 @@ import java.util.UUID;
 class JdbcLedgerLog implements LedgerLog {
 
     private static final String SCOPE = " from ledger_entry where customer_id = :customer "
-            + "and country_code = current_setting('app.country', true)";
+            + "and country_code = current_setting('app.country', true) "
+            + "and type in ('TOPUP', 'WITHDRAWAL', 'WITHDRAWAL_REVERSAL')";
 
     private static final RowMapper<LedgerRecord> MAPPER = (rs, rowNum) -> new LedgerRecord(
             rs.getObject("id", UUID.class), rs.getString("type"), rs.getLong("amount_minor"),

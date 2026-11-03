@@ -21,6 +21,7 @@ export function PasswordField(props: Omit<TextFieldProps, "type" | "trailing">) 
 
   return (
     <TextField
+      placeholder="••••••••"
       {...props}
       type={visible ? "text" : "password"}
       trailing={

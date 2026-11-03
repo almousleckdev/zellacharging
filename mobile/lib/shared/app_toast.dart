@@ -9,33 +9,17 @@ import '../core/theme/app_spacing.dart';
 abstract final class AppToast {
   static OverlayEntry? _current;
 
-  static void success(BuildContext context, String message) => _show(
-    context,
-    message,
-    AppIcons.checkCircle,
-    AppColors.success,
-  );
+  static void success(BuildContext context, String message) =>
+      _show(context, message, AppIcons.checkCircle, AppColors.success);
 
-  static void error(BuildContext context, String message) => _show(
-    context,
-    message,
-    AppIcons.warning,
-    AppColors.danger,
-  );
+  static void error(BuildContext context, String message) =>
+      _show(context, message, AppIcons.warning, AppColors.danger);
 
-  static void warning(BuildContext context, String message) => _show(
-    context,
-    message,
-    AppIcons.warning,
-    AppColors.warning,
-  );
+  static void warning(BuildContext context, String message) =>
+      _show(context, message, AppIcons.warning, AppColors.warning);
 
-  static void info(BuildContext context, String message) => _show(
-    context,
-    message,
-    AppIcons.info,
-    AppColors.primary,
-  );
+  static void info(BuildContext context, String message) =>
+      _show(context, message, AppIcons.info, AppColors.primary);
 
   static void _show(
     BuildContext context,

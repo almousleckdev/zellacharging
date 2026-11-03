@@ -11,19 +11,20 @@ import 'test_fonts.dart';
 void main() {
   setUpAll(loadTestFonts);
 
-  testWidgets('the customer never types an amount, the wallet balance is used', (
-    tester,
-  ) async {
-    await pumpApp(
-      tester,
-      const ChargeSetupPage(stationId: 'CP-1', initialConnectorId: 1),
-      overrides: overrides(),
-    );
-    await tester.pump(const Duration(milliseconds: 600));
+  testWidgets(
+    'the customer never types an amount, the wallet balance is used',
+    (tester) async {
+      await pumpApp(
+        tester,
+        const ChargeSetupPage(stationId: 'CP-1', initialConnectorId: 1),
+        overrides: overrides(),
+      );
+      await tester.pump(const Duration(milliseconds: 600));
 
-    expect(find.byType(AmountCard), findsNothing);
-    expect(find.byType(TextField), findsNothing);
-    expect(find.text(PayText.balanceUsed), findsOneWidget);
-    await closeApp(tester);
-  });
+      expect(find.byType(AmountCard), findsNothing);
+      expect(find.byType(TextField), findsNothing);
+      expect(find.text(PayText.balanceUsed), findsOneWidget);
+      await closeApp(tester);
+    },
+  );
 }

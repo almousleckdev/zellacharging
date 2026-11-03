@@ -99,10 +99,8 @@ abstract final class PayText {
     en: 'Charging uses your available balance and stops automatically when it runs out.',
   );
 
-  static String get rechargeNeededTitle => AppLanguage.pick(
-    fr: 'Solde insuffisant',
-    en: 'Insufficient balance',
-  );
+  static String get rechargeNeededTitle =>
+      AppLanguage.pick(fr: 'Solde insuffisant', en: 'Insufficient balance');
 
   static String rechargeNeeded(String minimum) => AppLanguage.pick(
     fr: 'Il faut au moins $minimum dans votre portefeuille pour démarrer une recharge. Rechargez votre compte.',

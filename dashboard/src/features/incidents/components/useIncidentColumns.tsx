@@ -12,9 +12,13 @@ const SEVERITY_TONES = { HIGH: "danger", MEDIUM: "warning", LOW: "neutral" } as 
 const STATUS_TONES = { OPEN: "danger", ACKNOWLEDGED: "warning", RESOLVED: "success" } as const;
 
 export function subjectHref(incident: IncidentItem): string {
-  return incident.subjectType === "session"
-    ? `/sessions/${incident.country}/${incident.subjectId}`
-    : `/payments/${incident.country}/${incident.subjectType.toUpperCase()}/${incident.subjectId}`;
+  if (incident.subjectType === "session") {
+    return `/sessions/${incident.country}/${incident.subjectId}`;
+  }
+  if (incident.subjectType === "withdrawal") {
+    return `/withdrawals/${incident.country}/${incident.subjectId}`;
+  }
+  return `/customers/${incident.country}/${incident.customerId}`;
 }
 
 export function useIncidentColumns(): Column<IncidentItem>[] {

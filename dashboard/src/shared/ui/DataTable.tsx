@@ -50,7 +50,7 @@ function SortHeader({ column, label, sort }: { column: string; label: string; so
   );
 }
 
-const COLUMN_MIN_WIDTH = 140;
+const TABLE_MIN_WIDTH = 720;
 
 function CardRow<Row>({ row, columns }: { row: Row; columns: Column<Row>[] }) {
   const [lead, ...rest] = columns;
@@ -136,7 +136,7 @@ function Grid<Row>({ caption, columns, rows, rowKey, open, sort }: { caption: st
 export function DataTable<Row>({ caption, columns, rows, rowKey, rowHref, sort }: DataTableProps<Row>) {
   const router = useRouter();
   const [ref, width] = useElementWidth<HTMLDivElement>();
-  const tabular = width === null || width >= columns.length * COLUMN_MIN_WIDTH;
+  const tabular = width === null || width >= TABLE_MIN_WIDTH;
   const open = rowHref ? (row: Row) => router.push(rowHref(row)) : undefined;
   const shared = { caption, columns, rows, rowKey, open };
 

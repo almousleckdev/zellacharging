@@ -37,7 +37,7 @@ export const frCommon = {
     },
     back: "Retour",
     related: "Enregistrements liés",
-    none: "—",
+    none: "",
     retry: "Réessayer",
     loading: "Chargement…",
     skipToContent: "Aller au contenu principal",

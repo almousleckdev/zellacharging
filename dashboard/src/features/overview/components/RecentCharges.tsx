@@ -11,12 +11,12 @@ import { DataTable } from "@/shared/ui/DataTable";
 
 const RECENT = 6;
 
-export function RecentCharges() {
+function ChargesCard() {
   const { t } = useI18n();
   const { country, scopedHref } = useSession();
   const query = useLogList("sessions", { country, text: "", from: "", to: "", page: 0, size: RECENT, sort: "", extra: {} }, sessionListSchema);
   const rows = query.data?.items ?? [];
-  const columns = useSessionColumns().filter((column) => ["station", "state", "energy", "cost", "date"].includes(column.key));
+  const columns = useSessionColumns().filter((column) => ["station", "customer", "state", "energy", "cost", "date"].includes(column.key));
 
   return (
     <Card
@@ -40,4 +40,10 @@ export function RecentCharges() {
       )}
     </Card>
   );
+}
+
+export function RecentCharges() {
+  const { profile } = useSession();
+
+  return profile.permissions.includes("SESSIONS_READ") ? <ChargesCard /> : null;
 }

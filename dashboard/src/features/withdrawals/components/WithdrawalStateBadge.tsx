@@ -14,9 +14,9 @@ const TONES: Record<string, "success" | "warning" | "danger"> = {
   FAILED: "danger",
 };
 
-export function PaymentStateBadge({ state }: { state: string }) {
+export function WithdrawalStateBadge({ state }: { state: string }) {
   const { t } = useI18n();
-  const labels: Record<string, string> = t.payments.states;
+  const labels: Record<string, string> = t.withdrawals.states;
 
   return <Badge tone={TONES[state] ?? "neutral"}>{labels[state] ?? state}</Badge>;
 }

@@ -2,6 +2,7 @@ package com.evcharge.customer.admin.web;
 
 import com.evcharge.customer.admin.application.AdminSessionService;
 import com.evcharge.customer.admin.domain.AdminAccess;
+import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.shared.LogFilter;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -28,7 +29,7 @@ class AdminSessionController {
                              @RequestParam(required = false) Instant from, @RequestParam(required = false) Instant to,
                              @RequestParam(required = false) UUID customerId, @RequestParam(required = false) String sort, @RequestParam(required = false) String station,
                              @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        return SessionListResponse.from(sessions.list(admin, country, state, q, new LogFilter(from, to, customerId), station, sort, page, size));
+        return SessionListResponse.from(sessions.list(admin, Permission.SESSIONS_READ, country, state, q, new LogFilter(from, to, customerId), station, sort, page, size));
     }
 
     @GetMapping("/by-customer")
@@ -42,12 +43,12 @@ class AdminSessionController {
                                     @RequestParam(required = false) String station,
                                     @RequestParam(defaultValue = "0") int page,
                                     @RequestParam(defaultValue = "10") int size) {
-        return SessionDigestResponse.from(sessions.byCustomer(admin, country, state, q,
+        return SessionDigestResponse.from(sessions.byCustomer(admin, Permission.SESSIONS_READ, country, state, q,
                 new LogFilter(from, to, null), station, sort, page, size));
     }
 
     @GetMapping("/{country}/{id}")
     SessionDetailResponse detail(AdminAccess admin, @PathVariable String country, @PathVariable UUID id) {
-        return SessionDetailResponse.from(sessions.detail(admin, country, id));
+        return SessionDetailResponse.from(sessions.detail(admin, Permission.SESSIONS_READ, country, id));
     }
 }

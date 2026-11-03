@@ -60,7 +60,7 @@ export function ReviewDialog({ incident, status, onClose }: ReviewDialogProps) {
           rows={4}
           onChange={(event) => setNote(event.target.value)}
           placeholder={labels.notePlaceholder}
-          className="rounded-control border border-border-strong bg-background p-3 text-sm font-normal"
+          className="rounded-control border border-transparent bg-surface-strong p-3 text-sm font-normal focus:bg-background"
         />
       </label>
     </Modal>

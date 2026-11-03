@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import type { PaymentItem } from "@/features/payments/schemas";
+import type { WithdrawalItem } from "../schemas";
 import { ApiError } from "@/shared/api/adminFetch";
 import { errorMessage } from "@/shared/i18n/errorMessage";
 import { useI18n } from "@/shared/i18n/I18nProvider";
@@ -13,7 +13,7 @@ import { useToast } from "@/shared/ui/ToastProvider";
 import { useReviewWithdrawal, type WithdrawalAction } from "../api/useReviewWithdrawal";
 
 type DecisionDialogProps = {
-  withdrawal: PaymentItem;
+  withdrawal: WithdrawalItem;
   action: WithdrawalAction;
   onClose: () => void;
 };
@@ -87,7 +87,7 @@ export function DecisionDialog({ withdrawal, action, onClose }: DecisionDialogPr
             }}
             placeholder={labels.notePlaceholder}
             aria-invalid={missing}
-            className="rounded-control border border-border-strong bg-background p-3 text-sm font-normal"
+            className="rounded-control border border-transparent bg-surface-strong p-3 text-sm font-normal focus:bg-background"
           />
         </label>
         {missing && reasonRequired && (

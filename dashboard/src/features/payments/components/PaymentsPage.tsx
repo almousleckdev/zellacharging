@@ -1,36 +1,26 @@
 "use client";
 
 import { useSession } from "@/features/session/SessionProvider";
+import { sessionDigestSchema } from "@/features/sessions/schemas";
+import { useSessionDigestColumns } from "@/features/sessions/components/useSessionDigestColumns";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
-import { paymentListSchema } from "../schemas";
-import { usePaymentColumns } from "./usePaymentColumns";
 
-const KINDS = ["TOPUP", "WITHDRAWAL"] as const;
-const STATES = ["SUCCEEDED", "PAID", "PENDING_APPROVAL", "PENDING", "PROCESSING", "REQUESTED", "REVIEW", "FAILED"] as const;
-
-export function PaymentsPage({ customerId }: { customerId?: string }) {
+export function PaymentsPage() {
   const { t } = useI18n();
   const { scopedHref } = useSession();
-  const columns = usePaymentColumns();
-  const kinds: Record<string, string> = t.payments.kinds;
-  const states: Record<string, string> = t.payments.states;
+  const columns = useSessionDigestColumns();
 
   return (
     <LogListPage
-      resource="payments"
-      schema={paymentListSchema}
+      resource="payments/by-customer"
+      exportName="payments"
+      schema={sessionDigestSchema}
       labels={t.payments}
       icon="wallet"
-      columns={customerId ? columns.filter((column) => column.key !== "customer") : columns}
-      rowKey={(row) => `${row.kind}-${row.id}`}
-      rowHref={(row) => scopedHref(`/payments/${row.country}/${row.kind}/${row.id}`)}
-      filters={[
-        { key: "kind", label: t.payments.kindLabel, allLabel: t.payments.allKinds, options: KINDS.map((value) => ({ value, label: kinds[value] })) },
-        { key: "state", label: t.payments.stateLabel, allLabel: t.payments.allStates, options: STATES.map((value) => ({ value, label: states[value] })) },
-      ]}
-      fixed={customerId ? { customerId } : undefined}
-      embedded={customerId !== undefined}
+      columns={columns}
+      rowKey={(row) => `${row.country}-${row.customerId}`}
+      rowHref={(row) => scopedHref(`/customers/${row.country}/${row.customerId}?tab=sessions`)}
     />
   );
 }

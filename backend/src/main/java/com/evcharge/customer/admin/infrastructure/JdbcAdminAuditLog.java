@@ -16,7 +16,8 @@ import java.util.UUID;
 @Repository
 class JdbcAdminAuditLog implements AdminAuditLog {
 
-    private static final String FROM = " from admin_audit_record a join admin_user u on u.id = a.admin_id where true";
+    private static final String FROM = " from admin_audit_record a join admin_user u on u.id = a.admin_id "
+            + "where a.action <> 'CUSTOMER_VIEWED'";
     private static final String TEXT = " and (lower(u.email) like :pattern escape '\\' "
             + "or lower(coalesce(a.subject, '')) like :pattern escape '\\' "
             + "or lower(coalesce(a.detail, '')) like :pattern escape '\\')";
@@ -47,7 +48,7 @@ class JdbcAdminAuditLog implements AdminAuditLog {
 
     @Override
     public List<String> actions() {
-        return jdbc.sql("select distinct action from admin_audit_record order by action").query(String.class).list();
+        return jdbc.sql("select distinct action from admin_audit_record where action <> 'CUSTOMER_VIEWED' order by action").query(String.class).list();
     }
 
     private static JdbcClient.StatementSpec bind(JdbcClient.StatementSpec spec, AuditQuery query) {

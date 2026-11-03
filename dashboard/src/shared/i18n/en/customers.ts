@@ -19,7 +19,7 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
       PENDING_VERIFICATION: "Pending verification",
       PENDING_PHONE: "Phone to confirm",
     },
-    tabs: { overview: "Overview", sessions: "Charging sessions", payments: "Payments", wallet: "Wallet", activity: "Activity" },
+    tabs: { overview: "Overview", sessions: "Charging sessions", wallet: "Wallet", activity: "Activity" },
     ledger: {
       loadError: "We couldn't load the wallet movements.",
       emptyTitle: "No movements",

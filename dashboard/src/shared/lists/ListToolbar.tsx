@@ -9,11 +9,11 @@ type ListToolbarProps = {
 
 export function ListToolbar({ search, filters, actions, range }: ListToolbarProps) {
   return (
-    <div className="flex flex-wrap items-center gap-3 border-b border-border px-5 py-3.5">
+    <div className="flex flex-col gap-3 border-b border-border px-4 py-3.5 sm:flex-row sm:flex-wrap sm:items-center sm:px-5">
       {search}
       {filters}
       {range}
-      <div className="ml-auto">{actions}</div>
+      <div className="sm:ml-auto">{actions}</div>
     </div>
   );
 }

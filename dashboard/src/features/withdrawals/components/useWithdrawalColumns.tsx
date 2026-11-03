@@ -7,30 +7,24 @@ import { cn } from "@/shared/lib/cn";
 import { CellLink } from "@/shared/ui/CellLink";
 import type { Column } from "@/shared/ui/DataTable";
 import { OperatorBadge } from "@/shared/ui/OperatorBadge";
-import { isSettled, signedAmount } from "../format";
-import type { PaymentItem } from "../schemas";
-import { PaymentStateBadge } from "./PaymentStateBadge";
+import { isPaidOut, withdrawalAmount } from "../format";
+import type { WithdrawalItem } from "../schemas";
+import { WithdrawalStateBadge } from "./WithdrawalStateBadge";
 
-export function usePaymentColumns(): Column<PaymentItem>[] {
+export function useWithdrawalColumns(): Column<WithdrawalItem>[] {
   const { t } = useI18n();
   const format = useFormatters();
   const { scopedHref } = useSession();
-  const labels = t.payments.columns;
-  const kinds: Record<string, string> = t.payments.kinds;
-  const states: Record<string, string> = t.payments.states;
-  const amount = (row: PaymentItem) => signedAmount(row, format);
+  const labels = t.withdrawals.columns;
+  const states: Record<string, string> = t.withdrawals.states;
+  const amount = (row: WithdrawalItem) => withdrawalAmount(row, format);
 
   return [
     {
       key: "payment",
       header: labels.payment,
-      text: (row) => `${kinds[row.kind] ?? row.kind} ${row.reference}`,
-      cell: (row) => (
-        <span className="flex flex-col">
-          <span className="font-medium text-foreground">{kinds[row.kind] ?? row.kind}</span>
-          <span className="font-mono text-xs text-subtle">{row.reference}</span>
-        </span>
-      ),
+      text: (row) => row.reference,
+      cell: (row) => <span className="font-mono text-xs text-foreground">{row.reference}</span>,
     },
     {
       key: "customer",
@@ -46,14 +40,14 @@ export function usePaymentColumns(): Column<PaymentItem>[] {
         </CellLink>
       ),
     },
-    { key: "state", header: labels.state, text: (row) => states[row.state] ?? row.state, cell: (row) => <PaymentStateBadge state={row.state} /> },
+    { key: "state", header: labels.state, text: (row) => states[row.state] ?? row.state, cell: (row) => <WithdrawalStateBadge state={row.state} /> },
     {
       key: "amount",
       header: labels.amount,
       align: "right",
       sortKey: "amount",
       text: amount,
-      cell: (row) => <span className={cn("figure font-semibold", !isSettled(row) && "text-subtle")}>{amount(row)}</span>,
+      cell: (row) => <span className={cn("figure font-semibold", !isPaidOut(row) && "text-subtle")}>{amount(row)}</span>,
     },
     { key: "date", header: labels.date, align: "right", sortKey: "date", text: (row) => format.dateTime(row.createdAt), cell: (row) => format.dateTime(row.createdAt) },
   ];

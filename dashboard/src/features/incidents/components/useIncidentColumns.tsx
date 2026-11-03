@@ -27,7 +27,7 @@ export function useIncidentColumns(): Column<IncidentItem>[] {
   const statuses: Record<string, string> = t.incidents.statuses;
   const amount = (row: IncidentItem) =>
     row.amountMinor === null || row.currency === null
-      ? "–"
+      ? ""
       : format.money([{ currency: row.currency, decimals: row.decimals, minor: row.amountMinor }])[0];
 
   return [

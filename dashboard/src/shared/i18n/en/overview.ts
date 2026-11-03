@@ -6,7 +6,6 @@ export const enOverview: Pick<Dictionary, "overview"> = {
     greeting: "Hello, {name}",
     pending: { title: "Withdrawals to approve", all: "See all", empty: "No withdrawal is waiting." },
     quick: { title: "Quick access" },
-    activity: { title: "Recent activity", all: "See all", empty: "No operation yet." },
     subtitle: "Sales and activity · {scope}",
     loadError: "We couldn't load the indicators.",
     unitKwh: "kWh",
@@ -37,7 +36,7 @@ export const enOverview: Pick<Dictionary, "overview"> = {
       liveSessions: "Charges in progress",
     },
     countries: { title: "Sales by country", text: "Comparison over the chosen period.", charges: "{count} charges", new: "New" },
-    network: { title: "Station network", all: "See stations", online: "online", charges: "{count} charges", unavailable: "Stations are temporarily unavailable." },
+    commissions: { title: "Commissions", all: "See all", empty: "No commission yet." },
     recent: { charges: "Latest charges", all: "See all", empty: "No charge yet." },
   },
 };

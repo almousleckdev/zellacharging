@@ -20,7 +20,7 @@ export function ConnectorStatusBadge({ status }: { status: string | null }) {
   const labels: Record<string, string> = t.stations.connectorStatuses;
 
   if (!status) {
-    return <Badge>{t.common.none}</Badge>;
+    return null;
   }
   return <Badge tone={TONES[status] ?? "neutral"}>{labels[status] ?? status}</Badge>;
 }

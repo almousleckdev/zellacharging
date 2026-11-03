@@ -57,7 +57,7 @@ describe("WithdrawalsPage", () => {
     const table = await screen.findByRole("table");
     expect(within(table).getByText("Aline Obame")).toBeInTheDocument();
     const url = String(fetchMock.mock.calls[0][0]);
-    expect(url).toContain("kind=WITHDRAWAL");
+    expect(url).toContain("/api/admin/withdrawals?");
     expect(url).toContain("state=PENDING_APPROVAL");
   });
 
@@ -71,7 +71,7 @@ describe("WithdrawalsPage", () => {
     expect(within(table).getByText("Aline Obame")).toBeInTheDocument();
     expect(within(table).getByText("À valider")).toBeInTheDocument();
     const url = String(fetchMock.mock.calls[0][0]);
-    expect(url).toContain("kind=WITHDRAWAL");
+    expect(url).toContain("/api/admin/withdrawals?");
     expect(url).not.toContain("state=PENDING_APPROVAL");
     expect(screen.getByRole("combobox", { name: "État" })).toBeInTheDocument();
   });

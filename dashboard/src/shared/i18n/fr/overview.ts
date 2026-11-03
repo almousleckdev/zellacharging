@@ -4,7 +4,6 @@ export const frOverview = {
     greeting: "Bonjour, {name}",
     pending: { title: "Retraits à valider", all: "Tout voir", empty: "Aucun retrait en attente." },
     quick: { title: "Accès rapide" },
-    activity: { title: "Activité récente", all: "Tout voir", empty: "Aucune opération pour le moment." },
     subtitle: "Voici l'aperçu de votre réseau · {scope}",
     loadError: "Impossible de charger les indicateurs.",
     unitKwh: "kWh",
@@ -35,7 +34,7 @@ export const frOverview = {
       liveSessions: "Recharges en cours",
     },
     countries: { title: "Ventes par pays", text: "Comparaison sur la période choisie.", charges: "{count} recharges", new: "Nouveau" },
-    network: { title: "Réseau de bornes", all: "Voir les bornes", online: "en ligne", charges: "{count} recharges", unavailable: "Les bornes sont momentanément indisponibles." },
+    commissions: { title: "Commissions", all: "Tout voir", empty: "Aucune commission pour le moment." },
     recent: { charges: "Dernières recharges", all: "Tout voir", empty: "Aucune recharge pour le moment." },
   },
 };

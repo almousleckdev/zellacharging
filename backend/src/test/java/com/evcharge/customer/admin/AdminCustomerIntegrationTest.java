@@ -131,7 +131,7 @@ class AdminCustomerIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void detailShowsWalletAndSessionFiguresAndIsAudited() throws Exception {
+    void detailShowsWalletAndSessionFiguresWithoutRecordingTheView() throws Exception {
         UUID customer = data.customer("GA", "ACTIVE", marker + "Detail", "Person", "+24162" + digits, ago(10));
         data.wallet("GA", customer, "XAF", 5000, 500);
         data.session("GA", customer, 1, "COMPLETED", "10.250", 1500L);
@@ -145,7 +145,7 @@ class AdminCustomerIntegrationTest extends PostgresTestBase {
                 .andExpect(jsonPath("$.sessions.spentMinor").value(1500));
 
         assertThat(jdbc.queryForObject("select count(*) from admin_audit_record where action = 'CUSTOMER_VIEWED' "
-                + "and subject = ?", Integer.class, customer.toString())).isEqualTo(1);
+                + "and subject = ?", Integer.class, customer.toString())).isZero();
     }
 
     @Test

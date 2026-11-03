@@ -31,13 +31,13 @@ export function useCustomerColumns(): Column<CustomerItem>[] {
       key: "customer",
       header: labels.customer,
       sortKey: "name",
-      text: (row) => `${name(row)} <${row.email ?? "—"}> ${row.phone ?? ""}`,
+      text: (row) => `${name(row)} <${row.email ?? ""}> ${row.phone ?? ""}`,
       cell: (row) => (
         <CellLink href={scopedHref(`/customers/${row.country}/${row.id}`)} className="flex items-center gap-3">
           <Avatar initials={initialsOf(row.firstName, row.lastName, row.email ?? "")} src={customerAvatarUrl(row.country, row.id, row.avatarVersion)} />
           <span className="flex flex-col">
             <span className="font-medium text-foreground">{name(row)}</span>
-            <span className="text-xs text-subtle">{[row.email, row.phone].filter(Boolean).join(" · ") || "—"}</span>
+            <span className="text-xs text-subtle">{[row.email, row.phone].filter(Boolean).join(" · ")}</span>
           </span>
         </CellLink>
       ),
@@ -46,7 +46,6 @@ export function useCustomerColumns(): Column<CustomerItem>[] {
       ? [{ key: "country", header: labels.country, text: (row: CustomerItem) => countryName(row.country), cell: (row: CustomerItem) => countryName(row.country) }]
       : []),
     { key: "status", header: labels.status, text: (row) => statuses[row.status] ?? row.status, cell: (row) => <CustomerStatusBadge status={row.status} /> },
-    { key: "balance", header: labels.balance, align: "right", text: (row) => money(row, row.balanceMinor), cell: (row) => money(row, row.balanceMinor) },
     { key: "charges", header: labels.charges, align: "right", text: (row) => row.completedSessions ?? 0, cell: (row) => format.number(row.completedSessions ?? 0) },
     {
       key: "spent",

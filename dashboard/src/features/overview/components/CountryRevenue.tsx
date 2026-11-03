@@ -9,7 +9,7 @@ import type { SeriesResponse } from "../seriesSchema";
 
 function deltaText(delta: number | null, activity: number, number: (value: number, digits?: number) => string, newLabel: string): string {
   if (activity === 0) {
-    return "—";
+    return "";
   }
   return delta === null ? newLabel : `${delta >= 0 ? "+" : "−"}${number(Math.abs(delta), 1)} %`;
 }

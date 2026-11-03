@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useSession } from "@/features/session/SessionProvider";
-import type { PaymentItem } from "@/features/payments/schemas";
+import type { WithdrawalItem } from "../schemas";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { Button } from "@/shared/ui/Button";
 import type { WithdrawalAction } from "../api/useReviewWithdrawal";
@@ -11,7 +11,7 @@ import { DecisionDialog } from "./DecisionDialog";
 const REFUNDABLE_STATES = ["REQUESTED", "PROCESSING", "REVIEW"];
 const COMPACT = "h-8 px-3";
 
-export function DecisionButtons({ withdrawal, compact = false }: { withdrawal: PaymentItem; compact?: boolean }) {
+export function DecisionButtons({ withdrawal, compact = false }: { withdrawal: WithdrawalItem; compact?: boolean }) {
   const { t } = useI18n();
   const { profile } = useSession();
   const [action, setAction] = useState<WithdrawalAction | null>(null);

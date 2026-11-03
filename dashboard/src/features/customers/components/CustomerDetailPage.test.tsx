@@ -56,7 +56,7 @@ describe("CustomerDetailPage", () => {
     expect(String(fetchMock.mock.calls[0][0])).toBe("/api/admin/customers/GA/c1");
   });
 
-  it("opens on an overview with the key figures, the identity and the wallet", async () => {
+  it("opens on an overview with the key figures and the identity, without any wallet figure", async () => {
     serve(detail);
 
     renderConsole(<CustomerDetailPage />);
@@ -64,8 +64,8 @@ describe("CustomerDetailPage", () => {
     const identity = (await screen.findByRole("heading", { name: "Identité" })).closest("section") as HTMLElement;
     expect(within(identity).getByText("aline@example.com")).toBeInTheDocument();
     expect(within(identity).getByText("Vérifié")).toBeInTheDocument();
-    const wallet = screen.getByRole("heading", { name: "Portefeuille" }).closest("section") as HTMLElement;
-    expect(wallet.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("5 000 FCFA");
+    expect(screen.queryByText("Solde")).not.toBeInTheDocument();
+    expect(screen.queryByRole("heading", { name: "Portefeuille" })).not.toBeInTheDocument();
     expect(screen.getByText("31,5 kWh")).toBeInTheDocument();
     expect(screen.getByText("Total dépensé").closest("article")?.textContent?.replace(/[\u00a0\u202f]/g, " ")).toContain("4 725 FCFA");
   });
@@ -81,21 +81,24 @@ describe("CustomerDetailPage", () => {
 
     renderConsole(<CustomerDetailPage />, { ...profileOf(), permissions: ["OVERVIEW_READ", "SESSIONS_READ", "PAYMENTS_READ", "AUDIT_READ"] });
 
-    for (const name of ["Aperçu", "Recharges", "Paiements", "Portefeuille", "Activité"]) {
+    for (const name of ["Aperçu", "Recharges", "Portefeuille", "Activité"]) {
       expect(await screen.findByRole("button", { name })).toBeInTheDocument();
     }
+    expect(screen.queryByRole("button", { name: "Paiements" })).not.toBeInTheDocument();
     expect(fetchMock.mock.calls.some(([url]) => String(url).includes("/ledger"))).toBe(false);
     navigation.search = new URLSearchParams("country=GA&tab=wallet");
     await user.click(screen.getByRole("button", { name: "Portefeuille" }));
     expect(navigation.replace).toHaveBeenCalledWith(expect.stringContaining("tab=wallet"));
   });
 
-  it("handles a customer without a wallet", async () => {
-    serve({ ...detail, wallet: null });
+  it("never shows a dash placeholder, even for a customer without a wallet or a session", async () => {
+    serve({ ...detail, wallet: null, sessions: { ...detail.sessions, completed: 0, lastSessionAt: null } });
 
     renderConsole(<CustomerDetailPage />);
 
-    expect(await screen.findByText("Aucun portefeuille pour ce client.")).toBeInTheDocument();
+    expect(await screen.findByText("Aucune session")).toBeInTheDocument();
+    expect(screen.queryByText("Solde")).not.toBeInTheDocument();
+    expect(document.body.textContent).not.toContain("—");
   });
 
   it("says so when the customer is not in the selected country", async () => {

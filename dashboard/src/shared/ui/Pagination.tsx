@@ -28,7 +28,7 @@ export function Pagination({ page, size, total, onPage, onSize }: PaginationProp
   const to = Math.min(total, (page + 1) * size);
 
   return (
-    <nav aria-label={labels.label} className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-5 py-3">
+    <nav aria-label={labels.label} className="flex flex-wrap items-center justify-between gap-3 border-t border-border px-4 py-3 sm:px-5">
       <div className="flex flex-wrap items-center gap-4 text-sm text-muted">
         <p>{interpolate(labels.summary, { from: format.number(from), to: format.number(to), total: format.number(total) })}</p>
         {onSize && (
@@ -37,7 +37,7 @@ export function Pagination({ page, size, total, onPage, onSize }: PaginationProp
           <select
             value={size}
             onChange={(event) => onSize(Number(event.target.value))}
-            className="h-8 rounded-control border border-border-strong bg-background px-2 text-sm text-foreground"
+            className="h-8 rounded-control border border-transparent bg-surface-strong px-2 text-sm text-foreground"
           >
             {PAGE_SIZES.map((option) => (
               <option key={option} value={option}>

@@ -4,7 +4,6 @@ import com.evcharge.customer.account.CustomerRecord;
 import com.evcharge.customer.charging.SessionDigest;
 import com.evcharge.customer.charging.SessionRecord;
 import com.evcharge.customer.shared.Sort;
-import com.evcharge.customer.wallet.PaymentDigest;
 import com.evcharge.customer.wallet.PaymentRecord;
 
 import java.util.Comparator;
@@ -47,15 +46,6 @@ final class SortOrders {
             case "count" -> Comparator.comparingLong(SessionDigest::sessions);
             case "spent" -> Comparator.comparingLong(SessionDigest::spentMinor);
             default -> Comparator.comparing((SessionDigest digest) -> digest.last().createdAt());
-        };
-        return directed(order, sort);
-    }
-
-    static Comparator<PaymentDigest> paymentDigests(Sort sort) {
-        Comparator<PaymentDigest> order = switch (sort.field()) {
-            case "count" -> Comparator.comparingLong(PaymentDigest::operations);
-            case "spent" -> Comparator.comparingLong(PaymentDigest::topupsMinor);
-            default -> Comparator.comparing((PaymentDigest digest) -> digest.last().createdAt());
         };
         return directed(order, sort);
     }

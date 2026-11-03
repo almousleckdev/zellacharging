@@ -1,6 +1,6 @@
 import { screen } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
-import { describe, expect, it, vi } from "vitest";
+import { afterEach, describe, expect, it, vi } from "vitest";
 import { renderConsole } from "@/test/renderConsole";
 import { DataTable } from "./DataTable";
 
@@ -34,5 +34,21 @@ describe("DataTable sorting", () => {
     await user.click(screen.getByRole("button", { name: "Name" }));
     expect(onChange).toHaveBeenLastCalledWith("");
     expect(screen.queryByRole("button", { name: "Plain" })).not.toBeInTheDocument();
+  });
+});
+
+describe("DataTable on a narrow screen", () => {
+  afterEach(() => {
+    vi.unstubAllGlobals();
+  });
+
+  it("stacks each row as a card instead of overflowing a table", () => {
+    vi.stubGlobal("matchMedia", () => ({ matches: false, addEventListener: vi.fn(), removeEventListener: vi.fn() }));
+
+    renderConsole(<DataTable caption="people" columns={columns} rows={[{ name: "Aline" }]} rowKey={(row) => row.name} />);
+
+    expect(screen.queryByRole("table")).not.toBeInTheDocument();
+    expect(screen.getByRole("list", { name: "people" })).toHaveTextContent("Aline");
+    expect(screen.getByRole("list", { name: "people" })).toHaveTextContent("Plain");
   });
 });

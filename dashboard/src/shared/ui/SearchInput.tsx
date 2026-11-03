@@ -35,7 +35,7 @@ export function SearchInput({ label, placeholder, value, onSearch, delayMs = 350
         value={text}
         placeholder={placeholder}
         onChange={(event) => setText(event.target.value)}
-        className="h-10 w-full rounded-control border border-border-strong bg-background pl-9 pr-3 text-sm text-foreground placeholder:text-subtle hover:border-subtle"
+        className="h-10 w-full rounded-control border border-transparent bg-surface-strong pl-9 pr-3 text-sm text-foreground placeholder:text-subtle focus:bg-background"
       />
     </div>
   );

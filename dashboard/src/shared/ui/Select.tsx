@@ -23,8 +23,8 @@ export function Select({ label, options, hideLabel = false, className, ...rest }
         <select
           id={id}
           className={cn(
-            "h-10 w-full cursor-pointer appearance-none rounded-control border border-border-strong bg-background",
-            "pl-3 pr-9 text-sm text-foreground hover:border-subtle disabled:cursor-not-allowed disabled:bg-surface",
+            "h-10 w-full cursor-pointer appearance-none rounded-control border border-transparent bg-surface-strong",
+            "pl-3 pr-9 text-sm text-foreground disabled:cursor-not-allowed disabled:bg-surface",
             className,
           )}
           {...rest}

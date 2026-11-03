@@ -80,13 +80,11 @@ public class AdminCustomerService {
     public CustomerDetail detail(AdminAccess admin, String country, UUID id) {
         List<String> scope = access.scope(admin, Permission.CUSTOMERS_READ, country);
         String code = AdminCountries.single(scope);
-        CustomerDetail detail = TenantContext.callAs(code, () -> {
+        return TenantContext.callAs(code, () -> {
             CustomerRecord record = customers.find(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                     "CUSTOMER_NOT_FOUND", "Customer not found"));
             return new CustomerDetail(code, record, wallets.ofCustomer(id).orElse(null), sessions.ofCustomer(id));
         });
-        audit.record(admin.id(), code, "CUSTOMER_VIEWED", id.toString(), null);
-        return detail;
     }
 
     public Optional<CustomerPicture> picture(AdminAccess admin, String country, UUID id) {

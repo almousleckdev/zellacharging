@@ -61,22 +61,37 @@ class AdminPaymentsAndSessionsIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void paymentsListTopupsAndWithdrawalsOfTheMatchingCustomerNewestFirst() throws Exception {
+    void paymentsListOnlyTheBilledChargesNewestFirst() throws Exception {
         UUID customer = data.customer("GA", "ACTIVE", marker, "Obame", null, Instant.now());
         data.wallet("GA", customer, "XAF", 4000, 0);
         data.topup("GA", customer, "SUCCEEDED", 5000);
         data.withdrawal("GA", customer, "PAID", 1000);
+        data.session("GA", customer, 1, "COMPLETED", "0.385", 138L);
+        data.session("GA", customer, 2, "FAILED", "0", 0L);
 
         call(root, "/v1/admin/payments?country=GA&q=" + marker)
                 .andExpect(status().isOk())
-                .andExpect(jsonPath("$.total").value(2))
+                .andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.items[0].state").value("COMPLETED"))
+                .andExpect(jsonPath("$.items[0].costMinor").value(138))
+                .andExpect(jsonPath("$.items[0].customerName").value(marker + " Obame"));
+    }
+
+    @Test
+    void withdrawalsListOnlyWithdrawalsForReviewers() throws Exception {
+        UUID customer = data.customer("GA", "ACTIVE", marker, "Cash", null, Instant.now());
+        data.wallet("GA", customer, "XAF", 4000, 0);
+        data.topup("GA", customer, "SUCCEEDED", 5000);
+        data.withdrawal("GA", customer, "PAID", 1000);
+        String finance = fixtures.create(AdminRole.FINANCE, Set.of("GA")).accessToken();
+        TenantContext.clear();
+
+        call(root, "/v1/admin/withdrawals?country=GA&q=" + marker)
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(1))
                 .andExpect(jsonPath("$.items[0].kind").value("WITHDRAWAL"))
-                .andExpect(jsonPath("$.items[0].currency").value("XAF"))
-                .andExpect(jsonPath("$.items[1].kind").value("TOPUP"))
-                .andExpect(jsonPath("$.items[1].amountMinor").value(5000))
-                .andExpect(jsonPath("$.items[1].customerName").value(marker + " Obame"));
-        call(root, "/v1/admin/payments?country=GA&kind=TOPUP&q=" + marker)
-                .andExpect(jsonPath("$.total").value(1));
+                .andExpect(jsonPath("$.items[0].amountMinor").value(1000));
+        call(finance, "/v1/admin/withdrawals?country=GA").andExpect(status().isForbidden());
     }
 
     @Test
@@ -101,14 +116,12 @@ class AdminPaymentsAndSessionsIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void sandboxTopupsNeverAppearInPayments() throws Exception {
-        UUID customer = data.customer("GA", "ACTIVE", marker, "Test", null, Instant.now());
-        data.wallet("GA", customer, "XAF", 0, 0);
-        data.topup("GA", customer, "SUCCEEDED", 19151);
-        TenantContext.runAs("GA", () -> jdbc.update(
-                "update topup set provider_ref = 'sandbox-GAXXXX' where customer_id = ?", customer));
+    void financeSeesTheChargesAndThePayments() throws Exception {
+        String finance = fixtures.create(AdminRole.FINANCE, Set.of("GA")).accessToken();
+        TenantContext.clear();
 
-        call(root, "/v1/admin/payments?country=GA&q=" + marker).andExpect(jsonPath("$.total").value(0));
+        call(finance, "/v1/admin/sessions?country=GA").andExpect(status().isOk());
+        call(finance, "/v1/admin/payments?country=GA").andExpect(status().isOk());
     }
 
     @Test

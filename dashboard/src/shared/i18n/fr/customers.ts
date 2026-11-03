@@ -17,7 +17,7 @@ export const frCustomers = {
       PENDING_VERIFICATION: "Vérification en attente",
       PENDING_PHONE: "Téléphone à confirmer",
     },
-    tabs: { overview: "Aperçu", sessions: "Recharges", payments: "Paiements", wallet: "Portefeuille", activity: "Activité" },
+    tabs: { overview: "Aperçu", sessions: "Recharges", wallet: "Portefeuille", activity: "Activité" },
     ledger: {
       loadError: "Impossible de charger les mouvements du portefeuille.",
       emptyTitle: "Aucun mouvement",

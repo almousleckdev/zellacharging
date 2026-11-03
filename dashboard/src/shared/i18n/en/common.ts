@@ -39,7 +39,7 @@ export const enCommon: Pick<Dictionary, "language" | "brand" | "common" | "error
     },
     back: "Back",
     related: "Related records",
-    none: "—",
+    none: "",
     retry: "Try again",
     loading: "Loading…",
     skipToContent: "Skip to main content",

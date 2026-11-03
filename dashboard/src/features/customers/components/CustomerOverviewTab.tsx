@@ -5,7 +5,6 @@ import { useFormatters } from "@/shared/i18n/useFormatters";
 import { MetricCard } from "@/shared/ui/MetricCard";
 import type { CustomerDetail } from "../schemas";
 import { IdentityCard } from "./IdentityCard";
-import { WalletCard } from "./WalletCard";
 
 export function CustomerOverviewTab({ customer }: { customer: CustomerDetail }) {
   const { t } = useI18n();
@@ -18,17 +17,13 @@ export function CustomerOverviewTab({ customer }: { customer: CustomerDetail }) 
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-5">
+      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <MetricCard label={labels.spent} value={money(sessions.spentMinor)} />
         <MetricCard label={labels.completed} value={format.number(sessions.completed)} hint={sessions.live > 0 ? labels.live : undefined} />
         <MetricCard label={labels.energy} value={`${format.number(sessions.energyKwh, 1)} ${t.overview.unitKwh}`} />
-        <MetricCard label={labels.balance} value={wallet ? money(wallet.balanceMinor) : t.common.none} />
-        <MetricCard label={labels.lastSession} value={sessions.lastSessionAt ? format.date(sessions.lastSessionAt) : labels.never} />
+        <MetricCard label={labels.lastSession} value={sessions.lastSessionAt ? format.date(sessions.lastSessionAt) : labels.never} compact />
       </div>
-      <div className="grid items-start gap-6 lg:grid-cols-2">
-        <IdentityCard customer={customer} />
-        <WalletCard wallet={wallet} />
-      </div>
+      <IdentityCard customer={customer} />
     </div>
   );
 }

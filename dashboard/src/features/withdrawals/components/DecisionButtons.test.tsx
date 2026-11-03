@@ -1,7 +1,7 @@
 import { screen, waitFor, within } from "@testing-library/react";
 import userEvent from "@testing-library/user-event";
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import type { PaymentItem } from "@/features/payments/schemas";
+import type { WithdrawalItem } from "../schemas";
 import { gabon, profileOf, renderConsole } from "@/test/renderConsole";
 import { DecisionButtons } from "./DecisionButtons";
 
@@ -11,7 +11,7 @@ vi.mock("next/navigation", () => ({
   useSearchParams: () => new URLSearchParams("country=GA"),
 }));
 
-const stuck: PaymentItem = {
+const stuck: WithdrawalItem = {
   kind: "WITHDRAWAL",
   id: "w2",
   country: "GA",

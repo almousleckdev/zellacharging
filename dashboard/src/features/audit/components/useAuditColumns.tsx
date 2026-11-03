@@ -30,9 +30,9 @@ export function useAuditColumns(): Column<AuditItem>[] {
       key: "subject",
       header: labels.subject,
       text: (row) => row.subject ?? "",
-      cell: (row) => <span className="break-all font-mono text-xs">{row.subject ?? "—"}</span>,
+      cell: (row) => <span className="break-all font-mono text-xs">{row.subject ?? ""}</span>,
     },
-    { key: "country", header: labels.country, text: (row) => row.country ?? "", cell: (row) => row.country ?? "—" },
-    { key: "detail", header: labels.detail, text: (row) => row.detail ?? "", cell: (row) => <span className="text-muted">{row.detail ?? "—"}</span> },
+    { key: "country", header: labels.country, text: (row) => row.country ?? "", cell: (row) => row.country ?? "" },
+    { key: "detail", header: labels.detail, text: (row) => row.detail ?? "", cell: (row) => <span className="text-muted">{row.detail ?? ""}</span> },
   ];
 }

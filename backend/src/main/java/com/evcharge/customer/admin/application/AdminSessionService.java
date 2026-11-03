@@ -33,9 +33,9 @@ public class AdminSessionService {
         this.digests = digests;
     }
 
-    public CountryListing<SessionRecord> list(AdminAccess admin, String country, String state, String text,
+    public CountryListing<SessionRecord> list(AdminAccess admin, Permission required, String country, String state, String text,
                                               LogFilter filter, String station, String sortBy, int page, int size) {
-        List<String> scope = access.scope(admin, Permission.SESSIONS_READ, country);
+        List<String> scope = access.scope(admin, required, country);
         Sort sort = Sort.parse(sortBy, SortOrders.SESSION_FIELDS, "date");
         return CountryMerge.ordered(scope, PageWindow.of(page, size), limit -> {
             SessionPage found = sessions.search(new SessionLogQuery(blank(state), blank(text), blank(station), filter, sort, limit));
@@ -43,9 +43,9 @@ public class AdminSessionService {
         }, SessionRecord::createdAt, SortOrders.sessions(sort));
     }
 
-    public CountryListing<SessionDigest> byCustomer(AdminAccess admin, String country, String state, String text,
+    public CountryListing<SessionDigest> byCustomer(AdminAccess admin, Permission required, String country, String state, String text,
                                                     LogFilter filter, String station, String sortBy, int page, int size) {
-        List<String> scope = access.scope(admin, Permission.SESSIONS_READ, country);
+        List<String> scope = access.scope(admin, required, country);
         Sort sort = Sort.parse(sortBy, SortOrders.DIGEST_FIELDS, "last");
         return CountryMerge.ordered(scope, PageWindow.of(page, size), limit -> {
             SessionDigestPage found = digests.search(new SessionLogQuery(blank(state), blank(text), blank(station), filter,
@@ -54,8 +54,8 @@ public class AdminSessionService {
         }, digest -> digest.last().createdAt(), SortOrders.sessionDigests(sort));
     }
 
-    public CountryEntry<SessionDetail> detail(AdminAccess admin, String country, UUID id) {
-        String code = AdminCountries.single(access.scope(admin, Permission.SESSIONS_READ, country));
+    public CountryEntry<SessionDetail> detail(AdminAccess admin, Permission required, String country, UUID id) {
+        String code = AdminCountries.single(access.scope(admin, required, country));
         SessionDetail found = TenantContext.callAs(code, () -> sessions.find(id)).orElseThrow(
                 () -> new ApiException(HttpStatus.NOT_FOUND, "SESSION_NOT_FOUND", "Session not found"));
         return new CountryEntry<>(code, found, found.record().createdAt());

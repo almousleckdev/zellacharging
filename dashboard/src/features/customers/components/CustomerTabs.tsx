@@ -1,6 +1,5 @@
 "use client";
 
-import { PaymentsPage } from "@/features/payments/components/PaymentsPage";
 import { SessionsPage } from "@/features/sessions/components/SessionsPage";
 import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
@@ -11,12 +10,11 @@ import { CustomerActivityTab } from "./CustomerActivityTab";
 import { CustomerOverviewTab } from "./CustomerOverviewTab";
 import { CustomerWalletTab } from "./CustomerWalletTab";
 
-type TabId = "overview" | "sessions" | "payments" | "wallet" | "activity";
+type TabId = "overview" | "sessions" | "wallet" | "activity";
 
 const TABS: { id: TabId; permission?: string }[] = [
   { id: "overview" },
   { id: "sessions", permission: "SESSIONS_READ" },
-  { id: "payments", permission: "PAYMENTS_READ" },
   { id: "wallet" },
   { id: "activity", permission: "AUDIT_READ" },
 ];
@@ -44,9 +42,8 @@ export function CustomerTabs({ customer }: { customer: CustomerDetail }) {
       </div>
       {active === "overview" && <CustomerOverviewTab customer={customer} />}
       {active === "sessions" && <SessionsPage customerId={customer.id} />}
-      {active === "payments" && <PaymentsPage customerId={customer.id} />}
       {active === "wallet" && (
-        <CustomerWalletTab country={customer.country} id={customer.id} currency={customer.wallet?.currency ?? "XAF"} decimals={customer.wallet?.decimals ?? 0} />
+        <CustomerWalletTab country={customer.country} id={customer.id} currency={customer.wallet?.currency ?? "XAF"} decimals={customer.wallet?.decimals ?? 0} wallet={customer.wallet} />
       )}
       {active === "activity" && <CustomerActivityTab country={customer.country} id={customer.id} />}
     </section>

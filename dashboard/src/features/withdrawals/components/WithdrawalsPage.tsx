@@ -1,14 +1,14 @@
 "use client";
 
 import { useSession } from "@/features/session/SessionProvider";
-import { paymentListSchema } from "@/features/payments/schemas";
-import { usePaymentColumns } from "@/features/payments/components/usePaymentColumns";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
 import { useUrlParams } from "@/shared/lib/useUrlParams";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { PillTabs } from "@/shared/ui/PillTabs";
+import { withdrawalListSchema } from "../schemas";
 import { DecisionButtons } from "./DecisionButtons";
+import { useWithdrawalColumns } from "./useWithdrawalColumns";
 
 type Tab = "pending" | "history";
 
@@ -21,8 +21,8 @@ export function WithdrawalsPage() {
   const { params, update } = useUrlParams();
   const tab: Tab = params.get("tab") === "history" ? "history" : "pending";
   const labels = t.withdrawals;
-  const states: Record<string, string> = t.payments.states;
-  const allColumns = usePaymentColumns();
+  const states: Record<string, string> = t.withdrawals.states;
+  const allColumns = useWithdrawalColumns();
   const columns = tab === "pending" ? allColumns.filter((column) => column.key !== "state") : allColumns;
   const pending = tab === "pending";
 
@@ -46,14 +46,14 @@ export function WithdrawalsPage() {
       <LogListPage
         key={tab}
         embedded
-        resource="payments"
-        schema={paymentListSchema}
+        resource="withdrawals"
+        schema={withdrawalListSchema}
         labels={pending ? labels : { ...labels, emptyTitle: labels.historyEmptyTitle, emptyText: labels.historyEmptyText }}
         icon="clipboard"
         columns={columns}
         rowKey={(row) => row.id}
-        rowHref={(row) => scopedHref(`/payments/${row.country}/${row.kind}/${row.id}`)}
-        fixed={pending ? { kind: "WITHDRAWAL", state: "PENDING_APPROVAL" } : { kind: "WITHDRAWAL" }}
+        rowHref={(row) => scopedHref(`/withdrawals/${row.country}/${row.id}`)}
+        fixed={pending ? { state: "PENDING_APPROVAL" } : undefined}
         filters={pending ? [] : [{ key: "state", label: labels.stateLabel, allLabel: labels.allStates, options: STATES.map((value) => ({ value, label: states[value] })) }]}
         withRange={!pending}
         exportName="withdrawals"

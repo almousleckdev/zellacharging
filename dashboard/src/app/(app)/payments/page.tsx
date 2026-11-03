@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
-import { PaymentsByCustomerPage } from "@/features/payments/components/PaymentsByCustomerPage";
+import { PaymentsPage } from "@/features/payments/components/PaymentsPage";
 
 export const metadata: Metadata = {
   title: "Paiements · Zella Charging",
 };
 
 export default function Payments() {
-  return <PaymentsByCustomerPage />;
+  return <PaymentsPage />;
 }

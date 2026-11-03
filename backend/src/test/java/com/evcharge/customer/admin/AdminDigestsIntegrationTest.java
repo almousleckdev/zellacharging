@@ -78,17 +78,16 @@ class AdminDigestsIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void thePaymentsPageListsEachCustomerOnceWithTheLastOperation() throws Exception {
+    void thePaymentsPageListsEachCustomerOnceWithTheirBilledCharges() throws Exception {
         UUID customer = data.customer("GA", "ACTIVE", marker + "Pay", "Many", null, Instant.now());
-        data.wallet("GA", customer, "XAF", 0, 0);
-        data.topup("GA", customer, "SUCCEEDED", 1000);
-        data.topup("GA", customer, "SUCCEEDED", 2000);
-        data.topup("GA", customer, "FAILED", 500);
+        data.session("GA", customer, 91, "COMPLETED", "1.0", 1000L);
+        data.session("GA", customer, 92, "COMPLETED", "1.0", 2000L);
+        data.session("GA", customer, 93, "FAILED", "0", 0L);
 
         call(get("/v1/admin/payments/by-customer?country=GA&q=" + marker)).andExpect(status().isOk())
-                .andExpect(jsonPath("$.total").value(1)).andExpect(jsonPath("$.items[0].operations").value(3))
-                .andExpect(jsonPath("$.items[0].topupsMinor").value(3000))
-                .andExpect(jsonPath("$.items[0].last.customerId").value(customer.toString()));
+                .andExpect(jsonPath("$.total").value(1)).andExpect(jsonPath("$.items[0].sessions").value(2))
+                .andExpect(jsonPath("$.items[0].spentMinor").value(3000))
+                .andExpect(jsonPath("$.items[0].customerId").value(customer.toString()));
     }
 
     @Test

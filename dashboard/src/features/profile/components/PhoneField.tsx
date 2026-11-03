@@ -30,7 +30,7 @@ export function PhoneField({ dial, digits, error, disabled, onChange }: PhoneFie
           value={dial}
           disabled={disabled}
           onChange={(event) => onChange({ dial: event.target.value, digits })}
-          className="h-10 rounded-control border border-border-strong bg-background px-2 text-sm"
+          className="h-10 rounded-control border border-transparent bg-surface-strong px-2 text-sm"
         >
           {DIAL_CODES.map((entry) => (
             <option key={entry.country} value={entry.dial}>
@@ -48,7 +48,7 @@ export function PhoneField({ dial, digits, error, disabled, onChange }: PhoneFie
           aria-invalid={error ? true : undefined}
           aria-describedby={messageId}
           onChange={(event) => onChange({ dial, digits: event.target.value.replace(/\D/g, "").slice(0, 12) })}
-          className={cn("h-10 min-w-0 flex-1 rounded-control border bg-background px-3 text-sm", error ? "border-danger" : "border-border-strong")}
+          className={cn("h-10 min-w-0 flex-1 rounded-control border bg-surface-strong px-3 text-sm focus:bg-background", error ? "border-danger" : "border-transparent")}
         />
       </div>
       <p id={messageId} className={cn("text-xs", error ? "text-danger" : "text-subtle")}>

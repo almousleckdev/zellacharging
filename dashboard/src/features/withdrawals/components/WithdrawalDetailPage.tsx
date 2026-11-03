@@ -10,42 +10,40 @@ import { DetailShell } from "@/shared/ui/DetailShell";
 import { OperatorBadge } from "@/shared/ui/OperatorBadge";
 import { RelatedLinks } from "@/shared/ui/RelatedLinks";
 import { FactList } from "@/shared/ui/FactList";
-import { DecisionButtons } from "@/features/withdrawals/components/DecisionButtons";
-import { usePaymentDetail } from "../api/usePaymentDetail";
-import { signedAmount } from "../format";
-import { PaymentStateBadge } from "./PaymentStateBadge";
+import { useWithdrawalDetail } from "../api/useWithdrawalDetail";
+import { withdrawalAmount } from "../format";
+import { DecisionButtons } from "./DecisionButtons";
+import { WithdrawalStateBadge } from "./WithdrawalStateBadge";
 
-export function PaymentDetailPage() {
+export function WithdrawalDetailPage() {
   const { t } = useI18n();
   const format = useFormatters();
   const { scopedHref } = useSession();
-  const params = useParams<{ country: string; kind: string; id: string }>();
-  const query = usePaymentDetail(params.country, params.kind, params.id);
-  const labels = t.payments.detail;
-  const kinds: Record<string, string> = t.payments.kinds;
+  const params = useParams<{ country: string; id: string }>();
+  const query = useWithdrawalDetail(params.country, params.id);
+  const labels = t.withdrawals.detail;
   const data = query.data;
   const payment = data?.payment;
-  const title = payment ? `${kinds[payment.kind] ?? payment.kind} · ${payment.reference}` : t.payments.title;
+  const title = payment ? `${t.withdrawals.title} · ${payment.reference}` : t.withdrawals.title;
 
   return (
     <DetailShell
-      backHref="/payments"
+      backHref="/withdrawals"
       backLabel={labels.back}
       title={title}
       icon="wallet"
       query={query}
       notFound={labels.notFound}
       loadError={labels.loadError}
-      badge={payment && <PaymentStateBadge state={payment.state} />}
-      actions={payment?.kind === "WITHDRAWAL" && <DecisionButtons withdrawal={payment} />}
+      badge={payment && <WithdrawalStateBadge state={payment.state} />}
+      actions={payment && <DecisionButtons withdrawal={payment} />}
     >
       {data && payment && (
         <div className="grid items-start gap-6 lg:grid-cols-2">
           <Card title={labels.operation}>
             <FactList
               facts={[
-                { label: labels.type, value: kinds[payment.kind] ?? payment.kind },
-                { label: labels.amount, value: <span className="figure font-semibold">{signedAmount(payment, format)}</span> },
+                { label: labels.amount, value: <span className="figure font-semibold">{withdrawalAmount(payment, format)}</span> },
                 { label: labels.reference, value: <span className="font-mono text-xs">{payment.reference}</span> },
                 { label: labels.provider, value: <span className="font-mono text-xs">{data.providerRef ?? t.common.none}</span> },
                 { label: labels.failure, value: payment.failureCode ?? t.common.none },
@@ -72,7 +70,6 @@ export function PaymentDetailPage() {
             customerHref={`/customers/${payment.country}/${payment.customerId}`}
             links={[
               { label: labels.relatedCustomer, query: "" },
-              { label: labels.relatedPayments, query: "?tab=payments" },
               { label: labels.relatedWallet, query: "?tab=wallet" },
             ]}
           />

@@ -15,13 +15,12 @@ import { periodsByCurrency } from "../seriesMath";
 import { overviewTotals } from "../totals";
 import { AttentionCard } from "./AttentionCard";
 import { CountryRevenue } from "./CountryRevenue";
-import { NetworkHealth } from "./NetworkHealth";
 import { OverviewSkeleton } from "./OverviewSkeleton";
 import { QuickAccess } from "./QuickAccess";
-import { RecentActivity } from "./RecentActivity";
 import { RecentCharges } from "./RecentCharges";
 import { RevenueChart } from "./RevenueCharts";
 import { RevenueKpis } from "./RevenueKpis";
+import { TopCommissions } from "./TopCommissions";
 
 const PERIODS = [7, 30, 90] as const;
 
@@ -35,7 +34,7 @@ export function OverviewPage() {
   const series = useSeries(country, days);
   const scope = countryLabel(country, profile.countries, t.shell.country.all);
   const periods = series.data ? periodsByCurrency(series.data, days) : [];
-  const active = periods.filter((item) => item.current.sessions + item.previous.sessions + item.current.topupCount > 0);
+  const active = periods.filter((item) => item.current.sessions + item.previous.sessions > 0);
   const primary = active[0] ?? periods[0];
   const name = profile.firstName ?? profile.email;
 
@@ -65,11 +64,6 @@ export function OverviewPage() {
           <>
             <RevenueKpis period={primary} days={days} />
             <RevenueChart period={primary} days={days} />
-            <RecentCharges />
-            <div className="grid items-start gap-6 lg:grid-cols-2">
-              <NetworkHealth />
-              {series.data.countries.length > 1 && <CountryRevenue series={series.data} days={days} />}
-            </div>
           </>
         )}
       </div>
@@ -77,8 +71,16 @@ export function OverviewPage() {
         <PendingWithdrawalsPanel />
         {overview.data && <AttentionCard totals={overviewTotals(overview.data.countries)} />}
         <QuickAccess />
-        <RecentActivity />
       </aside>
+      {overview.data && series.data && primary && (
+        <div className="flex min-w-0 flex-col gap-6 xl:col-span-2">
+          <RecentCharges />
+          <div className="grid items-start gap-6 lg:grid-cols-2">
+            <TopCommissions />
+            {series.data.countries.length > 1 && <CountryRevenue series={series.data} days={days} />}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

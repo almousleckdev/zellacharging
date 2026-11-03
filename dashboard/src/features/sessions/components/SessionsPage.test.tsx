@@ -48,7 +48,7 @@ describe("SessionsPage", () => {
     expect(screen.getByText("1 clients")).toBeInTheDocument();
   });
 
-  it("shows dashes while a session has no figures yet", async () => {
+  it("leaves the figures empty, without any dash, while a session has none yet", async () => {
     const live = { ...session, state: "ACTIVE", energyKwh: null, costMinor: null, startBatteryPercent: null, endBatteryPercent: null };
     vi.stubGlobal("fetch", vi.fn(async () => Response.json({ total: 1, page: 0, size: 20, items: [live] })));
 
@@ -56,6 +56,7 @@ describe("SessionsPage", () => {
 
     const table = await screen.findByRole("table");
     expect(within(table).getByText("En charge")).toBeInTheDocument();
-    expect(within(table).getAllByText("–").length).toBeGreaterThanOrEqual(2);
+    expect(within(table).queryByText("–")).not.toBeInTheDocument();
+    expect(within(table).queryByText("—")).not.toBeInTheDocument();
   });
 });

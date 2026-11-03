@@ -12,7 +12,7 @@ type DateRangeFilterProps = {
 };
 
 const PRESETS: RangePreset[] = ["today", "last7", "last30", "thisMonth"];
-const FIELD = "h-9 rounded-control border border-border-strong bg-background px-2.5 text-sm text-foreground hover:border-subtle";
+const FIELD = "h-9 rounded-control border border-transparent bg-surface-strong px-2.5 text-sm text-foreground focus:bg-background";
 
 export function DateRangeFilter({ from, to, onChange }: DateRangeFilterProps) {
   const { t } = useI18n();

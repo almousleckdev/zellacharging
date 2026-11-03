@@ -49,7 +49,7 @@ abstract final class WalletText {
     en: 'The payment was not completed.',
   );
 
-  static const minimumTopupMinor = 500;
+  static const minimumTopupMinor = 100;
 
   static const minimumWithdrawMinor = 500;
 

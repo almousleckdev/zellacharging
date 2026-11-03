@@ -37,8 +37,8 @@ abstract final class AppToast {
     context,
     message,
     AppIcons.info,
-    AppColors.textPrimary,
-    AppColors.surface,
+    AppColors.primary,
+    AppColors.primarySoft,
   );
 
   static void _show(

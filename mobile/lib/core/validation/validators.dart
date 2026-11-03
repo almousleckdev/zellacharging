@@ -57,13 +57,6 @@ abstract final class Validators {
       ? null
       : WalletText.invalidMobileMoney;
 
-  static String? chargeAmount(String? value) {
-    final amount = AmountInput.parse(value);
-    return amount != null && amount >= ChargeText.minimumChargeMinor
-        ? null
-        : ChargeText.invalidAmount;
-  }
-
   static String? withdrawAmount(String? value, int availableMinor) {
     final amount = AmountInput.parse(value);
     final valid =

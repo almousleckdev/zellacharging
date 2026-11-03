@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:zella/core/format/money_format.dart';
 import 'package:zella/core/l10n/strings.dart';
 import 'package:zella/features/charging/presentation/setup/charge_setup_page.dart';
 import 'package:zella/features/charging/domain/session_quote.dart';
@@ -196,21 +195,24 @@ void main() {
     await closeApp(tester);
   });
 
-  testWidgets('the setup button asks for the exact shortfall', (tester) async {
+  testWidgets('a wallet below 100 asks the customer to top up', (tester) async {
     await pumpApp(
       tester,
       const ChargeSetupPage(stationId: 'CP-1', initialConnectorId: 1),
       overrides: overridesWith(
-        wallet: _ScriptedWallet(['SUCCEEDED'], available: 500),
+        wallet: _ScriptedWallet(['SUCCEEDED'], available: 99),
         sessionRepo: _ShortSessions(),
       ),
     );
-    await tester.enterText(find.byType(TextField).first, '2000');
     await tester.pump(const Duration(milliseconds: 600));
 
     expect(
-      find.text(PayText.payAndStart(MoneyFormat.format(1500, 'XAF', 0))),
+      find.widgetWithText(FilledButton, PayText.rechargeAccount),
       findsOneWidget,
+    );
+    expect(
+      find.widgetWithText(FilledButton, PayText.startCharging),
+      findsNothing,
     );
     await closeApp(tester);
   });

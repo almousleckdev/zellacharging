@@ -1,6 +1,5 @@
 import 'package:flutter/widgets.dart';
 
-import '../../../../core/format/money_format.dart';
 import '../../../../core/l10n/strings.dart';
 import '../../../../shared/widgets/pay/action_bar.dart';
 import '../../domain/charge_plan.dart';
@@ -19,17 +18,10 @@ class ChargeActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final low = plan.belowMinimum;
     return ActionBar(
-      label: plan.needsPayment
-          ? PayText.payAndStart(
-              MoneyFormat.format(
-                plan.payNowMinor,
-                plan.currency,
-                plan.decimals,
-              ),
-            )
-          : PayText.startCharging,
-      hint: connectorChosen ? null : PayText.selectConnectorFirst,
+      label: low ? PayText.rechargeAccount : PayText.startCharging,
+      hint: low || connectorChosen ? null : PayText.selectConnectorFirst,
       onPressed: onPressed,
     );
   }

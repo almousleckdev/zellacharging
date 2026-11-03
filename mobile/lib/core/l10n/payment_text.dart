@@ -94,6 +94,24 @@ abstract final class PayText {
   static String payAmount(String amount) =>
       AppLanguage.pick(fr: 'Payer $amount', en: 'Pay $amount');
 
+  static String get balanceUsed => AppLanguage.pick(
+    fr: 'La recharge utilise votre solde disponible et s’arrête automatiquement quand il est épuisé.',
+    en: 'Charging uses your available balance and stops automatically when it runs out.',
+  );
+
+  static String get rechargeNeededTitle => AppLanguage.pick(
+    fr: 'Solde insuffisant',
+    en: 'Insufficient balance',
+  );
+
+  static String rechargeNeeded(String minimum) => AppLanguage.pick(
+    fr: 'Il faut au moins $minimum dans votre portefeuille pour démarrer une recharge. Rechargez votre compte.',
+    en: 'You need at least $minimum in your wallet to start a charge. Please top up your account.',
+  );
+
+  static String get rechargeAccount =>
+      AppLanguage.pick(fr: 'Recharger mon compte', en: 'Top up my account');
+
   static String get startCharging =>
       AppLanguage.pick(fr: 'Démarrer la recharge', en: 'Start charging');
 

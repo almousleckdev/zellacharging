@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zella/core/l10n/strings.dart';
 import 'package:zella/core/theme/app_spacing.dart';
-import 'package:zella/features/charging/presentation/setup/charge_setup_page.dart';
 import 'package:zella/features/home/presentation/home_page.dart';
 import 'package:zella/features/notifications/presentation/notification_groups.dart';
 import 'package:zella/features/stations/presentation/locations_page.dart';
@@ -27,10 +26,6 @@ void main() {
   for (final entry in {
     'top-up': const TopupPage(),
     'withdraw': const WithdrawPage(),
-    'charge setup': const ChargeSetupPage(
-      stationId: 'x',
-      initialConnectorId: 1,
-    ),
   }.entries) {
     testWidgets('${entry.key} enters its amount with the shared card', (
       tester,

@@ -18,11 +18,6 @@ abstract final class ChargeText {
   static String get amountHint =>
       AppLanguage.pick(fr: 'ex. 2000', en: 'e.g. 2000');
 
-  static String get invalidAmount => AppLanguage.pick(
-    fr: 'Saisissez un montant d\'au moins $minimumChargeMinor',
-    en: 'Enter an amount of at least $minimumChargeMinor',
-  );
-
   static String get payment => AppLanguage.pick(fr: 'Paiement', en: 'Payment');
 
   static String get paidFromWallet => AppLanguage.pick(
@@ -112,13 +107,7 @@ abstract final class ChargeText {
     en: 'The charge could not be started.',
   );
 
-  static const minimumChargeMinor = 2000;
-
-  static String get budgetLabel =>
-      AppLanguage.pick(fr: 'Montant à dépenser', en: 'Amount to spend');
-
-  static String get budgetHint =>
-      AppLanguage.pick(fr: 'Ex. 2 000', en: 'e.g. 2,000');
+  static const minimumChargeMinor = 100;
 
   static String updatedAgo(String age) =>
       AppLanguage.pick(fr: 'Mis à jour il y a $age', en: 'Updated $age ago');

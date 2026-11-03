@@ -4,10 +4,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
-import '../../shared/app_toast.dart';
 import 'push_message.dart';
 import 'push_providers.dart';
 import 'push_route.dart';
+import 'push_toast.dart';
 
 class PushListener extends ConsumerStatefulWidget {
   const PushListener({super.key, required this.child});
@@ -37,7 +37,7 @@ class _PushListenerState extends ConsumerState<PushListener> {
 
   void _showInApp(PushMessage message) {
     if (!mounted) return;
-    AppToast.info(context, '${message.title}\n${message.body}'.trim());
+    PushToast.show(context, message);
   }
 
   void _open(PushMessage message) {

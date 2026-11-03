@@ -15,7 +15,9 @@ class ChargePlan {
     this.energyKwh,
   });
 
-  static const minimumTopupMinor = 500;
+  static const minimumTopupMinor = 100;
+  static const minimumChargeMinor = 100;
+  static const maximumChargeMinor = 200000;
 
   factory ChargePlan.of({
     required int amountMinor,
@@ -60,6 +62,8 @@ class ChargePlan {
   final double? energyKwh;
 
   bool get needsPayment => shortfallMinor > 0;
+
+  bool get belowMinimum => amountMinor < (minimumMinor ?? minimumChargeMinor);
 
   int get fromWalletMinor => amountMinor - shortfallMinor;
 

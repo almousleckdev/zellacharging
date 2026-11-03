@@ -8,10 +8,7 @@ import '../../../../core/l10n/strings.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../shared/app_toast.dart';
 import '../../../../shared/widgets/async_body.dart';
-import '../../../profile/presentation/profile_providers.dart';
 import '../../../stations/presentation/station_providers.dart';
-import '../../../wallet/domain/mobile_operator.dart';
-import '../../../wallet/domain/operator_hint.dart';
 import '../../domain/charge_plan.dart';
 import '../../domain/charge_request.dart';
 import '../charge_flow_controller.dart';
@@ -39,11 +36,6 @@ class ChargeSetupPage extends ConsumerStatefulWidget {
 class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
     with ConnectorSelectionMixin {
   final _formKey = GlobalKey<FormState>();
-  final _amount = TextEditingController();
-  late final _phone = TextEditingController(
-    text: ref.read(profileProvider).asData?.value.phone ?? '',
-  );
-  MobileOperator _operator = MobileOperator.airtel;
   late String _attempt = _newAttempt();
   Timer? _refresh;
 
@@ -60,20 +52,21 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   @override
   void dispose() {
     _refresh?.cancel();
-    _amount.dispose();
-    _phone.dispose();
     super.dispose();
   }
 
   String _newAttempt() => DateTime.now().microsecondsSinceEpoch.toString();
 
   Future<void> _start(ChargePlan plan) async {
+    if (plan.belowMinimum) {
+      context.push(Routes.topup);
+      return;
+    }
     final chosen = connector;
     if (chosen == null) {
       AppToast.warning(context, PayText.selectConnectorFirst);
       return;
     }
-    if (!_formKey.currentState!.validate()) return;
     final session = await ref
         .read(chargeFlowProvider.notifier)
         .launch(
@@ -82,12 +75,6 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
             connectorId: chosen,
             amountMinor: plan.amountMinor,
             attemptKey: _attempt,
-            payment: plan.needsPayment
-                ? ChargePayment(
-                    operator: OperatorHint.resolve(_phone.text, _operator),
-                    msisdn: _phone.text.trim(),
-                  )
-                : null,
           ),
         );
     if (session != null && mounted) {
@@ -111,7 +98,6 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
       ref,
       stationId: widget.stationId,
       connector: connector,
-      amountText: _amount.text,
     );
     final idle = flow.phase == ChargePhase.idle;
     return Scaffold(
@@ -124,20 +110,12 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
                 formKey: _formKey,
                 station: station,
                 plan: plan,
-                amount: _amount,
-                phone: _phone,
                 connector: connector,
-                operator: _operator,
                 onConnector: (value) => setState(() => connector = value),
-                onOperator: (value) => setState(() => _operator = value),
-                onAmountChanged: () => setState(() {}),
               ),
             )
           : ChargeFlowView(
               flow: flow,
-              paying: plan.needsPayment,
-              operator: OperatorHint.resolve(_phone.text, _operator),
-              phone: _phone.text.trim(),
               onRetry: _retry,
               onClose: () => context.pop(),
             ),

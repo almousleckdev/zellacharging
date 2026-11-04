@@ -39,9 +39,9 @@ void main() {
     expect(AmountInput.parse(null), isNull);
   });
 
-  test('the top-up validator accepts grouped amounts and enforces 100', () {
+  test('the top-up validator accepts grouped amounts and enforces 200', () {
     expect(Validators.topupAmount('1 000'), isNull);
-    expect(Validators.topupAmount('100'), isNull);
-    expect(Validators.topupAmount('99'), isNotNull);
+    expect(Validators.topupAmount('200'), isNull);
+    expect(Validators.topupAmount('199'), isNotNull);
   });
 }

@@ -117,7 +117,7 @@ zella:
     requests-per-minute: ${ZELLA_OCPP_REQUESTS_PER_MINUTE:${NDZELA_OCPP_REQUESTS_PER_MINUTE:55}}
     priority-reserve: 10
   charging:
-    plug-in-timeout: 60s
+    plug-in-timeout: ${ZELLA_PLUG_IN_TIMEOUT:5m}
     sweep-interval: 15s
     stop-retry-after: 30s
     stop-threshold-percent: 100
@@ -161,15 +161,15 @@ zella:
   wallet:
     currency: ${ZELLA_WALLET_CURRENCY:${NDZELA_WALLET_CURRENCY:XAF}}
     decimals: 0
-    minimum-start-minor: ${ZELLA_WALLET_MIN_START:${NDZELA_WALLET_MIN_START:100}}
+    minimum-start-minor: ${ZELLA_WALLET_MIN_START:${NDZELA_WALLET_MIN_START:200}}
     maximum-start-minor: ${ZELLA_WALLET_MAX_START:${NDZELA_WALLET_MAX_START:200000}}
     ledger-check-interval: 10m
     withdrawal:
       enabled: ${ZELLA_WITHDRAWALS_ENABLED:${NDZELA_WITHDRAWALS_ENABLED:false}}
-      minimum-minor: 500
+      minimum-minor: 200
       maximum-minor: 200000
       daily-maximum-minor: 500000
       recheck-after: 2m
       review-after: 2h
-    min-topup-minor: 100
+    min-topup-minor: 200
     max-topup-minor: 500000

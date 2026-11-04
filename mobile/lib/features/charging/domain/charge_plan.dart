@@ -15,8 +15,8 @@ class ChargePlan {
     this.energyKwh,
   });
 
-  static const minimumTopupMinor = 100;
-  static const minimumChargeMinor = 100;
+  static const minimumTopupMinor = 200;
+  static const minimumChargeMinor = 200;
   static const maximumChargeMinor = 200000;
 
   factory ChargePlan.of({

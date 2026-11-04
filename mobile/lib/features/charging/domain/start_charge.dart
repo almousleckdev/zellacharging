@@ -15,7 +15,7 @@ class StartCharge {
     this._sessions, {
     Duration pollInterval = const Duration(seconds: 3),
     int maxPolls = 20,
-    this.minimumTopupMinor = 100,
+    this.minimumTopupMinor = 200,
   }) : _payment = CollectPayment(
          _wallets,
          pollInterval: pollInterval,

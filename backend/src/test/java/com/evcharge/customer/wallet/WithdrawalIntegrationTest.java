@@ -197,10 +197,10 @@ class WithdrawalIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void theSmallestWithdrawalIsFiveHundred() throws Exception {
-        withdraw(customer, 499, PASSWORD, "m1").andExpect(status().isBadRequest())
+    void theSmallestWithdrawalIsTwoHundred() throws Exception {
+        withdraw(customer, 199, PASSWORD, "m1").andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_AMOUNT"));
-        withdraw(customer, 500, PASSWORD, "m2").andExpect(status().isCreated());
+        withdraw(customer, 200, PASSWORD, "m2").andExpect(status().isCreated());
     }
 
     @Test

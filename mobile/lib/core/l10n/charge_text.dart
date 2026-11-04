@@ -107,7 +107,7 @@ abstract final class ChargeText {
     en: 'The charge could not be started.',
   );
 
-  static const minimumChargeMinor = 100;
+  static const minimumChargeMinor = 200;
 
   static String updatedAgo(String age) =>
       AppLanguage.pick(fr: 'Mis à jour il y a $age', en: 'Updated $age ago');

@@ -158,16 +158,16 @@ void main() {
     await closeApp(tester);
   });
 
-  testWidgets('the smallest withdrawal is 500', (tester) async {
+  testWidgets('the smallest withdrawal is 200', (tester) async {
     final wallet = await _openWithdraw(tester, ['PAID']);
     await _toTop(tester);
-    await tester.enterText(find.byType(TextFormField).first, '499');
+    await tester.enterText(find.byType(TextFormField).first, '199');
     await _tapWithdraw(tester);
     expect(find.text(WithdrawText.invalidAmount), findsOneWidget);
     expect(wallet.created, 0);
 
     await _toTop(tester);
-    await tester.enterText(find.byType(TextFormField).first, '500');
+    await tester.enterText(find.byType(TextFormField).first, '200');
     await _tapWithdraw(tester);
     expect(wallet.created, 1);
     await closeApp(tester);

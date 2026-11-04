@@ -31,7 +31,7 @@ abstract final class WithdrawText {
   );
 
   static String get minimumHint =>
-      AppLanguage.pick(fr: 'Minimum 500 FCFA', en: 'Minimum 500 FCFA');
+      AppLanguage.pick(fr: 'Minimum 200 FCFA', en: 'Minimum 200 FCFA');
 
   static String get pendingTitle =>
       AppLanguage.pick(fr: 'Demande envoyée', en: 'Request sent');
@@ -61,8 +61,8 @@ abstract final class WithdrawText {
       AppLanguage.pick(fr: 'Débité du portefeuille', en: 'Taken from wallet');
 
   static String get invalidAmount => AppLanguage.pick(
-    fr: 'Saisissez un montant d’au moins 500 et au plus votre solde disponible',
-    en: 'Enter an amount of at least 500 and at most your available balance',
+    fr: 'Saisissez un montant d’au moins 200 et au plus votre solde disponible',
+    en: 'Enter an amount of at least 200 and at most your available balance',
   );
 
   static String withdrawAmount(String amount) =>

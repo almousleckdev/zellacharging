@@ -6,6 +6,7 @@ on:
     paths: ['mobile/**', '.github/workflows/mobile.yml']
   push:
     branches: [main]
+    tags: ['v*']
     paths: ['mobile/**', '.github/workflows/mobile.yml']
 
 permissions:
@@ -37,9 +38,8 @@ jobs:
         run: flutter test
 
   android:
-    needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 40
+    timeout-minutes: 25
     defaults:
       run:
         working-directory: mobile
@@ -55,14 +55,17 @@ jobs:
           channel: stable
           cache: true
       - run: flutter pub get
+      - name: Debug build on pull requests
+        if: github.event_name == 'pull_request'
+        run: flutter build apk --debug --target-platform android-arm64
       - name: Release build
-        run: flutter build apk --release
+        if: github.event_name != 'pull_request'
+        run: flutter build apk --release --target-platform android-arm64
 
   ios:
-    needs: test
-    if: github.event_name != 'pull_request'
+    if: github.event_name == 'workflow_dispatch' || startsWith(github.ref, 'refs/tags/v')
     runs-on: macos-latest
-    timeout-minutes: 45
+    timeout-minutes: 30
     defaults:
       run:
         working-directory: mobile
@@ -72,6 +75,13 @@ jobs:
         with:
           channel: stable
           cache: true
+      - uses: actions/cache@v4
+        with:
+          path: |
+            mobile/ios/Pods
+            ~/Library/Caches/CocoaPods
+          key: pods-${{ runner.os }}-${{ hashFiles('mobile/pubspec.lock') }}
+          restore-keys: pods-${{ runner.os }}-
       - run: flutter pub get
       - name: Release build without signing
         run: flutter build ios --release --no-codesign

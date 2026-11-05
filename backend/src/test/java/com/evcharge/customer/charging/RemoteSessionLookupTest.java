@@ -110,4 +110,27 @@ class RemoteSessionLookupTest {
 
         verify(gateway, times(2)).sessionsOf("Z-A");
     }
+
+    private RemoteSession remoteStartedAt(Instant startedAt, String status) {
+        return new RemoteSession(11, "CP-1", 1, status, startedAt, null, null, null, null, null, null, 150L, "Z-A",
+                null, null);
+    }
+
+    @Test
+    void anActiveSessionIsFoundEvenWhenTheStationClockIsFarBehind() {
+        when(gateway.activeSessions()).thenReturn(List.of(remoteStartedAt(NOW.minus(Duration.ofHours(5)), "ACTIVE")));
+
+        Optional<RemoteSession> found = lookup.find(local("CP-1", "Z-A", null, SessionState.START_ACCEPTED));
+
+        assertThat(found).map(RemoteSession::transactionId).contains(11);
+    }
+
+    @Test
+    void aFinishedOldSessionIsNeverTakenForTheNewCharge() {
+        when(gateway.activeSessions()).thenReturn(List.of());
+        when(gateway.sessionsOf("Z-A")).thenReturn(List.of(remoteStartedAt(NOW.minus(Duration.ofHours(5)),
+                "COMPLETED")));
+
+        assertThat(lookup.find(local("CP-1", "Z-A", null, SessionState.START_ACCEPTED))).isEmpty();
+    }
 }

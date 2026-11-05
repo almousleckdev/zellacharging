@@ -3,6 +3,9 @@ package com.evcharge.customer.charging.application;
 import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.RemoteSession;
+import com.evcharge.customer.charging.domain.SessionState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
@@ -17,6 +20,8 @@ import java.util.concurrent.ConcurrentHashMap;
 
 @Component
 public class RemoteSessionLookup {
+
+    private static final Logger log = LoggerFactory.getLogger(RemoteSessionLookup.class);
 
     private record Snapshot(Instant at, List<RemoteSession> sessions) {
     }
@@ -68,7 +73,26 @@ public class RemoteSessionLookup {
             return Optional.empty();
         }
         fallbackAt.put(session.id(), now);
-        return match(gateway.sessionsOf(session.idTag()), session);
+        List<RemoteSession> ofIdTag = gateway.sessionsOf(session.idTag());
+        Optional<RemoteSession> found = match(ofIdTag, session);
+        if (found.isEmpty()) {
+            logUnmatched(session, ofIdTag);
+        }
+        return found;
+    }
+
+    private void logUnmatched(ChargingSession session, List<RemoteSession> ofIdTag) {
+        log.warn("No platform session matches charge {} (station={}, connector={}, idTag={}, requestedAt={}); "
+                        + "platform sessions of this idTag: {}; active on this station: {}",
+                session.id(), session.stationId(), session.connectorId(), session.idTag(), session.createdAt(),
+                describe(ofIdTag.stream()), describe(snapshot.sessions().stream()
+                        .filter(remote -> session.stationId().equals(remote.stationId()))));
+    }
+
+    private static String describe(java.util.stream.Stream<RemoteSession> sessions) {
+        return sessions.map(remote -> "[tx=" + remote.transactionId() + " station=" + remote.stationId()
+                + " connector=" + remote.connectorId() + " idTag=" + remote.idTag()
+                + " startedAt=" + remote.startedAt() + "]").toList().toString();
     }
 
     private static Optional<RemoteSession> match(List<RemoteSession> candidates, ChargingSession session) {
@@ -77,10 +101,15 @@ public class RemoteSessionLookup {
     }
 
     private static boolean matches(RemoteSession remote, ChargingSession session) {
-        Instant earliest = session.createdAt().minusSeconds(CLOCK_SKEW_SECONDS);
         boolean sameOwner = remote.idTag() == null || remote.idTag().equals(session.idTag());
         return sameOwner && remote.stationId().equals(session.stationId())
                 && remote.connectorId() == session.connectorId()
-                && remote.startedAt() != null && !remote.startedAt().isBefore(earliest);
+                && remote.startedAt() != null && startedAfterRequest(remote, session);
+    }
+
+    private static boolean startedAfterRequest(RemoteSession remote, ChargingSession session) {
+        boolean stillOpen = remote.toState() == SessionState.ACTIVE;
+        Instant earliest = session.createdAt().minusSeconds(CLOCK_SKEW_SECONDS);
+        return stillOpen || !remote.startedAt().isBefore(earliest);
     }
 }

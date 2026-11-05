@@ -112,3 +112,14 @@ continue on the charger.
 Single OCPP instance (S6/S27); in-memory rate limiter; webhooks manual registration;
 hardware not yet validated in the field; metering cadence unknown. Tracked in
 `IMPLEMENTATION_PLAN.md` risks.
+
+## 12. Partner API (NDZela)
+
+- Separate security chain for `/v1/partners/**`; JWTs are not accepted there and partner keys are not accepted anywhere
+  else. Keys are random (32 bytes), stored hashed, bound to one country, revocable at once, rotated by keeping two
+  active. No IP allow-list (the partner has no fixed outgoing IPs); 120 requests per minute per key instead.
+- Personal data leaves this system only for customers the partner names in a lookup (name only on a full email and
+  phone match) or has linked. Public customers are never listed. Every lookup, link, unlink, feed read (non-empty) and
+  key event is audited with counts and ids, never emails, phones, names or the key.
+- Contractual condition: the terms shown to customers must allow sharing name, email and phone with NDZela for this
+  purpose. This must be confirmed in writing before production use.

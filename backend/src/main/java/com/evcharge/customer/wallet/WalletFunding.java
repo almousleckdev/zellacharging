@@ -3,6 +3,7 @@ package com.evcharge.customer.wallet;
 import com.evcharge.customer.shared.Money;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface WalletFunding {
@@ -16,6 +17,8 @@ public interface WalletFunding {
     List<UUID> openHoldSessions();
 
     Money reserved(UUID sessionId);
+
+    Optional<Long> captured(UUID sessionId);
 
     Money available(UUID customerId);
 

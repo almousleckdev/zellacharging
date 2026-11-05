@@ -56,6 +56,12 @@ class JdbcHoldRepository implements HoldRepository {
     }
 
     @Override
+    public Optional<Long> captured(UUID sessionId) {
+        return jdbc.sql("select captured_minor from funding_hold where session_id = :id and captured_minor is not null")
+                .param("id", sessionId).query(Long.class).optional();
+    }
+
+    @Override
     public List<UUID> openSessionIds() {
         return jdbc.sql("select session_id from funding_hold where state = 'OPEN' order by created_at")
                 .query(UUID.class).list();

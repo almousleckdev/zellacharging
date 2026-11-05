@@ -46,9 +46,20 @@ class FcmPushSender implements PushSender {
 
     @Override
     public PushResult send(DeviceToken device, PushContent content) {
+        String token;
+        try {
+            token = accessToken.get();
+        } catch (RestClientResponseException e) {
+            log.warn("Google refused the Firebase access request with status {}: {}", e.getStatusCode().value(),
+                    e.getResponseBodyAsString());
+            return PushResult.RETRY;
+        } catch (RuntimeException e) {
+            log.warn("The Firebase access request failed: {}", e.getMessage());
+            return PushResult.RETRY;
+        }
         try {
             client.post().uri(sendUrl).contentType(MediaType.APPLICATION_JSON)
-                    .headers(headers -> headers.setBearerAuth(accessToken.get()))
+                    .headers(headers -> headers.setBearerAuth(token))
                     .body(Map.of("message", FcmMessage.of(device, content, settings.androidChannel()))).retrieve().toBodilessEntity();
             return PushResult.DELIVERED;
         } catch (RestClientResponseException e) {
@@ -63,7 +74,7 @@ class FcmPushSender implements PushSender {
         if (status.value() == 404 || body.contains("UNREGISTERED")) {
             return PushResult.INVALID_TOKEN;
         }
-        log.warn("Firebase refused a push with status {}", status.value());
+        log.warn("Firebase refused a push with status {}: {}", status.value(), body);
         return status.value() == 400 ? PushResult.INVALID_TOKEN : PushResult.RETRY;
     }
 }

@@ -1,6 +1,7 @@
 package com.evcharge.customer.charging.application;
 
 import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.FeeBreakdown;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.NotificationType;
 import com.evcharge.customer.shared.Notifier;
@@ -21,13 +22,15 @@ public class SessionSettlement {
     private final FeeCalculator fees;
     private final ChargingMetrics metrics;
     private final Notifier notifier;
+    private final SessionChargeRecorder charges;
 
     public SessionSettlement(WalletFunding funding, FeeCalculator fees, ChargingMetrics metrics,
-                             Notifier notifier) {
+                             Notifier notifier, SessionChargeRecorder charges) {
         this.funding = funding;
         this.fees = fees;
         this.metrics = metrics;
         this.notifier = notifier;
+        this.charges = charges;
     }
 
     @Transactional
@@ -43,6 +46,7 @@ public class SessionSettlement {
             }
             case FAILED -> {
                 funding.release(session.id());
+                charges.notCharged(session);
                 announce(session, NotificationType.CHARGE_FAILED);
             }
             default -> {
@@ -69,9 +73,11 @@ public class SessionSettlement {
             log.error("ALERT session {} finished without a cost: nothing is charged, flagged for review",
                     session.id());
             funding.settle(session.id(), null, session.currency());
+            charges.underReview(session);
             return;
         }
-        long total = fees.of(session.costMinor()).totalMinor();
+        FeeBreakdown breakdown = fees.of(session.costMinor());
+        long total = breakdown.totalMinor();
         long authorized = funding.reserved(session.id()).minor();
         if (total > authorized) {
             metrics.overshoot(total - authorized);
@@ -79,5 +85,10 @@ public class SessionSettlement {
                     session.id(), total, authorized);
         }
         funding.settle(session.id(), total, session.currency());
+        recordCharge(session, breakdown);
+    }
+
+    private void recordCharge(ChargingSession session, FeeBreakdown breakdown) {
+        charges.settled(session, breakdown, funding.captured(session.id()).orElse(0L));
     }
 }

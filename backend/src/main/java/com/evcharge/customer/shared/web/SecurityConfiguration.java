@@ -3,6 +3,7 @@ package com.evcharge.customer.shared.web;
 import com.evcharge.customer.shared.ActiveSessions;
 import com.evcharge.customer.shared.CountryDirectory;
 import com.evcharge.customer.shared.RateLimiter;
+import com.evcharge.customer.shared.SecurityHeaders;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -12,7 +13,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.oauth2.server.resource.web.authentication.BearerTokenAuthenticationFilter;
 import org.springframework.security.web.SecurityFilterChain;
-import org.springframework.security.web.header.writers.ReferrerPolicyHeaderWriter;
 import org.springframework.web.servlet.HandlerExceptionResolver;
 
 @Configuration
@@ -29,11 +29,7 @@ class SecurityConfiguration {
                                             RateLimitSettings rateLimits) throws Exception {
         return http
                 .csrf(csrf -> csrf.disable())
-                .headers(headers -> headers
-                        .contentSecurityPolicy(csp -> csp.policyDirectives("default-src 'none'; frame-ancestors 'none'"))
-                        .referrerPolicy(referrer -> referrer.policy(ReferrerPolicyHeaderWriter.ReferrerPolicy.NO_REFERRER))
-                        .httpStrictTransportSecurity(hsts -> hsts.includeSubDomains(true).maxAgeInSeconds(63072000))
-                        .permissionsPolicyHeader(permissions -> permissions.policy("camera=(), microphone=(), geolocation=()")))
+                .headers(SecurityHeaders::apply)
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v1/auth/**", "/v1/admin/auth/**", "/v1/payments/callback").permitAll()

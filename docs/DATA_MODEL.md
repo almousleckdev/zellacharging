@@ -134,3 +134,14 @@ table, operator data, charger credentials. If the platform's `session` for a
 `payment_transaction` the capture entry. Customer phone/email/name fields and
 `auth_provider` (`PASSWORD|GOOGLE|APPLE`), `phone_verified_at`, `status`
 (`PENDING_PHONE|ACTIVE|BLOCKED`) are added to `customer`.
+
+## 9. Partner and charge tables (2026-11-05)
+
+- `partner_api_key` (`V30`): `id`, `partner`, `country_code`, `key_hash` (SHA-256 hex, unique; the raw key is never
+  stored), `created_at`, `expires_at`, `revoked_at`, `last_used_at`. No RLS: it is read before a tenant is known.
+- `partner_link` (`V30`): `(partner, customer_id)` primary key, `country_code`, `linked_at`, composite FK to `customer`,
+  RLS by country. Decides which customers appear in the partner feed.
+- `session_charge` (`V31`): one row per session, written at settlement and never changed by replays. `state` is
+  `CHARGED`, `NOT_CHARGED`, `UNDER_REVIEW` or `REFUNDED`; `energy_cost_minor`, `vat_minor`, `service_fee_minor` are the
+  breakdown at that moment, `total_minor` is what the wallet captured; `estimated` marks rows backfilled for earlier
+  settlements (total from the hold, parts from the rates at backfill time). RLS by country.

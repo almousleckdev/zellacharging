@@ -116,6 +116,11 @@ public class FundingService implements WalletFunding {
         return holds.find(sessionId).map(hold -> money(hold.reservedMinor())).orElse(money(0));
     }
 
+    @Override
+    public Optional<Long> captured(UUID sessionId) {
+        return holds.captured(sessionId);
+    }
+
     private void close(FundingHold hold, long charge, HoldState state) {
         wallets.lock(hold.customerId());
         wallets.apply(hold.customerId(), -charge, -hold.reservedMinor());

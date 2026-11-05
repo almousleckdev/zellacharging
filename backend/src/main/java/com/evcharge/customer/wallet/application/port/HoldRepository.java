@@ -18,4 +18,6 @@ public interface HoldRepository {
     void close(UUID sessionId, HoldState state, long capturedMinor);
 
     List<UUID> openSessionIds();
+
+    Optional<Long> captured(UUID sessionId);
 }

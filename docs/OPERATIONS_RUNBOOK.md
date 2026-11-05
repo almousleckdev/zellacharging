@@ -56,3 +56,13 @@ Three start-up guards can stop the service on purpose. Each has an explicit over
 | Restricted database role | the database user is a superuser, has `BYPASSRLS`, or owns the tables | create a login in role `zella_app` and use it as `DB_USER` (see `TENANCY.md`) | `NDZELA_TENANCY_REQUIRE_RESTRICTED_ROLE=false` |
 | Secure charging-platform link | the OCPP URL is not https or no signing secret is set | set `NDZELA_OCPP_SIGNING_SECRET` (registered on the OCPP side) | `NDZELA_OCPP_REQUIRE_SECURE_CHANNEL=false` |
 | Payment provider | `sandbox` is selected without permission, or `pvit` is selected with missing settings | set the `PVIT_*` variables and `NDZELA_PAYMENT_PROVIDER=pvit` | `NDZELA_PAYMENT_ALLOW_SANDBOX=true` (credits money without collecting it) |
+
+## Partner API keys (NDZela)
+
+1. Sign in to the admin console as super admin and call `POST /v1/admin/partners/NDZELA/keys` with `{"country":"GA"}`.
+   The response contains the key once. Share it through a password manager, never email or chat.
+2. NDZela stores it as `ZELLA_API_KEY` in its own service and sends it as `X-Api-Key`.
+3. Rotate: issue a second key, let NDZela switch, then `DELETE /v1/admin/partners/NDZELA/keys/{id}` for the old one.
+4. Revoke immediately if a key leaks: the same `DELETE`. `GET .../keys` shows `lastUsedAt` to confirm who still uses what.
+5. `ZELLA_PARTNER_RATE_PER_MINUTE` (default 120) changes the per-key limit and `ZELLA_PARTNER_FEED_LAG` (default 10s)
+   the delay before a change appears in the feed; both need a restart.

@@ -173,3 +173,9 @@ zella:
       review-after: 2h
     min-topup-minor: 200
     max-topup-minor: 500000
+  partner:
+    rate-per-minute: ${ZELLA_PARTNER_RATE_PER_MINUTE:120}
+    max-lookup-batch: 200
+    default-feed-limit: 100
+    max-feed-limit: 500
+    feed-lag: ${ZELLA_PARTNER_FEED_LAG:10s}

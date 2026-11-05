@@ -170,3 +170,29 @@ answered by the platform and need the charger supplier.
 3. Dual active API keys for rotation.
 4. Expose station currency and timezone.
 5. Supplier questions: plug-in timeout, Local Billing, MeterValues interval, SetChargingProfile, auto-stop at kWh, connector numbering.
+
+## 11. Partner API: NDZela reads from this backend [V]
+
+Implemented 2026-11-05. Base path `/v1/partners/ndzela`, HTTPS only, header `X-Api-Key`, JSON. The key is bound to one
+country; the tenant is that country. Errors use RFC 7807 with these `code` values: `PARTNER_KEY_INVALID` (401),
+`TOO_MANY_REQUESTS` (429, `Retry-After`), `PARTNER_BATCH_EMPTY`, `PARTNER_BATCH_TOO_LARGE`, `PARTNER_CONTACT_INVALID`,
+`PARTNER_CURSOR_INVALID`, `PARTNER_LIMIT_INVALID` (400), `NOT_FOUND` (404).
+
+| Method and path | Purpose |
+|---|---|
+| `POST /id-tags/lookup` | `{drivers:[{ref,email,phoneE164}]}`, 1 to 200. Email lowercase, phone E.164. Returns `{results:[{ref,matches:[{customerId,idTag,matchedOn,quality,firstName,lastName}]}]}`. `quality` is `FULL` (email and phone match one customer; names returned) or `PARTIAL` (one field matches; no names). Only `ACTIVE` customers of the key's country. `idTag` is null until the customer's first charge; lookup never creates one. Read-only, links nothing. |
+| `PUT /links/{customerId}` | Confirm a driver. Idempotent, 204. 404 for an unknown, inactive or other-country customer. |
+| `DELETE /links/{customerId}` | Remove the link. Idempotent, 204. |
+| `GET /sessions?cursor=&limit=&customerId=` | Payment feed of linked customers' sessions that reached the charger. `limit` 1 to 500, default 100. No cursor reads from the beginning. Returns `{items,nextCursor,hasMore}`; `nextCursor` is null only for an empty first call. Changes newer than `ZELLA_PARTNER_FEED_LAG` (default 10 seconds) are not served yet, so a change that is still committing is never skipped. `customerId` restricts the feed to one linked customer (404 if not linked) with its own cursor: read it once after linking a driver, because the global cursor has already moved past that driver's history. |
+
+Feed item: `transactionId, customerId, idTag, stationId, connectorId, sessionState, startedAt, stoppedAt, energyKwh,
+energyCostMinor, vatMinor, serviceFeeMinor, totalChargedMinor, currency, currencyDecimals, paymentMethod ("WALLET"),
+paymentState, breakdownEstimated, updatedAt`. `paymentState` is `PENDING`, `CHARGED`, `NOT_CHARGED`, `UNDER_REVIEW` or
+`REFUNDED` (reserved: no refund flow exists yet). A change of state re-emits the same `transactionId` with a newer
+`updatedAt`; order is `(updatedAt, sessionId)`; `totalChargedMinor` is what the wallet actually captured.
+`breakdownEstimated` is true for charges settled before `session_charge` existed. When a charge was capped at the
+authorized budget, the breakdown parts are the full uncapped amounts while `totalChargedMinor` is what was captured, so
+they do not add up.
+
+Admin key management (super admin, `ADMINS_MANAGE`): `POST /v1/admin/partners/NDZELA/keys` with `{"country":"GA"}`
+returns the key once; `GET` lists without key material; `DELETE /{keyId}` revokes at once.

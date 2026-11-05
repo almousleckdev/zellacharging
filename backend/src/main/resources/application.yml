@@ -116,6 +116,9 @@ zella:
     require-secure-channel: ${ZELLA_OCPP_REQUIRE_SECURE_CHANNEL:${NDZELA_OCPP_REQUIRE_SECURE_CHANNEL:true}}
     requests-per-minute: ${ZELLA_OCPP_REQUESTS_PER_MINUTE:${NDZELA_OCPP_REQUESTS_PER_MINUTE:55}}
     priority-reserve: 10
+  ocpp-webhook:
+    secret: ${ZELLA_OCPP_WEBHOOK_SECRET:${OCPP_WEBHOOK_SECRET:}}
+    tolerance: 300s
   charging:
     plug-in-timeout: ${ZELLA_PLUG_IN_TIMEOUT:5m}
     sweep-interval: 15s

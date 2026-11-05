@@ -124,6 +124,14 @@ class JdbcSessionRepository implements SessionRepository {
     }
 
     @Override
+    public Optional<ChargingSession> findLiveAt(String stationId, int connectorId, String idTag) {
+        return jdbc.sql("select * from charging_session where station_id = :station and connector_id = :connector "
+                        + "and id_tag = :idTag and state in " + LIVE + " order by created_at desc limit 1")
+                .param("station", stationId).param("connector", connectorId).param("idTag", idTag)
+                .query(MAPPER).optional();
+    }
+
+    @Override
     public List<ChargingSession> history(UUID customerId, int limit) {
         return jdbc.sql("select * from charging_session where customer_id = :customerId and hidden_at is null "
                         + "order by created_at desc limit :limit")

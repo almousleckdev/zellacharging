@@ -27,6 +27,8 @@ public interface SessionRepository {
 
     Optional<ChargingSession> findLive(UUID customerId);
 
+    Optional<ChargingSession> findLiveAt(String stationId, int connectorId, String idTag);
+
     boolean hide(UUID id, UUID customerId, Instant at);
 
     Map<String, Set<Integer>> liveConnectors();

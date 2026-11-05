@@ -196,3 +196,19 @@ they do not add up.
 
 Admin key management (super admin, `ADMINS_MANAGE`): `POST /v1/admin/partners/NDZELA/keys` with `{"country":"GA"}`
 returns the key once; `GET` lists without key material; `DELETE /{keyId}` revokes at once.
+
+## 12. OCPP platform webhooks (incoming)
+
+`POST /v1/ocpp/webhooks` on the customer backend, public route, protected by the signature only.
+
+- Headers: `X-Webhook-Signature` (lowercase hex HMAC-SHA256). With V2 also `X-Webhook-Signature-Timestamp`; the signed text is
+  `timestamp + "\n" + rawBody`, and the timestamp must be within `zella.ocpp-webhook.tolerance` (300 s). Without the
+  timestamp header the V1 form applies: the HMAC of the raw body. Wrong or missing signature: `401 WEBHOOK_SIGNATURE_INVALID`.
+- The secret is `ZELLA_OCPP_WEBHOOK_SECRET`, falling back to `OCPP_WEBHOOK_SECRET`. Empty secret refuses every event.
+- Success is `202`; the work is done in the background. A signed body that is not an event is `400 MALFORMED_REQUEST`.
+- Handled: `session.metering` (stores energy, power, voltage and battery of the live session found by station, connector and
+  idTag), `session.started` and `session.stopped` (refresh that session from the platform). Other types are acknowledged
+  and ignored. Repeated `eventId`s are dropped (last 5000 remembered in memory; every handler is idempotent anyway).
+- Polling stays the source of truth. When the platform has no readings to poll, the live view and the budget guard use the
+  latest webhook reading if it is under 120 s old.
+- The OCPP team registers `https://apicharging.up.railway.app/v1/ocpp/webhooks` as the Zella destination.

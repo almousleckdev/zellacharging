@@ -61,7 +61,8 @@ Three start-up guards can stop the service on purpose. Each has an explicit over
 
 1. Sign in to the admin console as super admin and call `POST /v1/admin/partners/NDZELA/keys` with `{"country":"GA"}`.
    The response contains the key once. Share it through a password manager, never email or chat.
-2. NDZela stores it as `ZELLA_API_KEY` in its own service and sends it as `X-Api-Key`.
+2. NDZela stores it as `ZELLA_API_KEY` and the address as `ZELLA_BASE_URL` (not `ZELLA_API_URL`) in its own service and sends
+   the key as `X-Api-Key`.
 3. Rotate: issue a second key, let NDZela switch, then `DELETE /v1/admin/partners/NDZELA/keys/{id}` for the old one.
 4. Revoke immediately if a key leaks: the same `DELETE`. `GET .../keys` shows `lastUsedAt` to confirm who still uses what.
 5. `ZELLA_PARTNER_RATE_PER_MINUTE` (default 120) changes the per-key limit and `ZELLA_PARTNER_FEED_LAG` (default 10s)

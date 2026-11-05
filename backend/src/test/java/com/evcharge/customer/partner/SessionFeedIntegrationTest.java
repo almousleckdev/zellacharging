@@ -188,6 +188,33 @@ class SessionFeedIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void liveSessionCarriesItsBatteryPowerPriceAndLiveEnergy() throws Exception {
+        UUID id = session(driver, "ACTIVE", TRANSACTIONS.incrementAndGet(), 1);
+        jdbc.update("update charging_session set energy_kwh = null, last_energy_kwh = 4.2, start_battery_percent = 40, "
+                + "battery_percent = 93, last_power_kw = 30.5, price_per_kwh_minor = 350 where id = ?", id);
+
+        JsonNode item = feed("").get("items").get(0);
+
+        assertThat(item.get("energyKwh").decimalValue()).isEqualByComparingTo("4.2");
+        assertThat(item.get("batteryStartPercent").decimalValue()).isEqualByComparingTo("40");
+        assertThat(item.get("batteryPercent").decimalValue()).isEqualByComparingTo("93");
+        assertThat(item.get("powerKw").decimalValue()).isEqualByComparingTo("30.5");
+        assertThat(item.get("pricePerKwhMinor").asLong()).isEqualTo(350L);
+    }
+
+    @Test
+    void sessionWithoutReadingsReportsNullsNotZeros() throws Exception {
+        UUID id = session(driver, "ACTIVE", TRANSACTIONS.incrementAndGet(), 1);
+        jdbc.update("update charging_session set energy_kwh = null where id = ?", id);
+
+        JsonNode item = feed("").get("items").get(0);
+
+        assertThat(item.get("energyKwh").isNull()).isTrue();
+        assertThat(item.get("batteryPercent").isNull()).isTrue();
+        assertThat(item.get("powerKw").isNull()).isTrue();
+    }
+
+    @Test
     void settledSessionShowsTheBreakdownAndWalletMethod() throws Exception {
         UUID id = finished(driver, 1);
         charge(id, driver, "CHARGED", 1230L, false, 2);

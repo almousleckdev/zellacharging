@@ -7,6 +7,7 @@ import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.Metering;
+import com.evcharge.customer.charging.domain.SessionProgress;
 import com.evcharge.customer.charging.domain.SessionState;
 import org.junit.jupiter.api.Test;
 
@@ -35,6 +36,10 @@ class MeteringServiceTest {
             new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15), Duration.ofSeconds(30), 150L, 95,
                     Duration.ofSeconds(90), Duration.ofSeconds(5), Duration.ofSeconds(30)),
             Clock.fixed(NOW, ZoneOffset.UTC));
+
+    {
+        when(sessions.progressOf(org.mockito.ArgumentMatchers.any())).thenReturn(SessionProgress.none());
+    }
 
     private ChargingSession session(SessionState state) {
         return new ChargingSession(UUID.randomUUID(), UUID.randomUUID(), "CP-1", 1, "Z-X", state, null, 7, NOW,
@@ -98,5 +103,40 @@ class MeteringServiceTest {
         service.of(active);
 
         verify(gateway, org.mockito.Mockito.times(1)).metering(7);
+    }
+
+    @Test
+    void usesTheLatestWebhookReadingWhenThePlatformHasNoneToPoll() {
+        ChargingSession live = session(SessionState.ACTIVE);
+        when(gateway.metering(7)).thenReturn(Optional.empty());
+        when(sessions.progressOf(live.id())).thenReturn(new SessionProgress(new BigDecimal("4.2"),
+                NOW.minusSeconds(30)));
+        when(sessions.lastReadingOf(live.id())).thenReturn(new LastReading(null, new BigDecimal("93"),
+                new BigDecimal("400"), new BigDecimal("30")));
+
+        Metering used = service.of(live).orElseThrow();
+
+        assertThat(used.totalKwh()).isEqualByComparingTo("4.2");
+        assertThat(used.stateOfChargePercent()).isEqualByComparingTo("93");
+        assertThat(used.voltage()).isEqualByComparingTo("400");
+        assertThat(used.powerKw()).isEqualByComparingTo("30");
+    }
+
+    @Test
+    void ignoresAWebhookReadingThatIsTooOldToTrust() {
+        ChargingSession live = session(SessionState.ACTIVE);
+        when(gateway.metering(7)).thenReturn(Optional.empty());
+        when(sessions.progressOf(live.id())).thenReturn(new SessionProgress(new BigDecimal("4.2"),
+                NOW.minusSeconds(600)));
+
+        assertThat(service.of(live)).isEmpty();
+    }
+
+    @Test
+    void staysEmptyWhenNeitherThePlatformNorTheWebhookHasAnyReading() {
+        ChargingSession live = session(SessionState.ACTIVE);
+        when(gateway.metering(7)).thenReturn(Optional.empty());
+
+        assertThat(service.of(live)).isEmpty();
     }
 }

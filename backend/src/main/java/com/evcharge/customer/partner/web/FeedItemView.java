@@ -10,7 +10,8 @@ record FeedItemView(int transactionId, UUID customerId, String idTag, String sta
                     String sessionState, Instant startedAt, Instant stoppedAt, BigDecimal energyKwh,
                     Long energyCostMinor, Long vatMinor, Long serviceFeeMinor, Long totalChargedMinor,
                     String currency, Integer currencyDecimals, String paymentMethod, String paymentState,
-                    boolean breakdownEstimated, Instant updatedAt) {
+                    boolean breakdownEstimated, BigDecimal batteryStartPercent, BigDecimal batteryPercent,
+                    BigDecimal powerKw, Long pricePerKwhMinor, Instant updatedAt) {
 
     private static final String WALLET = "WALLET";
 
@@ -19,6 +20,7 @@ record FeedItemView(int transactionId, UUID customerId, String idTag, String sta
                 item.connectorId(), item.sessionState(), item.startedAt(), item.stoppedAt(), item.energyKwh(),
                 item.energyCostMinor(), item.vatMinor(), item.serviceFeeMinor(), item.totalChargedMinor(),
                 item.currency(), item.currencyDecimals(), WALLET, item.paymentState(), item.breakdownEstimated(),
+                item.batteryStartPercent(), item.batteryPercent(), item.powerKw(), item.pricePerKwhMinor(),
                 item.updatedAt());
     }
 }

@@ -18,7 +18,8 @@ class JdbcChargeFeed implements ChargeFeed {
 
     private static final String QUERY = "select * from ("
             + "select s.id as session_id, s.transaction_id, s.customer_id, s.id_tag, s.station_id, s.connector_id, "
-            + "s.state as session_state, s.started_at, s.stopped_at, s.energy_kwh, "
+            + "s.state as session_state, s.started_at, s.stopped_at, coalesce(s.energy_kwh, s.last_energy_kwh) as energy_kwh, "
+            + "s.start_battery_percent, s.battery_percent, s.last_power_kw, s.price_per_kwh_minor, "
             + "coalesce(c.state, 'PENDING') as payment_state, c.energy_cost_minor, c.vat_minor, c.service_fee_minor, "
             + "c.total_minor, coalesce(c.currency, s.currency) as currency, "
             + "coalesce(c.decimals, s.currency_decimals) as decimals, coalesce(c.estimated, false) as estimated, "
@@ -35,7 +36,8 @@ class JdbcChargeFeed implements ChargeFeed {
             Timestamps.read(rs, "stopped_at"), rs.getBigDecimal("energy_kwh"), nullableLong(rs, "energy_cost_minor"),
             nullableLong(rs, "vat_minor"), nullableLong(rs, "service_fee_minor"), nullableLong(rs, "total_minor"),
             rs.getString("currency"), nullableInt(rs, "decimals"), rs.getString("payment_state"),
-            rs.getBoolean("estimated"), Timestamps.read(rs, "feed_at"));
+            rs.getBoolean("estimated"), rs.getBigDecimal("start_battery_percent"), rs.getBigDecimal("battery_percent"),
+            rs.getBigDecimal("last_power_kw"), nullableLong(rs, "price_per_kwh_minor"), Timestamps.read(rs, "feed_at"));
 
     private final JdbcClient jdbc;
 

@@ -16,6 +16,7 @@ export function LogoutDialog({ open, onClose }: { open: boolean; onClose: () => 
       confirmLabel={t.shell.logout}
       cancelLabel={t.dialogs.cancel}
       loading={logout.isPending}
+      destructive
       onConfirm={() => logout.mutate(undefined, { onError: onClose })}
       onCancel={onClose}
     />

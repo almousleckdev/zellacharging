@@ -10,7 +10,7 @@ import { Avatar } from "@/shared/ui/Avatar";
 import { Icon } from "@/shared/ui/Icon";
 import { LogoutDialog } from "./LogoutDialog";
 
-const ITEM = "flex w-full items-center gap-2.5 px-4 py-2.5 text-left text-sm hover:bg-surface-strong";
+const ITEM = "flex w-full items-center gap-2.5 px-4 py-2 text-left text-sm text-foreground hover:bg-surface";
 
 export function ProfileMenu() {
   const { t } = useI18n();
@@ -33,7 +33,7 @@ export function ProfileMenu() {
         aria-controls={open ? menuId : undefined}
         aria-label={t.shell.accountMenu}
         onClick={() => setOpen((current) => !current)}
-        className="flex items-center gap-3 rounded-control p-1 pr-2 hover:bg-surface-strong"
+        className="flex items-center gap-3 rounded-full p-0.5 transition-colors hover:bg-surface-strong md:pr-3"
       >
         <Avatar initials={initialsOf(profile.firstName, profile.lastName, profile.email)} src={ownAvatarUrl(profile.avatarVersion)} size={36} />
         <span className="hidden min-w-0 flex-col text-left md:flex">
@@ -43,8 +43,8 @@ export function ProfileMenu() {
         <Icon name="chevronDown" className="hidden size-4 text-subtle md:block" />
       </button>
       {open && (
-        <div id={menuId} role="menu" className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-card border border-border bg-background shadow-lg">
-          <div className="flex flex-col gap-0.5 border-b border-border px-4 py-3">
+        <div id={menuId} role="menu" className="absolute right-0 z-40 mt-2 w-64 overflow-hidden rounded-card border border-border bg-background py-1 shadow-lg">
+          <div className="mb-1 flex flex-col gap-0.5 border-b border-border px-4 pb-3 pt-2">
             <p className="truncate text-sm font-semibold text-foreground">{name}</p>
             <p className="truncate text-xs text-subtle">{profile.email}</p>
           </div>
@@ -63,7 +63,7 @@ export function ProfileMenu() {
               setOpen(false);
               setConfirming(true);
             }}
-            className={`${ITEM} border-t border-border text-danger`}
+            className={`${ITEM} mt-1 border-t border-border pt-3 text-danger`}
           >
             <Icon name="logout" className="size-4" />
             {t.shell.logout}

@@ -50,6 +50,8 @@ export const enWithdrawals: Pick<Dictionary, "withdrawals"> = {
       state: "State",
       amount: "Amount",
       date: "Date",
+      operator: "Operator",
+      phone: "Phone",
     },
     actions: { approve: "Approve", reject: "Decline", refund: "Refund" },
     approve: {

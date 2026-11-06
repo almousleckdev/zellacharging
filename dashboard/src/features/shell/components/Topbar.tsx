@@ -11,12 +11,12 @@ export function Topbar({ onOpenMenu }: { onOpenMenu: () => void }) {
   const { t } = useI18n();
 
   return (
-    <div className="sticky top-0 z-20 flex h-16 items-center gap-3 border-b border-border bg-canvas/90 px-4 backdrop-blur sm:px-6 lg:px-10">
+    <div className="sticky top-0 z-20 flex h-16 shrink-0 items-center gap-3 border-b border-border bg-background px-4 sm:px-6">
       <button
         type="button"
         onClick={onOpenMenu}
         aria-label={t.shell.openMenu}
-        className="inline-flex size-9 items-center justify-center rounded-control text-muted hover:bg-surface-strong lg:hidden"
+        className="-ml-1 inline-flex size-9 items-center justify-center rounded-control text-muted hover:bg-surface-strong hover:text-foreground lg:hidden"
       >
         <Icon name="menu" />
       </button>

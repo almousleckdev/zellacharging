@@ -1,3 +1,4 @@
+import { MetricBand } from "./MetricBand";
 import { MetricCardSkeleton } from "./MetricCardSkeleton";
 import { Skeleton } from "./Skeleton";
 
@@ -19,11 +20,11 @@ export function PageSkeleton() {
         <Skeleton className="h-7 w-64" />
         <Skeleton className="h-4 w-80 max-w-full" />
       </div>
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <MetricBand>
         {Array.from({ length: 4 }, (_, index) => (
           <MetricCardSkeleton key={index} />
         ))}
-      </div>
+      </MetricBand>
       <div className="overflow-hidden rounded-card border border-border bg-background">
         <div className="flex items-center justify-between px-5 py-4">
           <Skeleton className="h-4 w-40" />

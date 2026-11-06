@@ -19,10 +19,10 @@ export function NotificationBell() {
     <Link
       href={scopedHref(canReview && (withdrawals.data?.total ?? 0) > 0 ? "/withdrawals" : "/incidents")}
       aria-label={t.shell.notifications}
-      className="relative inline-flex size-10 items-center justify-center rounded-control border border-border bg-background text-muted hover:text-foreground"
+      className="relative inline-flex size-9 items-center justify-center rounded-full text-muted transition-colors hover:bg-surface-strong hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
       <Icon name="bell" className="size-[18px]" />
-      {pending > 0 && <span aria-hidden="true" className="absolute right-2.5 top-2.5 size-2 rounded-full bg-primary ring-2 ring-background" />}
+      {pending > 0 && <span aria-hidden="true" className="absolute right-2 top-2 size-2 rounded-full bg-primary ring-2 ring-background" />}
     </Link>
   );
 }

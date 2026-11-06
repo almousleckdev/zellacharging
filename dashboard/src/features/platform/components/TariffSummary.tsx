@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
+import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
 import type { SettingsSection } from "../schemas";
 
@@ -17,7 +18,7 @@ export function TariffSummary({ sections, currency, decimals }: TariffSummaryPro
   const price = charging.pricePerKwhMinor;
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 min-[1700px]:grid-cols-4">
+    <MetricBand>
       <MetricCard
         label={labels.pricePerKwhMinor}
         icon="bolt"
@@ -26,6 +27,6 @@ export function TariffSummary({ sections, currency, decimals }: TariffSummaryPro
       <MetricCard label={labels.serviceFeePercent} icon="percent" value={percent(charging.serviceFeePercent)} />
       <MetricCard label={labels.vatPercent} icon="tag" value={percent(charging.vatPercent)} />
       <MetricCard label={labels.withdrawalsEnabled} icon="wallet" value={wallet.withdrawalsEnabled === true ? t.platform.on : t.platform.off} />
-    </div>
+    </MetricBand>
   );
 }

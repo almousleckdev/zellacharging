@@ -6,6 +6,7 @@ import type { SubmitEvent } from "react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { errorMessage } from "@/shared/i18n/errorMessage";
 import { Alert } from "@/shared/ui/Alert";
+import { AuthHeading } from "@/shared/ui/AuthHeading";
 import { Button } from "@/shared/ui/Button";
 import { TextField } from "@/shared/ui/TextField";
 import { requestPasswordReset } from "../api/authClient";
@@ -39,10 +40,7 @@ export function ForgotPasswordForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1.5">
-        <h1 className="text-3xl font-semibold text-foreground">{labels.forgotTitle}</h1>
-        <p className="text-sm text-muted">{labels.forgotSubtitle}</p>
-      </div>
+      <AuthHeading title={labels.forgotTitle} subtitle={labels.forgotSubtitle} />
       {recovery.errorCode && <Alert>{errorMessage(t, recovery.errorCode)}</Alert>}
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         <TextField

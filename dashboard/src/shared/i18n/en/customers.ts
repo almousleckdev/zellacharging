@@ -12,7 +12,7 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
     loadError: "We couldn't load the customers.",
     emptyTitle: "No customers found",
     emptyText: "Change your search or filters to see results.",
-    columns: { balance: "Balance", charges: "Charges", spent: "Spent", lastCharge: "Last charge", customer: "Customer", phone: "Phone", country: "Country", status: "Status", joined: "Joined" },
+    columns: { balance: "Balance", charges: "Charges", spent: "Spent", lastCharge: "Last charge", firstName: "First name", lastName: "Last name", email: "Email", customer: "Customer", phone: "Phone", country: "Country", status: "Status", joined: "Joined" },
     statuses: {
       ACTIVE: "Active",
       BLOCKED: "Suspended",

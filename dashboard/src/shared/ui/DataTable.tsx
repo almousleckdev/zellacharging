@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import type { ReactNode } from "react";
 import { cn } from "@/shared/lib/cn";
+import type { ExportColumn } from "@/shared/export/types";
 import { useElementWidth } from "@/shared/lib/useElementWidth";
 
 export type Column<Row> = {
@@ -11,6 +12,7 @@ export type Column<Row> = {
   align?: "left" | "right";
   cell: (row: Row) => ReactNode;
   text?: (row: Row) => string | number;
+  exports?: ExportColumn<Row>[];
   sortKey?: string;
 };
 
@@ -40,7 +42,7 @@ function SortHeader({ column, label, sort }: { column: string; label: string; so
       type="button"
       onClick={() => sort.onChange(nextSort(sort.value, column))}
       aria-label={label}
-      className="inline-flex items-center gap-1 hover:text-foreground"
+      className="-mx-1.5 inline-flex items-center gap-1 rounded px-1.5 py-0.5 hover:bg-surface-strong hover:text-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-primary"
     >
       {label}
       <span aria-hidden="true" className={direction ? "text-primary-text" : "text-border-strong"}>
@@ -96,12 +98,12 @@ function Grid<Row>({ caption, columns, rows, rowKey, open, sort }: { caption: st
     <table className="w-full border-collapse text-sm">
       <caption className="sr-only">{caption}</caption>
       <thead>
-        <tr className="border-b border-border bg-surface text-left">
+        <tr className="border-b border-border bg-background text-left">
           {columns.map((column) => (
             <th
               key={column.key}
               scope="col"
-              className={cn("whitespace-nowrap px-4 py-3 text-xs font-medium text-subtle first:pl-5 last:pr-5", column.align === "right" && "text-right")}
+              className={cn("whitespace-nowrap px-3.5 py-2.5 text-xs font-medium text-muted first:pl-4 last:pr-4", column.align === "right" && "text-right")}
             >
               {column.sortKey && sort ? <SortHeader column={column.sortKey} label={column.header} sort={sort} /> : column.header}
             </th>
@@ -113,13 +115,13 @@ function Grid<Row>({ caption, columns, rows, rowKey, open, sort }: { caption: st
           <tr
             key={rowKey(row)}
             onClick={open ? () => open(row) : undefined}
-            className={cn("border-b border-border transition-colors last:border-b-0 hover:bg-surface", open && "cursor-pointer")}
+            className={cn("border-b border-border/70 transition-colors last:border-b-0 hover:bg-surface", open && "cursor-pointer")}
           >
             {columns.map((column) => (
               <td
                 key={column.key}
                 className={cn(
-                  "px-4 py-3.5 align-middle text-foreground first:pl-5 last:pr-5 [overflow-wrap:anywhere]",
+                  "px-3.5 py-3 align-middle text-foreground first:pl-4 last:pr-4 [overflow-wrap:anywhere]",
                   column.align === "right" && "whitespace-nowrap text-right tabular-nums [overflow-wrap:normal]",
                 )}
               >

@@ -56,13 +56,13 @@ export function Modal({ open, title, description, busy = false, size = "sm", onC
         }
       }}
       className={cn(
-        "m-auto max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-card border border-border",
-        "bg-background p-0 text-foreground shadow-xl backdrop:bg-foreground/40",
+        "m-auto max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-xl",
+        "bg-background p-0 text-foreground shadow-xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
         size === "lg" ? "max-w-2xl" : "max-w-md",
         open && "flex flex-col",
       )}
     >
-      <header className="flex items-start justify-between gap-4 px-6 pt-6">
+      <header className="flex items-start justify-between gap-4 px-6 pb-1 pt-6">
         <div className="flex flex-col gap-1.5">
           <h2 id={titleId} className="text-lg font-semibold tracking-tight">
             {title}
@@ -78,14 +78,14 @@ export function Modal({ open, title, description, busy = false, size = "sm", onC
             type="button"
             onClick={requestClose}
             aria-label={t.dialogs.close}
-            className="inline-flex size-8 shrink-0 items-center justify-center rounded-control text-subtle hover:bg-surface-strong"
+            className="inline-flex size-8 shrink-0 items-center justify-center rounded-full text-subtle hover:bg-surface-strong"
           >
             <Icon name="close" className="size-4" />
           </button>
         )}
       </header>
       {children && <div className="min-h-0 flex-1 overflow-y-auto px-6 py-5">{children}</div>}
-      <footer className="mt-4 flex flex-col-reverse gap-2 border-t border-border bg-surface px-6 py-4 sm:flex-row sm:justify-end">
+      <footer className="flex flex-col-reverse gap-2 px-6 pb-6 pt-4 sm:flex-row sm:justify-end">
         {footer}
       </footer>
     </dialog>

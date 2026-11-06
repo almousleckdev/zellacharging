@@ -7,6 +7,7 @@ import { passwordSetupSchema } from "@/features/onboarding/schemas";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { errorMessage } from "@/shared/i18n/errorMessage";
 import { Alert } from "@/shared/ui/Alert";
+import { AuthHeading } from "@/shared/ui/AuthHeading";
 import { Button } from "@/shared/ui/Button";
 import { PasswordField } from "@/shared/ui/PasswordField";
 import { resetPassword } from "../api/authClient";
@@ -46,10 +47,7 @@ export function ResetPasswordForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1.5">
-        <h1 className="text-3xl font-semibold text-foreground">{labels.resetTitle}</h1>
-        <p className="text-sm text-muted">{labels.resetSubtitle}</p>
-      </div>
+      <AuthHeading title={labels.resetTitle} subtitle={labels.resetSubtitle} />
       {recovery.errorCode && <Alert>{errorMessage(t, recovery.errorCode)}</Alert>}
       <form onSubmit={handleSubmit} noValidate className="flex flex-col gap-5">
         <PasswordField

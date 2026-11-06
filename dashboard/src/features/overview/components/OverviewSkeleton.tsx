@@ -1,14 +1,15 @@
+import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCardSkeleton } from "@/shared/ui/MetricCardSkeleton";
 import { Skeleton } from "@/shared/ui/Skeleton";
 
 export function OverviewSkeleton() {
   return (
     <div aria-hidden="true" className="flex flex-col gap-6">
-      <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      <MetricBand>
         {Array.from({ length: 4 }, (_, index) => (
           <MetricCardSkeleton key={index} />
         ))}
-      </div>
+      </MetricBand>
       <div className="overflow-hidden rounded-card border border-border bg-background">
         <div className="px-5 py-4">
           <Skeleton className="h-4 w-40" />

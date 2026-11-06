@@ -8,6 +8,7 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { interpolate } from "@/shared/i18n/interpolate";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { Button } from "@/shared/ui/Button";
+import { FIELD } from "@/shared/ui/fieldStyles";
 import { Modal } from "@/shared/ui/Modal";
 import { useToast } from "@/shared/ui/ToastProvider";
 import { useReviewWithdrawal, type WithdrawalAction } from "../api/useReviewWithdrawal";
@@ -87,7 +88,7 @@ export function DecisionDialog({ withdrawal, action, onClose }: DecisionDialogPr
             }}
             placeholder={labels.notePlaceholder}
             aria-invalid={missing}
-            className="rounded-control border border-transparent bg-surface-strong p-3 text-sm font-normal focus:bg-surface-focus"
+            className={`p-3 font-normal ${FIELD}`}
           />
         </label>
         {missing && reasonRequired && (

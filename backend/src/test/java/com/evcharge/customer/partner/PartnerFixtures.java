@@ -41,6 +41,16 @@ public class PartnerFixtures {
         return tag;
     }
 
+    public UUID session(UUID customer, String state, Integer transactionId, Instant at) {
+        UUID id = UUID.randomUUID();
+        Timestamp when = Timestamp.from(at);
+        jdbc.update("insert into charging_session (id, customer_id, station_id, connector_id, id_tag, state, "
+                + "transaction_id, started_at, energy_kwh, currency, currency_decimals, created_at, updated_at) "
+                + "values (?, ?, ?, 1, 'Z-TAG', ?, ?, ?, 12.5, 'XOF', 0, ?, ?)", id, customer,
+                "CP-" + id.toString().substring(0, 8), state, transactionId, when, when, when);
+        return id;
+    }
+
     public void expire(UUID keyId) {
         jdbc.update("update partner_api_key set expires_at = ? where id = ?",
                 Timestamp.from(Instant.now().minusSeconds(60)), keyId);

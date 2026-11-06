@@ -12,6 +12,8 @@ export const enAuth: Pick<Dictionary, "login" | "totp" | "recovery"> = {
     submit: "Sign in",
     submitting: "Signing in…",
     forgot: "Forgot your password?",
+    heroTitle: "Run your charging network, simply.",
+    heroText: "Stations, sessions, payments and withdrawals: all of Zella Charging operations in one place.",
   },
   recovery: {
     forgotTitle: "Forgot your password",

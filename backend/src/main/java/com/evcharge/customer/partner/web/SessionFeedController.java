@@ -21,10 +21,17 @@ class SessionFeedController {
     }
 
     @GetMapping("/sessions")
-    FeedResponse sessions(@AuthenticationPrincipal PartnerPrincipal principal,
+    FeedResponse<FeedItemView> sessions(@AuthenticationPrincipal PartnerPrincipal principal,
                           @RequestParam(required = false) String cursor,
                           @RequestParam(required = false) Integer limit,
                           @RequestParam(required = false) UUID customerId) {
         return FeedResponse.of(feed.read(principal, cursor, limit, customerId));
+    }
+
+    @GetMapping("/public-sessions")
+    FeedResponse<PublicFeedItemView> publicSessions(@AuthenticationPrincipal PartnerPrincipal principal,
+                                                    @RequestParam(required = false) String cursor,
+                                                    @RequestParam(required = false) Integer limit) {
+        return FeedResponse.ofPublic(feed.readPublic(principal, cursor, limit));
     }
 }

@@ -185,6 +185,8 @@ country; the tenant is that country. Errors use RFC 7807 with these `code` value
 | `DELETE /links/{customerId}` | Remove the link. Idempotent, 204. |
 | `GET /sessions?cursor=&limit=&customerId=` | Payment feed of linked customers' sessions that reached the charger. `limit` 1 to 500, default 100. No cursor reads from the beginning. Returns `{items,nextCursor,hasMore}`; `nextCursor` is null only for an empty first call. Changes newer than `ZELLA_PARTNER_FEED_LAG` (default 10 seconds) are not served yet, so a change that is still committing is never skipped. `customerId` restricts the feed to one linked customer (404 if not linked) with its own cursor: read it once after linking a driver, because the global cursor has already moved past that driver's history. |
 
+| `GET /public-sessions?cursor=&limit=` | The same feed for the sessions of customers who are **not** linked to NDZela (2026-11-06). Same paging, key and lag. An item is the feed item **without** `customerId`, `idTag` and `paymentMethod`: what was charged, never who. A customer who gets linked leaves this feed. Empty when everyone is linked. |
+
 Feed item: `transactionId, customerId, idTag, stationId, connectorId, sessionState, startedAt, stoppedAt, energyKwh,
 energyCostMinor, vatMinor, serviceFeeMinor, totalChargedMinor, currency, currencyDecimals, paymentMethod ("WALLET"),
 paymentState, breakdownEstimated, updatedAt`. `paymentState` is `PENDING`, `CHARGED`, `NOT_CHARGED`, `UNDER_REVIEW` or

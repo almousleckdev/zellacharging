@@ -2,6 +2,7 @@
 
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { Alert } from "@/shared/ui/Alert";
+import { AuthHeading } from "@/shared/ui/AuthHeading";
 import { useAdminLogin } from "../hooks/useAdminLogin";
 import { CredentialsStep } from "./CredentialsStep";
 import { TotpStep } from "./TotpStep";
@@ -19,10 +20,7 @@ export function LoginForm() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-1.5">
-        <h1 className="text-3xl font-semibold text-foreground">{heading.title}</h1>
-        <p className="text-sm text-muted">{heading.subtitle}</p>
-      </div>
+      <AuthHeading title={heading.title} subtitle={heading.subtitle} />
       {login.errorCode && <Alert>{t.errors[login.errorCode]}</Alert>}
       {login.step ? (
         <TotpStep step={login.step} pending={login.pending} onSubmit={login.submitCode} onBack={login.restart} />

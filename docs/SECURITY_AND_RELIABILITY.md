@@ -7,7 +7,7 @@ Tags: **[V]** verified in the OCPP platform · **[P]** proposed · **[A]** assum
 * Passwords: argon2id; or passwordless OTP **[U]**. Rate-limited login (per account
   and per IP), generic error messages.
 * Access JWT 15 min (asymmetric signing, `kid` rotation), refresh 30 d, rotating with
-  reuse detection (reuse ⇒ revoke whole family). Refresh token in OS secure storage.
+  reuse detection (reuse ⇒ revoke whole family). Admin console tokens (10 min access, 12 h refresh) tolerate a reuse within **30 seconds** of the first use, because several requests of the dashboard renew together on serverless instances; a later replay or a revoked token still revokes the family. Refresh token in OS secure storage.
 * **Authorization = ownership filter on every query** (`WHERE customer_id = :jwt.sub`).
   Foreign resources return `404`, never `403` (same anti-enumeration rule the OCPP
   platform applies [V]). No customer id in request bodies/paths for "my" resources.

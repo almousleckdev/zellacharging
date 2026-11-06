@@ -10,7 +10,7 @@ export const frCustomers = {
     loadError: "Impossible de charger les clients.",
     emptyTitle: "Aucun client trouvé",
     emptyText: "Modifiez votre recherche ou vos filtres pour afficher des résultats.",
-    columns: { balance: "Solde", charges: "Recharges", spent: "Dépensé", lastCharge: "Dernière recharge", customer: "Client", phone: "Téléphone", country: "Pays", status: "Statut", joined: "Inscrit le" },
+    columns: { balance: "Solde", charges: "Recharges", spent: "Dépensé", lastCharge: "Dernière recharge", firstName: "Prénom", lastName: "Nom", email: "E-mail", customer: "Client", phone: "Téléphone", country: "Pays", status: "Statut", joined: "Inscrit le" },
     statuses: {
       ACTIVE: "Actif",
       BLOCKED: "Suspendu",

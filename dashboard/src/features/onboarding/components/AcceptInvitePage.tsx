@@ -6,6 +6,7 @@ import { TotpStep } from "@/features/auth/components/TotpStep";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { errorMessage } from "@/shared/i18n/errorMessage";
 import { Alert } from "@/shared/ui/Alert";
+import { AuthHeading } from "@/shared/ui/AuthHeading";
 import { Spinner } from "@/shared/ui/Spinner";
 import { Stepper } from "@/shared/ui/Stepper";
 import { useInvitation } from "../hooks/useInvitation";
@@ -29,8 +30,7 @@ export function AcceptInvitePage() {
   if (invitation.phase === "invalid") {
     return (
       <div className="flex flex-col gap-4">
-        <h1 className="text-2xl font-semibold tracking-tight">{labels.invalidTitle}</h1>
-        <p className="text-sm text-muted">{labels.invalidText}</p>
+        <AuthHeading title={labels.invalidTitle} subtitle={labels.invalidText} />
         <Link href="/login" className="text-sm font-semibold text-primary-text hover:underline">
           {labels.backToLogin}
         </Link>
@@ -42,15 +42,13 @@ export function AcceptInvitePage() {
   return (
     <div className="flex flex-col gap-6">
       <Stepper steps={steps} current={securityPhase ? 1 : 0} label={labels.stepLabel} />
-      <div className="flex flex-col gap-1.5">
-        <h1 className="text-2xl font-semibold tracking-tight">{securityPhase ? t.totp.enrollTitle : labels.title}</h1>
-        <p className="text-sm text-muted">{securityPhase ? t.totp.enrollSubtitle : labels.subtitle}</p>
+      <AuthHeading title={securityPhase ? t.totp.enrollTitle : labels.title} subtitle={securityPhase ? t.totp.enrollSubtitle : labels.subtitle}>
         {!securityPhase && invitation.email && (
           <p className="text-sm text-foreground">
             {labels.account} : <span className="font-semibold">{invitation.email}</span>
           </p>
         )}
-      </div>
+      </AuthHeading>
       {invitation.errorCode && <Alert>{errorMessage(t, invitation.errorCode)}</Alert>}
       {securityPhase ? (
         <TotpStep step={invitation.step as NonNullable<typeof invitation.step>} pending={invitation.pending} onSubmit={invitation.submitCode} />

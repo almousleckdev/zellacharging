@@ -11,9 +11,12 @@ export function useExportSheet<Row>(title: string, fileName: string, columns: Co
   const { t } = useI18n();
   const format = useFormatters();
 
-  const exportColumns: ExportColumn<Row>[] = columns.flatMap((column) =>
-    column.text ? [{ header: column.header, value: column.text, numeric: column.align === "right" }] : [],
-  );
+  const exportColumns: ExportColumn<Row>[] = columns.flatMap((column) => {
+    if (column.exports) {
+      return column.exports;
+    }
+    return column.text ? [{ header: column.header, value: column.text, numeric: column.align === "right" }] : [];
+  });
   const active = [
     filters.text && `"${filters.text}"`,
     filters.from && `${t.common.range.from} ${filters.from}`,

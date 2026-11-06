@@ -1,5 +1,6 @@
 import Link from "next/link";
 import type { ReactNode } from "react";
+import { AuthHeading } from "@/shared/ui/AuthHeading";
 
 type Props = {
   title: string;
@@ -12,8 +13,7 @@ type Props = {
 export function AuthNotice({ title, text, linkHref, linkLabel, children }: Props) {
   return (
     <div className="flex flex-col gap-4">
-      <h1 className="text-2xl font-semibold tracking-tight text-foreground">{title}</h1>
-      <p className="text-sm text-muted">{text}</p>
+      <AuthHeading title={title} subtitle={text} />
       {children}
       <Link href={linkHref} className="text-sm font-semibold text-primary-text hover:underline">
         {linkLabel}

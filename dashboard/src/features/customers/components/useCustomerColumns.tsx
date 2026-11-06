@@ -31,7 +31,12 @@ export function useCustomerColumns(): Column<CustomerItem>[] {
       key: "customer",
       header: labels.customer,
       sortKey: "name",
-      text: (row) => `${name(row)} <${row.email ?? ""}> ${row.phone ?? ""}`,
+      exports: [
+        { header: labels.firstName, value: (row) => row.firstName },
+        { header: labels.lastName, value: (row) => row.lastName },
+        { header: labels.email, value: (row) => row.email ?? "" },
+        { header: labels.phone, value: (row) => row.phone ?? "" },
+      ],
       cell: (row) => (
         <CellLink href={scopedHref(`/customers/${row.country}/${row.id}`)} className="flex items-center gap-3">
           <Avatar initials={initialsOf(row.firstName, row.lastName, row.email ?? "")} src={customerAvatarUrl(row.country, row.id, row.avatarVersion)} />

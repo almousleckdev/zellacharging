@@ -1,6 +1,7 @@
 import { useId } from "react";
 import type { ComponentProps, ReactNode } from "react";
 import { cn } from "@/shared/lib/cn";
+import { FIELD, FIELD_INVALID } from "./fieldStyles";
 
 export type TextFieldProps = Omit<ComponentProps<"input">, "id"> & {
   label: string;
@@ -25,11 +26,10 @@ export function TextField({ label, error, hint, trailing, className, ...rest }: 
           aria-invalid={error ? true : undefined}
           aria-describedby={message ? messageId : undefined}
           className={cn(
-            "h-11 w-full rounded-control border border-transparent bg-surface-strong px-3.5 text-sm text-foreground transition",
-            "placeholder:text-subtle disabled:opacity-60",
-            "focus:bg-surface-focus focus:outline-none",
-            error && "border-danger",
-            trailing ? "pr-11" : undefined,
+            "h-9 w-full px-3",
+            FIELD,
+            error && FIELD_INVALID,
+            trailing ? "pr-10" : undefined,
             className,
           )}
           {...rest}

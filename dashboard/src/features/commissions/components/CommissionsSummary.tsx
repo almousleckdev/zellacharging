@@ -3,6 +3,7 @@
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { interpolate } from "@/shared/i18n/interpolate";
 import { useI18n } from "@/shared/i18n/I18nProvider";
+import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
 import type { CommissionSummary } from "../schemas";
 
@@ -14,7 +15,7 @@ export function CommissionsSummary({ summary }: { summary: CommissionSummary }) 
   const rate = format.number(summary.serviceFeePercent, summary.serviceFeePercent % 1 === 0 ? 0 : 1);
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 min-[1700px]:grid-cols-4">
+    <MetricBand>
       <MetricCard
         label={interpolate(labels.earned, { rate })}
         icon="percent"
@@ -34,6 +35,6 @@ export function CommissionsSummary({ summary }: { summary: CommissionSummary }) 
         value={money(summary.electricMinor + summary.serviceFeeMinor + summary.vatMinor)}
         hint={labels.totalHint}
       />
-    </div>
+    </MetricBand>
   );
 }

@@ -5,6 +5,7 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { deltaPercent } from "../seriesMath";
 import type { CurrencyPeriod, Totals } from "../seriesMath";
+import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
 
 type Tile = {
@@ -46,7 +47,7 @@ export function RevenueKpis({ period, days }: { period: CurrencyPeriod; days: nu
   ];
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 min-[1700px]:grid-cols-4">
+    <MetricBand>
       {tiles.map((tile) => (
         <MetricCard
           key={tile.key}
@@ -62,6 +63,6 @@ export function RevenueKpis({ period, days }: { period: CurrencyPeriod; days: nu
           }}
         />
       ))}
-    </div>
+    </MetricBand>
   );
 }

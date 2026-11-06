@@ -38,43 +38,45 @@ export function OverviewPage() {
   const primary = active[0] ?? periods[0];
   const name = profile.firstName ?? profile.email;
 
+  const ready = Boolean(overview.data && series.data && primary);
+
   return (
-    <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
-      <div className="flex min-w-0 flex-col gap-6">
-        <PageHeader
-          title={interpolate(t.overview.greeting, { name })}
-          subtitle={interpolate(t.overview.subtitle, { scope })}
-          actions={
-            <PillTabs
-              label={t.overview.period.label}
-              options={PERIODS.map((value) => ({ value, label: `${value} ${t.overview.period.days}` }))}
-              value={days as (typeof PERIODS)[number]}
-              onChange={(value) => update({ days: value === 30 ? null : String(value) }, false)}
-            />
-          }
-        />
-        {(overview.isPending || series.isPending) && (
-          <div role="status" aria-busy="true">
-            <span className="sr-only">{t.common.loading}</span>
-            <OverviewSkeleton />
-          </div>
-        )}
-        {(overview.isError || series.isError) && <ErrorState message={t.overview.loadError} onRetry={() => void overview.refetch()} />}
-        {overview.data && series.data && primary && <RevenueKpis period={primary} days={days} />}
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={interpolate(t.overview.greeting, { name })}
+        subtitle={interpolate(t.overview.subtitle, { scope })}
+        actions={
+          <PillTabs
+            label={t.overview.period.label}
+            options={PERIODS.map((value) => ({ value, label: `${value} ${t.overview.period.days}` }))}
+            value={days as (typeof PERIODS)[number]}
+            onChange={(value) => update({ days: value === 30 ? null : String(value) }, false)}
+          />
+        }
+      />
+      {(overview.isPending || series.isPending) && (
+        <div role="status" aria-busy="true">
+          <span className="sr-only">{t.common.loading}</span>
+          <OverviewSkeleton />
+        </div>
+      )}
+      {(overview.isError || series.isError) && <ErrorState message={t.overview.loadError} onRetry={() => void overview.refetch()} />}
+      {ready && primary && <RevenueKpis period={primary} days={days} />}
+      <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
+        <div className="flex min-w-0 flex-col gap-6">
+          {ready && primary && <RevenueChart period={primary} days={days} />}
+          {ready && <RecentCharges />}
+        </div>
+        <aside className="flex min-w-0 flex-col gap-4">
+          <PendingWithdrawalsPanel />
+          {overview.data && <AttentionCard totals={overviewTotals(overview.data.countries)} />}
+          <QuickAccess />
+        </aside>
       </div>
-      <aside className="flex min-w-0 flex-col gap-4">
-        <PendingWithdrawalsPanel />
-        {overview.data && <AttentionCard totals={overviewTotals(overview.data.countries)} />}
-        <QuickAccess />
-      </aside>
-      {overview.data && series.data && primary && (
-        <div className="flex min-w-0 flex-col gap-6 xl:col-span-2">
-          <RevenueChart period={primary} days={days} />
-          <RecentCharges />
-          <div className="grid items-start gap-6 lg:grid-cols-2">
-            <TopCommissions />
-            {series.data.countries.length > 1 && <CountryRevenue series={series.data} days={days} />}
-          </div>
+      {ready && series.data && (
+        <div className="grid items-start gap-6 lg:grid-cols-2">
+          <TopCommissions />
+          {series.data.countries.length > 1 && primary && <CountryRevenue series={series.data} days={days} />}
         </div>
       )}
     </div>

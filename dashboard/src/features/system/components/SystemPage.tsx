@@ -9,6 +9,7 @@ import { Badge } from "@/shared/ui/Badge";
 import { Button } from "@/shared/ui/Button";
 import { Card } from "@/shared/ui/Card";
 import { FactList } from "@/shared/ui/FactList";
+import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
 import { PageHeader } from "@/shared/ui/PageHeader";
 import { QueryStatus } from "@/shared/ui/QueryStatus";
@@ -37,11 +38,11 @@ export function SystemPage() {
       <QueryStatus pending={query.isPending} failed={query.isError} loadError={labels.loadError} onRetry={() => void query.refetch()} />
       {query.data && (
         <>
-          <div className="grid gap-4 sm:grid-cols-3">
+          <MetricBand columns={3}>
             <MetricCard label={labels.health} icon="shield" value={`${upCount} / ${query.data.probes.length}`} />
             <MetricCard label={labels.startedAt} icon="clipboard" value={format.dateTime(new Date(query.data.startedAtMillis).toISOString())} />
             <MetricCard label={labels.java} icon="sliders" value={query.data.javaVersion} />
-          </div>
+          </MetricBand>
           <div className="grid items-start gap-6 lg:grid-cols-2">
             <Card title={labels.health}>
               <FactList

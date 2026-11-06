@@ -48,6 +48,8 @@ export const frWithdrawals = {
       state: "État",
       amount: "Montant",
       date: "Date",
+      operator: "Opérateur",
+      phone: "Téléphone",
     },
     actions: { approve: "Valider", reject: "Refuser", refund: "Rembourser" },
     approve: {

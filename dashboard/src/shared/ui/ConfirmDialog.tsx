@@ -10,6 +10,7 @@ type ConfirmDialogProps = {
   confirmLabel: string;
   cancelLabel: string;
   loading?: boolean;
+  destructive?: boolean;
   onConfirm: () => void;
   onCancel: () => void;
 };
@@ -21,6 +22,7 @@ export function ConfirmDialog({
   confirmLabel,
   cancelLabel,
   loading = false,
+  destructive = false,
   onConfirm,
   onCancel,
 }: ConfirmDialogProps) {
@@ -36,7 +38,7 @@ export function ConfirmDialog({
           <Button variant="secondary" onClick={onCancel} disabled={loading} autoFocus>
             {cancelLabel}
           </Button>
-          <Button onClick={onConfirm} loading={loading}>
+          <Button variant={destructive ? "danger" : "primary"} onClick={onConfirm} loading={loading}>
             {confirmLabel}
           </Button>
         </>

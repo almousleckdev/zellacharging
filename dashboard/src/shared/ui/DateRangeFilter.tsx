@@ -3,6 +3,7 @@
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { presetRange } from "@/shared/lib/dateRange";
 import type { RangePreset } from "@/shared/lib/dateRange";
+import { FIELD } from "./fieldStyles";
 import { PillTabs } from "./PillTabs";
 
 type DateRangeFilterProps = {
@@ -12,7 +13,7 @@ type DateRangeFilterProps = {
 };
 
 const PRESETS: RangePreset[] = ["today", "last7", "last30", "thisMonth"];
-const FIELD = "h-9 rounded-control border border-transparent bg-surface-strong px-2.5 text-sm text-foreground focus:bg-surface-focus";
+const DATE_FIELD = `h-9 px-2.5 ${FIELD}`;
 
 export function DateRangeFilter({ from, to, onChange }: DateRangeFilterProps) {
   const { t } = useI18n();
@@ -35,11 +36,11 @@ export function DateRangeFilter({ from, to, onChange }: DateRangeFilterProps) {
       />
       <label className="flex items-center gap-1.5 text-sm text-muted">
         <span>{labels.from}</span>
-        <input type="date" value={from} max={to || undefined} onChange={(event) => onChange(event.target.value, to)} className={FIELD} />
+        <input type="date" value={from} max={to || undefined} onChange={(event) => onChange(event.target.value, to)} className={DATE_FIELD} />
       </label>
       <label className="flex items-center gap-1.5 text-sm text-muted">
         <span>{labels.to}</span>
-        <input type="date" value={to} min={from || undefined} onChange={(event) => onChange(from, event.target.value)} className={FIELD} />
+        <input type="date" value={to} min={from || undefined} onChange={(event) => onChange(from, event.target.value)} className={DATE_FIELD} />
       </label>
       {(from || to) && (
         <button type="button" onClick={() => onChange("", "")} className="text-sm font-medium text-primary-text hover:underline">

@@ -1,6 +1,7 @@
 "use client";
 
 import type { CurrencySeries } from "@/features/overview/seriesMath";
+import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
 import type { IconName } from "@/shared/ui/Icon";
 import { totalOf } from "./reportColumns";
@@ -18,10 +19,10 @@ export function ReportSummary({ group, bucket }: { group: CurrencySeries; bucket
   const { value, labels } = useReportFormat(group, bucket);
 
   return (
-    <div className="grid gap-4 sm:grid-cols-2 min-[1700px]:grid-cols-4">
+    <MetricBand>
       {HEADLINES.map(({ key, icon }) => (
         <MetricCard key={key} label={labels[key]} icon={icon} value={value(key, totalOf(group.points, key))} />
       ))}
-    </div>
+    </MetricBand>
   );
 }

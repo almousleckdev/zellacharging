@@ -10,6 +10,8 @@ export const frAuth = {
     submit: "Se connecter",
     submitting: "Connexion en cours…",
     forgot: "Mot de passe oublié ?",
+    heroTitle: "Pilotez votre réseau de recharge, simplement.",
+    heroText: "Bornes, sessions, paiements et retraits : toute l'exploitation Zella Charging au même endroit.",
   },
   recovery: {
     forgotTitle: "Mot de passe oublié",

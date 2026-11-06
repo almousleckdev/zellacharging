@@ -3,6 +3,7 @@
 import { useId } from "react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { cn } from "@/shared/lib/cn";
+import { FIELD, FIELD_INVALID } from "@/shared/ui/fieldStyles";
 import { DIAL_CODES } from "../phone";
 
 type PhoneFieldProps = {
@@ -30,7 +31,7 @@ export function PhoneField({ dial, digits, error, disabled, onChange }: PhoneFie
           value={dial}
           disabled={disabled}
           onChange={(event) => onChange({ dial: event.target.value, digits })}
-          className="h-10 rounded-control border border-transparent bg-surface-strong px-2 text-sm"
+          className={`h-9 px-2 ${FIELD}`}
         >
           {DIAL_CODES.map((entry) => (
             <option key={entry.country} value={entry.dial}>
@@ -48,7 +49,7 @@ export function PhoneField({ dial, digits, error, disabled, onChange }: PhoneFie
           aria-invalid={error ? true : undefined}
           aria-describedby={messageId}
           onChange={(event) => onChange({ dial, digits: event.target.value.replace(/\D/g, "").slice(0, 12) })}
-          className={cn("h-10 min-w-0 flex-1 rounded-control border bg-surface-strong px-3 text-sm focus:bg-surface-focus", error ? "border-danger" : "border-transparent")}
+          className={cn("h-9 min-w-0 flex-1 px-3", FIELD, error && FIELD_INVALID)}
         />
       </div>
       <p id={messageId} className={cn("text-xs", error ? "text-danger" : "text-subtle")}>

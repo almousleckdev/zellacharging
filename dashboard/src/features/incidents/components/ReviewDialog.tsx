@@ -5,6 +5,7 @@ import { ApiError } from "@/shared/api/adminFetch";
 import { errorMessage } from "@/shared/i18n/errorMessage";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { Button } from "@/shared/ui/Button";
+import { FIELD } from "@/shared/ui/fieldStyles";
 import { Modal } from "@/shared/ui/Modal";
 import { useToast } from "@/shared/ui/ToastProvider";
 import { useReviewIncident } from "../api/useReviewIncident";
@@ -60,7 +61,7 @@ export function ReviewDialog({ incident, status, onClose }: ReviewDialogProps) {
           rows={4}
           onChange={(event) => setNote(event.target.value)}
           placeholder={labels.notePlaceholder}
-          className="rounded-control border border-transparent bg-surface-strong p-3 text-sm font-normal focus:bg-surface-focus"
+          className={`p-3 font-normal ${FIELD}`}
         />
       </label>
     </Modal>

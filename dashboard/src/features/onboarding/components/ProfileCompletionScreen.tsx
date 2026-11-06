@@ -6,6 +6,7 @@ import { ProfileDetailsForm } from "@/features/profile/components/ProfileDetails
 import type { AdminProfile } from "@/features/session/schemas";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { Stepper } from "@/shared/ui/Stepper";
+import { AuthHeading } from "@/shared/ui/AuthHeading";
 
 export function ProfileCompletionScreen({ profile }: { profile: AdminProfile }) {
   const { t } = useI18n();
@@ -15,10 +16,7 @@ export function ProfileCompletionScreen({ profile }: { profile: AdminProfile }) 
     <AuthLayout>
       <div className="flex flex-col gap-6">
         <Stepper steps={[labels.steps.password, labels.steps.security, labels.steps.profile]} current={2} label={labels.stepLabel} />
-        <div className="flex flex-col gap-1.5">
-          <h1 className="text-2xl font-semibold tracking-tight">{labels.completeTitle}</h1>
-          <p className="text-sm text-muted">{labels.completeSubtitle}</p>
-        </div>
+        <AuthHeading title={labels.completeTitle} subtitle={labels.completeSubtitle} />
         <AvatarUploader profile={profile} />
         <ProfileDetailsForm profile={profile} submitLabel={t.common.continue} />
       </div>

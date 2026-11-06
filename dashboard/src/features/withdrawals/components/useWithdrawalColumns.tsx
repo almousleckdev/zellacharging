@@ -29,7 +29,11 @@ export function useWithdrawalColumns(): Column<WithdrawalItem>[] {
     {
       key: "customer",
       header: labels.customer,
-      text: (row) => `${row.customerName} (${row.operator} ${row.msisdn})`,
+      exports: [
+        { header: labels.customer, value: (row) => row.customerName },
+        { header: labels.operator, value: (row) => row.operator },
+        { header: labels.phone, value: (row) => row.msisdn },
+      ],
       cell: (row) => (
         <CellLink href={scopedHref(`/customers/${row.country}/${row.customerId}`)} className="flex flex-col">
           <span className="font-medium">{row.customerName}</span>

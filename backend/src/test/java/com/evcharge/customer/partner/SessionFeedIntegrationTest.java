@@ -67,13 +67,7 @@ class SessionFeedIntegrationTest extends PostgresTestBase {
     }
 
     private UUID session(UUID customer, String state, Integer transactionId, int secondsAfterBase) {
-        UUID id = UUID.randomUUID();
-        Timestamp at = Timestamp.from(BASE.plusSeconds(secondsAfterBase));
-        jdbc.update("insert into charging_session (id, customer_id, station_id, connector_id, id_tag, state, "
-                + "transaction_id, started_at, energy_kwh, currency, currency_decimals, created_at, updated_at) "
-                + "values (?, ?, ?, 1, 'Z-TAG', ?, ?, ?, 12.5, 'XOF', 0, ?, ?)", id, customer,
-                "CP-" + id.toString().substring(0, 8), state, transactionId, at, at, at);
-        return id;
+        return fixtures.session(customer, state, transactionId, BASE.plusSeconds(secondsAfterBase));
     }
 
     private UUID finished(UUID customer, int secondsAfterBase) {

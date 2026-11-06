@@ -7,40 +7,44 @@
   --color-primary-text: #c2410c;
   --color-on-primary: #ffffff;
 
-  --color-canvas: #f4f5f9;
+  --color-canvas: #f3f5f8;
   --color-background: #ffffff;
-  --color-surface: #f8f9fb;
-  --color-surface-strong: #eff1f4;
-  --color-surface-focus: #e6e9ef;
-  --color-border: #eaecf2;
-  --color-border-strong: #d5d9e0;
+  --color-surface: #f8fafc;
+  --color-surface-strong: #f1f5f9;
+  --color-surface-focus: #e2e8f0;
+  --color-border: #e3e8ef;
+  --color-border-strong: #cbd5e1;
 
-  --color-foreground: #101828;
-  --color-muted: #475467;
-  --color-subtle: #667085;
+  --color-foreground: #0f172a;
+  --color-muted: #5b6b80;
+  --color-subtle: #64748b;
 
-  --color-danger: #d92d20;
-  --color-danger-soft: #fef3f2;
-  --color-danger-border: #fecdca;
-  --color-success: #067647;
-  --color-success-soft: #ecfdf3;
+  --color-danger: #dc2626;
+  --color-danger-soft: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-success: #15803d;
+  --color-success-soft: #f0fdf4;
+  --color-info: #1e40af;
+  --color-info-soft: #dbeafe;
   --color-series-1: #f97316;
-  --color-series-2: #475467;
-  --color-grid: #eef0f5;
+  --color-series-2: #5b6b80;
+  --color-grid: #eef1f5;
 
-  --color-sidebar: #101828;
-  --color-sidebar-raised: #1d2939;
-  --color-sidebar-line: #2a3649;
-  --color-sidebar-text: #f2f4f7;
-  --color-sidebar-muted: #98a2b3;
+  --color-sidebar: #0f172a;
+  --color-sidebar-raised: rgb(255 255 255 / 0.07);
+  --color-sidebar-line: rgb(255 255 255 / 0.1);
+  --color-sidebar-text: #ffffff;
+  --color-sidebar-muted: #cbd5e1;
+  --color-sidebar-faint: #64748b;
 
-  --font-sans: var(--font-figtree), ui-sans-serif, system-ui, sans-serif;
+  --font-sans: var(--font-plex), ui-sans-serif, system-ui, sans-serif;
+  --font-display: var(--font-bricolage), ui-sans-serif, system-ui, sans-serif;
   --font-mono: ui-monospace, SFMono-Regular, Menlo, monospace;
 
-  --radius-control: 0.75rem;
-  --radius-card: 1rem;
+  --radius-control: 0.375rem;
+  --radius-card: 0.5rem;
 
-  --shadow-card: 0 1px 3px rgb(16 24 40 / 0.04), 0 1px 2px rgb(16 24 40 / 0.03);
+  --shadow-card: 0 1px 2px rgb(15 23 42 / 0.04);
 }
 
 :root {
@@ -63,8 +67,8 @@ body {
   input:focus-visible,
   select:focus-visible,
   textarea:focus-visible {
-    outline: none;
-    box-shadow: none;
+    outline: 2px solid var(--color-primary);
+    outline-offset: 0;
   }
 
   input:-webkit-autofill,

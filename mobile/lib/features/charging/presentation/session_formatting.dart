@@ -64,7 +64,8 @@ extension SessionFormatting on ChargingSession {
       ? '--'
       : '${MoneyFormat.format(pricePerKwhMinor!, currency!, currencyDecimals ?? 0)} / ${Strings.kwhUnit}';
 
-  String get stopReasonText => HistoryText.stopReasonOf(stopReason, state.isLive);
+  String get stopReasonText =>
+      HistoryText.stopReasonOf(stopReason, state.isLive);
 
   String get priceText {
     final estimate = estimatedCost;

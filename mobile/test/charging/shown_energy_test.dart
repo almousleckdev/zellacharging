@@ -19,18 +19,24 @@ ChargingSession _session(SessionState state) => ChargingSession(
 );
 
 void main() {
-  test('a finished session shows the final energy, not the last live reading', () {
-    expect(_session(SessionState.completed).shownEnergyKwh, 2.931);
-  });
+  test(
+    'a finished session shows the final energy, not the last live reading',
+    () {
+      expect(_session(SessionState.completed).shownEnergyKwh, 2.931);
+    },
+  );
 
   test('a running session shows the live reading', () {
     expect(_session(SessionState.active).shownEnergyKwh, 2.902);
   });
 
-  test('the price of the kWh and the stop reason are shown on a finished session', () {
-    final session = _session(SessionState.completed);
+  test(
+    'the price of the kWh and the stop reason are shown on a finished session',
+    () {
+      final session = _session(SessionState.completed);
 
-    expect(session.pricePerKwhText, contains('120'));
-    expect(session.stopReasonText, isNotEmpty);
-  });
+      expect(session.pricePerKwhText, contains('120'));
+      expect(session.stopReasonText, isNotEmpty);
+    },
+  );
 }

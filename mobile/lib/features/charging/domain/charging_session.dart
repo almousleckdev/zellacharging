@@ -50,6 +50,7 @@ class ChargingSession {
   final int? pricePerKwhMinor;
   final String? stopReason;
 
-  double? get shownEnergyKwh =>
-      state.isLive ? metering?.totalKwh ?? energyKwh : energyKwh ?? metering?.totalKwh;
+  double? get shownEnergyKwh => state.isLive
+      ? metering?.totalKwh ?? energyKwh
+      : energyKwh ?? metering?.totalKwh;
 }

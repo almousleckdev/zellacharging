@@ -11,10 +11,13 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.time.Duration;
 import java.time.Instant;
 
 @Service
 public class AdminRefreshService {
+
+    private static final Duration REUSE_GRACE = Duration.ofSeconds(30);
 
     private final AdminRefreshTokenRepository refreshTokens;
     private final AdminRepository admins;
@@ -32,13 +35,18 @@ public class AdminRefreshService {
     @Transactional(noRollbackFor = ApiException.class)
     public AdminTokens refresh(String rawToken) {
         Instant now = clock.instant();
-        AdminRefreshToken token = refreshTokens.findByHash(Sha256.hex(rawToken))
-                .orElseThrow(AdminRefreshService::invalid);
-        if (token.isConsumed()) {
-            refreshTokens.revokeFamily(token.familyId(), now);
+        String hash = Sha256.hex(rawToken);
+        AdminRefreshToken token = refreshTokens.findByHash(hash).orElseThrow(AdminRefreshService::invalid);
+        if (token.revokedAt() != null || token.isExpiredAt(now)) {
             throw invalid();
         }
-        if (token.isExpiredAt(now) || !refreshTokens.markUsed(token.id(), now)) {
+        Instant usedAt = token.usedAt();
+        if (usedAt == null && !refreshTokens.markUsed(token.id(), now)) {
+            usedAt = refreshTokens.findByHash(hash).filter(current -> current.revokedAt() == null)
+                    .map(AdminRefreshToken::usedAt).orElseThrow(AdminRefreshService::invalid);
+        }
+        if (usedAt != null && usedAt.plus(REUSE_GRACE).isBefore(now)) {
+            refreshTokens.revokeFamily(token.familyId(), now);
             throw invalid();
         }
         AdminUser admin = admins.findById(token.adminId()).filter(AdminUser::active)

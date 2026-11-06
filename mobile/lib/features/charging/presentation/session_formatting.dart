@@ -60,6 +60,12 @@ extension SessionFormatting on ChargingSession {
         : MoneyFormat.format(costMinor!, currency!, currencyDecimals ?? 0);
   }
 
+  String get pricePerKwhText => pricePerKwhMinor == null || currency == null
+      ? '--'
+      : '${MoneyFormat.format(pricePerKwhMinor!, currency!, currencyDecimals ?? 0)} / ${Strings.kwhUnit}';
+
+  String get stopReasonText => HistoryText.stopReasonOf(stopReason, state.isLive);
+
   String get priceText {
     final estimate = estimatedCost;
     if (costMinor != null || estimate == null) return costText;

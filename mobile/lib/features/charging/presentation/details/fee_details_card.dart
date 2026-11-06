@@ -32,7 +32,7 @@ class FeeDetailsCard extends StatelessWidget {
         InfoRow(label: HistoryText.vat, value: _money(fees?.vatMinor)),
         InfoRow(
           label: HistoryText.serviceFee,
-          value: _money(fees?.serviceMinor),
+          value: _money(fees == null ? null : 0),
         ),
         const Divider(height: 16, color: AppColors.border),
         InfoRow(

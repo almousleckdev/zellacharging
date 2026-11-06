@@ -100,7 +100,8 @@ void main() {
     expect(find.text('18.500 kWh'), findsOneWidget);
     expect(find.text(_money(1000)), findsOneWidget);
     expect(find.text(_money(180)), findsOneWidget);
-    expect(find.text(_money(50)), findsOneWidget);
+    expect(find.text(_money(50)), findsNothing);
+    expect(find.text(_money(0)), findsOneWidget);
     expect(find.text(_money(1230)), findsWidgets);
     await _close(tester);
   });

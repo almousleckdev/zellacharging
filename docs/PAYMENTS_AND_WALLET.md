@@ -70,7 +70,7 @@ cached on `wallet` and derived from the ledger:
   `Available` or `Preparing`, not in use), the amount range, then reserves atomically. `Idempotency-Key`
   makes a retry return the same session.
 * The backend stops the charge. `FundsGuard` runs every 15 s: estimated cost plus the cost of the next
-  `stop-lead-time` (15 s) of charging at the current power, against 100% of the reservation, so the chosen
+  `stop-lead-time` (45 s since 2026-11-06, covering the sweep, the metering staleness and the stop latency) of charging at the current power, against 100% of the reservation, so the chosen
   amount is consumed. Any energy delivered after the stop command is capped at the reservation, and an unused
   remainder (battery full first) is released back to the wallet. A stop that is not
   confirmed is re-issued every 30 s while the session is `STOPPING`. A session is never marked stopped because a
@@ -95,7 +95,7 @@ The platform allows 60 requests/minute for all customers together. What a sweep 
 * one `GET /api/v1/sessions?status=ACTIVE` for every live session of every customer (`RemoteSessionLookup`),
   shared by the sweeper and by user reads for 5 s;
 * one metering call per ACTIVE session, at most every 10 s (`metering-interval`); the battery level shown can never
-  be fresher than the charger's own `MeterValueSampleInterval`; the stop prediction (`stop-lead-time`, 15 s) covers a little of the extra staleness;
+  be fresher than the charger's own `MeterValueSampleInterval`; the stop prediction (`stop-lead-time`, 45 s) covers a little of the extra staleness;
 * one lookup by transaction when a session leaves the active list, once;
 * a lookup by idTag only for a session still waiting for its transaction, at most every 20 s (always when it is
   about to time out).

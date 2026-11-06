@@ -39,6 +39,8 @@ class DeviceInfoCard extends StatelessWidget {
       children: [
         InfoRow(label: HistoryText.deviceNo, value: session.stationId),
         InfoRow(label: HistoryText.dcPower, value: _dcPower),
+        InfoRow(label: HistoryText.pricePerKwh, value: session.pricePerKwhText),
+        InfoRow(label: HistoryText.stopReason, value: session.stopReasonText),
         InfoRow(label: HistoryText.voltageLabel, value: session.voltageText),
         InfoRow(label: HistoryText.startTime, value: _time(session.startedAt)),
         InfoRow(label: HistoryText.endTime, value: _time(session.stoppedAt)),

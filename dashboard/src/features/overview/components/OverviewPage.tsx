@@ -66,19 +66,15 @@ export function OverviewPage() {
         <div className="flex min-w-0 flex-col gap-6">
           {ready && primary && <RevenueChart period={primary} days={days} />}
           {ready && <RecentCharges />}
+          {ready && <TopCommissions />}
         </div>
         <aside className="flex min-w-0 flex-col gap-4">
           <PendingWithdrawalsPanel />
           {overview.data && <AttentionCard totals={overviewTotals(overview.data.countries)} />}
           <QuickAccess />
+          {ready && series.data && series.data.countries.length > 1 && primary && <CountryRevenue series={series.data} days={days} />}
         </aside>
       </div>
-      {ready && series.data && (
-        <div className="grid items-start gap-6 lg:grid-cols-2">
-          <TopCommissions />
-          {series.data.countries.length > 1 && primary && <CountryRevenue series={series.data} days={days} />}
-        </div>
-      )}
     </div>
   );
 }

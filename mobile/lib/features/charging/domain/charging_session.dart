@@ -24,6 +24,8 @@ class ChargingSession {
     this.lastPowerKw,
     this.fees,
     this.estimatedCost,
+    this.pricePerKwhMinor,
+    this.stopReason,
   });
 
   final String id;
@@ -45,6 +47,9 @@ class ChargingSession {
   final double? lastPowerKw;
   final SessionFees? fees;
   final EstimatedCost? estimatedCost;
+  final int? pricePerKwhMinor;
+  final String? stopReason;
 
-  double? get shownEnergyKwh => metering?.totalKwh ?? energyKwh;
+  double? get shownEnergyKwh =>
+      state.isLive ? metering?.totalKwh ?? energyKwh : energyKwh ?? metering?.totalKwh;
 }

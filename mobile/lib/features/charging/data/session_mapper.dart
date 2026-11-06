@@ -29,6 +29,8 @@ abstract final class SessionMapper {
       lastPowerKw: (json['lastPowerKw'] as num?)?.toDouble(),
       fees: fees == null ? null : _fees(fees),
       estimatedCost: estimate == null ? null : _estimate(estimate),
+      pricePerKwhMinor: (json['pricePerKwhMinor'] as num?)?.toInt(),
+      stopReason: json['stopReason'] as String?,
     );
   }
 

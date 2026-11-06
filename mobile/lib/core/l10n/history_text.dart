@@ -55,6 +55,32 @@ abstract final class HistoryText {
   static String get serviceFee =>
       AppLanguage.pick(fr: 'Frais de service', en: 'Service fee');
 
+  static String get pricePerKwh =>
+      AppLanguage.pick(fr: 'Prix du kWh', en: 'Price per kWh');
+
+  static String get stopReason =>
+      AppLanguage.pick(fr: 'Motif d’arrêt', en: 'Stop reason');
+
+  static String stopReasonOf(String? reason, bool running) {
+    if (running) return '--';
+    return switch (reason) {
+      'PowerLoss' || 'Reboot' || 'HardReset' || 'SoftReset' => AppLanguage.pick(
+        fr: 'Coupure d’électricité',
+        en: 'Power cut',
+      ),
+      'Remote' ||
+      'Local' ||
+      'EVDisconnected' ||
+      'EmergencyStop' ||
+      'DeAuthorized' ||
+      'UnlockCommand' => AppLanguage.pick(
+        fr: 'Arrêt par le conducteur',
+        en: 'Stopped by the driver',
+      ),
+      _ => AppLanguage.pick(fr: 'Montant atteint', en: 'Amount reached'),
+    };
+  }
+
   static String get total => AppLanguage.pick(fr: 'Total', en: 'Total');
 
   static String get deviceInfo =>

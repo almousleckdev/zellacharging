@@ -30,13 +30,12 @@ class PushRegistration {
   Future<void> stop() async {
     await _refresh?.cancel();
     _refresh = null;
-    final token = _registered ?? await _messaging.token();
-    _registered = null;
-    if (token == null) return;
     try {
-      await _registry.unregister(token);
+      final token = _registered ?? await _messaging.token();
+      _registered = null;
+      if (token != null) await _registry.unregister(token);
     } on Object {
-      return;
+      _registered = null;
     }
   }
 }

@@ -21,6 +21,8 @@ final signedOutElsewhereProvider = NotifierProvider<SignedOutElsewhere, bool>(
 );
 
 class SessionController extends Notifier<SessionStatus> {
+  static const _cleanupLimit = Duration(seconds: 3);
+
   @override
   SessionStatus build() {
     _restore();
@@ -44,10 +46,18 @@ class SessionController extends Notifier<SessionStatus> {
   }
 
   Future<void> signOut() async {
-    await ref.read(pushRegistrationProvider).stop();
-    await ref.read(appBadgeProvider).set(0);
+    await _bestEffort(() => ref.read(pushRegistrationProvider).stop());
+    await _bestEffort(() => ref.read(appBadgeProvider).set(0));
     await ref.read(tokenStoreProvider).clear();
     state = SessionStatus.unauthenticated;
+  }
+
+  Future<void> _bestEffort(Future<void> Function() cleanup) async {
+    try {
+      await cleanup().timeout(_cleanupLimit);
+    } on Object {
+      return;
+    }
   }
 }
 

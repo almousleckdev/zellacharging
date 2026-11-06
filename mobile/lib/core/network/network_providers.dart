@@ -25,8 +25,11 @@ Dio _newClient() => Dio(
   ),
 );
 
+bool _isSignedIn(SessionStatus status) => status == SessionStatus.authenticated;
+
 final dioProvider = Provider<Dio>((ref) {
   final store = ref.watch(tokenStoreProvider);
+  ref.watch(sessionControllerProvider.select(_isSignedIn));
   final client = _newClient();
   final refresher = TokenRefresher(plainClient: _newClient(), store: store);
   client.interceptors.add(LanguageInterceptor());

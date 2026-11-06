@@ -99,6 +99,18 @@ class PlatformWebhookIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void aWebhookSentToTheRootAddressIsAcceptedToo() throws Exception {
+        UUID id = liveSession("CP-WH-5", "Z-WH-5");
+        String body = metering("evt-" + UUID.randomUUID(), "CP-WH-5", "Z-WH-5");
+
+        mvc.perform(post("/").contentType(MediaType.APPLICATION_JSON).content(body)
+                        .header("X-Webhook-Signature", sign(body)))
+                .andExpect(status().isAccepted());
+
+        assertThat(waitForReading(id).get("battery_percent")).isNotNull();
+    }
+
+    @Test
     void aWrongSignatureIsRefusedAndChangesNothing() throws Exception {
         UUID id = liveSession("CP-WH-3", "Z-WH-3");
         String body = metering("evt-" + UUID.randomUUID(), "CP-WH-3", "Z-WH-3");

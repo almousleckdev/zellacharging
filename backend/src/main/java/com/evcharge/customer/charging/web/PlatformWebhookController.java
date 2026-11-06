@@ -9,13 +9,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
-import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.time.Clock;
 
 @RestController
-@RequestMapping("/v1/ocpp")
 class PlatformWebhookController {
 
     private final PlatformEvents events;
@@ -31,7 +29,7 @@ class PlatformWebhookController {
         this.clock = clock;
     }
 
-    @PostMapping("/webhooks")
+    @PostMapping({"/v1/ocpp/webhooks", "/"})
     ResponseEntity<Void> receive(@RequestBody byte[] body,
                                  @RequestHeader(name = "X-Webhook-Signature", required = false) String signature,
                                  @RequestHeader(name = "X-Webhook-Signature-Timestamp", required = false)

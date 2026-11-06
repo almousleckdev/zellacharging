@@ -34,7 +34,7 @@ class SecurityConfiguration {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/v1/auth/**", "/v1/admin/auth/**", "/v1/payments/callback",
                                 "/v1/ocpp/webhooks").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/v1/contact").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/v1/contact", "/").permitAll()
                         .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> { }).authenticationEntryPoint(problems)

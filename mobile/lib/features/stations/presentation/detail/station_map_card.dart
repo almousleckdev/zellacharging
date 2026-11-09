@@ -67,7 +67,7 @@ class StationMapCard extends ConsumerWidget {
                   TileLayer(
                     urlTemplate:
                         'https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-                    userAgentPackageName: 'com.zella.ocpp.gabon',
+                    userAgentPackageName: 'com.zella.charging.gabon',
                     tileProvider: ref.watch(mapTileProvider),
                   ),
                   MarkerLayer(

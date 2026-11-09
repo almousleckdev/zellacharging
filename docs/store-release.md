@@ -1,6 +1,6 @@
 # Shipping to TestFlight and Google Play (internal)
 
-App id on both stores: `com.zella.ocpp.gabon`. Apple Team ID: `XB5CS344AV`.
+App id: Google Play `com.zella.charging.gabon` (the old `com.zella.ocpp.gabon` is taken by a rejected app in the personal account), App Store `com.zella.ocpp.gabon`. Apple Team ID: `XB5CS344AV`.
 
 ## 0. Before building
 

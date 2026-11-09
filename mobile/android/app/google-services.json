@@ -7,12 +7,80 @@
   "client": [
     {
       "client_info": {
+        "mobilesdk_app_id": "1:445891709592:android:6c09670f11e1df56881eed",
+        "android_client_info": {
+          "package_name": "com.zella.charging.gabon"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "445891709592-7oh76hvlo11u0jrjoguv7j7lq3em6enr.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.charging.gabon",
+            "certificate_hash": "c50ff880b76cc254b7817cf36abd25cdad898053"
+          }
+        },
+        {
+          "client_id": "445891709592-knkkf0s67ef9h6i1sn4hemkntns32mqu.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.charging.gabon",
+            "certificate_hash": "ec890c3b815dc5a0b695b7e640a8fb03389e6418"
+          }
+        },
+        {
+          "client_id": "445891709592-mpj0fpahkhhs188neh8g6001vaqrmjd7.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.charging.gabon",
+            "certificate_hash": "ef7d63e268f53be13d84872a733893a8bef80b93"
+          }
+        },
+        {
+          "client_id": "445891709592-395hn7fvie555fju0bk0j572b7qifkkq.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBYv-st2kDr79XHWowcsJodLr0zzXnqY2k"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "445891709592-395hn7fvie555fju0bk0j572b7qifkkq.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "445891709592-f00783vrqjlnvqp0qb2a2j74i1e5vnqb.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.zella.ocpp.gabon"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
         "mobilesdk_app_id": "1:445891709592:android:a1254166b52428cc881eed",
         "android_client_info": {
           "package_name": "com.zella.ocpp.gabon"
         }
       },
       "oauth_client": [
+        {
+          "client_id": "445891709592-cp86mjr8pj649km8mnlghrs1nnm3bebg.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.zella.ocpp.gabon",
+            "certificate_hash": "c50ff880b76cc254b7817cf36abd25cdad898053"
+          }
+        },
         {
           "client_id": "445891709592-frqa4hnsmh1f3fdg30rom29cbu9i1lao.apps.googleusercontent.com",
           "client_type": 1,

@@ -9,6 +9,7 @@ import com.evcharge.customer.shared.ApiException;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
+import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.Optional;
@@ -53,7 +54,7 @@ public class SessionReconciler {
         rememberPrice(session, remote);
         rememberBattery(session, remote);
         ChargingSession next = remote
-                .map(found -> priced(session.withRemote(found, nextState(session, found), now), now))
+                .map(found -> priced(withMeasuredEnergy(session.withRemote(found, nextState(session, found), now)), now))
                 .orElseGet(() -> expireIfStale(session, now));
         if (!next.equals(session)) {
             sessions.update(next);
@@ -70,6 +71,15 @@ public class SessionReconciler {
     private void rememberBattery(ChargingSession session, Optional<RemoteSession> remote) {
         remote.ifPresent(found -> telemetry.recordBatteryLevels(session.id(), found.socStartPercent(),
                 found.socEndPercent()));
+    }
+
+    private ChargingSession withMeasuredEnergy(ChargingSession session) {
+        boolean finished = session.state() == SessionState.COMPLETED || session.state() == SessionState.ABANDONED;
+        if (!finished || session.energyKwh() != null) {
+            return session;
+        }
+        BigDecimal measured = telemetry.progressOf(session.id()).energyKwh();
+        return measured == null ? session : session.withMeasuredEnergy(measured);
     }
 
     private ChargingSession priced(ChargingSession session, Instant now) {

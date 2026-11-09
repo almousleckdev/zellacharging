@@ -117,4 +117,20 @@ class SessionReconcilerTest {
 
         verify(telemetry).recordBatteryLevels(live.id(), new BigDecimal("91"), new BigDecimal("100"));
     }
+
+    @Test
+    void anAbandonedPlatformSessionWithoutEnergyIsBilledOnTheEnergyWeMeasured() {
+        ChargingSession running = stopping().withState(SessionState.ACTIVE, null, NOW);
+        RemoteSession abandoned = new RemoteSession(7, "CP-1", 1, "ABANDONED", NOW.minusSeconds(600), NOW, null, null,
+                null, null, "PowerLoss", 150L, "Z-X", null, null);
+        when(gateway.sessionsOf("Z-X")).thenReturn(List.of(abandoned));
+        when(telemetry.progressOf(running.id()))
+                .thenReturn(new com.evcharge.customer.charging.domain.SessionProgress(new BigDecimal("2.0"), NOW));
+
+        ChargingSession result = reconciler(150L).reconcile(running);
+
+        assertThat(result.state()).isEqualTo(SessionState.ABANDONED);
+        assertThat(result.energyKwh()).isEqualByComparingTo("2.0");
+        assertThat(result.costMinor()).isEqualTo(300L);
+    }
 }

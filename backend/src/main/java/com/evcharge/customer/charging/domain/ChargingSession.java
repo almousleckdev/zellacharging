@@ -58,6 +58,11 @@ public record ChargingSession(
                 createdAt, updatedAt);
     }
 
+    public ChargingSession withMeasuredEnergy(BigDecimal kwh) {
+        return new ChargingSession(id, customerId, stationId, connectorId, idTag, state, failureCode, transactionId,
+                startedAt, stoppedAt, kwh, costMinor, currency, currencyDecimals, stopReason, createdAt, updatedAt);
+    }
+
     public ChargingSession withEnergy(BigDecimal kwh, Instant now) {
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, state, failureCode, transactionId,
                 startedAt, now, kwh, costMinor, currency, currencyDecimals, stopReason, createdAt, now);

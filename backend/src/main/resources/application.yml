@@ -129,7 +129,7 @@ zella:
     metering-interval: 10s
     stall:
       after: ${ZELLA_STALL_AFTER:5m}
-      silent-after: ${ZELLA_SILENT_AFTER:90s}
+      silent-after: ${ZELLA_SILENT_AFTER:40s}
     price-per-kwh-minor: ${ZELLA_PRICE_PER_KWH:${NDZELA_PRICE_PER_KWH:}}
   fees:
     vat-percent: ${ZELLA_VAT_PERCENT:${NDZELA_VAT_PERCENT:0}}

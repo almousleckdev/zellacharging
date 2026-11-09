@@ -207,10 +207,16 @@ sent by the station after it reboots (firmware dependent), by a new `StartTransa
 
 What we do:
 - Meter samples arrive about every 10 s. Each new sample stamps `charging_session.reading_at` with our own clock (the sample
-  time is the charger's clock and is not trusted). After `ZELLA_SILENT_AFTER` (90 s) without a new sample, `ChargerSilence`
+  time is the charger's clock and is not trusted). After `ZELLA_SILENT_AFTER` (40 s) without a new sample, `ChargerSilence`
   polls the platform once to confirm. Still nothing: `StalledSessionCloser` closes the charge `ABANDONED`, failure code
   `CHARGER_OFFLINE`, stop reason `PowerLoss`, bills the energy delivered plus the fee and releases the rest of the hold.
-  If the platform cannot be asked, nothing is closed. The 5 min `ZELLA_STALL_AFTER` rule stays as a second net.
+  The stop command is skipped (the charger cannot answer; the call only blocks the sweep). If the platform cannot be asked,
+  nothing is closed. The 5 min `ZELLA_STALL_AFTER` rule stays as a second net.
+- The Stop button on a charger that does not answer (timeout or offline) and has sent nothing for 20 s closes the charge the
+  same way, instead of showing an error (`UserStop`).
 - Resume: the customer scans again and starts a new charge (OCPP cannot resume a transaction). If the platform answers
   `CONCURRENT_IDTAG` because the old charge is still open there, `StartCommander` registers a new id tag, stores it on the
   customer and the session, and retries once.
+- If the platform later reports the same charge `ABANDONED` (no energy, no cost), `SessionReconciler` bills the energy we
+  measured ourselves (`last_energy_kwh`) instead of leaving the cost empty, so the customer is never charged nothing for
+  energy received.

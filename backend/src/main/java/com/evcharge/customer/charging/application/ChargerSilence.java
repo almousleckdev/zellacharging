@@ -7,6 +7,7 @@ import com.evcharge.customer.shared.ApiException;
 import org.springframework.stereotype.Component;
 
 import java.time.Clock;
+import java.time.Duration;
 
 @Component
 public class ChargerSilence {
@@ -25,7 +26,11 @@ public class ChargerSilence {
     }
 
     public boolean confirmed(ChargingSession session) {
-        if (session.transactionId() == null || !silent(session)) {
+        return confirmed(session, settings.silentAfter());
+    }
+
+    public boolean confirmed(ChargingSession session, Duration quietFor) {
+        if (session.transactionId() == null || !silent(session, quietFor)) {
             return false;
         }
         try {
@@ -33,12 +38,12 @@ public class ChargerSilence {
         } catch (ApiException e) {
             return false;
         }
-        return silent(session);
+        return silent(session, quietFor);
     }
 
-    private boolean silent(ChargingSession session) {
+    private boolean silent(ChargingSession session, Duration quietFor) {
         return telemetry.readingAtOf(session.id())
-                .map(at -> at.plus(settings.silentAfter()).isBefore(clock.instant()))
+                .map(at -> at.plus(quietFor).isBefore(clock.instant()))
                 .orElse(false);
     }
 }

@@ -46,22 +46,38 @@ public class StalledSessionCloser {
         if (!running) {
             return false;
         }
-        boolean silent = silence.confirmed(session);
+        if (silence.confirmed(session)) {
+            closeLostCharger(session);
+            return true;
+        }
         Instant now = clock.instant();
         SessionProgress progress = telemetry.progressOf(session.id());
-        if (!silent && !lastMoved(session, progress).plus(settings.after()).isBefore(now)) {
+        if (!lastMoved(session, progress).plus(settings.after()).isBefore(now)) {
             return false;
         }
-        BigDecimal delivered = progress.energyKwh() == null ? BigDecimal.ZERO : progress.energyKwh();
-        log.warn("ALERT session {} {}: closing it, billing {} kWh and returning the rest", session.id(),
-                silent ? "lost its charger" : "made no progress since " + lastMoved(session, progress), delivered);
+        log.warn("ALERT session {} made no progress since {}: closing it, billing {} kWh and returning the rest",
+                session.id(), lastMoved(session, progress), delivered(progress));
         stopQuietly(session);
-        ChargingSession energy = session.withEnergy(delivered, now);
-        ChargingSession ended = silent ? energy.lostPower(now) : energy.withState(SessionState.ABANDONED, "STALLED", now);
-        ChargingSession closed = priced(ended, delivered, now);
+        close(session.withEnergy(delivered(progress), now).withState(SessionState.ABANDONED, "STALLED", now));
+        return true;
+    }
+
+    public void closeLostCharger(ChargingSession session) {
+        Instant now = clock.instant();
+        BigDecimal energy = delivered(telemetry.progressOf(session.id()));
+        log.warn("ALERT session {} lost its charger: closing it, billing {} kWh and returning the rest",
+                session.id(), energy);
+        close(session.withEnergy(energy, now).lostPower(now));
+    }
+
+    private void close(ChargingSession ended) {
+        ChargingSession closed = priced(ended, ended.energyKwh(), clock.instant());
         sessions.update(closed);
         settlement.settle(closed);
-        return true;
+    }
+
+    private static BigDecimal delivered(SessionProgress progress) {
+        return progress.energyKwh() == null ? BigDecimal.ZERO : progress.energyKwh();
     }
 
     private void stopQuietly(ChargingSession session) {

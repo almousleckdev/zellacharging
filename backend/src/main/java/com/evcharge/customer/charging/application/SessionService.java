@@ -27,7 +27,7 @@ public class SessionService {
     private final StartableConnectors connectors;
     private final IdempotentStarts starts;
     private final SessionSettlement settlement;
-    private final StopCommander stopper;
+    private final UserStop userStop;
     private final StartCommander starter;
     private final WalletFunding funding;
     private final Clock clock;
@@ -36,7 +36,7 @@ public class SessionService {
     public SessionService(SessionRepository sessions, IdTagService idTags,
                           SessionRefresher refresher, StartableConnectors connectors, IdempotentStarts starts,
                           SessionSettlement settlement,
-                          StopCommander stopper, StartCommander starter, WalletFunding funding, Clock clock,
+                          UserStop userStop, StartCommander starter, WalletFunding funding, Clock clock,
                           AuditTrail audit) {
         this.sessions = sessions;
         this.idTags = idTags;
@@ -44,7 +44,7 @@ public class SessionService {
         this.connectors = connectors;
         this.starts = starts;
         this.settlement = settlement;
-        this.stopper = stopper;
+        this.userStop = userStop;
         this.starter = starter;
         this.funding = funding;
         this.clock = clock;
@@ -111,9 +111,7 @@ public class SessionService {
             throw new ApiException(HttpStatus.CONFLICT, "SESSION_NOT_ACTIVE", "No active charge to stop");
         }
         audit.record("SESSION_STOP_REQUESTED", customerId, sessionId.toString(), null);
-        if (!stopper.issue(session).accepted()) {
-            throw new ApiException(HttpStatus.CONFLICT, "STOP_REFUSED", "The charger refused to stop");
-        }
+        userStop.perform(session);
         return owned(customerId, sessionId);
     }
 

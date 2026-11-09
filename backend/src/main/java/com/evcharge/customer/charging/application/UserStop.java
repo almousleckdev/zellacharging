@@ -1,0 +1,50 @@
+package com.evcharge.customer.charging.application;
+
+import com.evcharge.customer.charging.domain.ChargingSession;
+import com.evcharge.customer.charging.domain.CommandOutcome;
+import com.evcharge.customer.shared.ApiException;
+import org.springframework.http.HttpStatus;
+import org.springframework.stereotype.Component;
+
+import java.time.Duration;
+import java.util.Set;
+
+@Component
+public class UserStop {
+
+    private static final Duration QUIET_FOR = Duration.ofSeconds(20);
+    private static final Set<String> UNREACHABLE = Set.of("CHARGER_UNREACHABLE", "CHARGER_TIMEOUT");
+
+    private final StopCommander stopper;
+    private final ChargerSilence silence;
+    private final StalledSessionCloser closer;
+
+    public UserStop(StopCommander stopper, ChargerSilence silence, StalledSessionCloser closer) {
+        this.stopper = stopper;
+        this.silence = silence;
+        this.closer = closer;
+    }
+
+    public void perform(ChargingSession session) {
+        CommandOutcome outcome = attempt(session);
+        if (outcome.accepted()) {
+            return;
+        }
+        if (UNREACHABLE.contains(outcome.reasonCode()) && silence.confirmed(session, QUIET_FOR)) {
+            closer.closeLostCharger(session);
+            return;
+        }
+        throw new ApiException(HttpStatus.CONFLICT, "STOP_REFUSED", "The charger refused to stop");
+    }
+
+    private CommandOutcome attempt(ChargingSession session) {
+        try {
+            return stopper.issue(session);
+        } catch (ApiException e) {
+            if (e.status() != HttpStatus.SERVICE_UNAVAILABLE) {
+                throw e;
+            }
+            return CommandOutcome.refused("CHARGER_UNREACHABLE", null);
+        }
+    }
+}

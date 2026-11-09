@@ -133,4 +133,22 @@ class PowerCutFlowIntegrationTest extends PostgresTestBase {
         assertThat(OCPP.hits("POST", "/api/v1/charge-points/CP-5/connectors/1/start")).isEqualTo(2);
         OCPP.route("POST", "/api/v1/charge-points/CP-5/connectors/1/start", 200, "{\"status\":\"PENDING\"}");
     }
+
+    @Test
+    void theStopButtonEndsAChargeWhoseChargerIsUnreachableAndSilent() throws Exception {
+        UUID customer = newCustomer();
+        String sessionId = com.jayway.jsonpath.JsonPath.read(
+                start(customer).andExpect(status().isCreated()).andReturn().getResponse().getContentAsString(), "$.id");
+        platformShowsTheChargeRunning(jdbc.queryForObject(
+                "select id_tag from customer_id_tag where customer_id = ?", String.class, customer));
+        mvc.perform(get("/v1/sessions/active").with(TestTenants.customer(customer))).andExpect(status().isOk());
+        jdbc.update("update charging_session set reading_at = now() - interval '5 minutes' where id = ?::uuid",
+                sessionId);
+
+        mvc.perform(post("/v1/sessions/" + sessionId + "/stop").with(TestTenants.customer(customer))
+                        .contentType(MediaType.APPLICATION_JSON).content("{}"))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$.state").value("ABANDONED"))
+                .andExpect(jsonPath("$.stopReason").value("PowerLoss"));
+    }
 }

@@ -9,6 +9,6 @@ public record StallSettings(Duration after, Duration silentAfter) {
 
     public StallSettings {
         after = after == null ? Duration.ofMinutes(5) : after;
-        silentAfter = silentAfter == null ? Duration.ofSeconds(90) : silentAfter;
+        silentAfter = silentAfter == null ? Duration.ofSeconds(40) : silentAfter;
     }
 }

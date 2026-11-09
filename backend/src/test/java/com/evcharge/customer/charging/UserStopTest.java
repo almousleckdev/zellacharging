@@ -74,6 +74,16 @@ class UserStopTest {
     }
 
     @Test
+    void aRefusalWithoutAReasonFromASilentChargerIsClosedAsInterrupted() {
+        when(stopper.issue(session)).thenReturn(CommandOutcome.refused("CHARGER_REFUSED", null));
+        when(silence.confirmed(session, Duration.ofSeconds(20))).thenReturn(true);
+
+        userStop.perform(session);
+
+        verify(closer).closeLostCharger(session);
+    }
+
+    @Test
     void aRefusalFromAnAliveChargerIsReportedAsIs() {
         when(stopper.issue(session)).thenReturn(CommandOutcome.refused("CHARGER_REFUSED", null));
 

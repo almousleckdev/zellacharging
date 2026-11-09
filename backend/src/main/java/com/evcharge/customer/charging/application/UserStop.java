@@ -7,13 +7,11 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
 import java.time.Duration;
-import java.util.Set;
 
 @Component
 public class UserStop {
 
     private static final Duration QUIET_FOR = Duration.ofSeconds(20);
-    private static final Set<String> UNREACHABLE = Set.of("CHARGER_UNREACHABLE", "CHARGER_TIMEOUT");
 
     private final StopCommander stopper;
     private final ChargerSilence silence;
@@ -30,7 +28,7 @@ public class UserStop {
         if (outcome.accepted()) {
             return;
         }
-        if (UNREACHABLE.contains(outcome.reasonCode()) && silence.confirmed(session, QUIET_FOR)) {
+        if (silence.confirmed(session, QUIET_FOR)) {
             closer.closeLostCharger(session);
             return;
         }

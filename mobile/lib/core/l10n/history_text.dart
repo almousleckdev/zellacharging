@@ -61,6 +61,9 @@ abstract final class HistoryText {
   static String get stopReason =>
       AppLanguage.pick(fr: 'Motif d’arrêt', en: 'Stop reason');
 
+  static String get interruptedReason =>
+      AppLanguage.pick(fr: 'Recharge interrompue', en: 'Charge interrupted');
+
   static String stopReasonOf(String? reason, bool running) {
     if (running) return '--';
     return switch (reason) {

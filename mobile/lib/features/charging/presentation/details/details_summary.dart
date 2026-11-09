@@ -26,7 +26,7 @@ class DetailsSummary extends StatelessWidget {
             const VerticalDivider(width: 1, color: AppColors.border),
             _cell(context, session.energyText, HistoryText.totalKwh),
             const VerticalDivider(width: 1, color: AppColors.border),
-            _cell(context, session.costText, HistoryText.totalFee, true),
+            _cell(context, session.costText, HistoryText.totalAmount, true),
           ],
         ),
       ),

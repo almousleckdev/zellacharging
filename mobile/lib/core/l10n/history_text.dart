@@ -38,14 +38,14 @@ abstract final class HistoryText {
   static String get totalKwh =>
       AppLanguage.pick(fr: 'Total kWh', en: 'Total kWh');
 
-  static String get totalFee =>
-      AppLanguage.pick(fr: 'Frais totaux', en: 'Total fee');
+  static String get totalAmount =>
+      AppLanguage.pick(fr: 'Montant total', en: 'Total amount');
 
   static String get locationTitle =>
       AppLanguage.pick(fr: 'Lieu', en: 'Location');
 
   static String get feeDetails =>
-      AppLanguage.pick(fr: 'Détail des frais', en: 'Fee details');
+      AppLanguage.pick(fr: 'Détail du montant', en: 'Price details');
 
   static String get electricFee =>
       AppLanguage.pick(fr: 'Électricité', en: 'Electric fee');

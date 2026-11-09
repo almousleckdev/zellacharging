@@ -56,11 +56,12 @@ class _CarSceneState extends State<CarScene>
   Widget build(BuildContext context) {
     return AspectRatio(
       aspectRatio: widget.spec.aspect,
-      child: LayoutBuilder(builder: (context, box) => _scene(box)),
+      child: LayoutBuilder(builder: (context, box) => _scene(context, box)),
     );
   }
 
-  Widget _scene(BoxConstraints box) {
+  Widget _scene(BuildContext context, BoxConstraints box) {
+    final pixelRatio = MediaQuery.devicePixelRatioOf(context);
     final fraction = widget.spec.slot;
     final slot = Rect.fromLTWH(
       box.maxWidth * fraction.left,
@@ -86,6 +87,7 @@ class _CarSceneState extends State<CarScene>
                   level: level,
                   progress: _wave.value,
                   charging: widget.charging,
+                  pixelRatio: pixelRatio,
                 ),
               ),
             ),

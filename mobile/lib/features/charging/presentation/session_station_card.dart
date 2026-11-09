@@ -9,6 +9,7 @@ import '../../../shared/widgets/status_chip.dart';
 import '../domain/charging_session.dart';
 import 'session_formatting.dart';
 import '../../../core/theme/app_icons.dart';
+import '../../../core/format/connector_label.dart';
 
 class SessionStationCard extends StatelessWidget {
   const SessionStationCard({super.key, required this.session});
@@ -37,7 +38,7 @@ class SessionStationCard extends StatelessWidget {
                   style: theme.textTheme.titleSmall,
                 ),
                 Text(
-                  '${StationText.connector} ${session.connectorId}',
+                  '${StationText.connector} ${ConnectorLabel.of(session.connectorId)}',
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: AppColors.textSecondary,
                   ),

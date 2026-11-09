@@ -46,6 +46,18 @@ public record ChargingSession(
                 startedAt, stoppedAt, energyKwh, minor, costCurrency, decimals, stopReason, createdAt, now);
     }
 
+    public ChargingSession lostPower(Instant now) {
+        return new ChargingSession(id, customerId, stationId, connectorId, idTag, SessionState.ABANDONED,
+                "CHARGER_OFFLINE", transactionId, startedAt, stoppedAt, energyKwh, costMinor, currency,
+                currencyDecimals, "PowerLoss", createdAt, now);
+    }
+
+    public ChargingSession withIdTag(String freshIdTag) {
+        return new ChargingSession(id, customerId, stationId, connectorId, freshIdTag, state, failureCode,
+                transactionId, startedAt, stoppedAt, energyKwh, costMinor, currency, currencyDecimals, stopReason,
+                createdAt, updatedAt);
+    }
+
     public ChargingSession withEnergy(BigDecimal kwh, Instant now) {
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, state, failureCode, transactionId,
                 startedAt, now, kwh, costMinor, currency, currencyDecimals, stopReason, createdAt, now);

@@ -85,6 +85,12 @@ class JdbcSessionRepository implements SessionRepository {
     }
 
     @Override
+    public void reassignIdTag(UUID id, String idTag) {
+        jdbc.sql("update charging_session set id_tag = :idTag where id = :id")
+                .param("idTag", idTag).param("id", id).update();
+    }
+
+    @Override
     public boolean hide(UUID id, UUID customerId, Instant at) {
         return jdbc.sql("update charging_session set hidden_at = :at where id = :id and customer_id = :customer "
                         + "and hidden_at is null and state not in " + LIVE)

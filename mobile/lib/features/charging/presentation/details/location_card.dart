@@ -5,6 +5,7 @@ import '../../../../shared/widgets/info_card.dart';
 import '../../../../shared/widgets/info_row.dart';
 import '../../../stations/domain/station.dart';
 import '../../domain/charging_session.dart';
+import '../../../../core/format/connector_label.dart';
 
 class LocationCard extends StatelessWidget {
   const LocationCard({super.key, required this.session, this.station});
@@ -26,7 +27,10 @@ class LocationCard extends StatelessWidget {
       title: HistoryText.locationTitle,
       children: [
         InfoRow(label: StationText.stationDetails, value: session.stationId),
-        InfoRow(label: StationText.connector, value: '${session.connectorId}'),
+        InfoRow(
+          label: StationText.connector,
+          value: ConnectorLabel.of(session.connectorId),
+        ),
         if (coordinates != null)
           InfoRow(label: HistoryText.gps, value: coordinates),
       ],

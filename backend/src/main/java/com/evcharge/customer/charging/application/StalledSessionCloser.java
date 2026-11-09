@@ -23,34 +23,42 @@ public class StalledSessionCloser {
     private final SessionCostEstimator estimator;
     private final SessionSettlement settlement;
     private final StopCommander stopper;
+    private final ChargerSilence silence;
     private final StallSettings settings;
     private final Clock clock;
 
     public StalledSessionCloser(SessionTelemetry telemetry, SessionRepository sessions,
                                 SessionCostEstimator estimator, SessionSettlement settlement,
-                                StopCommander stopper, StallSettings settings, Clock clock) {
+                                StopCommander stopper, ChargerSilence silence, StallSettings settings,
+                                Clock clock) {
         this.telemetry = telemetry;
         this.sessions = sessions;
         this.estimator = estimator;
         this.settlement = settlement;
         this.stopper = stopper;
+        this.silence = silence;
         this.settings = settings;
         this.clock = clock;
     }
 
     public boolean closeIfStalled(ChargingSession session) {
         boolean running = session.state() == SessionState.ACTIVE || session.state() == SessionState.STOPPING;
+        if (!running) {
+            return false;
+        }
+        boolean silent = silence.confirmed(session);
         Instant now = clock.instant();
         SessionProgress progress = telemetry.progressOf(session.id());
-        if (!running || !lastMoved(session, progress).plus(settings.after()).isBefore(now)) {
+        if (!silent && !lastMoved(session, progress).plus(settings.after()).isBefore(now)) {
             return false;
         }
         BigDecimal delivered = progress.energyKwh() == null ? BigDecimal.ZERO : progress.energyKwh();
-        log.warn("ALERT session {} made no progress since {}: closing it, billing {} kWh and returning the rest",
-                session.id(), lastMoved(session, progress), delivered);
+        log.warn("ALERT session {} {}: closing it, billing {} kWh and returning the rest", session.id(),
+                silent ? "lost its charger" : "made no progress since " + lastMoved(session, progress), delivered);
         stopQuietly(session);
-        ChargingSession closed = priced(session.withEnergy(delivered, now)
-                .withState(SessionState.ABANDONED, "STALLED", now), delivered, now);
+        ChargingSession energy = session.withEnergy(delivered, now);
+        ChargingSession ended = silent ? energy.lostPower(now) : energy.withState(SessionState.ABANDONED, "STALLED", now);
+        ChargingSession closed = priced(ended, delivered, now);
         sessions.update(closed);
         settlement.settle(closed);
         return true;

@@ -69,7 +69,7 @@ void main() {
 
   testWidgets('the free connector can be chosen', (tester) async {
     await _openSetup(tester, 1);
-    await tester.tap(find.text('${StationText.connector} 2'));
+    await tester.tap(find.text('${StationText.connector} B'));
     await tester.pump(const Duration(milliseconds: 300));
 
     expect(find.byIcon(AppIcons.checkCircle), findsOneWidget);

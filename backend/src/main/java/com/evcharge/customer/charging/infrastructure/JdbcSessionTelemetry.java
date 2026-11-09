@@ -6,9 +6,11 @@ import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionProgress;
 import org.springframework.jdbc.core.simple.JdbcClient;
 
-import java.math.BigDecimal;
+import com.evcharge.customer.shared.Timestamps;
 import org.springframework.stereotype.Repository;
 
+import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -30,12 +32,23 @@ class JdbcSessionTelemetry implements SessionTelemetry {
                     last_power_kw = coalesce(:power, last_power_kw),
                     progress_at = case when cast(:kwh as numeric) is not null and cast(:kwh as numeric) > coalesce(last_energy_kwh, -1)
                         then now() else progress_at end,
+                    reading_at = case when cast(:sampled as timestamptz) is not null
+                            and cast(:sampled as timestamptz) is distinct from last_sample_at
+                        then now() else reading_at end,
+                    last_sample_at = coalesce(cast(:sampled as timestamptz), last_sample_at),
                     last_energy_kwh = case when cast(:kwh as numeric) is not null and cast(:kwh as numeric) > coalesce(last_energy_kwh, -1)
                         then cast(:kwh as numeric) else last_energy_kwh end
                 where id = :id
                 """)
                 .param("battery", reading.stateOfChargePercent()).param("voltage", reading.voltage())
-                .param("power", reading.powerKw()).param("kwh", reading.totalKwh()).param("id", id).update();
+                .param("power", reading.powerKw()).param("kwh", reading.totalKwh())
+                .param("sampled", Timestamps.toDb(reading.sampledAt())).param("id", id).update();
+    }
+
+    @Override
+    public Optional<Instant> readingAtOf(UUID id) {
+        return jdbc.sql("select reading_at from charging_session where id = :id and reading_at is not null")
+                .param("id", id).query((rs, rowNum) -> Timestamps.read(rs, "reading_at")).optional();
     }
 
     @Override

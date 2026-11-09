@@ -5,6 +5,7 @@ import com.evcharge.customer.charging.domain.Metering;
 import com.evcharge.customer.charging.domain.SessionProgress;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -15,6 +16,8 @@ public interface SessionTelemetry {
     LastReading lastReadingOf(UUID id);
 
     SessionProgress progressOf(UUID id);
+
+    Optional<Instant> readingAtOf(UUID id);
 
     void recordBatteryLevels(UUID id, BigDecimal start, BigDecimal end);
 

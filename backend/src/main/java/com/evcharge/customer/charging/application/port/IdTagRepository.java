@@ -8,4 +8,6 @@ public interface IdTagRepository {
     Optional<String> find(UUID customerId);
 
     boolean saveIfAbsent(UUID customerId, String idTag);
+
+    void replace(UUID customerId, String idTag);
 }

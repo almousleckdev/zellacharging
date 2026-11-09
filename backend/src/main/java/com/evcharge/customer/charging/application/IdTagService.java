@@ -7,6 +7,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.security.SecureRandom;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -28,18 +29,38 @@ public class IdTagService {
         return idTags.find(customerId).orElseGet(() -> allocate(customerId));
     }
 
+    public String replace(UUID customerId) {
+        for (int attempt = 0; attempt < ATTEMPTS; attempt++) {
+            Optional<String> candidate = registered();
+            if (candidate.isPresent()) {
+                idTags.replace(customerId, candidate.get());
+                return candidate.get();
+            }
+        }
+        throw unavailable();
+    }
+
     private String allocate(UUID customerId) {
         for (int attempt = 0; attempt < ATTEMPTS; attempt++) {
-            String candidate = generate();
-            if (gateway.registerIdTag(candidate) && idTags.saveIfAbsent(customerId, candidate)) {
-                return candidate;
+            Optional<String> candidate = registered();
+            if (candidate.isPresent() && idTags.saveIfAbsent(customerId, candidate.get())) {
+                return candidate.get();
             }
             var existing = idTags.find(customerId);
             if (existing.isPresent()) {
                 return existing.get();
             }
         }
-        throw new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "ID_TAG_UNAVAILABLE",
+        throw unavailable();
+    }
+
+    private Optional<String> registered() {
+        String candidate = generate();
+        return gateway.registerIdTag(candidate) ? Optional.of(candidate) : Optional.empty();
+    }
+
+    private static ApiException unavailable() {
+        return new ApiException(HttpStatus.SERVICE_UNAVAILABLE, "ID_TAG_UNAVAILABLE",
                 "Could not prepare the charging identity");
     }
 

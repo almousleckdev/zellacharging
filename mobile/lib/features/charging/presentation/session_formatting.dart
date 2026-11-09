@@ -95,6 +95,7 @@ extension SessionFormatting on ChargingSession {
     SessionState.startAccepted => ChargeText.waitingForPlug,
     SessionState.stopping => ChargeText.finishing,
     SessionState.failed => ChargeText.sessionFailed,
+    SessionState.abandoned => ChargeText.sessionInterrupted,
     _ => null,
   };
 }

@@ -1,7 +1,6 @@
 package com.evcharge.customer.charging.application;
 
 import com.evcharge.customer.charging.StartableConnectors;
-import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionRepository;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.CommandOutcome;
@@ -23,29 +22,30 @@ public class SessionService {
     private static final int HISTORY_LIMIT = 100;
 
     private final SessionRepository sessions;
-    private final ChargingGateway gateway;
     private final IdTagService idTags;
     private final SessionRefresher refresher;
     private final StartableConnectors connectors;
     private final IdempotentStarts starts;
     private final SessionSettlement settlement;
     private final StopCommander stopper;
+    private final StartCommander starter;
     private final WalletFunding funding;
     private final Clock clock;
     private final AuditTrail audit;
 
-    public SessionService(SessionRepository sessions, ChargingGateway gateway, IdTagService idTags,
+    public SessionService(SessionRepository sessions, IdTagService idTags,
                           SessionRefresher refresher, StartableConnectors connectors, IdempotentStarts starts,
                           SessionSettlement settlement,
-                          StopCommander stopper, WalletFunding funding, Clock clock, AuditTrail audit) {
+                          StopCommander stopper, StartCommander starter, WalletFunding funding, Clock clock,
+                          AuditTrail audit) {
         this.sessions = sessions;
-        this.gateway = gateway;
         this.idTags = idTags;
         this.refresher = refresher;
         this.connectors = connectors;
         this.starts = starts;
         this.settlement = settlement;
         this.stopper = stopper;
+        this.starter = starter;
         this.funding = funding;
         this.clock = clock;
         this.audit = audit;
@@ -79,15 +79,16 @@ public class SessionService {
         return dispatchStart(session);
     }
 
-    private ChargingSession dispatchStart(ChargingSession session) {
-        CommandOutcome outcome;
+    private ChargingSession dispatchStart(ChargingSession requested) {
+        StartCommander.Started started;
         try {
-            outcome = gateway.start(session.stationId(), session.connectorId(), session.idTag(),
-                    "start:" + session.id());
+            started = starter.issue(requested);
         } catch (RuntimeException e) {
-            fail(session, "CHARGING_UNAVAILABLE");
+            fail(requested, "CHARGING_UNAVAILABLE");
             throw e;
         }
+        ChargingSession session = started.session();
+        CommandOutcome outcome = started.outcome();
         boolean uncertain = !outcome.accepted() && "CHARGER_TIMEOUT".equals(outcome.reasonCode());
         if (outcome.accepted() || uncertain) {
             ChargingSession next = session.withState(SessionState.START_ACCEPTED, null, clock.instant());

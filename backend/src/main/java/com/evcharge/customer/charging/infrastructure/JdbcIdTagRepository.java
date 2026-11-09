@@ -31,4 +31,10 @@ class JdbcIdTagRepository implements IdTagRepository {
                 .param("id", customerId).param("tag", idTag)
                 .param("now", Timestamps.toDb(Instant.now())).update() == 1;
     }
+
+    @Override
+    public void replace(UUID customerId, String idTag) {
+        jdbc.sql("update customer_id_tag set id_tag = :tag, created_at = :now where customer_id = :id")
+                .param("id", customerId).param("tag", idTag).param("now", Timestamps.toDb(Instant.now())).update();
+    }
 }

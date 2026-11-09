@@ -7,6 +7,7 @@ import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/status_chip.dart';
 import '../domain/station_connector.dart';
 import 'connector_status_style.dart';
+import '../../../core/format/connector_label.dart';
 
 class ConnectorTile extends StatelessWidget {
   const ConnectorTile({
@@ -39,7 +40,7 @@ class ConnectorTile extends StatelessWidget {
           CircleAvatar(
             backgroundColor: AppColors.primarySoft,
             child: Text(
-              '${connector.connectorId}',
+              ConnectorLabel.of(connector.connectorId),
               style: const TextStyle(color: AppColors.primary),
             ),
           ),

@@ -21,6 +21,8 @@ public interface SessionRepository {
 
     void update(ChargingSession session);
 
+    void reassignIdTag(UUID id, String idTag);
+
     Optional<ChargingSession> findOwned(UUID id, UUID customerId);
 
     Optional<ChargingSession> findById(UUID id);

@@ -196,3 +196,21 @@ decimals].
 (`REQUESTED`, `START_ACCEPTED`, `STOPPING`, `COMPLETED_UNSETTLED`) and over
 sync cursor; every transition re-reads authority (OCPP `GET /sessions/{id}`) before
 acting.
+
+## 12. Power cut at the charger (verified in code 2026-11-09, charger behaviour still to confirm)
+
+What the platform sees: nothing at the moment of the cut. The station is dead, so no OCPP frame is sent. The platform keeps the
+websocket open until its 300 s idle timeout, then emits `device.offline`. It asks for a heartbeat every 60 s, so the `online`
+flag is **not** a fast signal. The platform session stays `ACTIVE`. It is closed only by a `StopTransaction` (reason `PowerLoss`)
+sent by the station after it reboots (firmware dependent), by a new `StartTransaction` on the same connector (`ABANDONED`,
+`PowerLoss`, no price), or by the 24 h orphan sweep.
+
+What we do:
+- Meter samples arrive about every 10 s. Each new sample stamps `charging_session.reading_at` with our own clock (the sample
+  time is the charger's clock and is not trusted). After `ZELLA_SILENT_AFTER` (90 s) without a new sample, `ChargerSilence`
+  polls the platform once to confirm. Still nothing: `StalledSessionCloser` closes the charge `ABANDONED`, failure code
+  `CHARGER_OFFLINE`, stop reason `PowerLoss`, bills the energy delivered plus the fee and releases the rest of the hold.
+  If the platform cannot be asked, nothing is closed. The 5 min `ZELLA_STALL_AFTER` rule stays as a second net.
+- Resume: the customer scans again and starts a new charge (OCPP cannot resume a transaction). If the platform answers
+  `CONCURRENT_IDTAG` because the old charge is still open there, `StartCommander` registers a new id tag, stores it on the
+  customer and the session, and retries once.

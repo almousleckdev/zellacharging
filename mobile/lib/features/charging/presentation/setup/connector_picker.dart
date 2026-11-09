@@ -7,6 +7,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/status_chip.dart';
 import '../../../stations/domain/station_connector.dart';
 import '../../../stations/presentation/connector_status_style.dart';
+import '../../../../core/format/connector_label.dart';
 
 class ConnectorPicker extends StatelessWidget {
   const ConnectorPicker({
@@ -98,7 +99,7 @@ class _Option extends StatelessWidget {
                   children: [
                     Expanded(
                       child: Text(
-                        '${StationText.connector} ${connector.connectorId}',
+                        '${StationText.connector} ${ConnectorLabel.of(connector.connectorId)}',
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                         style: theme.textTheme.bodyMedium?.copyWith(

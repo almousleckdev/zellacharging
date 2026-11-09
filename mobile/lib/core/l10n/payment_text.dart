@@ -1,4 +1,5 @@
 import 'app_language.dart';
+import '../format/connector_label.dart';
 
 abstract final class PayText {
   static String get budgetTitle =>
@@ -119,8 +120,8 @@ abstract final class PayText {
   );
 
   static String cableDetected(int connector) => AppLanguage.pick(
-    fr: 'Câble détecté sur le connecteur $connector',
-    en: 'Cable detected on connector $connector',
+    fr: 'Câble détecté sur le connecteur ${ConnectorLabel.of(connector)}',
+    en: 'Cable detected on connector ${ConnectorLabel.of(connector)}',
   );
 
   static String get cableSeveral => AppLanguage.pick(

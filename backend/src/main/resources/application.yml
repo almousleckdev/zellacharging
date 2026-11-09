@@ -122,6 +122,7 @@ zella:
   charging:
     plug-in-timeout: ${ZELLA_PLUG_IN_TIMEOUT:5m}
     sweep-interval: 15s
+    silence-check-interval: 5s
     stop-retry-after: 30s
     stop-threshold-percent: 100
     stop-lead-time: ${ZELLA_STOP_LEAD_TIME:45s}
@@ -129,7 +130,7 @@ zella:
     metering-interval: 10s
     stall:
       after: ${ZELLA_STALL_AFTER:5m}
-      silent-after: ${ZELLA_SILENT_AFTER:40s}
+      silent-after: ${ZELLA_SILENT_AFTER:25s}
     price-per-kwh-minor: ${ZELLA_PRICE_PER_KWH:${NDZELA_PRICE_PER_KWH:}}
   fees:
     vat-percent: ${ZELLA_VAT_PERCENT:${NDZELA_VAT_PERCENT:0}}

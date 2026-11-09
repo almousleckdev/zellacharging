@@ -104,6 +104,7 @@ class StalledSessionCloserTest {
     void aChargerThatWentSilentClosesTheChargeAtOnceAndBillsOnlyTheEnergyDelivered() {
         ChargingSession session = active();
         when(silence.confirmed(session)).thenReturn(true);
+        when(telemetry.readingAtOf(session.id())).thenReturn(Optional.of(NOW.minusSeconds(60)));
         when(telemetry.progressOf(session.id()))
                 .thenReturn(new SessionProgress(new BigDecimal("0.464"), NOW.minus(Duration.ofSeconds(100))));
         when(estimator.forEnergy(any(), any())).thenReturn(Optional.of(new Money(70, "XAF", 0)));
@@ -115,7 +116,22 @@ class StalledSessionCloserTest {
         assertThat(closed.getValue().state()).isEqualTo(SessionState.ABANDONED);
         assertThat(closed.getValue().failureCode()).isEqualTo("CHARGER_OFFLINE");
         assertThat(closed.getValue().stopReason()).isEqualTo("PowerLoss");
+        assertThat(closed.getValue().stoppedAt()).isEqualTo(NOW.minusSeconds(60));
         assertThat(closed.getValue().energyKwh()).isEqualByComparingTo("0.464");
         assertThat(closed.getValue().costMinor()).isEqualTo(70);
+    }
+
+    @Test
+    void theFastCheckClosesOnlyAChargerThatIsConfirmedSilent() {
+        ChargingSession silent = active();
+        ChargingSession alive = active();
+        when(silence.confirmed(silent)).thenReturn(true);
+        when(telemetry.progressOf(any())).thenReturn(SessionProgress.none());
+        when(estimator.forEnergy(any(), any())).thenReturn(Optional.of(new Money(0, "XAF", 0)));
+
+        assertThat(closer.closeIfSilent(alive)).isFalse();
+        assertThat(closer.closeIfSilent(silent)).isTrue();
+
+        verify(settlement).settle(any());
     }
 }

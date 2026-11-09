@@ -46,9 +46,10 @@ public record ChargingSession(
                 startedAt, stoppedAt, energyKwh, minor, costCurrency, decimals, stopReason, createdAt, now);
     }
 
-    public ChargingSession lostPower(Instant now) {
+    public ChargingSession lostPower(Instant lastSeen, Instant now) {
+        Instant ended = startedAt != null && lastSeen.isBefore(startedAt) ? startedAt : lastSeen;
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, SessionState.ABANDONED,
-                "CHARGER_OFFLINE", transactionId, startedAt, stoppedAt, energyKwh, costMinor, currency,
+                "CHARGER_OFFLINE", transactionId, startedAt, ended, energyKwh, costMinor, currency,
                 currencyDecimals, "PowerLoss", createdAt, now);
     }
 

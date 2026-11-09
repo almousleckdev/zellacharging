@@ -46,8 +46,7 @@ public class StalledSessionCloser {
         if (!running) {
             return false;
         }
-        if (silence.confirmed(session)) {
-            closeLostCharger(session);
+        if (closeIfSilent(session)) {
             return true;
         }
         Instant now = clock.instant();
@@ -62,12 +61,22 @@ public class StalledSessionCloser {
         return true;
     }
 
+    public boolean closeIfSilent(ChargingSession session) {
+        boolean running = session.state() == SessionState.ACTIVE || session.state() == SessionState.STOPPING;
+        if (!running || !silence.confirmed(session)) {
+            return false;
+        }
+        closeLostCharger(session);
+        return true;
+    }
+
     public void closeLostCharger(ChargingSession session) {
         Instant now = clock.instant();
         BigDecimal energy = delivered(telemetry.progressOf(session.id()));
+        Instant lastSeen = telemetry.readingAtOf(session.id()).orElse(now);
         log.warn("ALERT session {} lost its charger: closing it, billing {} kWh and returning the rest",
                 session.id(), energy);
-        close(session.withEnergy(energy, now).lostPower(now));
+        close(session.withEnergy(energy, now).lostPower(lastSeen, now));
     }
 
     private void close(ChargingSession ended) {

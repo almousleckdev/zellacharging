@@ -3,7 +3,7 @@ title = "Zella Charging"
 [extend]
 useDefault = true
 
-[[allowlists]]
+[allowlist]
 description = "Firebase client configuration: these keys only identify the app and are restricted by package and bundle id"
 paths = [
   '''mobile/android/app/google-services\.json''',

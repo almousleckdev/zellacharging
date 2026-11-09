@@ -132,7 +132,7 @@ abstract final class ChargeText {
     'stopping': AppLanguage.pick(fr: 'Arrêt', en: 'Stopping'),
     'completed': AppLanguage.pick(fr: 'Terminée', en: 'Completed'),
     'failed': AppLanguage.pick(fr: 'Échec', en: 'Failed'),
-    'abandoned': AppLanguage.pick(fr: 'Anormale', en: 'Abnormal'),
+    'abandoned': AppLanguage.pick(fr: 'Interrompue', en: 'Interrupted'),
   };
 
   static String get chargingStatus =>

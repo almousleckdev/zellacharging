@@ -207,8 +207,8 @@ sent by the station after it reboots (firmware dependent), by a new `StartTransa
 
 What we do:
 - Meter samples arrive about every 10 s. Each new sample stamps `charging_session.reading_at` with our own clock (the sample
-  time is the charger's clock and is not trusted). After `ZELLA_SILENT_AFTER` (40 s) without a new sample, `ChargerSilence`
-  polls the platform once to confirm. Still nothing: `StalledSessionCloser` closes the charge `ABANDONED`, failure code
+  time is the charger's clock and is not trusted). After `ZELLA_SILENT_AFTER` (25 s, checked every 5 s by `SessionSweeper.watchChargers`) without a new sample, `ChargerSilence`
+  polls the platform once to confirm. Still nothing: `StalledSessionCloser` closes the charge `ABANDONED` (ended at the last reading), failure code
   `CHARGER_OFFLINE`, stop reason `PowerLoss`, bills the energy delivered plus the fee and releases the rest of the hold.
   The stop command is skipped (the charger cannot answer; the call only blocks the sweep). If the platform cannot be asked,
   nothing is closed. The 5 min `ZELLA_STALL_AFTER` rule stays as a second net.

@@ -46,6 +46,24 @@ public class SessionSweeper {
         }
     }
 
+    @Scheduled(fixedDelayString = "${zella.charging.silence-check-interval}",
+            initialDelayString = "${zella.charging.silence-check-interval}")
+    public void watchChargers() {
+        for (Country country : countries.active()) {
+            TenantContext.runAs(country.code(), this::watchCountry);
+        }
+    }
+
+    private void watchCountry() {
+        for (UUID id : funding.openHoldSessions()) {
+            try {
+                sessions.findById(id).ifPresent(stalled::closeIfSilent);
+            } catch (RuntimeException e) {
+                log.warn("Silence check failed for session {}", id, e);
+            }
+        }
+    }
+
     private void sweepCountry() {
         for (UUID id : funding.openHoldSessions()) {
             try {

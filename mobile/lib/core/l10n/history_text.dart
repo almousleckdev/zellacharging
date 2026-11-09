@@ -125,6 +125,6 @@ abstract final class HistoryText {
     AppLanguage.pick(fr: 'Tous', en: 'All'),
     AppLanguage.pick(fr: 'En cours', en: 'Charging'),
     AppLanguage.pick(fr: 'Terminées', en: 'Completed'),
-    AppLanguage.pick(fr: 'Anormales', en: 'Abnormal'),
+    AppLanguage.pick(fr: 'Interrompues', en: 'Interrupted'),
   ];
 }

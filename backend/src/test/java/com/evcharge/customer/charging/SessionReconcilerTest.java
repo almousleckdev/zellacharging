@@ -3,7 +3,11 @@ package com.evcharge.customer.charging;
 import com.evcharge.customer.charging.application.FeeCalculator;
 import com.evcharge.customer.charging.application.FeeSettings;
 import com.evcharge.customer.charging.application.SessionCostEstimator;
+import com.evcharge.customer.charging.application.EarlyStopRetry;
 import com.evcharge.customer.charging.application.RemoteSessionLookup;
+import com.evcharge.customer.charging.application.StartCommander;
+import com.evcharge.customer.charging.application.port.StartAttempts;
+import com.evcharge.customer.charging.application.port.TransactionClaims;
 import com.evcharge.customer.charging.application.SessionReconciler;
 import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.charging.application.SessionSettlement;
@@ -47,10 +51,13 @@ class SessionReconcilerTest {
         when(funding.reserved(any())).thenReturn(new Money(5000, "XAF", 0));
         SessionSettings settings = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
                 Duration.ofSeconds(30), price, 95, Duration.ofSeconds(90), Duration.ZERO, Duration.ZERO);
-        return new SessionReconciler(new RemoteSessionLookup(gateway, settings, Clock.fixed(NOW, ZoneOffset.UTC)),
+        return new SessionReconciler(new RemoteSessionLookup(gateway, mock(TransactionClaims.class), mock(StartAttempts.class), settings,
+                        Clock.fixed(NOW, ZoneOffset.UTC)),
                 sessions, telemetry, settings, settlement,
                 new SessionCostEstimator(funding, new SessionTariff(telemetry, settings),
                         new FeeCalculator(new FeeSettings(null, null))),
+                new EarlyStopRetry(mock(StartCommander.class), mock(StartAttempts.class),
+                        Clock.fixed(NOW, ZoneOffset.UTC)),
                 Clock.fixed(NOW, ZoneOffset.UTC));
     }
 

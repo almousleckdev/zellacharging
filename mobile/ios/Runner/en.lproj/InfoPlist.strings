@@ -1,0 +1,4 @@
+"NSCameraUsageDescription" = "The camera is used to scan charger QR codes and to take your profile picture.";
+"NSPhotoLibraryUsageDescription" = "Your photo library is used to choose your profile picture.";
+"NSLocationWhenInUseUsageDescription" = "Your location is used to find charging stations near you.";
+"NSLocalNetworkUsageDescription" = "Zella Charging connects to the charging server on your local network during development.";

@@ -1,6 +1,8 @@
 package com.evcharge.customer.charging.application;
 
 import com.evcharge.customer.charging.application.port.ChargingGateway;
+import com.evcharge.customer.charging.application.port.StartAttempts;
+import com.evcharge.customer.charging.application.port.TransactionClaims;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.RemoteSession;
 import com.evcharge.customer.charging.domain.SessionState;
@@ -15,6 +17,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -30,19 +33,24 @@ public class RemoteSessionLookup {
     private static final Duration FALLBACK_INTERVAL = Duration.ofSeconds(20);
 
     private final ChargingGateway gateway;
+    private final TransactionClaims claims;
+    private final StartAttempts attempts;
     private final SessionSettings settings;
     private final Clock clock;
     private final Map<UUID, Instant> fallbackAt = new ConcurrentHashMap<>();
     private Snapshot snapshot = new Snapshot(Instant.MIN, List.of());
 
-    public RemoteSessionLookup(ChargingGateway gateway, SessionSettings settings, Clock clock) {
+    public RemoteSessionLookup(ChargingGateway gateway, TransactionClaims claims, StartAttempts attempts,
+                               SessionSettings settings, Clock clock) {
         this.gateway = gateway;
+        this.claims = claims;
+        this.attempts = attempts;
         this.settings = settings;
         this.clock = clock;
     }
 
     public Optional<RemoteSession> find(ChargingSession session) {
-        Optional<RemoteSession> running = match(activeSnapshot(), session);
+        Optional<RemoteSession> running = match(activeSessions(), session);
         if (running.isPresent()) {
             return running;
         }
@@ -56,7 +64,7 @@ public class RemoteSessionLookup {
         return viaIdTag(session);
     }
 
-    private synchronized List<RemoteSession> activeSnapshot() {
+    public synchronized List<RemoteSession> activeSessions() {
         Instant now = clock.instant();
         if (snapshot.at().plus(settings.userRefreshInterval()).isAfter(now)) {
             return snapshot.sessions();
@@ -95,9 +103,16 @@ public class RemoteSessionLookup {
                 + " startedAt=" + remote.startedAt() + "]").toList().toString();
     }
 
-    private static Optional<RemoteSession> match(List<RemoteSession> candidates, ChargingSession session) {
+    private Optional<RemoteSession> match(List<RemoteSession> candidates, ChargingSession session) {
+        Set<Integer> retired = session.transactionId() == null ? attempts.retired(session.id()) : Set.of();
         return candidates.stream().filter(remote -> matches(remote, session))
+                .filter(remote -> !retired.contains(remote.transactionId()))
+                .filter(remote -> free(remote, session))
                 .max(Comparator.comparing(RemoteSession::startedAt));
+    }
+
+    private boolean free(RemoteSession remote, ChargingSession session) {
+        return session.transactionId() != null || !claims.heldByAnother(remote.transactionId(), session.id());
     }
 
     private static boolean matches(RemoteSession remote, ChargingSession session) {

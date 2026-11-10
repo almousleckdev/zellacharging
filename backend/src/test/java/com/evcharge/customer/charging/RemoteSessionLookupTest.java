@@ -3,6 +3,8 @@ package com.evcharge.customer.charging;
 import com.evcharge.customer.charging.application.RemoteSessionLookup;
 import com.evcharge.customer.charging.application.SessionSettings;
 import com.evcharge.customer.charging.application.port.ChargingGateway;
+import com.evcharge.customer.charging.application.port.StartAttempts;
+import com.evcharge.customer.charging.application.port.TransactionClaims;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.RemoteSession;
 import com.evcharge.customer.charging.domain.SessionState;
@@ -17,7 +19,9 @@ import java.util.Optional;
 import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -30,10 +34,12 @@ class RemoteSessionLookupTest {
     private static final Instant NOW = Instant.parse("2026-10-16T12:00:00Z");
 
     private final ChargingGateway gateway = mock(ChargingGateway.class);
+    private final TransactionClaims claims = mock(TransactionClaims.class);
+    private final StartAttempts attempts = mock(StartAttempts.class);
     private final SessionSettings settings = new SessionSettings(Duration.ofSeconds(60), Duration.ofSeconds(15),
             Duration.ofSeconds(30), 150L, 95, Duration.ofSeconds(120), Duration.ofSeconds(5),
             Duration.ofSeconds(30));
-    private final RemoteSessionLookup lookup = new RemoteSessionLookup(gateway, settings,
+    private final RemoteSessionLookup lookup = new RemoteSessionLookup(gateway, claims, attempts, settings,
             Clock.fixed(NOW, ZoneOffset.UTC));
 
     private ChargingSession local(String station, String idTag, Integer transaction, SessionState state) {
@@ -130,6 +136,24 @@ class RemoteSessionLookupTest {
         when(gateway.activeSessions()).thenReturn(List.of());
         when(gateway.sessionsOf("Z-A")).thenReturn(List.of(remoteStartedAt(NOW.minus(Duration.ofHours(5)),
                 "COMPLETED")));
+
+        assertThat(lookup.find(local("CP-1", "Z-A", null, SessionState.START_ACCEPTED))).isEmpty();
+    }
+
+    @Test
+    void aTransactionAlreadyHeldByAnotherSessionIsNeverAdopted() {
+        when(gateway.activeSessions()).thenReturn(List.of());
+        when(gateway.sessionsOf("Z-A")).thenReturn(List.of(remoteStartedAt(NOW.minusSeconds(40), "COMPLETED")));
+        when(claims.heldByAnother(eq(11), any())).thenReturn(true);
+
+        assertThat(lookup.find(local("CP-1", "Z-A", null, SessionState.START_ACCEPTED))).isEmpty();
+    }
+
+    @Test
+    void aRunningTransactionHeldByAnotherSessionIsNeverAdopted() {
+        when(gateway.activeSessions()).thenReturn(List.of(remoteStartedAt(NOW.minusSeconds(40), "ACTIVE")));
+        when(gateway.sessionsOf("Z-A")).thenReturn(List.of());
+        when(claims.heldByAnother(eq(11), any())).thenReturn(true);
 
         assertThat(lookup.find(local("CP-1", "Z-A", null, SessionState.START_ACCEPTED))).isEmpty();
     }

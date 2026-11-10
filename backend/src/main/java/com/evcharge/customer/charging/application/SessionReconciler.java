@@ -23,17 +23,19 @@ public class SessionReconciler {
     private final SessionSettings settings;
     private final SessionSettlement settlement;
     private final SessionCostEstimator estimator;
+    private final EarlyStopRetry earlyStop;
     private final Clock clock;
 
     public SessionReconciler(RemoteSessionLookup lookup, SessionRepository sessions,
                              SessionTelemetry telemetry, SessionSettings settings, SessionSettlement settlement,
-                             SessionCostEstimator estimator, Clock clock) {
+                             SessionCostEstimator estimator, EarlyStopRetry earlyStop, Clock clock) {
         this.lookup = lookup;
         this.sessions = sessions;
         this.telemetry = telemetry;
         this.settings = settings;
         this.settlement = settlement;
         this.estimator = estimator;
+        this.earlyStop = earlyStop;
         this.clock = clock;
     }
 
@@ -53,9 +55,10 @@ public class SessionReconciler {
         }
         rememberPrice(session, remote);
         rememberBattery(session, remote);
-        ChargingSession next = remote
+        ChargingSession observed = remote
                 .map(found -> priced(withMeasuredEnergy(session.withRemote(found, nextState(session, found), now)), now))
                 .orElseGet(() -> expireIfStale(session, now));
+        ChargingSession next = earlyStop.apply(session, observed);
         if (!next.equals(session)) {
             sessions.update(next);
             settlement.onChange(session, next);

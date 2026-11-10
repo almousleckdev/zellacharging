@@ -103,8 +103,13 @@ abstract final class ChargeText {
   );
 
   static String get sessionInterrupted => AppLanguage.pick(
-    fr: 'La recharge a été interrompue. Seule l\'énergie reçue est facturée, le reste est rendu à votre portefeuille. Vous pouvez scanner à nouveau pour reprendre.',
-    en: 'The charge was interrupted. You only pay for the energy received and the rest goes back to your wallet. Scan again to resume.',
+    fr: 'Recharge interrompue. Seule l\'énergie reçue est facturée.',
+    en: 'Charge interrupted. You only pay for the energy received.',
+  );
+
+  static String get chargerStoppedEarly => AppLanguage.pick(
+    fr: 'La borne a arrêté la recharge. Débranchez puis rebranchez le câble, puis scannez à nouveau.',
+    en: 'The charger stopped the charge. Unplug and replug the cable, then scan again.',
   );
 
   static String get sessionFailed => AppLanguage.pick(

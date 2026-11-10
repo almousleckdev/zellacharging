@@ -24,17 +24,19 @@ public class SessionSweeper {
     private final SessionSettlement settlement;
     private final FundsGuard guard;
     private final StalledSessionCloser stalled;
+    private final OrphanChargeGuard orphans;
     private final CountryDirectory countries;
 
     public SessionSweeper(WalletFunding funding, SessionRepository sessions, SessionReconciler reconciler,
                           SessionSettlement settlement, FundsGuard guard,
-                         StalledSessionCloser stalled, CountryDirectory countries) {
+                         StalledSessionCloser stalled, OrphanChargeGuard orphans, CountryDirectory countries) {
         this.funding = funding;
         this.sessions = sessions;
         this.reconciler = reconciler;
         this.settlement = settlement;
         this.guard = guard;
         this.stalled = stalled;
+        this.orphans = orphans;
         this.countries = countries;
     }
 
@@ -65,12 +67,21 @@ public class SessionSweeper {
     }
 
     private void sweepCountry() {
+        stopOrphans();
         for (UUID id : funding.openHoldSessions()) {
             try {
                 sessions.findById(id).ifPresent(this::tend);
             } catch (RuntimeException e) {
                 log.warn("Sweep failed for session {}", id, e);
             }
+        }
+    }
+
+    private void stopOrphans() {
+        try {
+            orphans.stopOrphans();
+        } catch (RuntimeException e) {
+            log.warn("Orphan charge check failed", e);
         }
     }
 

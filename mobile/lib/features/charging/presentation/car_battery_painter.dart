@@ -3,6 +3,8 @@ import 'dart:math' as math;
 import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
+import 'battery_sweep.dart';
+import 'battery_tray.dart';
 
 class CarBatteryPainter extends CustomPainter {
   const CarBatteryPainter({
@@ -30,15 +32,18 @@ class CarBatteryPainter extends CustomPainter {
       Offset.zero & size,
       Radius.circular(size.height * 0.3),
     );
-    _drawGlow(canvas, tray);
-    _drawTray(canvas, tray, size);
+    BatteryTray.glow(canvas, tray, _accent, charging);
+    BatteryTray.body(canvas, tray, size);
     final inner = tray.deflate(_inset).outerRect;
     final cells = _layout(inner);
     final exact = level.clamp(0.0, 1.0) * _cells;
     _drawCells(canvas, inner, cells, exact);
-    if (charging) _drawSweep(canvas, cells, exact);
-    _drawGloss(canvas, tray, size);
-    _drawBorder(canvas, tray);
+    if (charging) {
+      BatterySweep.ahead(canvas, cells, _cellRadius, exact, progress);
+      BatterySweep.filled(canvas, cells, _cellRadius, exact, progress);
+    }
+    BatteryTray.gloss(canvas, tray, size);
+    BatteryTray.border(canvas, tray, _accent);
   }
 
   List<Rect> _layout(Rect inner) {
@@ -70,7 +75,7 @@ class CarBatteryPainter extends CustomPainter {
         end: Alignment.bottomCenter,
         colors: [AppColors.chargeGreen, AppColors.chargeDeep],
       ).createShader(inner);
-    final pulse = 0.5 - 0.5 * math.cos(progress * 2 * math.pi);
+    final pulse = 0.5 - 0.5 * math.cos(progress * 4 * math.pi);
     for (var i = 0; i < _cells; i++) {
       final cell = RRect.fromRectAndRadius(cells[i], _cellRadius);
       canvas.drawRRect(
@@ -102,101 +107,6 @@ class CarBatteryPainter extends CustomPainter {
         canvas.restore();
       }
     }
-  }
-
-  void _drawSweep(Canvas canvas, List<Rect> cells, double exact) {
-    final full = exact.floor();
-    final partial = exact - full;
-    final filled = Path();
-    for (var i = 0; i < math.min(full, _cells); i++) {
-      filled.addRRect(RRect.fromRectAndRadius(cells[i], _cellRadius));
-    }
-    if (full < _cells && partial > 0) {
-      final c = cells[full];
-      filled.addRect(Rect.fromLTWH(c.left, c.top, c.width * partial, c.height));
-    }
-    if (full == 0 && partial == 0) return;
-    final right = full >= _cells
-        ? cells.last.right
-        : cells[full].left + cells[full].width * partial;
-    final band = cells.first.width * 3;
-    final centre =
-        cells.first.left -
-        band +
-        (right - cells.first.left + 2 * band) * progress;
-    final stripe = Rect.fromLTRB(
-      centre - band,
-      cells.first.top,
-      centre + band,
-      cells.first.bottom,
-    );
-    canvas.save();
-    canvas.clipPath(filled);
-    canvas.drawRect(
-      stripe,
-      Paint()
-        ..shader = LinearGradient(
-          colors: [
-            AppColors.onPrimary.withValues(alpha: 0),
-            AppColors.onPrimary.withValues(alpha: 0.3),
-            AppColors.onPrimary.withValues(alpha: 0),
-          ],
-        ).createShader(stripe),
-    );
-    canvas.restore();
-  }
-
-  void _drawGlow(Canvas canvas, RRect tray) {
-    canvas.drawRRect(
-      tray,
-      Paint()
-        ..color = _accent.withValues(alpha: charging ? 0.32 : 0.2)
-        ..maskFilter = const MaskFilter.blur(BlurStyle.normal, 7),
-    );
-  }
-
-  void _drawTray(Canvas canvas, RRect tray, Size size) {
-    canvas.drawRRect(
-      tray,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.textPrimary.withValues(alpha: 0.88),
-            AppColors.textPrimary,
-          ],
-        ).createShader(Offset.zero & size),
-    );
-  }
-
-  void _drawGloss(Canvas canvas, RRect tray, Size size) {
-    final upper = Rect.fromLTWH(0, 0, size.width, size.height * 0.45);
-    canvas.save();
-    canvas.clipRRect(tray);
-    canvas.drawRect(
-      upper,
-      Paint()
-        ..shader = LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            AppColors.onPrimary.withValues(alpha: 0.16),
-            AppColors.onPrimary.withValues(alpha: 0),
-          ],
-        ).createShader(upper),
-    );
-    canvas.restore();
-  }
-
-  void _drawBorder(Canvas canvas, RRect tray) {
-    canvas.drawRRect(
-      tray.deflate(0.7),
-      Paint()
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 1.4
-        ..color = _accent,
-    );
   }
 
   @override

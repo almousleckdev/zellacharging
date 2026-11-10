@@ -25,6 +25,12 @@ class JdbcIdTagRepository implements IdTagRepository {
     }
 
     @Override
+    public Optional<UUID> customerOf(String idTag) {
+        return jdbc.sql("select customer_id from customer_id_tag where id_tag = :tag")
+                .param("tag", idTag).query(UUID.class).optional();
+    }
+
+    @Override
     public boolean saveIfAbsent(UUID customerId, String idTag) {
         return jdbc.sql("insert into customer_id_tag (customer_id, id_tag, created_at) "
                         + "values (:id, :tag, :now) on conflict do nothing")

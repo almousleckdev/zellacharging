@@ -23,7 +23,7 @@ class _CarSceneState extends State<CarScene>
     with SingleTickerProviderStateMixin {
   late final AnimationController _wave = AnimationController(
     vsync: this,
-    duration: const Duration(milliseconds: 2600),
+    duration: const Duration(milliseconds: 1500),
   );
 
   @override
@@ -78,7 +78,7 @@ class _CarSceneState extends State<CarScene>
           rect: slot,
           child: TweenAnimationBuilder<double>(
             tween: Tween(end: widget.level),
-            duration: const Duration(milliseconds: 900),
+            duration: const Duration(milliseconds: 500),
             curve: Curves.easeOutCubic,
             builder: (context, level, _) => AnimatedBuilder(
               animation: _wave,

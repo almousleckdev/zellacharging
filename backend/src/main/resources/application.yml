@@ -122,7 +122,7 @@ zella:
   charging:
     plug-in-timeout: ${ZELLA_PLUG_IN_TIMEOUT:5m}
     sweep-interval: 15s
-    silence-check-interval: 5s
+    silence-check-interval: 2s
     stop-retry-after: 30s
     stop-threshold-percent: 100
     stop-lead-time: ${ZELLA_STOP_LEAD_TIME:45s}

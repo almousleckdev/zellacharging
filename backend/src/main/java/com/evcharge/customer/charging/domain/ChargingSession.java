@@ -46,6 +46,11 @@ public record ChargingSession(
                 startedAt, stoppedAt, energyKwh, minor, costCurrency, decimals, stopReason, createdAt, now);
     }
 
+    public ChargingSession restarted(Instant now) {
+        return new ChargingSession(id, customerId, stationId, connectorId, idTag, SessionState.START_ACCEPTED, null,
+                null, null, null, null, null, null, null, null, createdAt, now);
+    }
+
     public ChargingSession lostPower(Instant lastSeen, Instant now) {
         Instant ended = startedAt != null && lastSeen.isBefore(startedAt) ? startedAt : lastSeen;
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, SessionState.ABANDONED,

@@ -9,7 +9,7 @@ import '../domain/session_quote.dart';
 import '../domain/session_repository.dart';
 import '../domain/start_charge.dart';
 
-const _pollInterval = Duration(seconds: 5);
+const _pollInterval = Duration(seconds: 2);
 const _quoteDebounce = Duration(milliseconds: 400);
 const _settleDelay = Duration(seconds: 3);
 

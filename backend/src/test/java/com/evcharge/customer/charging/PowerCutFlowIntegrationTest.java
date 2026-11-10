@@ -38,8 +38,6 @@ class PowerCutFlowIntegrationTest extends PostgresTestBase {
             .route("POST", "/api/v1/id-tags", 201, "{\"idTag\":\"x\"}")
             .route("POST", "/api/v1/charge-points/CP-5/connectors/1/start", 200, "{\"status\":\"PENDING\"}")
             .route("POST", "/api/v1/charge-points/CP-5/connectors/1/stop", 502, "{}")
-            .route("GET", "/api/v1/sessions/7/metering", 200,
-                    "{\"totalKwh\":2.0,\"currentPowerKw\":7.0,\"voltage\":230,\"sampledAt\":\"2026-11-09T09:00:00Z\"}")
             .station("CP-5");
 
     @DynamicPropertySource
@@ -78,8 +76,15 @@ class PowerCutFlowIntegrationTest extends PostgresTestBase {
                 .contentType(MediaType.APPLICATION_JSON).content(START));
     }
 
+    private static final java.util.concurrent.atomic.AtomicInteger TRANSACTIONS =
+            new java.util.concurrent.atomic.AtomicInteger(700);
+
     private void platformShowsTheChargeRunning(String idTag) {
-        OCPP.route("GET", "/api/v1/sessions", 200, "{\"items\":[{\"transactionId\":7,\"deviceId\":\"CP-5\","
+        int transaction = TRANSACTIONS.incrementAndGet();
+        OCPP.route("GET", "/api/v1/sessions/" + transaction + "/metering", 200,
+                "{\"totalKwh\":2.0,\"currentPowerKw\":7.0,\"voltage\":230,"
+                        + "\"sampledAt\":\"2026-11-09T09:00:00Z\"}");
+        OCPP.route("GET", "/api/v1/sessions", 200, "{\"items\":[{\"transactionId\":" + transaction + ",\"deviceId\":\"CP-5\","
                 + "\"connectorId\":1,\"status\":\"ACTIVE\",\"startedAt\":\"" + Instant.now().minusSeconds(120)
                 + "\",\"idTag\":\"" + idTag + "\",\"pricePerKwhMinor\":150,\"currency\":\"XOF\","
                 + "\"currencyDecimals\":0}]}");

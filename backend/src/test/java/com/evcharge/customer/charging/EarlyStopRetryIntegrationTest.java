@@ -86,8 +86,8 @@ class EarlyStopRetryIntegrationTest extends PostgresTestBase {
 
     private String refusedByTheCharger(int transaction, String idTag) {
         return "{\"transactionId\":" + transaction + ",\"deviceId\":\"CP-14\",\"connectorId\":1,"
-                + "\"status\":\"COMPLETED\",\"startedAt\":\"" + Instant.now().minusSeconds(20)
-                + "\",\"stoppedAt\":\"" + Instant.now().minusSeconds(7) + "\",\"energyKwh\":0,"
+                + "\"status\":\"COMPLETED\",\"startedAt\":\"" + Instant.now().minusSeconds(40)
+                + "\",\"stoppedAt\":\"" + Instant.now().minusSeconds(25) + "\",\"energyKwh\":0,"
                 + "\"stopReason\":\"Other\",\"idTag\":\"" + idTag + "\"}";
     }
 

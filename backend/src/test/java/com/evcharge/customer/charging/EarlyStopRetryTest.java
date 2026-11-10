@@ -42,7 +42,7 @@ class EarlyStopRetryTest {
     }
 
     private ChargingSession endedBy(String reason, String kwh) {
-        return session(SessionState.COMPLETED, reason, kwh, NOW.minusSeconds(7));
+        return session(SessionState.COMPLETED, reason, kwh, NOW.minusSeconds(20));
     }
 
     private void startIsAccepted(ChargingSession before) {
@@ -61,6 +61,16 @@ class EarlyStopRetryTest {
         assertThat(next.transactionId()).isNull();
         assertThat(next.startedAt()).isNull();
         verify(attempts).retire(before.id(), 824);
+    }
+
+    @Test
+    void theChargerGetsTimeToSettleBeforeTheNewStart() {
+        ChargingSession before = running();
+        ChargingSession justStopped = session(SessionState.COMPLETED, "Other", "0.000", NOW.minusSeconds(5));
+
+        assertThat(retry.apply(before, justStopped)).isSameAs(before);
+
+        verify(starter, never()).issue(any());
     }
 
     @Test
@@ -99,7 +109,7 @@ class EarlyStopRetryTest {
     void aChargeThatRanForMinutesIsNeverRestarted() {
         ChargingSession before = running();
         ChargingSession ended = new ChargingSession(before.id(), before.customerId(), "CP-1", 1, "Z-A",
-                SessionState.COMPLETED, null, 824, NOW.minusSeconds(300), NOW.minusSeconds(7), BigDecimal.ZERO, null,
+                SessionState.COMPLETED, null, 824, NOW.minusSeconds(300), NOW.minusSeconds(20), BigDecimal.ZERO, null,
                 null, null, "Other", before.createdAt(), NOW);
 
         assertThat(retry.apply(before, ended)).isEqualTo(ended);

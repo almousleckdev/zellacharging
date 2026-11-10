@@ -20,6 +20,7 @@ public class EarlyStopRetry {
     private static final String FAILURE = "CHARGER_STOPPED_EARLY";
     private static final Duration EARLY = Duration.ofSeconds(90);
     private static final BigDecimal NEGLIGIBLE = new BigDecimal("0.05");
+    private static final Duration SETTLE = Duration.ofSeconds(15);
     private static final int MAX_RESTARTS = 2;
 
     private final StartCommander starter;
@@ -37,6 +38,9 @@ public class EarlyStopRetry {
             return after;
         }
         Instant now = clock.instant();
+        if (after.stoppedAt().plus(SETTLE).isAfter(now)) {
+            return before;
+        }
         if (attempts.retired(before.id()).size() < MAX_RESTARTS) {
             StartCommander.Started started = starter.issue(before);
             if (started.outcome().accepted()) {

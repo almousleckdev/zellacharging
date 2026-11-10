@@ -8,9 +8,12 @@ import org.springframework.stereotype.Component;
 
 import java.time.Clock;
 import java.time.Duration;
+import java.time.Instant;
 
 @Component
 public class ChargerSilence {
+
+    private static final Duration START_GRACE = Duration.ofSeconds(90);
 
     private final SessionTelemetry telemetry;
     private final ChargingGateway gateway;
@@ -26,7 +29,12 @@ public class ChargerSilence {
     }
 
     public boolean confirmed(ChargingSession session) {
-        return confirmed(session, settings.silentAfter());
+        return !justStarted(session) && confirmed(session, settings.silentAfter());
+    }
+
+    private boolean justStarted(ChargingSession session) {
+        Instant began = session.startedAt() != null ? session.startedAt() : session.createdAt();
+        return began.plus(START_GRACE).isAfter(clock.instant());
     }
 
     public boolean confirmed(ChargingSession session, Duration quietFor) {

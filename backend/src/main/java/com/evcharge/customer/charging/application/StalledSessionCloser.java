@@ -66,8 +66,24 @@ public class StalledSessionCloser {
         if (!running || !silence.confirmed(session)) {
             return false;
         }
+        if (chargerStillAnswers(session)) {
+            return true;
+        }
         closeLostCharger(session);
         return true;
+    }
+
+    private boolean chargerStillAnswers(ChargingSession session) {
+        try {
+            boolean accepted = stopper.issue(session).accepted();
+            if (accepted) {
+                log.warn("ALERT session {} looked silent but its charger accepted a stop: ending it normally",
+                        session.id());
+            }
+            return accepted;
+        } catch (RuntimeException e) {
+            return false;
+        }
     }
 
     public void closeLostCharger(ChargingSession session) {

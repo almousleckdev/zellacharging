@@ -37,7 +37,7 @@ class ChargerSilenceTest {
 
     private ChargingSession active(Integer transactionId) {
         return new ChargingSession(UUID.randomUUID(), UUID.randomUUID(), "CP-1", 1, "Z-X", SessionState.ACTIVE,
-                null, transactionId, NOW, null, null, null, "XAF", 0, null, NOW, NOW);
+                null, transactionId, NOW.minusSeconds(600), null, null, null, "XAF", 0, null, NOW.minusSeconds(600), NOW);
     }
 
     private static Metering sample() {
@@ -50,6 +50,19 @@ class ChargerSilenceTest {
         when(telemetry.readingAtOf(session.id())).thenReturn(Optional.of(NOW.minusSeconds(30)));
 
         assertThat(silence.confirmed(session)).isFalse();
+
+        verify(gateway, never()).metering(7);
+    }
+
+    @Test
+    void aChargeThatJustStartedIsNeverJudgedSilentWhileItsFirstReadingIsStillComing() {
+        ChargingSession fresh = new ChargingSession(UUID.randomUUID(), UUID.randomUUID(), "CP-1", 1, "Z-X",
+                SessionState.ACTIVE, null, 7, NOW.minusSeconds(40), null, null, null, "XAF", 0, null,
+                NOW.minusSeconds(45), NOW);
+        when(telemetry.readingAtOf(fresh.id())).thenReturn(Optional.of(NOW.minusSeconds(40)));
+        when(gateway.metering(7)).thenReturn(Optional.of(sample()));
+
+        assertThat(silence.confirmed(fresh)).isFalse();
 
         verify(gateway, never()).metering(7);
     }

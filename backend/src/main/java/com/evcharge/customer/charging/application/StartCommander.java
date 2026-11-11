@@ -45,6 +45,10 @@ public class StartCommander {
     }
 
     private CommandOutcome send(ChargingSession session, String idempotencyKey) {
-        return gateway.start(session.stationId(), session.connectorId(), session.idTag(), idempotencyKey);
+        CommandOutcome outcome = gateway.start(session.stationId(), session.connectorId(), session.idTag(),
+                idempotencyKey);
+        log.info("Start command for session {} at {} connector {}: accepted={} reason={}", session.id(),
+                session.stationId(), session.connectorId(), outcome.accepted(), outcome.reasonCode());
+        return outcome;
     }
 }

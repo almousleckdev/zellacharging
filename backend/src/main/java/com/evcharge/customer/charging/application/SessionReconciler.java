@@ -6,6 +6,8 @@ import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.RemoteSession;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.ApiException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -16,6 +18,8 @@ import java.util.Optional;
 
 @Component
 public class SessionReconciler {
+
+    private static final Logger log = LoggerFactory.getLogger(SessionReconciler.class);
 
     private final RemoteSessionLookup lookup;
     private final SessionRepository sessions;
@@ -61,9 +65,17 @@ public class SessionReconciler {
         ChargingSession next = earlyStop.apply(session, observed);
         if (!next.equals(session)) {
             sessions.update(next);
+            logTransition(session, next);
             settlement.onChange(session, next);
         }
         return next;
+    }
+
+    private void logTransition(ChargingSession before, ChargingSession after) {
+        if (before.state() != after.state()) {
+            log.info("Session {} {} -> {} (transaction {}, {} kWh)", after.id(), before.state(), after.state(),
+                    after.transactionId(), after.energyKwh());
+        }
     }
 
     private void rememberPrice(ChargingSession session, Optional<RemoteSession> remote) {

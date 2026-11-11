@@ -53,6 +53,8 @@
 	<string>Zella Charging connects to the charging server on your local network during development.</string>
 	<key>NSLocationWhenInUseUsageDescription</key>
 	<string>Your location is used to find charging stations near you.</string>
+	<key>NSLocationAlwaysAndWhenInUseUsageDescription</key>
+	<string>Your location is used to find charging stations near you.</string>
 	<key>NSPhotoLibraryUsageDescription</key>
 	<string>Your photo library is used to choose your profile picture.</string>
 	<key>UIApplicationSceneManifest</key>

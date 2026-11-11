@@ -2,3 +2,4 @@
 "NSPhotoLibraryUsageDescription" = "Votre photothèque sert à choisir votre photo de profil.";
 "NSLocationWhenInUseUsageDescription" = "Votre position sert à trouver les stations de recharge près de vous.";
 "NSLocalNetworkUsageDescription" = "Zella Charging se connecte au serveur de recharge sur votre réseau local pendant le développement.";
+"NSLocationAlwaysAndWhenInUseUsageDescription" = "Votre position sert à trouver les stations de recharge près de vous.";

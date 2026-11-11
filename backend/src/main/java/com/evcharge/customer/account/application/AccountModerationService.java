@@ -43,6 +43,12 @@ class AccountModerationService implements CustomerModeration {
     }
 
     @Override
+    @Transactional(readOnly = true)
+    public boolean suspended(UUID customerId) {
+        return load(customerId).status() == CustomerStatus.BLOCKED;
+    }
+
+    @Override
     @Transactional
     public void suspend(UUID customerId) {
         Customer customer = load(customerId);

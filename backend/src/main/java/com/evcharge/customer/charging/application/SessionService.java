@@ -7,6 +7,7 @@ import com.evcharge.customer.charging.domain.CommandOutcome;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.AuditTrail;
+import com.evcharge.customer.shared.CustomerStanding;
 import com.evcharge.customer.wallet.WalletFunding;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
@@ -32,12 +33,13 @@ public class SessionService {
     private final WalletFunding funding;
     private final Clock clock;
     private final AuditTrail audit;
+    private final CustomerStanding standing;
 
     public SessionService(SessionRepository sessions, IdTagService idTags,
                           SessionRefresher refresher, StartableConnectors connectors, IdempotentStarts starts,
                           SessionSettlement settlement,
                           UserStop userStop, StartCommander starter, WalletFunding funding, Clock clock,
-                          AuditTrail audit) {
+                          AuditTrail audit, CustomerStanding standing) {
         this.sessions = sessions;
         this.idTags = idTags;
         this.refresher = refresher;
@@ -49,10 +51,12 @@ public class SessionService {
         this.funding = funding;
         this.clock = clock;
         this.audit = audit;
+        this.standing = standing;
     }
 
     public ChargingSession start(UUID customerId, String stationId, int connectorId, long amountMinor,
                                  String idempotencyKey) {
+        standing.requireActive(customerId);
         Optional<ChargingSession> earlier = starts.earlier(customerId, idempotencyKey, stationId, connectorId,
                 amountMinor);
         if (earlier.isPresent()) {

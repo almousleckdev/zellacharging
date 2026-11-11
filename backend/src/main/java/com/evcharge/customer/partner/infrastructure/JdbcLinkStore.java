@@ -37,4 +37,10 @@ class JdbcLinkStore implements LinkStore {
         return jdbc.sql("select customer_id from partner_link where partner = :partner order by linked_at")
                 .param("partner", partner).query(UUID.class).list();
     }
+
+    @Override
+    public boolean isLinked(String partner, UUID customerId) {
+        return jdbc.sql("select count(*) from partner_link where partner = :partner and customer_id = :customer")
+                .param("partner", partner).param("customer", customerId).query(Integer.class).single() > 0;
+    }
 }

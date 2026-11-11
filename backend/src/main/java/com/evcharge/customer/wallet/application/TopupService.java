@@ -1,7 +1,9 @@
 package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.CustomerStanding;
 import com.evcharge.customer.shared.NotificationType;
+import com.evcharge.customer.shared.SuspendedNumbers;
 import com.evcharge.customer.shared.Notifier;
 import com.evcharge.customer.wallet.application.port.TopupRepository;
 import com.evcharge.customer.wallet.domain.CollectionRequest;
@@ -34,10 +36,13 @@ public class TopupService {
     private final PaymentSettings payments;
     private final Clock clock;
     private final Notifier notifier;
+    private final CustomerStanding standing;
+    private final SuspendedNumbers suspendedNumbers;
 
     public TopupService(WalletSettings settings, TopupRepository topups, PaymentGateways gateways,
                         TopupSettlement settlement, PaymentSettings payments,
-                        Clock clock, Notifier notifier) {
+                        Clock clock, Notifier notifier, CustomerStanding standing,
+                        SuspendedNumbers suspendedNumbers) {
         this.settings = settings;
         this.topups = topups;
         this.gateways = gateways;
@@ -45,10 +50,17 @@ public class TopupService {
         this.payments = payments;
         this.clock = clock;
         this.notifier = notifier;
+        this.standing = standing;
+        this.suspendedNumbers = suspendedNumbers;
     }
 
     public Topup create(UUID customerId, MobileOperator operator, String msisdn, long amountMinor, String key) {
+        standing.requireActive(customerId);
         validate(msisdn, amountMinor);
+        if (suspendedNumbers.refuse(customerId, msisdn, amountMinor, settings.currency(), key)) {
+            throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "TOPUP_NUMBER_SUSPENDED",
+                    "This number cannot be used to top up");
+        }
         Optional<Topup> previous = topups.findByIdempotencyKey(customerId, key);
         if (previous.isPresent()) {
             return previous.get();

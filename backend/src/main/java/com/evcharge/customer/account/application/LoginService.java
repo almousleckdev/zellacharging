@@ -21,15 +21,18 @@ public class LoginService {
     private final SessionIssuer sessions;
     private final FailedLoginPolicy failures;
     private final AuditTrail audit;
+    private final SuspendedRefusal suspended;
 
     public LoginService(CustomerRepository customers, PasswordHasher passwords, ContactNormalizer contacts,
-                        SessionIssuer sessions, FailedLoginPolicy failures, AuditTrail audit) {
+                        SessionIssuer sessions, FailedLoginPolicy failures, AuditTrail audit,
+                        SuspendedRefusal suspended) {
         this.customers = customers;
         this.passwords = passwords;
         this.contacts = contacts;
         this.sessions = sessions;
         this.failures = failures;
         this.audit = audit;
+        this.suspended = suspended;
     }
 
     @Transactional(noRollbackFor = ApiException.class)
@@ -44,7 +47,7 @@ public class LoginService {
             throw invalidCredentials();
         }
         if (customer.status() == CustomerStatus.BLOCKED) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "ACCOUNT_SUSPENDED", "Account is suspended");
+            throw suspended.of(customer.id());
         }
         if (!customer.canAuthenticate()) {
             throw new ApiException(HttpStatus.FORBIDDEN, "ACCOUNT_NOT_VERIFIED", "Account is not verified");

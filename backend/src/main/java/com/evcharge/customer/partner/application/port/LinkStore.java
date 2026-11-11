@@ -11,4 +11,6 @@ public interface LinkStore {
     boolean unlink(String partner, UUID customerId);
 
     List<UUID> linkedCustomerIds(String partner);
+
+    boolean isLinked(String partner, UUID customerId);
 }

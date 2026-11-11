@@ -1,5 +1,6 @@
 package com.evcharge.customer.partner;
 
+import com.evcharge.customer.partner.domain.EvidenceReference;
 import com.evcharge.customer.shared.TenantContext;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -32,6 +33,35 @@ public class PartnerFixtures {
                 + "phone_e164, password_hash, status, created_at) values (?, ?, ?, ?, ?, 'x', ?, now())", id,
                 firstName, lastName, email, phone, status));
         return id;
+    }
+
+    public void suspend(String country, UUID customer, long owedMinor, String... numbers) {
+        TenantContext.runAs(country, () -> {
+            jdbc.update("insert into partner_link (partner, customer_id, linked_at) values ('NDZELA', ?, now()) "
+                    + "on conflict do nothing", customer);
+            jdbc.update("insert into partner_suspension (partner, customer_id, owed_minor, currency, decimals, "
+                    + "blocked_before, suspended_at) values ('NDZELA', ?, ?, 'XAF', 0, false, now())",
+                    customer, owedMinor);
+            for (String number : numbers) {
+                jdbc.update("insert into suspended_number (partner, customer_id, msisdn) "
+                        + "values ('NDZELA', ?, ?)", customer, number);
+            }
+        });
+        jdbc.update("update customer set status = 'BLOCKED' where id = ?", customer);
+    }
+
+    public void evidence(String country, UUID suspended, UUID receiving, boolean receivingLinked, long amountMinor,
+                         String key) {
+        TenantContext.runAs(country, () -> jdbc.update("insert into suspension_evidence (id, partner, "
+                + "suspended_customer_id, receiving_customer_id, receiving_ref, receiving_linked, kind, msisdn, "
+                + "amount_minor, currency, idempotency_key, occurred_at) values (?, 'NDZELA', ?, ?, ?, ?, "
+                + "'TOPUP_FROM_SUSPENDED_NUMBER', '+24177000000', ?, 'XAF', ?, now())", UUID.randomUUID(), suspended,
+                receiving, EvidenceReference.of(receiving), receivingLinked, amountMinor, key));
+    }
+
+    public void link(String country, UUID customer) {
+        TenantContext.runAs(country, () -> jdbc.update("insert into partner_link (partner, customer_id, "
+                + "linked_at) values ('NDZELA', ?, now()) on conflict do nothing", customer));
     }
 
     public String idTagFor(String country, UUID customer) {

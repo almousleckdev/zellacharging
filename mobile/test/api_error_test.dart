@@ -1,5 +1,6 @@
 import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zella/core/format/money_format.dart';
 import 'package:zella/core/l10n/app_language.dart';
 import 'package:zella/core/network/api_error.dart';
 import 'package:zella/core/network/api_error_kind.dart';
@@ -79,4 +80,27 @@ void main() {
       expect(verifying, isNot(contains('Rien n’a été débité')));
     },
   );
+
+  test('a suspended account shows the amount owed in the current language', () {
+    final body = {'code': 'ACCOUNT_SUSPENDED', 'owedMinor': 69000};
+    final amount = MoneyFormat.format(69000, 'XAF', 0);
+
+    final french = ApiError.fromDio(_failure(403, body)).message;
+    expect(french, contains(amount));
+    expect(french, contains('NDZela'));
+
+    AppLanguage.current = AppLanguage.en;
+    final english = ApiError.fromDio(_failure(403, body)).message;
+    expect(english, contains(amount));
+    expect(english, contains('NDZela'));
+  });
+
+  test('a suspended account without an amount keeps the generic message', () {
+    final error = ApiError.fromDio(
+      _failure(403, {'code': 'ACCOUNT_SUSPENDED'}),
+    );
+
+    expect(error.code, 'ACCOUNT_SUSPENDED');
+    expect(error.message, isNot(contains('FCFA')));
+  });
 }

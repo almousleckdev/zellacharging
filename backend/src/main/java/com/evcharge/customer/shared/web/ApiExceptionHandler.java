@@ -38,7 +38,9 @@ class ApiExceptionHandler extends ResponseEntityExceptionHandler {
         if (ex.status().is5xxServerError()) {
             log.warn("Service failure {}: {}", ex.code(), ex.getMessage());
         }
-        return problem(ex.status(), ex.code(), ex.getMessage());
+        ProblemDetail problem = problem(ex.status(), ex.code(), ex.getMessage());
+        ex.details().forEach(problem::setProperty);
+        return problem;
     }
 
     @ExceptionHandler(AuthenticationException.class)

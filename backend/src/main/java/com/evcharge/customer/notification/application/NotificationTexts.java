@@ -58,6 +58,25 @@ public class NotificationTexts {
                     "Welcome to Zella", "Your account is ready.");
             case PASSWORD_CHANGED -> pick(en, "Mot de passe modifié", "Si ce n'était pas vous, contactez le support.",
                     "Password changed", "If this was not you, contact support.");
+            case ACCOUNT_SUSPENDED_ARREARS -> pick(en, "Compte suspendu",
+                    "Votre compte est suspendu car votre loyer NDZela est impayé. Réglez-le pour le réactiver.",
+                    "Account suspended",
+                    "Your account is suspended because your NDZela rent is unpaid. Pay it to reactivate it.");
+            case ACCOUNT_RESTORED -> pick(en, "Compte réactivé",
+                    "Votre loyer est réglé : votre compte est de nouveau actif.",
+                    "Account reactivated", "Your rent is paid: your account is active again.");
+            case SUSPENDED_HELP_DETECTED -> pick(en, "Activité détectée",
+                    "Un rechargement depuis votre numéro vers un autre compte a été détecté pendant votre suspension. "
+                            + "Cela enfreint les conditions d'utilisation : des sanctions peuvent s'appliquer.",
+                    "Activity detected",
+                    "A top-up from your number into another account was detected during your suspension. "
+                            + "This breaks the terms of use: sanctions may apply.");
+            case HELPER_WARNED -> pick(en, "Avertissement",
+                    "Votre compte a servi à aider une personne suspendue à recharger. "
+                            + "Cela enfreint les conditions d'utilisation : des sanctions peuvent s'appliquer.",
+                    "Warning",
+                    "Your account was used to help a suspended person charge. "
+                            + "This breaks the terms of use: sanctions may apply.");
         };
     }
 

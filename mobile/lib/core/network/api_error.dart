@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../l10n/strings.dart';
+import '../l10n/suspension_text.dart';
 import 'api_error_kind.dart';
 
 class ApiError implements Exception {
@@ -29,13 +30,19 @@ class ApiError implements Exception {
     );
   }
 
+  static String? _owingMessage(String code, Map data) {
+    final owed = data['owedMinor'];
+    if (code != 'ACCOUNT_SUSPENDED' || owed is! num) return null;
+    return SuspensionText.owing(owed.toInt());
+  }
+
   factory ApiError.fromDio(DioException error) {
     final status = error.response?.statusCode;
     final data = error.response?.data;
     if (data is Map && data['code'] is String) {
       final code = data['code'] as String;
       final reference = data['correlationId'] as String?;
-      final known = ErrorText.byCode[code];
+      final known = _owingMessage(code, data) ?? ErrorText.byCode[code];
       final detail = data['detail'] is String ? data['detail'] as String : null;
       final base = known ?? detail ?? Strings.unknownError;
       final unexplained = known == null && detail == null;

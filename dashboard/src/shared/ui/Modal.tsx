@@ -57,6 +57,7 @@ export function Modal({ open, title, description, busy = false, size = "sm", onC
       }}
       className={cn(
         "m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-y-auto overflow-x-hidden rounded-xl",
+        "whitespace-normal text-left normal-nums",
         "bg-background p-0 text-foreground shadow-xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
         size === "lg" ? "max-w-2xl" : "max-w-md",
         open && "flex flex-col",

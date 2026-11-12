@@ -52,11 +52,16 @@ public class PartnerFixtures {
 
     public void evidence(String country, UUID suspended, UUID receiving, boolean receivingLinked, long amountMinor,
                          String key) {
+        evidence(country, suspended, receiving, receivingLinked, amountMinor, key, 60);
+    }
+
+    public void evidence(String country, UUID suspended, UUID receiving, boolean receivingLinked, long amountMinor,
+                         String key, int secondsAgo) {
         TenantContext.runAs(country, () -> jdbc.update("insert into suspension_evidence (id, partner, "
                 + "suspended_customer_id, receiving_customer_id, receiving_ref, receiving_linked, kind, msisdn, "
                 + "amount_minor, currency, idempotency_key, occurred_at) values (?, 'NDZELA', ?, ?, ?, ?, "
-                + "'TOPUP_FROM_SUSPENDED_NUMBER', '+24177000000', ?, 'XAF', ?, now())", UUID.randomUUID(), suspended,
-                receiving, EvidenceReference.of(receiving), receivingLinked, amountMinor, key));
+                + "'TOPUP_FROM_SUSPENDED_NUMBER', '+24177000000', ?, 'XAF', ?, now() - make_interval(secs => ?))", UUID.randomUUID(), suspended,
+                receiving, EvidenceReference.of(receiving), receivingLinked, amountMinor, key, secondsAgo));
     }
 
     public void link(String country, UUID customer) {

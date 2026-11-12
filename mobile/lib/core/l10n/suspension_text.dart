@@ -1,9 +1,14 @@
 import '../format/money_format.dart';
 import 'app_language.dart';
+import 'error_text.dart';
 
 abstract final class SuspensionText {
   static const _currency = 'XAF';
   static const _decimals = 0;
+
+  static String signedOut(int? owedMinor) => owedMinor == null
+      ? ErrorText.byCode['ACCOUNT_SUSPENDED']!
+      : owing(owedMinor);
 
   static String owing(int owedMinor) {
     final amount = MoneyFormat.format(owedMinor, _currency, _decimals);

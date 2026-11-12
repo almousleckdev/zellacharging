@@ -7,6 +7,7 @@ import 'package:zella/core/notifications/push_message.dart';
 import 'package:zella/core/notifications/push_messaging.dart';
 import 'package:zella/core/notifications/push_registration.dart';
 import 'package:zella/core/notifications/push_route.dart';
+import 'package:zella/core/notifications/push_suspension.dart';
 import 'package:zella/core/router/routes.dart';
 
 class _FakeMessaging implements PushMessaging {
@@ -124,5 +125,27 @@ void main() {
 
       expect(registry.unregistered, ['token-1']);
     });
+  });
+
+  test('a suspension push is recognised', () {
+    const suspended = PushMessage(
+      title: 't',
+      body: 'b',
+      data: {'type': 'ACCOUNT_SUSPENDED_ARREARS', 'owedMinor': '69000'},
+    );
+    const withoutAmount = PushMessage(
+      title: 't',
+      body: 'b',
+      data: {'type': 'ACCOUNT_SUSPENDED_ARREARS'},
+    );
+    const other = PushMessage(
+      title: 't',
+      body: 'b',
+      data: {'type': 'CHARGE_STARTED', 'owedMinor': '5'},
+    );
+
+    expect(PushSuspension.isSuspension(suspended), isTrue);
+    expect(PushSuspension.isSuspension(withoutAmount), isTrue);
+    expect(PushSuspension.isSuspension(other), isFalse);
   });
 }

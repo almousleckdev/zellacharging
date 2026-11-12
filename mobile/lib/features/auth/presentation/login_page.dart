@@ -3,9 +3,11 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
+import '../../../core/l10n/suspension_text.dart';
 import '../../../core/l10n/verification_text.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/session/session_controller.dart';
+import '../../../core/session/suspended_on_sign_out.dart';
 import '../../../core/session/stay_signed_in.dart';
 import '../../../core/storage/preference_providers.dart';
 import '../../../core/theme/app_icons.dart';
@@ -42,7 +44,14 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
   }
 
   void _announceReplacement() {
-    if (!mounted || !ref.read(signedOutElsewhereProvider)) return;
+    if (!mounted) return;
+    final suspension = ref.read(suspensionNoticeProvider);
+    if (suspension != null) {
+      ref.read(suspensionNoticeProvider.notifier).acknowledge();
+      AppToast.warning(context, SuspensionText.signedOut(suspension.owedMinor));
+      return;
+    }
+    if (!ref.read(signedOutElsewhereProvider)) return;
     ref.read(signedOutElsewhereProvider.notifier).acknowledge();
     AppToast.warning(context, AuthText.signedOutElsewhere);
   }

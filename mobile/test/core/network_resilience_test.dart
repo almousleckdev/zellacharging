@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:typed_data';
 
 import 'package:dio/dio.dart';
@@ -60,7 +61,10 @@ class _Scripted implements HttpClientAdapter {
     }
     if (next is Map) {
       return ResponseBody.fromString(
-        '{"code":"${next['code']}"}',
+        jsonEncode({
+          for (final entry in next.entries)
+            if (entry.key != 'status') entry.key: entry.value,
+        }),
         next['status'] as int,
         headers: {
           Headers.contentTypeHeader: [Headers.jsonContentType],
@@ -216,4 +220,151 @@ void main() {
     );
     expect(adapter.calls, hasLength(3));
   });
+
+  test(
+    'a suspended account signs out at once and reports the amount owed',
+    () async {
+      final store = _MemoryStore();
+      final client = _dio(
+        _Scripted([
+          {'status': 403, 'code': 'ACCOUNT_SUSPENDED', 'owedMinor': 69000},
+        ]),
+      );
+      final refresher = TokenRefresher(
+        plainClient: _dio(_Scripted([])),
+        store: store,
+      );
+      var calls = 0;
+      int? owed;
+      client.interceptors.add(
+        AuthInterceptor(
+          store: store,
+          refresher: refresher,
+          client: client,
+          onSessionExpired: ({required bool replaced}) {},
+          onSuspended: (owedMinor) {
+            calls++;
+            owed = owedMinor;
+          },
+        ),
+      );
+
+      await expectLater(
+        client.get<dynamic>('/v1/wallet'),
+        throwsA(isA<DioException>()),
+      );
+
+      expect(calls, 1);
+      expect(owed, 69000);
+      expect(store.access, isNull);
+      expect(store.refresh, isNull);
+    },
+  );
+
+  test('a suspension without an amount still signs the customer out', () async {
+    final store = _MemoryStore();
+    final client = _dio(
+      _Scripted([
+        {'status': 403, 'code': 'ACCOUNT_SUSPENDED'},
+      ]),
+    );
+    final refresher = TokenRefresher(
+      plainClient: _dio(_Scripted([])),
+      store: store,
+    );
+    var calls = 0;
+    int? owed = 1;
+    client.interceptors.add(
+      AuthInterceptor(
+        store: store,
+        refresher: refresher,
+        client: client,
+        onSessionExpired: ({required bool replaced}) {},
+        onSuspended: (owedMinor) {
+          calls++;
+          owed = owedMinor;
+        },
+      ),
+    );
+
+    await expectLater(
+      client.get<dynamic>('/v1/sessions'),
+      throwsA(isA<DioException>()),
+    );
+
+    expect(calls, 1);
+    expect(owed, isNull);
+  });
+
+  test('a refused sign-in is not a sign-out and keeps the tokens', () async {
+    final store = _MemoryStore();
+    final client = _dio(
+      _Scripted([
+        {'status': 403, 'code': 'ACCOUNT_SUSPENDED', 'owedMinor': 69000},
+      ]),
+    );
+    final refresher = TokenRefresher(
+      plainClient: _dio(_Scripted([])),
+      store: store,
+    );
+    var calls = 0;
+    client.interceptors.add(
+      AuthInterceptor(
+        store: store,
+        refresher: refresher,
+        client: client,
+        onSessionExpired: ({required bool replaced}) {},
+        onSuspended: (_) => calls++,
+      ),
+    );
+
+    await expectLater(
+      client.post<dynamic>('/v1/auth/login'),
+      throwsA(isA<DioException>()),
+    );
+
+    expect(calls, 0);
+    expect(store.access, 'old-access');
+  });
+
+  test(
+    'a refresh refused because the account is suspended signs out with the amount owed',
+    () async {
+      final store = _MemoryStore();
+      final client = _dio(_Scripted([401]));
+      final refresher = TokenRefresher(
+        plainClient: _dio(
+          _Scripted([
+            {'status': 403, 'code': 'ACCOUNT_SUSPENDED', 'owedMinor': 69000},
+          ]),
+        ),
+        store: store,
+      );
+      var calls = 0;
+      int? owed;
+      var expired = false;
+      client.interceptors.add(
+        AuthInterceptor(
+          store: store,
+          refresher: refresher,
+          client: client,
+          onSessionExpired: ({required bool replaced}) => expired = true,
+          onSuspended: (owedMinor) {
+            calls++;
+            owed = owedMinor;
+          },
+        ),
+      );
+
+      await expectLater(
+        client.get<dynamic>('/v1/wallet'),
+        throwsA(isA<DioException>()),
+      );
+
+      expect(calls, 1);
+      expect(owed, 69000);
+      expect(expired, isFalse);
+      expect(store.refresh, isNull);
+    },
+  );
 }

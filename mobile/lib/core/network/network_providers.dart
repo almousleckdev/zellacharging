@@ -41,6 +41,8 @@ final dioProvider = Provider<Dio>((ref) {
       onSessionExpired: ({required replaced}) => ref
           .read(sessionControllerProvider.notifier)
           .expire(replaced: replaced),
+      onSuspended: (owedMinor) =>
+          ref.read(sessionControllerProvider.notifier).suspend(owedMinor),
     ),
   );
   client.interceptors.add(RetryInterceptor(client: client));

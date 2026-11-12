@@ -3,6 +3,7 @@ package com.evcharge.customer.account.application;
 import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.RefreshTokenRepository;
 import com.evcharge.customer.account.domain.Customer;
+import com.evcharge.customer.account.domain.CustomerStatus;
 import com.evcharge.customer.account.domain.RefreshToken;
 import com.evcharge.customer.shared.Sha256;
 import com.evcharge.customer.shared.ApiException;
@@ -19,13 +20,15 @@ public class RefreshSessionService {
     private final RefreshTokenRepository refreshTokens;
     private final CustomerRepository customers;
     private final SessionIssuer sessions;
+    private final SuspendedRefusal suspended;
     private final Clock clock;
 
     public RefreshSessionService(RefreshTokenRepository refreshTokens, CustomerRepository customers,
-                          SessionIssuer sessions, Clock clock) {
+                          SessionIssuer sessions, SuspendedRefusal suspended, Clock clock) {
         this.refreshTokens = refreshTokens;
         this.customers = customers;
         this.sessions = sessions;
+        this.suspended = suspended;
         this.clock = clock;
     }
 
@@ -33,6 +36,7 @@ public class RefreshSessionService {
     public AuthTokens refresh(String rawToken) {
         Instant now = clock.instant();
         RefreshToken token = refreshTokens.findByHash(Sha256.hex(rawToken)).orElseThrow(RefreshSessionService::invalid);
+        refuseWhenSuspended(token);
         if (token.isConsumed()) {
             refreshTokens.revokeFamily(token.familyId(), now);
             throw invalid();
@@ -43,6 +47,12 @@ public class RefreshSessionService {
         Customer customer = customers.findById(token.customerId()).filter(Customer::canAuthenticate)
                 .orElseThrow(RefreshSessionService::invalid);
         return sessions.issue(customer.id(), customer.country(), token.familyId());
+    }
+
+    private void refuseWhenSuspended(RefreshToken token) {
+        customers.findById(token.customerId()).filter(customer -> customer.status() == CustomerStatus.BLOCKED).ifPresent(customer -> {
+            throw suspended.of(customer.id());
+        });
     }
 
     @Transactional

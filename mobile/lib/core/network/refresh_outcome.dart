@@ -1,1 +1,1 @@
-enum RefreshOutcome { refreshed, rejected, unavailable }
+enum RefreshOutcome { refreshed, rejected, unavailable, suspended }

@@ -5,8 +5,10 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'push_message.dart';
+import '../session/session_verifier.dart';
 import 'push_providers.dart';
 import 'push_route.dart';
+import 'push_suspension.dart';
 import 'push_toast.dart';
 
 class PushListener extends ConsumerStatefulWidget {
@@ -37,12 +39,20 @@ class _PushListenerState extends ConsumerState<PushListener> {
 
   void _showInApp(PushMessage message) {
     if (!mounted) return;
+    _verifySuspension(message);
     PushToast.show(context, message);
   }
 
   void _open(PushMessage message) {
+    _verifySuspension(message);
     final route = routeFor(message);
     if (mounted && route != null) context.push(route);
+  }
+
+  void _verifySuspension(PushMessage message) {
+    if (PushSuspension.isSuspension(message)) {
+      unawaited(ref.read(sessionVerifierProvider).check());
+    }
   }
 
   @override

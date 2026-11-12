@@ -60,10 +60,14 @@ class SuspensionIntegrationTest extends PostgresTestBase {
     }
 
     private void aTopupFrom(UUID customer, String msisdn) {
+        aTopupFrom(customer, msisdn, "SUCCEEDED");
+    }
+
+    private void aTopupFrom(UUID customer, String msisdn, String state) {
         UUID id = UUID.randomUUID();
         TenantContext.runAs("GA", () -> jdbc.update("insert into topup (id, customer_id, operator, msisdn, "
                 + "amount_minor, state, idempotency_key, created_at, updated_at, reference) "
-                + "values (?, ?, 'AIRTEL', ?, 5000, 'SUCCEEDED', ?, now(), now(), ?)", id, customer, msisdn,
+                + "values (?, ?, 'AIRTEL', ?, 5000, ?, ?, now(), now(), ?)", id, customer, msisdn, state,
                 id.toString(), "GA" + id.toString().replace("-", "")));
     }
 
@@ -135,6 +139,35 @@ class SuspensionIntegrationTest extends PostgresTestBase {
 
         assertThat(statusOf(customer)).isEqualTo("BLOCKED");
         assertThat(numbersOf(customer)).isEmpty();
+    }
+
+    @Test
+    void onlyTheNumbersOfSuccessfulTopUpsAreKept() throws Exception {
+        UUID customer = linkedCustomer("+24106000006");
+        aTopupFrom(customer, "+24107000010", "SUCCEEDED");
+        aTopupFrom(customer, "+24107000011", "FAILED");
+        aTopupFrom(customer, "+24107000012", "PENDING");
+
+        send(put(suspension(customer)).contentType(MediaType.APPLICATION_JSON).content(BODY))
+                .andExpect(status().isNoContent());
+
+        assertThat(numbersOf(customer)).containsExactly("+24106000006", "+24107000010");
+    }
+
+    @Test
+    void restoreStillReactivatesWhenTheAdminUnblockedAndTheSuspensionWasAppliedAgain() throws Exception {
+        UUID customer = linkedCustomer("+24106000007");
+        TenantContext.runAs("GA", () -> jdbc.update("update customer set status = 'BLOCKED' where id = ?", customer));
+        send(put(suspension(customer)).contentType(MediaType.APPLICATION_JSON).content(BODY))
+                .andExpect(status().isNoContent());
+        TenantContext.runAs("GA", () -> jdbc.update("update customer set status = 'ACTIVE' where id = ?", customer));
+        send(put(suspension(customer)).contentType(MediaType.APPLICATION_JSON).content(BODY))
+                .andExpect(status().isNoContent());
+        assertThat(statusOf(customer)).isEqualTo("BLOCKED");
+
+        send(delete(suspension(customer))).andExpect(status().isNoContent());
+
+        assertThat(statusOf(customer)).isEqualTo("ACTIVE");
     }
 
     @Test

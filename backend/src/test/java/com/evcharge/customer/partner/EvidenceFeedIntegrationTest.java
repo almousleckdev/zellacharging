@@ -101,6 +101,15 @@ class EvidenceFeedIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void anEventStillInsideTheFeedLagIsNotServedYetSoNoRowIsEverSkipped() throws Exception {
+        fixtures.evidence("GA", driver, customer(), false, 700, "k-late", 0);
+        fixtures.evidence("GA", driver, customer(), false, 701, "k-old", 120);
+
+        feed("").andExpect(status().isOk()).andExpect(jsonPath("$.items.length()").value(1))
+                .andExpect(jsonPath("$.items[0].amountMinor").value(701));
+    }
+
+    @Test
     void aBadCursorIsRefused() throws Exception {
         feed("&cursor=not-a-cursor").andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("PARTNER_CURSOR_INVALID"));

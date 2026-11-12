@@ -8,6 +8,7 @@ import com.evcharge.customer.shared.Timestamps;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.UUID;
 
@@ -36,16 +37,16 @@ class JdbcEvidenceStore implements EvidenceStore {
     }
 
     @Override
-    public List<EvidenceItem> after(String partner, long sequence, int size, UUID suspendedCustomerId) {
+    public List<EvidenceItem> after(String partner, long sequence, int size, UUID suspendedCustomerId, Instant visibleBefore) {
         return jdbc.sql("select e.seq, e.id, e.suspended_customer_id, e.kind, e.receiving_ref, e.receiving_linked, "
                         + "case when e.receiving_linked then e.receiving_customer_id end as receiving_customer_id, "
                         + "e.amount_minor, e.currency, e.occurred_at from suspension_evidence e "
-                        + "where e.partner = :partner and e.seq > :sequence "
+                        + "where e.partner = :partner and e.seq > :sequence and e.occurred_at <= :until "
                         + "and (cast(:customer as uuid) is null or e.suspended_customer_id = cast(:customer as uuid)) "
                         + "and exists (select 1 from partner_link l where l.partner = e.partner "
                         + "and l.customer_id = e.suspended_customer_id) order by e.seq limit :size")
                 .param("partner", partner).param("sequence", sequence).param("customer", suspendedCustomerId)
-                .param("size", size)
+                .param("size", size).param("until", Timestamps.toDb(visibleBefore))
                 .query((rs, row) -> new EvidenceItem(rs.getLong("seq"), rs.getObject("id", UUID.class),
                         rs.getObject("suspended_customer_id", UUID.class), rs.getString("kind"),
                         rs.getString("receiving_ref"), rs.getBoolean("receiving_linked"),

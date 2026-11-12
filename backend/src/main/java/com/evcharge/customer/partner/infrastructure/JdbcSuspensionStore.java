@@ -24,7 +24,7 @@ class JdbcSuspensionStore implements SuspensionStore {
     @Override
     public List<String> knownNumbers(UUID customerId) {
         return jdbc.sql("select phone_e164 from customer where id = :id and phone_e164 is not null "
-                        + "union select msisdn from topup where customer_id = :id")
+                        + "union select msisdn from topup where customer_id = :id and state = 'SUCCEEDED'")
                 .param("id", customerId).query(String.class).list();
     }
 
@@ -50,8 +50,9 @@ class JdbcSuspensionStore implements SuspensionStore {
                         + ":blocked, :at) on conflict (partner, customer_id) do update set "
                         + "owed_minor = excluded.owed_minor, currency = excluded.currency, "
                         + "decimals = excluded.decimals, "
-                        + "blocked_before = case when partner_suspension.restored_at is null "
-                        + "then partner_suspension.blocked_before else excluded.blocked_before end, "
+                        + "blocked_before = case when excluded.blocked_before = false then false "
+                        + "when partner_suspension.restored_at is null then partner_suspension.blocked_before "
+                        + "else excluded.blocked_before end, "
                         + "suspended_at = case when partner_suspension.restored_at is null "
                         + "then partner_suspension.suspended_at else excluded.suspended_at end, restored_at = null")
                 .param("partner", partner).param("customer", customerId).param("owed", owedMinor)

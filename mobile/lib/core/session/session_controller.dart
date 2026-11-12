@@ -4,6 +4,7 @@ import '../network/network_providers.dart';
 import '../notifications/push_providers.dart';
 import '../storage/preference_providers.dart';
 import 'stay_signed_in.dart';
+import 'suspended_on_sign_out.dart';
 
 enum SessionStatus { unknown, authenticated, unauthenticated }
 
@@ -42,6 +43,13 @@ class SessionController extends Notifier<SessionStatus> {
 
   void expire({bool replaced = false}) {
     if (replaced) ref.read(signedOutElsewhereProvider.notifier).mark();
+    state = SessionStatus.unauthenticated;
+  }
+
+  Future<void> suspend(int? owedMinor) async {
+    if (state == SessionStatus.unauthenticated) return;
+    ref.read(suspensionNoticeProvider.notifier).mark(owedMinor);
+    await ref.read(tokenStoreProvider).clear();
     state = SessionStatus.unauthenticated;
   }
 

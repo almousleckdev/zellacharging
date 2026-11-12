@@ -2,6 +2,8 @@ import 'package:dio/dio.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zella/core/format/money_format.dart';
 import 'package:zella/core/l10n/app_language.dart';
+import 'package:zella/core/l10n/error_text.dart';
+import 'package:zella/core/l10n/suspension_text.dart';
 import 'package:zella/core/network/api_error.dart';
 import 'package:zella/core/network/api_error_kind.dart';
 
@@ -102,5 +104,15 @@ void main() {
 
     expect(error.code, 'ACCOUNT_SUSPENDED');
     expect(error.message, isNot(contains('FCFA')));
+  });
+
+  test('the sign-out notice names the amount, or is generic without one', () {
+    final amount = MoneyFormat.format(69000, 'XAF', 0);
+
+    expect(SuspensionText.signedOut(69000), contains(amount));
+    expect(
+      SuspensionText.signedOut(null),
+      ErrorText.byCode['ACCOUNT_SUSPENDED'],
+    );
   });
 }

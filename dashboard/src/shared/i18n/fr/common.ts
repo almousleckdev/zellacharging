@@ -80,6 +80,7 @@ export const frCommon = {
     INVALID_RANGE: "Cette période n'est pas valide.",
     INVALID_INCIDENT_STATUS: "Ce statut n'est pas valide.",
     CUSTOMER_NOT_FOUND: "Client introuvable.",
+    INVALID_COMPLIMENTARY: "Indiquez un motif, et une date de fin future si vous en définissez une.",
     WITHDRAWAL_NOT_FOUND: "Retrait introuvable.",
     WITHDRAWAL_NOT_PENDING: "Ce retrait a déjà été traité.",
     WITHDRAWAL_NOT_REFUNDABLE: "Ce retrait ne peut pas être remboursé : il est déjà terminé ou trop récent.",

@@ -7,6 +7,7 @@ import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.CustomerPrincipal;
+import com.evcharge.customer.shared.FreeCharging;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -26,17 +27,20 @@ class WalletController {
     private final WalletService wallets;
     private final TopupService topups;
     private final WithdrawalSettings withdrawals;
+    private final FreeCharging free;
 
-    WalletController(WalletService wallets, TopupService topups, WithdrawalSettings withdrawals) {
+    WalletController(WalletService wallets, TopupService topups, WithdrawalSettings withdrawals,
+                     FreeCharging free) {
         this.wallets = wallets;
         this.topups = topups;
         this.withdrawals = withdrawals;
+        this.free = free;
     }
 
     @GetMapping
     WalletResponse balance(CustomerPrincipal me) {
         return WalletResponse.from(wallets.balance(me.id()), withdrawals.enabled(),
-                wallets.payoutSource(me.id()), wallets.payoutSources(me.id()));
+                wallets.payoutSource(me.id()), wallets.payoutSources(me.id()), free.allowed(me.id()));
     }
 
     @GetMapping("/transactions")

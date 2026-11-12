@@ -1,5 +1,6 @@
 package com.evcharge.customer.admin.application;
 
+import com.evcharge.customer.account.ComplimentaryAccess;
 import com.evcharge.customer.account.CustomerDirectory;
 import com.evcharge.customer.account.CustomerModeration;
 import com.evcharge.customer.account.CustomerPage;
@@ -31,16 +32,18 @@ public class AdminCustomerService {
     private final WalletStatistics wallets;
     private final SessionStatistics sessions;
     private final CustomerModeration moderation;
+    private final ComplimentaryAccess complimentary;
     private final AdminAudit audit;
 
     public AdminCustomerService(AdminAccessService access, CustomerDirectory customers, WalletStatistics wallets,
                                 SessionStatistics sessions, CustomerModeration moderation,
-                                AdminAudit audit) {
+                                ComplimentaryAccess complimentary, AdminAudit audit) {
         this.access = access;
         this.customers = customers;
         this.wallets = wallets;
         this.sessions = sessions;
         this.moderation = moderation;
+        this.complimentary = complimentary;
         this.audit = audit;
     }
 
@@ -83,7 +86,8 @@ public class AdminCustomerService {
         return TenantContext.callAs(code, () -> {
             CustomerRecord record = customers.find(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                     "CUSTOMER_NOT_FOUND", "Customer not found"));
-            return new CustomerDetail(code, record, wallets.ofCustomer(id).orElse(null), sessions.ofCustomer(id));
+            return new CustomerDetail(code, record, wallets.ofCustomer(id).orElse(null), sessions.ofCustomer(id),
+                    complimentary.find(id).orElse(null));
         });
     }
 

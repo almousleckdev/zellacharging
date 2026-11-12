@@ -18,7 +18,7 @@ class JdbcHoldRepository implements HoldRepository {
 
     private static final RowMapper<FundingHold> MAPPER = (rs, rowNum) -> new FundingHold(
             rs.getObject("session_id", UUID.class), rs.getObject("customer_id", UUID.class),
-            rs.getLong("reserved_minor"), HoldState.valueOf(rs.getString("state")));
+            rs.getLong("reserved_minor"), HoldState.valueOf(rs.getString("state")), rs.getBoolean("waived"));
 
     private final JdbcClient jdbc;
 
@@ -28,10 +28,11 @@ class JdbcHoldRepository implements HoldRepository {
 
     @Override
     public void insert(FundingHold hold) {
-        jdbc.sql("insert into funding_hold (session_id, customer_id, reserved_minor, state, created_at) "
-                        + "values (:session, :customer, :reserved, :state, :now)")
+        jdbc.sql("insert into funding_hold (session_id, customer_id, reserved_minor, state, waived, created_at) "
+                        + "values (:session, :customer, :reserved, :state, :waived, :now)")
                 .param("session", hold.sessionId()).param("customer", hold.customerId())
                 .param("reserved", hold.reservedMinor()).param("state", hold.state().name())
+                .param("waived", hold.waived())
                 .param("now", Timestamps.toDb(Instant.now())).update();
     }
 

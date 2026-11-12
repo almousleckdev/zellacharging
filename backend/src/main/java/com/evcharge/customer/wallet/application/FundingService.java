@@ -1,16 +1,14 @@
 package com.evcharge.customer.wallet.application;
 
 import com.evcharge.customer.shared.ApiException;
+import com.evcharge.customer.shared.FreeCharging;
 import com.evcharge.customer.shared.Money;
 import com.evcharge.customer.wallet.StartLimits;
 import com.evcharge.customer.wallet.WalletFunding;
 import com.evcharge.customer.wallet.application.port.HoldRepository;
-import com.evcharge.customer.wallet.application.port.LedgerRepository;
 import com.evcharge.customer.wallet.application.port.WalletRepository;
 import com.evcharge.customer.wallet.domain.FundingHold;
 import com.evcharge.customer.wallet.domain.HoldState;
-import com.evcharge.customer.wallet.domain.LedgerEntry;
-import com.evcharge.customer.wallet.domain.LedgerType;
 import com.evcharge.customer.wallet.domain.WalletBalance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,7 +16,6 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.Clock;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -31,16 +28,16 @@ public class FundingService implements WalletFunding {
     private final WalletSettings settings;
     private final WalletRepository wallets;
     private final HoldRepository holds;
-    private final LedgerRepository ledger;
-    private final Clock clock;
+    private final HoldCloser closer;
+    private final FreeCharging free;
 
     public FundingService(WalletSettings settings, WalletRepository wallets, HoldRepository holds,
-                          LedgerRepository ledger, Clock clock) {
+                          HoldCloser closer, FreeCharging free) {
         this.settings = settings;
         this.wallets = wallets;
         this.holds = holds;
-        this.ledger = ledger;
-        this.clock = clock;
+        this.closer = closer;
+        this.free = free;
     }
 
     @Override
@@ -55,13 +52,16 @@ public class FundingService implements WalletFunding {
         if (amountMinor < settings.minimumStartMinor() || amountMinor > settings.maximumStartMinor()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_AMOUNT", "Amount is outside the allowed range");
         }
-        if (wallet.availableMinor() < amountMinor) {
+        boolean waived = free.allowed(customerId);
+        if (!waived && wallet.availableMinor() < amountMinor) {
             throw new ApiException(HttpStatus.PAYMENT_REQUIRED, "INSUFFICIENT_FUNDS",
                     "Top up your wallet to start charging");
         }
-        holds.insert(new FundingHold(sessionId, customerId, amountMinor, HoldState.OPEN));
-        wallets.apply(customerId, 0, amountMinor);
-        record(customerId, LedgerType.RESERVE, amountMinor, sessionId, "reserve:" + sessionId);
+        holds.insert(new FundingHold(sessionId, customerId, amountMinor, HoldState.OPEN, waived));
+        if (waived) {
+            return money(amountMinor);
+        }
+        closer.reserved(customerId, sessionId, amountMinor);
         return money(amountMinor);
     }
 
@@ -74,23 +74,23 @@ public class FundingService implements WalletFunding {
         }
         if (costMinor == null) {
             log.error("ALERT hold {} closed without a cost: nothing is charged, flagged for review", sessionId);
-            close(hold.get(), 0, HoldState.REVIEW);
+            closer.close(hold.get(), 0, HoldState.REVIEW);
             return;
         }
         boolean comparable = settings.currency().equals(currency);
-        long charge = comparable ? Math.min(costMinor, hold.get().reservedMinor()) : 0;
+        long charge = comparable && !hold.get().waived() ? Math.min(costMinor, hold.get().reservedMinor()) : 0;
         if (!comparable) {
             log.warn("Session {} priced in {} but wallet is {}: flagged for review", sessionId, currency,
                     settings.currency());
         }
-        close(hold.get(), charge, comparable ? (charge > 0 ? HoldState.SETTLED : HoldState.RELEASED)
+        closer.close(hold.get(), charge, comparable ? (charge > 0 ? HoldState.SETTLED : HoldState.RELEASED)
                 : HoldState.REVIEW);
     }
 
     @Override
     @Transactional
     public void release(UUID sessionId) {
-        holds.lock(sessionId).filter(FundingHold::isOpen).ifPresent(hold -> close(hold, 0, HoldState.RELEASED));
+        holds.lock(sessionId).filter(FundingHold::isOpen).ifPresent(hold -> closer.close(hold, 0, HoldState.RELEASED));
     }
 
     @Override
@@ -101,6 +101,9 @@ public class FundingService implements WalletFunding {
     @Override
     @Transactional
     public Money available(UUID customerId) {
+        if (free.allowed(customerId)) {
+            return money(settings.maximumStartMinor());
+        }
         wallets.ensure(customerId, settings.currency(), settings.decimals());
         return money(Math.max(0, wallets.read(customerId).availableMinor()));
     }
@@ -121,22 +124,9 @@ public class FundingService implements WalletFunding {
         return holds.captured(sessionId);
     }
 
-    private void close(FundingHold hold, long charge, HoldState state) {
-        wallets.lock(hold.customerId());
-        wallets.apply(hold.customerId(), -charge, -hold.reservedMinor());
-        if (charge > 0) {
-            record(hold.customerId(), LedgerType.CAPTURE, charge, hold.sessionId(), "capture:" + hold.sessionId());
-        }
-        long unused = hold.reservedMinor() - charge;
-        if (unused > 0) {
-            record(hold.customerId(), LedgerType.RELEASE, unused, hold.sessionId(), "release:" + hold.sessionId());
-        }
-        holds.close(hold.sessionId(), state, charge);
-    }
-
-    private void record(UUID customerId, LedgerType type, long amount, UUID sessionId, String key) {
-        ledger.append(new LedgerEntry(UUID.randomUUID(), customerId, type, amount, sessionId, null, key,
-                clock.instant()));
+    @Override
+    public boolean waived(UUID sessionId) {
+        return holds.find(sessionId).map(FundingHold::waived).orElse(false);
     }
 
     private Money money(long minor) {

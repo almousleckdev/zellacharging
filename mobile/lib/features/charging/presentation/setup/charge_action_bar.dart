@@ -18,7 +18,7 @@ class ChargeActionBar extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final low = plan.belowMinimum;
+    final low = plan.needsTopup;
     return ActionBar(
       label: low ? PayText.rechargeAccount : PayText.startCharging,
       hint: low || connectorChosen ? null : PayText.selectConnectorFirst,

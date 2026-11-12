@@ -7,6 +7,8 @@ class ChargeQuote {
     amountMinor: amountMinor,
     shortfallMinor: wallet == null
         ? amountMinor
+        : wallet.freeCharging
+        ? 0
         : (amountMinor - wallet.availableMinor).clamp(0, amountMinor),
   );
 

@@ -13,10 +13,9 @@ ChargePlan watchChargePlan(
   required int? connector,
 }) {
   final wallet = ref.watch(walletProvider).value;
-  final amount = min(
-    wallet?.availableMinor ?? 0,
-    ChargePlan.maximumChargeMinor,
-  );
+  final amount = wallet?.freeCharging ?? false
+      ? ChargePlan.maximumChargeMinor
+      : min(wallet?.availableMinor ?? 0, ChargePlan.maximumChargeMinor);
   final request = connector == null || amount < ChargePlan.minimumChargeMinor
       ? null
       : QuoteRequest(stationId, connector, amount);

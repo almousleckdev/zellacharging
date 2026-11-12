@@ -25,7 +25,40 @@ SessionQuote _quote(int amount, {int shortfall = 0, double vat = 0}) =>
       estimatedEnergyKwh: 12.5,
     );
 
+const _freeWallet = Wallet(
+  balanceMinor: 0,
+  reservedMinor: 0,
+  availableMinor: 0,
+  currency: 'XAF',
+  decimals: 0,
+  freeCharging: true,
+);
+
 void main() {
+  test('free charging never needs a payment or a top-up', () {
+    final plan = ChargePlan.of(
+      amountMinor: ChargePlan.maximumChargeMinor,
+      wallet: _freeWallet,
+    );
+    expect(plan.freeCharging, isTrue);
+    expect(plan.needsPayment, isFalse);
+    expect(plan.needsTopup, isFalse);
+  });
+
+  test('an empty wallet without free charging still needs a top-up', () {
+    final plan = ChargePlan.of(
+      amountMinor: 0,
+      wallet: const Wallet(
+        balanceMinor: 0,
+        reservedMinor: 0,
+        availableMinor: 0,
+        currency: 'XAF',
+        decimals: 0,
+      ),
+    );
+    expect(plan.needsTopup, isTrue);
+  });
+
   test('the local plan covers what the wallet can and asks for the rest', () {
     final plan = ChargePlan.of(amountMinor: 4000, wallet: _wallet);
     expect(plan.fromWalletMinor, 2500);

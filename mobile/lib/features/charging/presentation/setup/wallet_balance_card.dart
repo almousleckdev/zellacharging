@@ -16,7 +16,8 @@ class WalletBalanceCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
-    final low = plan.belowMinimum;
+    final free = plan.freeCharging;
+    final low = plan.needsTopup;
     final color = low ? AppColors.danger : AppColors.success;
     final minimum = MoneyFormat.format(
       plan.minimumMinor ?? ChargePlan.minimumChargeMinor,
@@ -35,18 +36,24 @@ class WalletBalanceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  MoneyFormat.format(
-                    plan.availableMinor,
-                    plan.currency,
-                    plan.decimals,
-                  ),
+                  free
+                      ? PayText.freeCharging
+                      : MoneyFormat.format(
+                          plan.availableMinor,
+                          plan.currency,
+                          plan.decimals,
+                        ),
                   style: theme.textTheme.titleLarge?.copyWith(
                     fontWeight: FontWeight.w700,
                   ),
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  low ? PayText.rechargeNeeded(minimum) : PayText.balanceUsed,
+                  free
+                      ? PayText.freeChargingNote
+                      : low
+                      ? PayText.rechargeNeeded(minimum)
+                      : PayText.balanceUsed,
                   style: theme.textTheme.bodySmall?.copyWith(
                     color: low ? AppColors.danger : AppColors.textSecondary,
                   ),

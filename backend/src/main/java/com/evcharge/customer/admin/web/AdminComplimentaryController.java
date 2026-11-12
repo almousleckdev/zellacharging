@@ -1,0 +1,47 @@
+package com.evcharge.customer.admin.web;
+
+import com.evcharge.customer.admin.application.AdminComplimentaryService;
+import com.evcharge.customer.admin.domain.AdminAccess;
+import jakarta.validation.Valid;
+import org.springframework.http.HttpStatus;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.List;
+import java.util.UUID;
+
+@RestController
+@RequestMapping("/v1/admin")
+class AdminComplimentaryController {
+
+    private final AdminComplimentaryService complimentary;
+
+    AdminComplimentaryController(AdminComplimentaryService complimentary) {
+        this.complimentary = complimentary;
+    }
+
+    @GetMapping("/complimentary")
+    List<ComplimentaryResponse> list(AdminAccess admin, @RequestParam(required = false) String country) {
+        return complimentary.list(admin, country).stream().map(ComplimentaryResponse::from).toList();
+    }
+
+    @PutMapping("/customers/{country}/{id}/complimentary")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void grant(AdminAccess admin, @PathVariable String country, @PathVariable UUID id,
+               @Valid @RequestBody ComplimentaryRequest request) {
+        complimentary.grant(admin, country, id, request.reason(), request.expiresAt());
+    }
+
+    @DeleteMapping("/customers/{country}/{id}/complimentary")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void revoke(AdminAccess admin, @PathVariable String country, @PathVariable UUID id) {
+        complimentary.revoke(admin, country, id);
+    }
+}

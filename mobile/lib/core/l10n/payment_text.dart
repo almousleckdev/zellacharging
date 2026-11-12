@@ -100,6 +100,14 @@ abstract final class PayText {
     en: 'Charging uses your available balance and stops automatically when it runs out.',
   );
 
+  static String get freeCharging =>
+      AppLanguage.pick(fr: 'Recharge gratuite', en: 'Free charging');
+
+  static String get freeChargingNote => AppLanguage.pick(
+    fr: 'Votre compte bénéficie de la recharge gratuite. Rien n’est débité de votre portefeuille.',
+    en: 'Your account has free charging. Nothing is taken from your wallet.',
+  );
+
   static String get rechargeNeededTitle =>
       AppLanguage.pick(fr: 'Solde insuffisant', en: 'Insufficient balance');
 

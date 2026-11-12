@@ -8,17 +8,17 @@ import java.util.Optional;
 
 record WalletResponse(long balanceMinor, long reservedMinor, long availableMinor, String currency, int decimals,
                       boolean withdrawalsEnabled, String payoutNumber, String payoutOperator,
-                      List<PayoutNumber> payoutNumbers) {
+                      List<PayoutNumber> payoutNumbers, boolean freeCharging) {
 
     record PayoutNumber(String msisdn, String operator) {
     }
 
     static WalletResponse from(WalletBalance wallet, boolean withdrawalsEnabled, Optional<Topup> payoutSource,
-                               List<Topup> payoutSources) {
+                               List<Topup> payoutSources, boolean freeCharging) {
         return new WalletResponse(wallet.balanceMinor(), wallet.reservedMinor(), wallet.availableMinor(),
                 wallet.currency(), wallet.decimals(), withdrawalsEnabled,
                 payoutSource.map(Topup::msisdn).orElse(null),
                 payoutSource.map(topup -> topup.operator().name()).orElse(null),
-                payoutSources.stream().map(t -> new PayoutNumber(t.msisdn(), t.operator().name())).toList());
+                payoutSources.stream().map(t -> new PayoutNumber(t.msisdn(), t.operator().name())).toList(), freeCharging);
     }
 }

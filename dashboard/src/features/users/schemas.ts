@@ -38,6 +38,7 @@ export const ASSIGNABLE_PERMISSIONS = [
   "PAYMENTS_READ",
   "WITHDRAWALS_REVIEW",
   "AUDIT_READ",
+  "COMPLIMENTARY_MANAGE",
 ] as const;
 
 export const ROLE_PRESETS: Record<AssignableRole, readonly string[]> = {

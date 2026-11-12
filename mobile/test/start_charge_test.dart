@@ -151,6 +151,18 @@ void main() {
     expect(ChargeQuote.of(1000, wallet).needsPayment, isFalse);
   });
 
+  test('free charging never asks for a payment', () {
+    const wallet = Wallet(
+      balanceMinor: 0,
+      reservedMinor: 0,
+      availableMinor: 0,
+      currency: 'XAF',
+      decimals: 0,
+      freeCharging: true,
+    );
+    expect(ChargeQuote.of(200000, wallet).needsPayment, isFalse);
+  });
+
   test('starts straight away when the wallet covers the amount', () async {
     final wallets = _FakeWallets(5000);
     final sessions = _FakeSessions();

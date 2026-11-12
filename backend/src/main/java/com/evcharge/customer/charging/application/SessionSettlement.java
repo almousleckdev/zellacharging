@@ -89,6 +89,10 @@ public class SessionSettlement {
     }
 
     private void recordCharge(ChargingSession session, FeeBreakdown breakdown) {
+        if (funding.waived(session.id())) {
+            charges.notCharged(session);
+            return;
+        }
         charges.settled(session, breakdown, funding.captured(session.id()).orElse(0L));
     }
 }

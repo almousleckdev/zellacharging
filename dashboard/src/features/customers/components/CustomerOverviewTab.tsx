@@ -5,6 +5,7 @@ import { useFormatters } from "@/shared/i18n/useFormatters";
 import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
 import type { CustomerDetail } from "../schemas";
+import { FreeAccessCard } from "./FreeAccessCard";
 import { IdentityCard } from "./IdentityCard";
 
 export function CustomerOverviewTab({ customer }: { customer: CustomerDetail }) {
@@ -25,6 +26,7 @@ export function CustomerOverviewTab({ customer }: { customer: CustomerDetail }) 
         <MetricCard label={labels.lastSession} value={sessions.lastSessionAt ? format.date(sessions.lastSessionAt) : labels.never} compact />
       </MetricBand>
       <IdentityCard customer={customer} />
+      <FreeAccessCard customer={customer} />
     </div>
   );
 }

@@ -44,11 +44,18 @@ const sessionsSchema = z.object({
   lastSessionAt: z.string().nullable(),
 });
 
+const freeAccessSchema = z.object({
+  reason: z.string(),
+  grantedAt: z.string(),
+  expiresAt: z.string().nullable(),
+});
+
 export const customerDetailSchema = customerItemSchema.extend({
   emailVerified: z.boolean(),
   phoneVerified: z.boolean(),
   wallet: walletSchema.nullable(),
   sessions: sessionsSchema,
+  freeAccess: freeAccessSchema.nullable().optional(),
 });
 
 export type CustomerItem = z.infer<typeof customerItemSchema>;

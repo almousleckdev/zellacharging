@@ -58,7 +58,7 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   String _newAttempt() => DateTime.now().microsecondsSinceEpoch.toString();
 
   Future<void> _start(ChargePlan plan) async {
-    if (plan.belowMinimum) {
+    if (plan.needsTopup) {
       context.push(Routes.topup);
       return;
     }

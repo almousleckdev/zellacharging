@@ -13,6 +13,7 @@ class ChargePlan {
     this.vatPercent = 0,
     this.serviceFeePercent = 0,
     this.energyKwh,
+    this.freeCharging = false,
   });
 
   static const minimumTopupMinor = 200;
@@ -24,6 +25,7 @@ class ChargePlan {
     Wallet? wallet,
     SessionQuote? server,
   }) {
+    final free = wallet?.freeCharging ?? false;
     if (server != null && server.amountMinor == amountMinor) {
       return ChargePlan(
         amountMinor: amountMinor,
@@ -36,6 +38,7 @@ class ChargePlan {
         vatPercent: server.vatPercent,
         serviceFeePercent: server.serviceFeePercent,
         energyKwh: server.estimatedEnergyKwh,
+        freeCharging: free,
       );
     }
     final available = wallet?.availableMinor ?? 0;
@@ -43,10 +46,13 @@ class ChargePlan {
       amountMinor: amountMinor,
       shortfallMinor: wallet == null
           ? amountMinor
+          : free
+          ? 0
           : (amountMinor - available).clamp(0, amountMinor),
       availableMinor: available,
       currency: wallet?.currency ?? '',
       decimals: wallet?.decimals ?? 0,
+      freeCharging: free,
     );
   }
 
@@ -60,8 +66,11 @@ class ChargePlan {
   final double vatPercent;
   final double serviceFeePercent;
   final double? energyKwh;
+  final bool freeCharging;
 
   bool get needsPayment => shortfallMinor > 0;
+
+  bool get needsTopup => belowMinimum && !freeCharging;
 
   bool get belowMinimum => amountMinor < (minimumMinor ?? minimumChargeMinor);
 

@@ -9,6 +9,7 @@ class Wallet {
     required this.currency,
     required this.decimals,
     this.withdrawalsEnabled = false,
+    this.freeCharging = false,
     this.payoutNumber,
     this.payoutOperator,
     this.payoutNumbers = const [],
@@ -20,6 +21,7 @@ class Wallet {
   final String currency;
   final int decimals;
   final bool withdrawalsEnabled;
+  final bool freeCharging;
   final String? payoutNumber;
   final MobileOperator? payoutOperator;
   final List<PayoutNumber> payoutNumbers;

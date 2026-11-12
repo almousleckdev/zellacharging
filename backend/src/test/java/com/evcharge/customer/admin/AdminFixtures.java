@@ -6,6 +6,7 @@ import com.evcharge.customer.admin.application.port.AdminTokenIssuer;
 import com.evcharge.customer.admin.domain.AdminRole;
 import com.evcharge.customer.admin.domain.AdminStatus;
 import com.evcharge.customer.admin.domain.AdminUser;
+import com.evcharge.customer.admin.domain.Permission;
 
 import java.time.Instant;
 import java.util.Set;
@@ -30,6 +31,14 @@ public class AdminFixtures {
 
     public Created create(AdminRole role, Set<String> countries) {
         return store(role, countries, true);
+    }
+
+    public Created createWith(AdminRole role, Set<String> countries, Set<Permission> permissions) {
+        UUID id = UUID.randomUUID();
+        AdminUser user = AdminUser.create(id, id + "@zella.test", passwords.hash(PASSWORD), role, AdminStatus.ACTIVE,
+                permissions, countries);
+        admins.create(user.withName("Test", "Admin"), Instant.now());
+        return new Created(id, id + "@zella.test", tokens.issueAccess(admins.findById(id).orElseThrow()));
     }
 
     public Created createWithoutProfile(AdminRole role, Set<String> countries) {

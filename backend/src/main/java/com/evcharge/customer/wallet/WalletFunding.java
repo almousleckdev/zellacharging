@@ -20,6 +20,8 @@ public interface WalletFunding {
 
     Optional<Long> captured(UUID sessionId);
 
+    boolean waived(UUID sessionId);
+
     Money available(UUID customerId);
 
     StartLimits startLimits();

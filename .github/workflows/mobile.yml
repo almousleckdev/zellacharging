@@ -82,9 +82,8 @@ jobs:
           path: |
             mobile/ios/Pods
             ~/Library/Caches/CocoaPods
-            ~/Library/Developer/Xcode/DerivedData
-          key: pods-${{ runner.os }}-${{ hashFiles('mobile/pubspec.lock') }}
-          restore-keys: pods-${{ runner.os }}-
+          key: pods-${{ runner.os }}-flutter-3.44.8-${{ hashFiles('mobile/pubspec.lock') }}
+          restore-keys: pods-${{ runner.os }}-flutter-3.44.8-
       - run: flutter pub get
       - name: Release build without signing
         run: flutter build ios --release --no-codesign

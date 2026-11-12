@@ -56,19 +56,19 @@ export function Modal({ open, title, description, busy = false, size = "sm", onC
         }
       }}
       className={cn(
-        "m-auto max-h-[calc(100vh-2rem)] w-[calc(100%-2rem)] overflow-hidden rounded-xl",
+        "m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-y-auto overflow-x-hidden rounded-xl",
         "bg-background p-0 text-foreground shadow-xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
         size === "lg" ? "max-w-2xl" : "max-w-md",
         open && "flex flex-col",
       )}
     >
       <header className="flex items-start justify-between gap-4 px-6 pb-1 pt-6">
-        <div className="flex flex-col gap-1.5">
+        <div className="flex min-w-0 flex-col gap-1.5">
           <h2 id={titleId} className="text-lg font-semibold tracking-tight">
             {title}
           </h2>
           {description && (
-            <p id={descriptionId} className="text-sm text-muted">
+            <p id={descriptionId} className="break-words text-sm text-muted">
               {description}
             </p>
           )}

@@ -99,6 +99,22 @@ class LookupIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void aProvenSocialEmailIsFullEvenWhenAnotherAccountMatchesThePhone() throws Exception {
+        String email = email();
+        String phone = phone();
+        UUID social = fixtures.customer("GA", "Ada", "Lovelace", email, null, "ACTIVE");
+        fixtures.signedInWithGoogle("GA", social);
+        UUID byPhone = fixtures.customer("GA", "Ada", "L", email(), phone, "ACTIVE");
+
+        lookup(driver("d1", email, phone)).andExpect(status().isOk())
+                .andExpect(jsonPath("$.results[0].matches", hasSize(2)))
+                .andExpect(jsonPath("$.results[0].matches[0].customerId").value(social.toString()))
+                .andExpect(jsonPath("$.results[0].matches[0].quality").value("FULL"))
+                .andExpect(jsonPath("$.results[0].matches[1].customerId").value(byPhone.toString()))
+                .andExpect(jsonPath("$.results[0].matches[1].quality").value("PARTIAL"));
+    }
+
+    @Test
     void emailOnlyIsPartialWithoutNames() throws Exception {
         String email = email();
         UUID id = fixtures.customer("GA", "Ada", "Lovelace", email, phone(), "ACTIVE");

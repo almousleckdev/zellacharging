@@ -9,6 +9,7 @@ import com.evcharge.customer.account.application.port.SocialTokenVerifier;
 import com.evcharge.customer.account.domain.Avatar;
 import com.evcharge.customer.account.domain.SocialProfile;
 import com.evcharge.customer.account.domain.SocialProvider;
+import com.evcharge.customer.shared.TenantContext;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -86,6 +87,28 @@ class SocialLoginIntegrationTest extends PostgresTestBase {
                 Boolean.class, id)).isTrue();
         assertThat(jdbc.queryForObject("select password_login from customer where id = ?", Boolean.class, id))
                 .isFalse();
+    }
+
+    @Test
+    void googleSignInAttachesToTheAccountWaitingForThatEmailInsteadOfCreatingASecondOne() throws Exception {
+        String email = email();
+        UUID existing = UUID.randomUUID();
+        String phone = "+2417" + (1000000 + new java.util.Random().nextInt(8999999));
+        TenantContext.runAs("GA", () -> {
+            jdbc.update("insert into customer (id, first_name, last_name, email, phone_e164, password_hash, status, "
+                    + "created_at) values (?, 'Aline', 'Obame', null, ?, 'x', 'ACTIVE', now())", existing, phone);
+            jdbc.update("insert into pending_email (customer_id, email, created_at) values (?, ?, now())",
+                    existing, email);
+        });
+        token("g9", SocialProvider.GOOGLE, "sub-" + email, email, true);
+
+        signIn(SocialProvider.GOOGLE, "g9").andExpect(status().isOk());
+
+        assertThat(customerOf(email)).isEqualTo(existing);
+        assertThat(jdbc.queryForObject("select count(*) from customer where email = ?", Integer.class, email))
+                .isEqualTo(1);
+        assertThat(jdbc.queryForObject("select count(*) from pending_email where customer_id = ?", Integer.class,
+                existing)).isZero();
     }
 
     @Test

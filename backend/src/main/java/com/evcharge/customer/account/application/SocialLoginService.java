@@ -3,6 +3,7 @@ package com.evcharge.customer.account.application;
 import com.evcharge.customer.account.application.port.CustomerIdentityRepository;
 import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.PasswordHasher;
+import com.evcharge.customer.account.application.port.PendingEmailRepository;
 import com.evcharge.customer.account.application.port.SocialTokenVerifier;
 import com.evcharge.customer.account.domain.Channel;
 import com.evcharge.customer.account.domain.Customer;
@@ -27,6 +28,7 @@ public class SocialLoginService {
     private final CustomerRepository customers;
     private final PasswordHasher passwords;
     private final ContactNormalizer contacts;
+    private final PendingEmailRepository pendingEmails;
     private final SessionIssuer sessions;
     private final SocialAvatarImporter avatars;
     private final AuditTrail audit;
@@ -34,13 +36,14 @@ public class SocialLoginService {
 
     public SocialLoginService(SocialTokenVerifier verifier, CustomerIdentityRepository identities,
                               CustomerRepository customers, PasswordHasher passwords, ContactNormalizer contacts,
-                              SessionIssuer sessions, SocialAvatarImporter avatars, AuditTrail audit,
+                              PendingEmailRepository pendingEmails, SessionIssuer sessions, SocialAvatarImporter avatars, AuditTrail audit,
                               Clock clock) {
         this.verifier = verifier;
         this.identities = identities;
         this.customers = customers;
         this.passwords = passwords;
         this.contacts = contacts;
+        this.pendingEmails = pendingEmails;
         this.sessions = sessions;
         this.avatars = avatars;
         this.audit = audit;
@@ -71,9 +74,18 @@ public class SocialLoginService {
         }
         String email = contacts.email(profile.email());
         UUID customerId = customers.findByContact(Channel.EMAIL, email).map(this::adopt)
+                .or(() -> awaitingThisEmail(email))
                 .orElseGet(() -> create(profile, email, firstName, lastName));
         identities.link(customerId, profile.provider(), profile.subject(), clock.instant());
         return customerId;
+    }
+
+    private java.util.Optional<UUID> awaitingThisEmail(String email) {
+        return pendingEmails.ownerOf(email).flatMap(customers::findById).map(owner -> {
+            customers.attachEmail(owner.id(), email, clock.instant());
+            pendingEmails.delete(owner.id());
+            return adopt(owner);
+        });
     }
 
     private UUID adopt(Customer existing) {

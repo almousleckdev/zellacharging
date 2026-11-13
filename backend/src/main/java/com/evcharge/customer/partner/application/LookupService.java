@@ -50,12 +50,10 @@ public class LookupService {
                     MatchQuality.FULL, email.firstName(), email.lastName()));
             return matches;
         }
-        if (email != null && phone == null && email.emailProvenByProvider()) {
+        if (email != null && email.emailProvenByProvider()) {
             matches.add(new LookupMatch(email.id(), tags.get(email.id()), List.of("email"), MatchQuality.FULL,
                     email.firstName(), email.lastName()));
-            return matches;
-        }
-        if (email != null) {
+        } else if (email != null) {
             matches.add(partial(email, "email", tags));
         }
         if (phone != null) {

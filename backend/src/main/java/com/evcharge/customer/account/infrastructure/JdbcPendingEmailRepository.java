@@ -32,6 +32,12 @@ class JdbcPendingEmailRepository implements PendingEmailRepository {
     }
 
     @Override
+    public Optional<UUID> ownerOf(String email) {
+        return jdbc.sql("select customer_id from pending_email where email = :email order by created_at limit 1")
+                .param("email", email).query(UUID.class).optional();
+    }
+
+    @Override
     public void delete(UUID customerId) {
         jdbc.sql("delete from pending_email where customer_id = :id").param("id", customerId).update();
     }

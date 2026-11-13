@@ -10,5 +10,7 @@ public interface PendingEmailRepository {
 
     Optional<String> find(UUID customerId);
 
+    Optional<UUID> ownerOf(String email);
+
     void delete(UUID customerId);
 }

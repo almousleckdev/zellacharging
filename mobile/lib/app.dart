@@ -1,3 +1,4 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -22,7 +23,10 @@ class ZellaApp extends ConsumerWidget {
       theme: AppTheme.light(),
       locale: language.locale,
       supportedLocales: [for (final item in AppLanguage.values) item.locale],
-      localizationsDelegates: GlobalMaterialLocalizations.delegates,
+      localizationsDelegates: [
+        ...GlobalMaterialLocalizations.delegates,
+        CountryLocalizations.delegate,
+      ],
       builder: (_, child) => BottomSystemInset(child: child!),
       routerConfig: ref.watch(routerProvider),
     );

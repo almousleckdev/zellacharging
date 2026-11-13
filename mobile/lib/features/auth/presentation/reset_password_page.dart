@@ -42,7 +42,7 @@ class _ResetPasswordPageState extends ConsumerState<ResetPasswordPage>
       await ref
           .read(authRepositoryProvider)
           .resetPassword(
-            email: widget.args.email,
+            identifier: widget.args.identifier,
             code: widget.args.code,
             newPassword: _password.text,
           );

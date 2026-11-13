@@ -26,7 +26,11 @@ import 'package:zella/features/charging/domain/session_quote.dart';
 import 'package:zella/features/charging/domain/session_repository.dart';
 import 'package:zella/features/charging/domain/session_state.dart';
 import 'package:zella/features/profile/domain/profile.dart';
-import 'package:zella/features/profile/domain/otp_delivery.dart';
+import 'package:zella/features/auth/domain/auth_repository.dart';
+import 'package:zella/features/auth/domain/contact_channel.dart';
+import 'package:zella/features/auth/domain/registration_data.dart';
+import 'package:zella/features/auth/domain/verification_target.dart';
+import 'package:zella/shared/otp_delivery.dart';
 import 'package:zella/features/profile/domain/profile_repository.dart';
 import 'package:zella/features/stations/domain/resolved_connector.dart';
 import 'package:zella/features/stations/domain/station.dart';
@@ -432,4 +436,48 @@ class FakeSocialAuthenticator implements SocialAuthenticator {
     if (cancel) return null;
     return SocialCredential(provider: provider, idToken: 'token');
   }
+}
+
+class FakeAuth implements AuthRepository {
+  final registered = <RegistrationData>[];
+  final resets = <String>[];
+
+  @override
+  Future<VerificationTarget> register(RegistrationData data) async {
+    registered.add(data);
+    return data.email != null
+        ? VerificationTarget(channel: ContactChannel.email, value: data.email!)
+        : VerificationTarget(channel: ContactChannel.phone, value: data.phone!);
+  }
+
+  @override
+  Future<void> forgotPassword(
+    String identifier, {
+    OtpDelivery? delivery,
+  }) async => resets.add('$identifier:${delivery?.wire}');
+
+  @override
+  Future<void> verify(VerificationTarget target, String code) async {}
+
+  @override
+  Future<void> resendCode(
+    VerificationTarget target, {
+    OtpDelivery? delivery,
+  }) async {}
+
+  @override
+  Future<void> resetPassword({
+    required String identifier,
+    required String code,
+    required String newPassword,
+  }) async {}
+
+  @override
+  Future<void> login({
+    required String identifier,
+    required String password,
+  }) async {}
+
+  @override
+  Future<void> socialLogin(SocialCredential credential) async {}
 }

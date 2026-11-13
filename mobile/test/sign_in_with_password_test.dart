@@ -1,6 +1,8 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zella/shared/otp_delivery.dart';
 import 'package:zella/core/network/api_error.dart';
 import 'package:zella/features/auth/domain/auth_repository.dart';
+import 'package:zella/features/auth/domain/contact_channel.dart';
 import 'package:zella/features/auth/domain/registration_data.dart';
 import 'package:zella/features/auth/domain/sign_in_with_password.dart';
 import 'package:zella/features/auth/domain/social_credential.dart';
@@ -19,11 +21,14 @@ class _Auth implements AuthRepository {
   }
 
   @override
-  Future<void> resendCode(VerificationTarget target) async =>
-      resent.add(target.value);
+  Future<void> resendCode(
+    VerificationTarget target, {
+    OtpDelivery? delivery,
+  }) async => resent.add(target.value);
 
   @override
-  Future<void> forgotPassword(String email) => throw UnimplementedError();
+  Future<void> forgotPassword(String identifier, {OtpDelivery? delivery}) =>
+      throw UnimplementedError();
 
   @override
   Future<VerificationTarget> register(RegistrationData data) =>
@@ -31,7 +36,7 @@ class _Auth implements AuthRepository {
 
   @override
   Future<void> resetPassword({
-    required String email,
+    required String identifier,
     required String code,
     required String newPassword,
   }) => throw UnimplementedError();
@@ -60,27 +65,26 @@ void main() {
     expect(auth.resent, isEmpty);
   });
 
-  test('an unverified account gets a new code and the target back', () async {
-    final auth = _Auth(_error('ACCOUNT_NOT_VERIFIED'));
+  test(
+    'an unverified account is handed back as the target to verify',
+    () async {
+      final auth = _Auth(_error('ACCOUNT_NOT_VERIFIED'));
 
-    final pending = await SignInWithPassword(auth)(
-      identifier: 'a@b.com',
-      password: 'secret',
-    );
+      final email = await SignInWithPassword(auth)(
+        identifier: 'a@b.com',
+        password: 'secret',
+      );
+      final phone = await SignInWithPassword(auth)(
+        identifier: '+24162820745',
+        password: 'secret',
+      );
 
-    expect(pending?.value, 'a@b.com');
-    expect(auth.resent, ['a@b.com']);
-  });
-
-  test('an unverified phone identifier keeps the original error', () async {
-    final auth = _Auth(_error('ACCOUNT_NOT_VERIFIED'));
-
-    expect(
-      SignInWithPassword(auth)(identifier: '+24162820745', password: 'x'),
-      throwsA(isA<ApiError>()),
-    );
-    expect(auth.resent, isEmpty);
-  });
+      expect(email?.channel, ContactChannel.email);
+      expect(email?.value, 'a@b.com');
+      expect(phone?.channel, ContactChannel.phone);
+      expect(auth.resent, isEmpty);
+    },
+  );
 
   test('any other error is passed through without a resend', () async {
     final auth = _Auth(_error('INVALID_CREDENTIALS'));

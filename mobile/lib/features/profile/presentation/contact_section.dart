@@ -11,7 +11,7 @@ import '../../../shared/widgets/info_card.dart';
 import '../../../shared/submit_mixin.dart';
 import '../domain/contact_confirmation.dart';
 import '../domain/profile.dart';
-import 'otp_channel_sheet.dart';
+import '../../../shared/widgets/otp_channel_sheet.dart';
 import 'profile_providers.dart';
 
 class ContactSection extends ConsumerStatefulWidget {
@@ -52,6 +52,7 @@ class _ContactSectionState extends ConsumerState<ContactSection>
           verified: profile.emailVerified,
           addLabel: ProfileText.addEmail,
           onAdd: () => context.push(Routes.addEmail),
+          onChange: () => context.push(Routes.addEmail, extra: true),
         ),
         const Divider(height: AppSpacing.lg),
         _ContactRow(
@@ -61,6 +62,7 @@ class _ContactSectionState extends ConsumerState<ContactSection>
           verified: profile.phoneVerified,
           addLabel: ProfileText.addPhone,
           onAdd: () => context.push(Routes.addPhone),
+          onChange: () => context.push(Routes.addPhone, extra: true),
           onVerify: _verifyPhone,
           verifying: loading,
         ),
@@ -77,6 +79,7 @@ class _ContactRow extends StatelessWidget {
     required this.verified,
     required this.addLabel,
     required this.onAdd,
+    required this.onChange,
     this.onVerify,
     this.verifying = false,
   });
@@ -87,6 +90,7 @@ class _ContactRow extends StatelessWidget {
   final bool verified;
   final String addLabel;
   final VoidCallback onAdd;
+  final VoidCallback onChange;
   final VoidCallback? onVerify;
   final bool verifying;
 
@@ -145,6 +149,12 @@ class _ContactRow extends StatelessWidget {
               fontWeight: FontWeight.w700,
             ),
           ),
+        IconButton(
+          tooltip: ProfileText.editContact,
+          icon: const Icon(AppIcons.edit, size: 20),
+          color: AppColors.textSecondary,
+          onPressed: onChange,
+        ),
       ],
     );
   }

@@ -13,14 +13,15 @@ import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../domain/contact_confirmation.dart';
 import '../domain/contact_kind.dart';
-import '../domain/otp_delivery.dart';
-import 'otp_channel_sheet.dart';
+import '../../../shared/otp_delivery.dart';
+import '../../../shared/widgets/otp_channel_sheet.dart';
 import 'profile_providers.dart';
 
 class AddContactPage extends ConsumerStatefulWidget {
-  const AddContactPage({super.key, required this.kind});
+  const AddContactPage({super.key, required this.kind, this.changing = false});
 
   final ContactKind kind;
+  final bool changing;
 
   @override
   ConsumerState<AddContactPage> createState() => _AddContactPageState();
@@ -32,6 +33,20 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
   final _value = TextEditingController();
 
   bool get _isEmail => widget.kind == ContactKind.email;
+
+  String get _title => switch ((_isEmail, widget.changing)) {
+    (true, true) => ProfileText.changeEmail,
+    (true, false) => ProfileText.addEmail,
+    (false, true) => ProfileText.changePhone,
+    (false, false) => ProfileText.addPhone,
+  };
+
+  String get _hint => switch ((_isEmail, widget.changing)) {
+    (true, true) => ProfileText.changeEmailHint,
+    (true, false) => ProfileText.addEmailHint,
+    (false, true) => ProfileText.changePhoneHint,
+    (false, false) => ProfileText.addPhoneHint,
+  };
 
   @override
   void dispose() {
@@ -56,7 +71,11 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
       if (!mounted) return;
       context.pushReplacement(
         _isEmail ? Routes.confirmEmail : Routes.confirmPhone,
-        extra: ContactConfirmation(target: value, delivery: delivery),
+        extra: ContactConfirmation(
+          target: value,
+          delivery: delivery,
+          changing: widget.changing,
+        ),
       );
     });
   }
@@ -65,15 +84,13 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceMuted,
-      appBar: AppBar(
-        title: Text(_isEmail ? ProfileText.addEmail : ProfileText.addPhone),
-      ),
+      appBar: AppBar(title: Text(_title)),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
             Text(
-              _isEmail ? ProfileText.addEmailHint : ProfileText.addPhoneHint,
+              _hint,
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),

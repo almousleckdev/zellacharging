@@ -14,8 +14,12 @@ import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/app_toast.dart';
+import '../../../shared/otp_delivery.dart';
 import '../../../shared/submit_mixin.dart';
+import '../../../shared/widgets/otp_channel_sheet.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../domain/contact_channel.dart';
+import '../domain/verification_target.dart';
 import 'auth_providers.dart';
 import 'auth_switch_link.dart';
 import 'login_options_row.dart';
@@ -71,9 +75,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
           .read(signInWithPasswordProvider)
           .call(identifier: identifier, password: _password.text);
       if (unverified != null) {
-        if (!mounted) return;
-        AppToast.info(context, VerificationText.resumed);
-        context.go(Routes.otp, extra: OtpArgs.registration(unverified.value));
+        await _resumeVerification(unverified);
         return;
       }
       await ref
@@ -81,6 +83,22 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
           .save(stayKey, _remember ? '1' : '0');
       if (mounted) context.go(Routes.welcomeBack);
     });
+  }
+
+  Future<void> _resumeVerification(VerificationTarget target) async {
+    final OtpDelivery? delivery = target.channel == ContactChannel.phone
+        ? await showOtpChannelSheet(context)
+        : null;
+    if (target.channel == ContactChannel.phone && delivery == null) return;
+    await ref
+        .read(authRepositoryProvider)
+        .resendCode(target, delivery: delivery);
+    if (!mounted) return;
+    AppToast.info(context, VerificationText.resumed);
+    context.go(
+      Routes.otp,
+      extra: OtpArgs.registration(target, delivery: delivery),
+    );
   }
 
   @override
@@ -95,7 +113,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
             children: [
               AuthField(
                 controller: _identifier,
-                hint: AuthText.identifierLabel,
+                hint: AuthText.signInIdentifierLabel,
                 icon: AppIcons.envelope,
                 validator: Validators.required,
                 keyboardType: TextInputType.emailAddress,

@@ -1,3 +1,4 @@
+import 'package:country_picker/country_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -35,7 +36,10 @@ Future<void> pumpApp(
             theme: AppTheme.light().copyWith(platform: platform),
             locale: language.locale,
             supportedLocales: [for (final l in AppLanguage.values) l.locale],
-            localizationsDelegates: GlobalMaterialLocalizations.delegates,
+            localizationsDelegates: [
+              ...GlobalMaterialLocalizations.delegates,
+              CountryLocalizations.delegate,
+            ],
             home: home,
           );
         },

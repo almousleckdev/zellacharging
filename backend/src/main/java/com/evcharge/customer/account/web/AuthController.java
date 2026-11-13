@@ -42,8 +42,9 @@ class AuthController {
     @ResponseStatus(HttpStatus.CREATED)
     RegisterResponse register(@Valid @RequestBody RegisterRequest request) {
         return TenantContext.callAs(countries.forRegistration(request.email(), request.phone()),
-                () -> new RegisterResponse(registration.register(new RegisterCommand(request.firstName(),
-                        request.lastName(), request.email(), request.phone(), request.password()))));
+                () -> RegisterResponse.from(registration.register(new RegisterCommand(request.firstName(),
+                        request.lastName(), request.email(), request.phone(), request.password(),
+                        request.delivery()))));
     }
 
     @PostMapping("/verify")
@@ -57,7 +58,7 @@ class AuthController {
     @ResponseStatus(HttpStatus.ACCEPTED)
     void resend(@Valid @RequestBody ResendRequest request) {
         TenantContext.runAs(countries.forTarget(request.channel(), request.target()),
-                () -> verification.resend(request.channel(), request.target()));
+                () -> verification.resend(request.channel(), request.target(), request.delivery()));
     }
 
     @PostMapping("/login")

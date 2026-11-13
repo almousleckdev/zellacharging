@@ -4,16 +4,16 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/app_toast.dart';
+import '../../../shared/otp_delivery.dart';
 import '../../../shared/submit_mixin.dart';
-import '../../../shared/widgets/app_text_field.dart';
+import '../../../shared/widgets/otp_boxes.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../../../shared/widgets/resend_countdown.dart';
 import '../domain/contact_confirmation.dart';
 import '../domain/contact_kind.dart';
-import '../domain/otp_delivery.dart';
 import 'profile_providers.dart';
 
 class ConfirmContactPage extends ConsumerStatefulWidget {
@@ -32,10 +32,10 @@ class ConfirmContactPage extends ConsumerStatefulWidget {
 
 class _ConfirmContactPageState extends ConsumerState<ConfirmContactPage>
     with SubmitMixin {
-  final _formKey = GlobalKey<FormState>();
   final _code = TextEditingController();
 
   bool get _isEmail => widget.kind == ContactKind.email;
+  ContactConfirmation get _confirmation => widget.confirmation;
 
   @override
   void dispose() {
@@ -43,9 +43,20 @@ class _ConfirmContactPageState extends ConsumerState<ConfirmContactPage>
     super.dispose();
   }
 
-  void _confirm() {
-    if (!_formKey.currentState!.validate()) return;
-    submit(() async {
+  String get _doneMessage => switch ((_isEmail, _confirmation.changing)) {
+    (true, true) => ProfileText.emailChanged,
+    (true, false) => ProfileText.emailAdded,
+    (false, true) => ProfileText.phoneChanged,
+    (false, false) => ProfileText.phoneAdded,
+  };
+
+  Future<void> _confirm() async {
+    final invalid = Validators.otp(_code.text);
+    if (invalid != null) {
+      showError(invalid);
+      return;
+    }
+    await submit(() async {
       final repository = ref.read(profileRepositoryProvider);
       final code = _code.text.trim();
       await (_isEmail
@@ -53,22 +64,19 @@ class _ConfirmContactPageState extends ConsumerState<ConfirmContactPage>
           : repository.confirmPhone(code));
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      AppToast.success(
-        context,
-        _isEmail ? ProfileText.emailAdded : ProfileText.phoneAdded,
-      );
+      AppToast.success(context, _doneMessage);
       context.pop();
     });
   }
 
-  void _resend() {
-    submit(() async {
+  Future<void> _resend() async {
+    await submit(() async {
       final repository = ref.read(profileRepositoryProvider);
       await (_isEmail
-          ? repository.addEmail(widget.confirmation.target)
+          ? repository.addEmail(_confirmation.target)
           : repository.addPhone(
-              widget.confirmation.target,
-              widget.confirmation.delivery ?? OtpDelivery.whatsapp,
+              _confirmation.target,
+              _confirmation.delivery ?? OtpDelivery.whatsapp,
             ));
       if (mounted) AppToast.success(context, AuthText.codeResent);
     });
@@ -76,6 +84,7 @@ class _ConfirmContactPageState extends ConsumerState<ConfirmContactPage>
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: AppColors.surfaceMuted,
       appBar: AppBar(
@@ -91,41 +100,24 @@ class _ConfirmContactPageState extends ConsumerState<ConfirmContactPage>
           children: [
             Text(
               _isEmail
-                  ? ProfileText.confirmEmailBody(widget.confirmation.target)
+                  ? ProfileText.confirmEmailBody(_confirmation.target)
                   : ProfileText.confirmPhoneBody(
-                      widget.confirmation.target,
-                      bySms: widget.confirmation.delivery == OtpDelivery.sms,
+                      _confirmation.target,
+                      bySms: _confirmation.delivery == OtpDelivery.sms,
                     ),
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Form(
-              key: _formKey,
-              child: AppTextField(
-                controller: _code,
-                label: AuthText.codeLabel,
-                icon: AppIcons.key,
-                validator: Validators.otp,
-                keyboardType: TextInputType.number,
-                textInputAction: TextInputAction.done,
-                maxLength: 6,
-                autofillHints: const [AutofillHints.oneTimeCode],
+              style: theme.textTheme.bodyMedium?.copyWith(
+                color: AppColors.textSecondary,
               ),
             ),
+            const SizedBox(height: AppSpacing.lg),
+            OtpBoxes(controller: _code),
+            const SizedBox(height: AppSpacing.md),
+            ResendCountdown(onResend: _resend),
             const SizedBox(height: AppSpacing.xl),
             PrimaryButton(
               label: AuthText.verify,
               loading: loading,
               onPressed: _confirm,
-            ),
-            const SizedBox(height: AppSpacing.sm),
-            Center(
-              child: TextButton(
-                onPressed: loading ? null : _resend,
-                child: Text(AuthText.resendCode),
-              ),
             ),
           ],
         ),

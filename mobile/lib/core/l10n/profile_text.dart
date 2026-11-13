@@ -165,6 +165,30 @@ abstract final class ProfileText {
     en: 'Add a phone number',
   );
 
+  static String get changeEmail =>
+      AppLanguage.pick(fr: 'Changer l’e-mail', en: 'Change email');
+
+  static String get changePhone =>
+      AppLanguage.pick(fr: 'Changer le numéro', en: 'Change phone number');
+
+  static String get changeEmailHint => AppLanguage.pick(
+    fr: 'Saisissez la nouvelle adresse. Elle remplacera l’actuelle une fois le code confirmé.',
+    en: 'Enter the new address. It replaces the current one once the code is confirmed.',
+  );
+
+  static String get changePhoneHint => AppLanguage.pick(
+    fr: 'Saisissez le nouveau numéro. Il remplacera l’actuel une fois le code confirmé.',
+    en: 'Enter the new number. It replaces the current one once the code is confirmed.',
+  );
+
+  static String get emailChanged =>
+      AppLanguage.pick(fr: 'E-mail modifié', en: 'Email changed');
+
+  static String get phoneChanged =>
+      AppLanguage.pick(fr: 'Numéro modifié', en: 'Phone number changed');
+
+  static String get editContact => AppLanguage.pick(fr: 'Modifier', en: 'Edit');
+
   static String get addEmailHint => AppLanguage.pick(
     fr: 'Nous enverrons un code de confirmation à cette adresse.',
     en: 'We will send a confirmation code to this address.',

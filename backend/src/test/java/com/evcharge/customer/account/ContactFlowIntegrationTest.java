@@ -98,7 +98,7 @@ class ContactFlowIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void anEmailAlreadyUsedOrAlreadySetIsRefused() throws Exception {
+    void anEmailAlreadyUsedIsRefusedWhetherAddingOrChanging() throws Exception {
         String taken = "taken-" + UUID.randomUUID() + "@example.com";
         customer(taken, null);
         UUID phoneOnly = customer(null, freshPhone());
@@ -106,8 +106,8 @@ class ContactFlowIntegrationTest extends PostgresTestBase {
 
         submit(phoneOnly, "/v1/me/email", "{\"email\":\"" + taken + "\"}").andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("CONTACT_ALREADY_USED"));
-        submit(withEmail, "/v1/me/email", "{\"email\":\"other@example.com\"}").andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("EMAIL_ALREADY_SET"));
+        submit(withEmail, "/v1/me/email", "{\"email\":\"own-again@example.com\"}")
+                .andExpect(status().isNoContent());
     }
 
     @Test
@@ -121,8 +121,32 @@ class ContactFlowIntegrationTest extends PostgresTestBase {
         submit(id, "/v1/me/phone/verify", "{\"code\":\"" + lastCode(CodeDelivery.WHATSAPP, phone) + "\"}")
                 .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value(phone))
                 .andExpect(jsonPath("$.phoneVerified").value(true));
-        submit(id, "/v1/me/phone", "{\"phone\":\"" + freshPhone() + "\",\"delivery\":\"WHATSAPP\"}").andExpect(status().isConflict())
-                .andExpect(jsonPath("$.code").value("PHONE_ALREADY_SET"));
+    }
+
+    @Test
+    void aCustomerChangesTheEmailByConfirmingTheCodeSentToTheNewOne() throws Exception {
+        String old = "old-" + UUID.randomUUID() + "@example.com";
+        UUID id = customer(old, freshPhone());
+        String fresh = "fresh-" + id + "@example.com";
+
+        submit(id, "/v1/me/email", "{\"email\":\"" + fresh + "\"}").andExpect(status().isNoContent());
+        mvc.perform(get("/v1/me").with(TestTenants.customer(id))).andExpect(jsonPath("$.email").value(old));
+
+        submit(id, "/v1/me/email/verify", "{\"code\":\"" + lastCode(fresh) + "\"}").andExpect(status().isOk())
+                .andExpect(jsonPath("$.email").value(fresh)).andExpect(jsonPath("$.emailVerified").value(true));
+    }
+
+    @Test
+    void aCustomerChangesThePhoneByConfirmingTheCodeSentToTheNewNumber() throws Exception {
+        UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", freshPhone());
+        String fresh = freshPhone();
+
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + fresh + "\",\"delivery\":\"SMS\"}")
+                .andExpect(status().isNoContent());
+
+        submit(id, "/v1/me/phone/verify", "{\"code\":\"" + lastCode(CodeDelivery.SMS, fresh) + "\"}")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value(fresh))
+                .andExpect(jsonPath("$.phoneVerified").value(true));
     }
 
     @Test

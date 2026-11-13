@@ -2,6 +2,7 @@ package com.evcharge.customer.account.infrastructure;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.i18n.LocaleContextHolder;
 import org.springframework.stereotype.Component;
 
 import java.util.LinkedHashMap;
@@ -28,7 +29,7 @@ class WhatsAppCodeSender {
         Map<String, String> form = new LinkedHashMap<>();
         form.put("To", "whatsapp:" + phoneE164);
         form.put("MessagingServiceSid", settings.service());
-        form.put("ContentSid", settings.template());
+        form.put("ContentSid", settings.templateFor(LocaleContextHolder.getLocale()));
         form.put("ContentVariables", "{\"1\":\"" + code + "\"}");
         twilio.post(phoneE164, form);
     }

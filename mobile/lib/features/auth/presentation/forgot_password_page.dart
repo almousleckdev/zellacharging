@@ -7,9 +7,12 @@ import '../../../core/router/routes.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
-import '../../../shared/app_toast.dart';
+import '../../../shared/otp_delivery.dart';
 import '../../../shared/submit_mixin.dart';
+import '../../../shared/widgets/otp_channel_sheet.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../domain/contact_channel.dart';
+import '../domain/verification_target.dart';
 import 'auth_providers.dart';
 import 'otp_args.dart';
 import 'widgets/auth_field.dart';
@@ -33,17 +36,26 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
     super.dispose();
   }
 
-  void _send() {
+  Future<void> _send() async {
     if (!_formKey.currentState!.validate()) return;
     final value = _identifier.text.trim();
-    if (!value.contains('@')) {
-      AppToast.warning(context, AuthText.phoneResetSoon);
-      return;
-    }
-    submit(() async {
-      await ref.read(authRepositoryProvider).forgotPassword(value);
+    final target = VerificationTarget(
+      channel: ContactChannel.of(value),
+      value: value,
+    );
+    final OtpDelivery? delivery = target.channel == ContactChannel.phone
+        ? await showOtpChannelSheet(context)
+        : null;
+    if (target.channel == ContactChannel.phone && delivery == null) return;
+    await submit(() async {
+      await ref
+          .read(authRepositoryProvider)
+          .forgotPassword(value, delivery: delivery);
       if (mounted) {
-        context.push(Routes.otp, extra: OtpArgs.passwordReset(value));
+        context.push(
+          Routes.otp,
+          extra: OtpArgs.passwordReset(target, delivery: delivery),
+        );
       }
     });
   }
@@ -59,7 +71,7 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
           key: _formKey,
           child: AuthField(
             controller: _identifier,
-            hint: AuthText.identifierLabel,
+            hint: AuthText.forgotIdentifierLabel,
             icon: AppIcons.envelope,
             validator: Validators.required,
             keyboardType: TextInputType.emailAddress,

@@ -6,6 +6,7 @@ import 'package:zella/core/storage/token_store.dart';
 import 'package:zella/features/auth/data/auth_repository_impl.dart';
 import 'package:zella/features/auth/domain/contact_channel.dart';
 import 'package:zella/features/auth/domain/registration_data.dart';
+import 'package:zella/shared/otp_delivery.dart';
 
 class _RecordingAdapter implements HttpClientAdapter {
   final requests = <RequestOptions>[];
@@ -17,7 +18,13 @@ class _RecordingAdapter implements HttpClientAdapter {
     Future<void>? cancelFuture,
   ) async {
     requests.add(options);
-    return ResponseBody.fromString('', 201);
+    return ResponseBody.fromString(
+      '{"customerId":"c1","channel":"${options.data['phone'] != null && options.data['email'] == null ? 'PHONE' : 'EMAIL'}","target":"${options.data['email'] ?? options.data['phone']}"}',
+      201,
+      headers: {
+        Headers.contentTypeHeader: ['application/json'],
+      },
+    );
   }
 
   @override
@@ -57,6 +64,27 @@ void main() {
     expect(target.channel, ContactChannel.email);
     expect(target.value, 'aline@example.com');
   });
+
+  test(
+    'registration with a phone only verifies the phone it was sent to',
+    () async {
+      final target = await repository.register(
+        const RegistrationData(
+          firstName: 'Aline',
+          lastName: 'Obame',
+          password: 'Secret123!',
+          phone: '+24177123456',
+          delivery: OtpDelivery.sms,
+        ),
+      );
+
+      expect(sentBody().containsKey('email'), isFalse);
+      expect(sentBody()['phone'], '+24177123456');
+      expect(sentBody()['delivery'], 'SMS');
+      expect(target.channel, ContactChannel.phone);
+      expect(target.value, '+24177123456');
+    },
+  );
 
   test('registration without a phone does not send one', () async {
     final target = await repository.register(

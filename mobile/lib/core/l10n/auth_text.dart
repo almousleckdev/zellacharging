@@ -213,8 +213,8 @@ abstract final class AuthText {
   );
 
   static String get forgotBody => AppLanguage.pick(
-    fr: 'Saisissez votre e-mail et nous vous enverrons un code pour réinitialiser votre mot de passe.',
-    en: 'Enter your email and we’ll send you a code to reset your password.',
+    fr: 'Saisissez votre e-mail ou votre numéro de téléphone et nous vous enverrons un code pour réinitialiser votre mot de passe.',
+    en: 'Enter your email or phone number and we’ll send you a code to reset your password.',
   );
 
   static String get sendCode =>
@@ -222,11 +222,6 @@ abstract final class AuthText {
 
   static String get backToLogin =>
       AppLanguage.pick(fr: 'Retour à la connexion', en: 'Back to login');
-
-  static String get phoneResetSoon => AppLanguage.pick(
-    fr: 'La réinitialisation par SMS arrive bientôt. Utilisez votre e-mail.',
-    en: 'Reset by SMS is coming soon. Please use your email.',
-  );
 
   static String get otpTitle =>
       AppLanguage.pick(fr: 'Vérifiez votre code', en: 'Verify your code');
@@ -243,6 +238,31 @@ abstract final class AuthText {
 
   static String get changeEmail =>
       AppLanguage.pick(fr: 'Changer d’e-mail', en: 'Change email');
+
+  static String get changePhone =>
+      AppLanguage.pick(fr: 'Changer de numéro', en: 'Change number');
+
+  static String get phoneNumberLabel =>
+      AppLanguage.pick(fr: 'Numéro de téléphone', en: 'Phone number');
+
+  static String get searchCountry =>
+      AppLanguage.pick(fr: 'Rechercher un pays', en: 'Search for a country');
+
+  static String get signUpWithEmail =>
+      AppLanguage.pick(fr: 'E-mail', en: 'Email');
+
+  static String get signUpWithPhone =>
+      AppLanguage.pick(fr: 'Téléphone', en: 'Phone');
+
+  static String get signInIdentifierLabel => AppLanguage.pick(
+    fr: 'E-mail ou numéro de téléphone',
+    en: 'Email or phone number',
+  );
+
+  static String get forgotIdentifierLabel => AppLanguage.pick(
+    fr: 'E-mail ou numéro de téléphone',
+    en: 'Email or phone number',
+  );
 
   static String get newPasswordTitle => AppLanguage.pick(
     fr: 'Créez un nouveau mot de passe',

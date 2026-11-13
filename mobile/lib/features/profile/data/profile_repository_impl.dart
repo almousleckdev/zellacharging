@@ -4,7 +4,7 @@ import 'package:dio/dio.dart';
 
 import '../../../core/network/api_error.dart';
 import '../../auth/domain/social_credential.dart';
-import '../domain/otp_delivery.dart';
+import '../../../shared/otp_delivery.dart';
 import '../domain/profile.dart';
 import '../domain/profile_repository.dart';
 

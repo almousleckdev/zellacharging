@@ -1,7 +1,7 @@
 import 'dart:typed_data';
 
 import '../../auth/domain/social_credential.dart';
-import 'otp_delivery.dart';
+import '../../../shared/otp_delivery.dart';
 import 'profile.dart';
 
 abstract class ProfileRepository {

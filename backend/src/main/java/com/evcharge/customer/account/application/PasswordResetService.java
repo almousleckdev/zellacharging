@@ -4,6 +4,7 @@ import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.PasswordHasher;
 import com.evcharge.customer.account.application.port.RefreshTokenRepository;
 import com.evcharge.customer.account.domain.Channel;
+import com.evcharge.customer.account.domain.CodeDelivery;
 import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.CustomerStatus;
@@ -46,23 +47,26 @@ public class PasswordResetService {
     }
 
     @Transactional(noRollbackFor = ApiException.class)
-    public void request(String rawEmail) {
-        ContactPoint email = new ContactPoint(Channel.EMAIL, contacts.email(rawEmail));
-        customers.findByContact(Channel.EMAIL, email.target()).filter(this::eligible).ifPresent(customer -> {
-            try {
-                verification.reissue(customer, email, Channel.PASSWORD_RESET);
-            } catch (ApiException tooSoon) {
-                if (tooSoon.status() != HttpStatus.TOO_MANY_REQUESTS) {
-                    throw tooSoon;
-                }
-            }
-        });
+    public void request(String identifier, CodeDelivery delivery) {
+        ContactPoint contact = contacts.resolve(identifier);
+        customers.findByContact(contact.channel(), contact.target()).filter(c -> eligible(c, contact.channel()))
+                .ifPresent(customer -> {
+                    try {
+                        verification.reissue(customer, contact, Channel.PASSWORD_RESET,
+                                RegistrationService.deliveryFor(contact, delivery));
+                    } catch (ApiException tooSoon) {
+                        if (tooSoon.status() != HttpStatus.TOO_MANY_REQUESTS) {
+                            throw tooSoon;
+                        }
+                    }
+                });
     }
 
     @Transactional(noRollbackFor = ApiException.class)
-    public void reset(String rawEmail, String code, String newPassword) {
-        String email = contacts.email(rawEmail);
-        Customer customer = customers.findByContact(Channel.EMAIL, email).filter(this::eligible)
+    public void reset(String identifier, String code, String newPassword) {
+        ContactPoint contact = contacts.resolve(identifier);
+        Customer customer = customers.findByContact(contact.channel(), contact.target())
+                .filter(c -> eligible(c, contact.channel()))
                 .orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST, "INVALID_CODE", "Invalid or expired code"));
         verification.confirm(customer, Channel.PASSWORD_RESET, code);
         customers.updatePasswordHash(customer.id(), passwords.hash(newPassword));
@@ -73,7 +77,7 @@ public class PasswordResetService {
                 Map.of("screen", "settings"));
     }
 
-    private boolean eligible(Customer customer) {
-        return customer.status() == CustomerStatus.ACTIVE && customers.isVerified(customer.id(), Channel.EMAIL);
+    private boolean eligible(Customer customer, Channel channel) {
+        return customer.status() == CustomerStatus.ACTIVE && customers.isVerified(customer.id(), channel);
     }
 }

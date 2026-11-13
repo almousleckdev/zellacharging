@@ -94,20 +94,17 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void registrationNeedsAnEmail() throws Exception {
+    void registrationNeedsAnEmailOrAPhone() throws Exception {
         postJson("/v1/auth/register", """
-                {"firstName":"No","lastName":"Email","password":"Secret123!"}
-                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("EMAIL_REQUIRED"));
+                {"firstName":"No","lastName":"Contact","password":"Secret123!"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CONTACT_REQUIRED"));
         postJson("/v1/auth/register", """
-                {"firstName":"No","lastName":"Email","email":"  ","password":"Secret123!"}
-                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("EMAIL_REQUIRED"));
-        postJson("/v1/auth/register", """
-                {"firstName":"Jean","lastName":"Mba","phone":"+24177123456","password":"Secret123!"}
-                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("EMAIL_REQUIRED"));
+                {"firstName":"No","lastName":"Contact","email":"  ","password":"Secret123!"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CONTACT_REQUIRED"));
     }
 
     @Test
-    void aPhoneNumberIsStoredNormalizedButNeverGetsACode() throws Exception {
+    void aPhoneNumberNextToAnEmailIsStoredNormalizedAndKeepsTheEmailAsTheOneToVerify() throws Exception {
         postJson("/v1/auth/register", """
                 {"firstName":"Jean","lastName":"Mba","email":"jean@example.com","phone":"123","password":"Secret123!"}
                 """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_PHONE"));
@@ -126,12 +123,12 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void codesAreOnlyVerifiedAndResentForEmail() throws Exception {
+    void passwordResetIsNotACodeChannelOfTheVerificationEndpoints() throws Exception {
         postJson("/v1/auth/verify", """
-                {"channel":"PHONE","target":"077123456","code":"123456"}
+                {"channel":"PASSWORD_RESET","target":"jean@example.com","code":"123456"}
                 """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CHANNEL_NOT_SUPPORTED"));
         postJson("/v1/auth/verify/resend", """
-                {"channel":"PHONE","target":"077123456"}
+                {"channel":"PASSWORD_RESET","target":"jean@example.com"}
                 """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CHANNEL_NOT_SUPPORTED"));
 
         verify(sender, never()).send(any(), anyString(), anyString());

@@ -3,7 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:zella/core/l10n/strings.dart';
 import 'package:zella/features/profile/domain/contact_confirmation.dart';
 import 'package:zella/features/profile/domain/contact_kind.dart';
-import 'package:zella/features/profile/domain/otp_delivery.dart';
+import 'package:zella/shared/otp_delivery.dart';
 import 'package:zella/features/profile/domain/profile.dart';
 import 'package:zella/features/profile/presentation/add_contact_page.dart';
 import 'package:zella/features/profile/presentation/confirm_contact_page.dart';
@@ -93,6 +93,20 @@ void main() {
     await closeApp(tester);
   });
 
+  testWidgets('changing a contact says so in the title and the hint', (
+    tester,
+  ) async {
+    await pumpApp(
+      tester,
+      const AddContactPage(kind: ContactKind.phone, changing: true),
+      overrides: overridesWith(profile: FakeProfile()),
+    );
+
+    expect(find.text(ProfileText.changePhone), findsOneWidget);
+    expect(find.text(ProfileText.changePhoneHint), findsOneWidget);
+    await closeApp(tester);
+  });
+
   testWidgets('an invalid email is refused before anything is sent', (
     tester,
   ) async {
@@ -169,7 +183,7 @@ void main() {
       find.text(ProfileText.confirmPhoneBody('+24162820745')),
       findsOneWidget,
     );
-    await tester.enterText(find.byType(TextFormField), '654321');
+    await tester.enterText(find.byType(TextField), '654321');
     await tester.tap(find.text(AuthText.verify));
     await settle(tester);
 
@@ -195,7 +209,7 @@ void main() {
       find.text(ProfileText.confirmEmailBody('aline@example.com')),
       findsOneWidget,
     );
-    await tester.enterText(find.byType(TextFormField), '123456');
+    await tester.enterText(find.byType(TextField), '123456');
     await tester.tap(find.text(AuthText.verify));
     await settle(tester);
 

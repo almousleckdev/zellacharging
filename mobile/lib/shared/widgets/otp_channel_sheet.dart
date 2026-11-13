@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 
-import '../../../core/l10n/strings.dart';
-import '../../../core/theme/app_colors.dart';
-import '../../../core/theme/app_icons.dart';
-import '../../../core/theme/app_spacing.dart';
-import '../domain/otp_delivery.dart';
+import '../../core/l10n/strings.dart';
+import '../../core/theme/app_colors.dart';
+import '../../core/theme/app_icons.dart';
+import '../../core/theme/app_spacing.dart';
+import '../otp_delivery.dart';
 
 Future<OtpDelivery?> showOtpChannelSheet(BuildContext context) =>
     showModalBottomSheet<OtpDelivery>(

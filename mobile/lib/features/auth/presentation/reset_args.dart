@@ -1,6 +1,6 @@
 class ResetArgs {
-  const ResetArgs({required this.email, required this.code});
+  const ResetArgs({required this.identifier, required this.code});
 
-  final String email;
+  final String identifier;
   final String code;
 }

@@ -40,12 +40,6 @@ abstract final class Validators {
   static String? Function(String?) sameAs(TextEditingController other) =>
       (value) => value == other.text ? null : AuthText.passwordsDiffer;
 
-  static String? emailForSignUp(String? value) {
-    final text = (value ?? '').trim();
-    if (text.isEmpty) return Strings.required;
-    return _email.hasMatch(text) ? null : AuthText.phoneNeedsEmail;
-  }
-
   static String? otp(String? value) =>
       value != null && RegExp(r'^\d{6}$').hasMatch(value.trim())
       ? null

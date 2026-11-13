@@ -2,7 +2,6 @@ package com.evcharge.customer.account.web;
 
 import com.evcharge.customer.account.application.AccountCountries;
 import com.evcharge.customer.account.application.PasswordResetService;
-import com.evcharge.customer.account.domain.Channel;
 import com.evcharge.customer.shared.TenantContext;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -27,13 +26,14 @@ class PasswordResetController {
     @PostMapping("/forgot")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void forgot(@Valid @RequestBody ForgotPasswordRequest request) {
-        TenantContext.runAs(countries.forTarget(Channel.EMAIL, request.email()), () -> resets.request(request.email()));
+        TenantContext.runAs(countries.forIdentifier(request.contact()),
+                () -> resets.request(request.contact(), request.delivery()));
     }
 
     @PostMapping("/reset")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void reset(@Valid @RequestBody ResetPasswordRequest request) {
-        TenantContext.runAs(countries.forTarget(Channel.EMAIL, request.email()),
-                () -> resets.reset(request.email(), request.code(), request.newPassword()));
+        TenantContext.runAs(countries.forIdentifier(request.contact()),
+                () -> resets.reset(request.contact(), request.code(), request.newPassword()));
     }
 }

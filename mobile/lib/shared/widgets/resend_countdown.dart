@@ -2,8 +2,8 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 
-import '../../../../core/l10n/strings.dart';
-import '../../../../core/theme/app_colors.dart';
+import '../../core/l10n/strings.dart';
+import '../../core/theme/app_colors.dart';
 
 class ResendCountdown extends StatefulWidget {
   const ResendCountdown({super.key, required this.onResend, this.seconds = 60});

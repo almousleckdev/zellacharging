@@ -45,9 +45,6 @@ public class ContactService {
     @Transactional
     public void startEmail(UUID customerId, String rawEmail) {
         Customer customer = profiles.get(customerId);
-        if (customer.email() != null) {
-            throw conflict("EMAIL_ALREADY_SET");
-        }
         ContactPoint email = new ContactPoint(Channel.EMAIL, contacts.email(rawEmail));
         requireUnused(email);
         pending.save(customerId, email.target(), clock.instant());
@@ -68,9 +65,6 @@ public class ContactService {
     public void startPhone(UUID customerId, String rawPhone, CodeDelivery delivery) {
         requirePhoneDelivery(delivery);
         Customer customer = profiles.get(customerId);
-        if (customer.phone() != null) {
-            throw conflict("PHONE_ALREADY_SET");
-        }
         ContactPoint phone = new ContactPoint(Channel.PHONE, contacts.phone(rawPhone));
         if (!countries.forTarget(Channel.PHONE, phone.target()).equals(TenantContext.require())) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "PHONE_COUNTRY_MISMATCH",
@@ -85,11 +79,12 @@ public class ContactService {
     public void sendPhoneCode(UUID customerId, CodeDelivery delivery) {
         requirePhoneDelivery(delivery);
         Customer customer = profiles.get(customerId);
-        String target = pendingPhones.find(customerId).orElse(customer.phone());
+        Optional<String> pendingPhone = pendingPhones.find(customerId);
+        String target = pendingPhone.orElse(customer.phone());
         if (target == null) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "NO_PHONE", "No phone number to verify");
         }
-        if (customer.phone() != null && customers.isVerified(customerId, Channel.PHONE)) {
+        if (pendingPhone.isEmpty() && customers.isVerified(customerId, Channel.PHONE)) {
             throw conflict("PHONE_ALREADY_VERIFIED");
         }
         verification.reissue(customer, new ContactPoint(Channel.PHONE, target), Channel.PHONE, delivery);

@@ -1,4 +1,5 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:zella/shared/otp_delivery.dart';
 import 'package:zella/features/auth/domain/auth_repository.dart';
 import 'package:zella/features/auth/domain/registration_data.dart';
 import 'package:zella/features/auth/domain/sign_in_with_social.dart';
@@ -16,7 +17,8 @@ class _Auth implements AuthRepository {
       signedIn.add(credential);
 
   @override
-  Future<void> forgotPassword(String email) => throw UnimplementedError();
+  Future<void> forgotPassword(String identifier, {OtpDelivery? delivery}) =>
+      throw UnimplementedError();
 
   @override
   Future<void> login({required String identifier, required String password}) =>
@@ -27,12 +29,12 @@ class _Auth implements AuthRepository {
       throw UnimplementedError();
 
   @override
-  Future<void> resendCode(VerificationTarget target) =>
+  Future<void> resendCode(VerificationTarget target, {OtpDelivery? delivery}) =>
       throw UnimplementedError();
 
   @override
   Future<void> resetPassword({
-    required String email,
+    required String identifier,
     required String code,
     required String newPassword,
   }) => throw UnimplementedError();

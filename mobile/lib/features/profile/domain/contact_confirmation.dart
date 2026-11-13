@@ -1,8 +1,13 @@
-import 'otp_delivery.dart';
+import '../../../shared/otp_delivery.dart';
 
 class ContactConfirmation {
-  const ContactConfirmation({required this.target, this.delivery});
+  const ContactConfirmation({
+    required this.target,
+    this.delivery,
+    this.changing = false,
+  });
 
   final String target;
   final OtpDelivery? delivery;
+  final bool changing;
 }

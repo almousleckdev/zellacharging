@@ -27,6 +27,7 @@ abstract final class AppIcons {
   static const eyeSlash = PhosphorIconsRegular.eyeSlash;
   static const caretRight = PhosphorIconsRegular.caretRight;
   static const caretLeft = PhosphorIconsRegular.caretLeft;
+  static const caretDown = PhosphorIconsRegular.caretDown;
   static const googleLogo = PhosphorIconsBold.googleLogo;
   static const appleLogo = PhosphorIconsFill.appleLogo;
   static const headset = PhosphorIconsRegular.headset;
@@ -51,6 +52,7 @@ abstract final class AppIcons {
   static const chart = PhosphorIconsRegular.chartBar;
   static const coins = PhosphorIconsRegular.coins;
   static const trash = PhosphorIconsRegular.trash;
+  static const edit = PhosphorIconsRegular.pencilSimple;
   static const ticket = PhosphorIconsRegular.ticket;
   static const camera = PhosphorIconsRegular.camera;
   static const image = PhosphorIconsRegular.image;

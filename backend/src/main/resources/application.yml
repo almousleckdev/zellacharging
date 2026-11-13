@@ -59,6 +59,7 @@ zella:
     secret: ${ZELLA_TWILIO_SECRET:}
     service: ${ZELLA_TWILIO_SERVICE:}
     template: ${ZELLA_TWILIO_MODELE:}
+    template-en: ${ZELLA_TWILIO_MODELE_EN:}
     sms-service: ${ZELLA_TWILIO_SMS_SERVICE:}
     sms-number: ${ZELLA_TWILIO_SMS_NUMERO:}
   rate-limit:

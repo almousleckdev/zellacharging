@@ -16,8 +16,8 @@ import 'auth_providers.dart';
 import 'otp_args.dart';
 import 'reset_args.dart';
 import 'widgets/auth_page.dart';
-import 'widgets/otp_boxes.dart';
-import 'widgets/resend_countdown.dart';
+import '../../../shared/widgets/otp_boxes.dart';
+import '../../../shared/widgets/resend_countdown.dart';
 
 class OtpPage extends ConsumerStatefulWidget {
   const OtpPage({super.key, required this.args});
@@ -33,10 +33,7 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
 
   bool get _isReset => widget.args.purpose == OtpPurpose.passwordReset;
 
-  VerificationTarget get _target => VerificationTarget(
-    channel: ContactChannel.email,
-    value: widget.args.email,
-  );
+  VerificationTarget get _target => widget.args.target;
 
   @override
   void dispose() {
@@ -53,7 +50,7 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
     if (_isReset) {
       context.push(
         Routes.resetPassword,
-        extra: ResetArgs(email: widget.args.email, code: _code.text.trim()),
+        extra: ResetArgs(identifier: _target.value, code: _code.text.trim()),
       );
       return;
     }
@@ -69,8 +66,14 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
     await submit(() async {
       final repository = ref.read(authRepositoryProvider);
       _isReset
-          ? await repository.forgotPassword(widget.args.email)
-          : await repository.resendCode(_target);
+          ? await repository.forgotPassword(
+              _target.value,
+              delivery: widget.args.delivery,
+            )
+          : await repository.resendCode(
+              _target,
+              delivery: widget.args.delivery,
+            );
       if (mounted) AppToast.success(context, AuthText.codeResent);
     });
   }
@@ -84,7 +87,7 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
       subtitle: AuthText.otpSentTo,
       children: [
         Text(
-          widget.args.email,
+          _target.value,
           style: theme.textTheme.bodyLarge?.copyWith(
             fontWeight: FontWeight.w500,
           ),
@@ -104,7 +107,9 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
           child: TextButton(
             onPressed: () => context.pop(),
             child: Text(
-              AuthText.changeEmail,
+              _target.channel == ContactChannel.phone
+                  ? AuthText.changePhone
+                  : AuthText.changeEmail,
               style: const TextStyle(
                 color: AppColors.primary,
                 fontWeight: FontWeight.w500,

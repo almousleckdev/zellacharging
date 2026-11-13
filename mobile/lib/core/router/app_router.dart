@@ -121,11 +121,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.addEmail,
-        builder: (_, _) => const AddContactPage(kind: ContactKind.email),
+        builder: (_, state) => AddContactPage(
+          kind: ContactKind.email,
+          changing: state.extra == true,
+        ),
       ),
       GoRoute(
         path: Routes.addPhone,
-        builder: (_, _) => const AddContactPage(kind: ContactKind.phone),
+        builder: (_, state) => AddContactPage(
+          kind: ContactKind.phone,
+          changing: state.extra == true,
+        ),
       ),
       GoRoute(
         path: Routes.confirmEmail,

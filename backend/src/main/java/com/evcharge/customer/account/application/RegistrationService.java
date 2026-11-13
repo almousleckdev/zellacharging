@@ -3,6 +3,7 @@ package com.evcharge.customer.account.application;
 import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.PasswordHasher;
 import com.evcharge.customer.account.domain.Channel;
+import com.evcharge.customer.account.domain.CodeDelivery;
 import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.CustomerStatus;
@@ -35,21 +36,29 @@ public class RegistrationService {
     }
 
     @Transactional
-    public UUID register(RegisterCommand command) {
-        if (!hasText(command.email())) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "EMAIL_REQUIRED", "Email is required");
-        }
-        ContactPoint email = new ContactPoint(Channel.EMAIL, contacts.email(command.email()));
+    public RegisteredAccount register(RegisterCommand command) {
+        Optional<ContactPoint> email = Optional.ofNullable(command.email()).filter(RegistrationService::hasText)
+                .map(raw -> new ContactPoint(Channel.EMAIL, contacts.email(raw)));
         Optional<ContactPoint> phone = Optional.ofNullable(command.phone()).filter(RegistrationService::hasText)
                 .map(raw -> new ContactPoint(Channel.PHONE, contacts.phone(raw)));
-        requireUnused(email);
+        ContactPoint toVerify = email.or(() -> phone).orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST,
+                "CONTACT_REQUIRED", "An email or a phone number is required"));
+        email.ifPresent(this::requireUnused);
         phone.ifPresent(this::requireUnused);
         Customer customer = new Customer(UUID.randomUUID(), TenantContext.require(), command.firstName().trim(),
-                command.lastName().trim(), email.target(), phone.map(ContactPoint::target).orElse(null),
-                passwords.hash(command.password()), CustomerStatus.PENDING_VERIFICATION, 0, null, clock.instant());
+                command.lastName().trim(), email.map(ContactPoint::target).orElse(null),
+                phone.map(ContactPoint::target).orElse(null), passwords.hash(command.password()),
+                CustomerStatus.PENDING_VERIFICATION, 0, null, clock.instant());
         customers.save(customer);
-        verification.issue(customer, email);
-        return customer.id();
+        verification.issue(customer, toVerify, toVerify.channel(), deliveryFor(toVerify, command.delivery()));
+        return new RegisteredAccount(customer.id(), toVerify);
+    }
+
+    static CodeDelivery deliveryFor(ContactPoint contact, CodeDelivery requested) {
+        if (contact.channel() == Channel.EMAIL) {
+            return CodeDelivery.EMAIL;
+        }
+        return requested != null && requested.isPhone() ? requested : CodeDelivery.WHATSAPP;
     }
 
     private void requireUnused(ContactPoint point) {

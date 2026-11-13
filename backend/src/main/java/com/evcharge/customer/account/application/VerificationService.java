@@ -64,17 +64,18 @@ public class VerificationService {
     }
 
     @Transactional
-    public void resend(Channel channel, String target) {
-        requireEmail(channel);
+    public void resend(Channel channel, String target, CodeDelivery delivery) {
+        requireContactChannel(channel);
         ContactPoint contact = contacts.of(channel, target);
         customers.findByContact(contact.channel(), contact.target())
                 .filter(customer -> customer.status() != CustomerStatus.BLOCKED)
-                .ifPresent(customer -> reissue(customer, contact));
+                .ifPresent(customer -> reissue(customer, contact, channel,
+                        RegistrationService.deliveryFor(contact, delivery)));
     }
 
     @Transactional(noRollbackFor = ApiException.class)
     public void verify(Channel channel, String target, String submitted) {
-        requireEmail(channel);
+        requireContactChannel(channel);
         ContactPoint contact = contacts.of(channel, target);
         Customer customer = customers.findByContact(contact.channel(), contact.target())
                 .orElseThrow(VerificationService::invalidCode);
@@ -118,9 +119,10 @@ public class VerificationService {
         return Sha256.hex(settings.security().codePepper() + ":" + customerId + ":" + channel + ":" + code);
     }
 
-    private static void requireEmail(Channel channel) {
-        if (channel != Channel.EMAIL) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "CHANNEL_NOT_SUPPORTED", "Only email verification is available");
+    private static void requireContactChannel(Channel channel) {
+        if (channel != Channel.EMAIL && channel != Channel.PHONE) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "CHANNEL_NOT_SUPPORTED",
+                    "Verification is available for email and phone only");
         }
     }
 

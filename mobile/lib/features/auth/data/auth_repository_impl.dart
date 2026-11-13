@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 
 import '../../../core/network/api_error.dart';
+import '../../../shared/otp_delivery.dart';
 import '../../../core/storage/token_store.dart';
 import '../domain/auth_repository.dart';
 import '../domain/contact_channel.dart';
@@ -25,19 +26,20 @@ class AuthRepositoryImpl implements AuthRepository {
   @override
   Future<VerificationTarget> register(RegistrationData data) =>
       _guard(() async {
-        await client.post<void>(
+        final response = await client.post<Map<String, dynamic>>(
           '/v1/auth/register',
           data: {
             'firstName': data.firstName,
             'lastName': data.lastName,
             'password': data.password,
-            'email': data.email,
+            if (data.email != null) 'email': data.email,
             if (data.phone != null) 'phone': data.phone,
+            if (data.delivery != null) 'delivery': data.delivery!.wire,
           },
         );
         return VerificationTarget(
-          channel: ContactChannel.email,
-          value: data.email,
+          channel: ContactChannel.parse(response.data!['channel'] as String),
+          value: response.data!['target'] as String,
         );
       });
 
@@ -54,27 +56,43 @@ class AuthRepositoryImpl implements AuthRepository {
   );
 
   @override
-  Future<void> resendCode(VerificationTarget target) => _guard(
-    () => client.post<void>(
-      '/v1/auth/verify/resend',
-      data: {'channel': target.channel.apiName, 'target': target.value},
-    ),
-  );
+  Future<void> resendCode(VerificationTarget target, {OtpDelivery? delivery}) =>
+      _guard(
+        () => client.post<void>(
+          '/v1/auth/verify/resend',
+          data: {
+            'channel': target.channel.apiName,
+            'target': target.value,
+            if (delivery != null) 'delivery': delivery.wire,
+          },
+        ),
+      );
 
   @override
-  Future<void> forgotPassword(String email) => _guard(
-    () => client.post<void>('/v1/auth/password/forgot', data: {'email': email}),
-  );
+  Future<void> forgotPassword(String identifier, {OtpDelivery? delivery}) =>
+      _guard(
+        () => client.post<void>(
+          '/v1/auth/password/forgot',
+          data: {
+            'identifier': identifier,
+            if (delivery != null) 'delivery': delivery.wire,
+          },
+        ),
+      );
 
   @override
   Future<void> resetPassword({
-    required String email,
+    required String identifier,
     required String code,
     required String newPassword,
   }) => _guard(
     () => client.post<void>(
       '/v1/auth/password/reset',
-      data: {'email': email, 'code': code, 'newPassword': newPassword},
+      data: {
+        'identifier': identifier,
+        'code': code,
+        'newPassword': newPassword,
+      },
     ),
   );
 

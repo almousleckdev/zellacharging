@@ -38,6 +38,10 @@ public class AccountCountries {
     }
 
     public String forTarget(Channel channel, String target) {
+        if (channel != Channel.EMAIL && channel != Channel.PHONE) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "CHANNEL_NOT_SUPPORTED",
+                    "Verification is available for email and phone only");
+        }
         return forContact(contacts.of(channel, target));
     }
 

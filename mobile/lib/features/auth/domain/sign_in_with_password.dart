@@ -18,13 +18,11 @@ class SignInWithPassword {
       await _repository.login(identifier: identifier, password: password);
       return null;
     } on ApiError catch (error) {
-      if (error.code != unverifiedCode || !identifier.contains('@')) rethrow;
-      final target = VerificationTarget(
-        channel: ContactChannel.email,
+      if (error.code != unverifiedCode) rethrow;
+      return VerificationTarget(
+        channel: ContactChannel.of(identifier),
         value: identifier,
       );
-      await _repository.resendCode(target);
-      return target;
     }
   }
 }

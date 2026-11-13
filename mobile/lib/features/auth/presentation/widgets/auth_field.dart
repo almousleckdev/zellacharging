@@ -17,6 +17,7 @@ class AuthField extends StatefulWidget {
     this.textInputAction = TextInputAction.next,
     this.autofillHints,
     this.inputFormatters,
+    this.prefix,
   });
 
   final TextEditingController controller;
@@ -28,6 +29,7 @@ class AuthField extends StatefulWidget {
   final TextInputAction textInputAction;
   final Iterable<String>? autofillHints;
   final List<TextInputFormatter>? inputFormatters;
+  final Widget? prefix;
 
   @override
   State<AuthField> createState() => _AuthFieldState();
@@ -65,7 +67,9 @@ class _AuthFieldState extends State<AuthField> {
           horizontal: AppSpacing.md,
           vertical: 12,
         ),
-        prefixIcon: Icon(widget.icon, color: AppColors.textSecondary, size: 18),
+        prefixIcon:
+            widget.prefix ??
+            Icon(widget.icon, color: AppColors.textSecondary, size: 18),
         suffixIcon: widget.obscure
             ? IconButton(
                 icon: Icon(

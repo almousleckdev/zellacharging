@@ -34,12 +34,18 @@ class JdbcSessionStatistics implements SessionStatistics {
                         + "count(*) filter (where state = 'COMPLETED') as completed, "
                         + "count(*) filter (where started_at >= now() - interval '24 hours') as recent, "
                         + "coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) as energy, "
-                        + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED'), 0)::bigint as revenue "
+                        + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED' and "
+                        + SessionBilling.PAID + "), 0)::bigint as revenue, "
+                        + "coalesce(sum(energy_kwh) filter (where state = 'COMPLETED' and "
+                        + SessionBilling.FREE + "), 0) as free_energy, "
+                        + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED' and "
+                        + SessionBilling.FREE + "), 0)::bigint as free_value "
                         + "from charging_session "
                         + "where country_code = current_setting('app.country', true) and created_at >= :since")
                 .param("since", reporting.since())
                 .query((rs, rowNum) -> new SessionFigures(rs.getLong("live"), rs.getLong("completed"),
-                        rs.getLong("recent"), rs.getBigDecimal("energy"), rs.getLong("revenue"))).single();
+                        rs.getLong("recent"), rs.getBigDecimal("energy"), rs.getLong("revenue"),
+                        rs.getBigDecimal("free_energy"), rs.getLong("free_value"))).single();
     }
 
     @Override
@@ -58,7 +64,8 @@ class JdbcSessionStatistics implements SessionStatistics {
                         + "count(*) filter (where state in ('REQUESTED', 'START_ACCEPTED', 'ACTIVE', 'STOPPING')) "
                         + "as live, "
                         + "coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) as energy, "
-                        + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED'), 0)::bigint as spent, "
+                        + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED' and "
+                        + SessionBilling.PAID + "), 0)::bigint as spent, "
                         + "max(started_at) as last_session "
                         + "from charging_session where customer_id in (:ids) "
                         + "and country_code = current_setting('app.country', true) group by customer_id")

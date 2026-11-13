@@ -35,6 +35,7 @@ export const enOverview: Pick<Dictionary, "overview"> = {
       offlineStations: "Offline stations",
       liveSessions: "Charges in progress",
     },
+    complimentary: { title: "Free charges", text: "Energy consumed without payment, never counted in sales.", energy: "Energy given", value: "Value at tariff" },
     countries: { title: "Sales by country", text: "Comparison over the chosen period.", charges: "{count} charges", new: "New" },
     commissions: { title: "Commissions", all: "See all", empty: "No commission yet." },
     recent: { charges: "Latest charges", all: "See all", empty: "No charge yet." },

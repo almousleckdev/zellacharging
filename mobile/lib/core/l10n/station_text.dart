@@ -65,6 +65,13 @@ abstract final class StationText {
     en: 'Plug your vehicle into the connector first, then press Start.',
   );
 
+  static String freeIn(int minutes) {
+    final text = minutes >= 60
+        ? '${minutes ~/ 60} h ${(minutes % 60).toString().padLeft(2, '0')}'
+        : '$minutes min';
+    return AppLanguage.pick(fr: 'Libre dans ~$text', en: 'Free in ~$text');
+  }
+
   static String get startCharging =>
       AppLanguage.pick(fr: 'Démarrer', en: 'Start');
 

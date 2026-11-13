@@ -24,7 +24,8 @@ record AdminOverviewResponse(String scope, Instant since, List<CountryFigures> c
             return new CountryFigures(country.code(), country.name(), country.currency(), country.currencyDecimals(),
                     country.phoneRegion(), new Customers(customers.total(), customers.active(), customers.newLast30Days()),
                     new Sessions(sessions.live(), sessions.completed(), sessions.startedLast24Hours(),
-                            sessions.energyKwh(), sessions.revenueMinor()),
+                            sessions.energyKwh(), sessions.revenueMinor(), sessions.complimentaryKwh(),
+                            sessions.complimentaryValueMinor()),
                     new Wallets(wallets.wallets(), wallets.balanceMinor(), wallets.reservedMinor(),
                             wallets.topupsSucceededMinor(), wallets.pendingTopups(), wallets.withdrawalsPaidMinor(),
                             wallets.pendingWithdrawals(), wallets.capturedMinor()));
@@ -34,7 +35,8 @@ record AdminOverviewResponse(String scope, Instant since, List<CountryFigures> c
     record Customers(long total, long active, long newLast30Days) {
     }
 
-    record Sessions(long live, long completed, long startedLast24Hours, BigDecimal energyKwh, long revenueMinor) {
+    record Sessions(long live, long completed, long startedLast24Hours, BigDecimal energyKwh, long revenueMinor,
+                    BigDecimal complimentaryKwh, long complimentaryValueMinor) {
     }
 
     record Wallets(long count, long balanceMinor, long reservedMinor, long topupsSucceededMinor, long pendingTopups,

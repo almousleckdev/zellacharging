@@ -64,19 +64,6 @@ abstract final class PayText {
     en: 'Added to your wallet',
   );
 
-  static String vat(String percent) =>
-      AppLanguage.pick(fr: 'TVA $percent %', en: 'VAT $percent%');
-
-  static String serviceFee(String percent) => AppLanguage.pick(
-    fr: 'Frais de service $percent %',
-    en: 'Service fee $percent%',
-  );
-
-  static String get feesIncluded => AppLanguage.pick(
-    fr: 'Taxes et frais inclus dans le budget',
-    en: 'Taxes and fees included in the budget',
-  );
-
   static String get unusedReturned => AppLanguage.pick(
     fr: 'Le montant non utilisé est reversé dans votre portefeuille.',
     en: 'Any unused amount is returned to your wallet.',

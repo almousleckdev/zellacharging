@@ -55,6 +55,42 @@ abstract final class ChargeText {
     en: 'The session will end and the final amount is paid automatically from your wallet.',
   );
 
+  static String get cancelCharge =>
+      AppLanguage.pick(fr: 'Annuler la recharge', en: 'Cancel charging');
+
+  static String get cancelConfirmTitle =>
+      AppLanguage.pick(fr: 'Annuler la recharge ?', en: 'Cancel charging?');
+
+  static String get cancelConfirmBody => AppLanguage.pick(
+    fr: 'Rien ne sera débité et le montant réservé retourne dans votre portefeuille.',
+    en: 'Nothing will be charged and the reserved amount returns to your wallet.',
+  );
+
+  static String get plugPromptTitle => AppLanguage.pick(
+    fr: 'Branchez le câble à votre véhicule',
+    en: 'Plug the cable into your vehicle',
+  );
+
+  static String get plugPromptBody => AppLanguage.pick(
+    fr: 'La recharge démarre dès que le câble est connecté. Sans branchement, elle s\'annule toute seule et rien n\'est débité.',
+    en: 'Charging starts as soon as the cable is connected. If it is not plugged in, it cancels by itself and nothing is charged.',
+  );
+
+  static String plugCountdown(String remaining) => AppLanguage.pick(
+    fr: 'Annulation automatique dans $remaining',
+    en: 'Automatic cancellation in $remaining',
+  );
+
+  static String get chargeCancelled => AppLanguage.pick(
+    fr: 'Recharge annulée. Aucun montant n\'a été débité.',
+    en: 'Charge cancelled. Nothing was charged.',
+  );
+
+  static String get startTimedOut => AppLanguage.pick(
+    fr: 'Le câble n\'a pas été branché à temps. Aucun montant n\'a été débité.',
+    en: 'The cable was not plugged in on time. Nothing was charged.',
+  );
+
   static String get unplugNotice => AppLanguage.pick(
     fr: 'Ne débranchez pas le câble pendant la recharge. Arrêtez d\'abord la recharge ici, puis débranchez.',
     en: 'Do not unplug the cable while charging. Stop the charge here first, then unplug.',

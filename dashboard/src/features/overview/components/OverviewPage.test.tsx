@@ -19,7 +19,7 @@ function figures(code: string, name: string, currency: string, scale: number) {
     currency,
     currencyDecimals: 0,
     customers: { total: 10 * scale, active: 8 * scale, newLast30Days: 2 * scale },
-    sessions: { live: scale, completed: 5 * scale, startedLast24Hours: 3 * scale, energyKwh: 40.5 * scale, revenueMinor: 6000 * scale },
+    sessions: { live: scale, completed: 5 * scale, startedLast24Hours: 3 * scale, energyKwh: 40.5 * scale, revenueMinor: 6000 * scale, complimentaryKwh: 0, complimentaryValueMinor: 0 },
     wallets: {
       count: 9 * scale,
       balanceMinor: 5000 * scale,

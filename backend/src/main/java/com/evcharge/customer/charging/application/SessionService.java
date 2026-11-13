@@ -111,12 +111,21 @@ public class SessionService {
 
     public ChargingSession stop(UUID customerId, UUID sessionId) {
         ChargingSession session = refresher.refresh(owned(customerId, sessionId));
+        if (session.state() == SessionState.START_ACCEPTED) {
+            return cancelWaiting(customerId, session);
+        }
         if (session.state() != SessionState.ACTIVE) {
             throw new ApiException(HttpStatus.CONFLICT, "SESSION_NOT_ACTIVE", "No active charge to stop");
         }
         audit.record("SESSION_STOP_REQUESTED", customerId, sessionId.toString(), null);
         userStop.perform(session);
         return owned(customerId, sessionId);
+    }
+
+    private ChargingSession cancelWaiting(UUID customerId, ChargingSession session) {
+        audit.record("SESSION_CANCEL_REQUESTED", customerId, session.id().toString(), null);
+        userStop.releaseWaitingCharger(session);
+        return fail(session, "CANCELLED");
     }
 
     public ChargingSession get(UUID customerId, UUID sessionId) {

@@ -6,4 +6,6 @@ import java.util.Set;
 public interface ConnectorOccupancy {
 
     Map<String, Set<Integer>> busyConnectors();
+
+    Map<String, Map<Integer, Integer>> minutesUntilFree();
 }

@@ -16,7 +16,8 @@ import java.util.List;
 @Repository
 class JdbcActivityFlows implements ActivityFlows {
 
-    private static final String BILLED = "state in ('COMPLETED', 'ABANDONED') and cost_minor > 0";
+    private static final String BILLED = "state in ('COMPLETED', 'ABANDONED') and cost_minor > 0 and "
+            + SessionBilling.PAID;
 
     private final JdbcClient jdbc;
     private final FeeRates fees;

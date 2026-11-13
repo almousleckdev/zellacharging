@@ -25,12 +25,14 @@ class JdbcSessionDigests implements SessionDigests {
 
     @Override
     public SessionDigestPage search(SessionLogQuery query) {
-        String scoped = "select s.*, c.first_name, c.last_name" + SessionFilters.FROM + SessionFilters.where(query);
+        String scoped = "select s.*, c.first_name, c.last_name, exists (select 1 from funding_hold h "
+                + "where h.session_id = s.id and h.waived) as free" + SessionFilters.FROM + SessionFilters.where(query);
         long total = SessionFilters.bind(jdbc.sql("select count(distinct s.customer_id)" + SessionFilters.FROM
                 + SessionFilters.where(query)), query, reporting.since()).query(Long.class).single();
         var items = SessionFilters.bind(jdbc.sql("with scoped as (" + scoped + "), agg as ("
                 + "select customer_id, count(*) as n, coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) "
-                + "as energy, coalesce(sum(cost_minor) filter (where state = 'COMPLETED'), 0)::bigint as spent, "
+                + "as energy, coalesce(sum(cost_minor) filter (where state = 'COMPLETED' and not free), 0)::bigint "
+                + "as spent, "
                 + "max(created_at) as last_at from scoped group by customer_id), latest as ("
                 + "select distinct on (customer_id) * from scoped order by customer_id, created_at desc, id) "
                 + "select a.n, a.energy, a.spent, l.* from agg a join latest l on l.customer_id = a.customer_id"

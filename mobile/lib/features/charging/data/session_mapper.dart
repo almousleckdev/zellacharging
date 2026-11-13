@@ -31,6 +31,7 @@ abstract final class SessionMapper {
       estimatedCost: estimate == null ? null : _estimate(estimate),
       pricePerKwhMinor: (json['pricePerKwhMinor'] as num?)?.toInt(),
       stopReason: json['stopReason'] as String?,
+      waitingUntil: _time(json['waitingUntil']),
     );
   }
 

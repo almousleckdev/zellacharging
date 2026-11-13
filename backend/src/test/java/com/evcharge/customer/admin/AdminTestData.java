@@ -39,6 +39,18 @@ public class AdminTestData {
                 "CP-" + UUID.randomUUID(), connector, state, energy, cost));
     }
 
+    public void complimentarySession(String country, UUID customer, String energy, long cost) {
+        UUID id = UUID.randomUUID();
+        TenantContext.runAs(country, () -> {
+            jdbc.update("insert into charging_session (id, customer_id, station_id, connector_id, id_tag, state, "
+                    + "started_at, energy_kwh, cost_minor, created_at, updated_at) values (?, ?, ?, 1, 'Z-x', "
+                    + "'COMPLETED', now(), ?::numeric, ?, now(), now())", id, customer, "CP-" + UUID.randomUUID(),
+                    energy, cost);
+            jdbc.update("insert into funding_hold (session_id, customer_id, reserved_minor, state, waived, "
+                    + "created_at) values (?, ?, ?, 'SETTLED', true, now())", id, customer, cost);
+        });
+    }
+
     public void sessionAt(String country, UUID customer, String station, int connector, String state, String energy,
                           Long cost) {
         TenantContext.runAs(country, () -> jdbc.update("insert into charging_session (id, customer_id, station_id, "

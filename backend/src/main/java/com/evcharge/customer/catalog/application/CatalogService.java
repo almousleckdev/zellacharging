@@ -36,9 +36,10 @@ public class CatalogService {
                     "latitude, longitude and radiusKm must be given together");
         }
         Map<String, Set<Integer>> busy = occupancy.busyConnectors();
+        Map<String, Map<Integer, Integer>> minutes = occupancy.minutesUntilFree();
         return directory.list(latitude, longitude, latitude == null ? null : radiusKm).stream()
                 .filter(CatalogService::inCurrentCountry)
-                .map(station -> station.occupying(busy.get(station.id()))).toList();
+                .map(station -> station.occupying(busy.get(station.id()), minutes.get(station.id()))).toList();
     }
 
     public Station station(String stationId) {
@@ -67,7 +68,8 @@ public class CatalogService {
     }
 
     private Station occupied(Station station) {
-        return station.occupying(occupancy.busyConnectors().get(station.id()));
+        return station.occupying(occupancy.busyConnectors().get(station.id()),
+                occupancy.minutesUntilFree().get(station.id()));
     }
 
     private static ApiException notFound() {

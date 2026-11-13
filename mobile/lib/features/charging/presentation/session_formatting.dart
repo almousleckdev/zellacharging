@@ -94,13 +94,19 @@ extension SessionFormatting on ChargingSession {
   };
 
   static const _chargerStoppedEarly = 'CHARGER_STOPPED_EARLY';
+  static const _cancelled = 'CANCELLED';
+  static const _startTimeout = 'START_TIMEOUT';
 
   String? get statusMessage => switch (state) {
-    SessionState.requested ||
-    SessionState.startAccepted => ChargeText.waitingForPlug,
+    SessionState.requested => ChargeText.waitingForPlug,
+    SessionState.startAccepted => null,
     SessionState.stopping => ChargeText.finishing,
     SessionState.failed when failureCode == _chargerStoppedEarly =>
       ChargeText.chargerStoppedEarly,
+    SessionState.failed when failureCode == _cancelled =>
+      ChargeText.chargeCancelled,
+    SessionState.failed when failureCode == _startTimeout =>
+      ChargeText.startTimedOut,
     SessionState.failed => ChargeText.sessionFailed,
     SessionState.abandoned => ChargeText.sessionInterrupted,
     _ => null,

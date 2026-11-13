@@ -44,16 +44,9 @@ abstract final class HistoryText {
   static String get locationTitle =>
       AppLanguage.pick(fr: 'Lieu', en: 'Location');
 
-  static String get feeDetails =>
-      AppLanguage.pick(fr: 'Détail du montant', en: 'Price details');
+  static String get payment => AppLanguage.pick(fr: 'Paiement', en: 'Payment');
 
-  static String get electricFee =>
-      AppLanguage.pick(fr: 'Électricité', en: 'Electric fee');
-
-  static String get vat => AppLanguage.pick(fr: 'TVA', en: 'VAT');
-
-  static String get serviceFee =>
-      AppLanguage.pick(fr: 'Frais de service', en: 'Service fee');
+  static String get zellaCharge => 'Zella Charge';
 
   static String get pricePerKwh =>
       AppLanguage.pick(fr: 'Prix du kWh', en: 'Price per kWh');

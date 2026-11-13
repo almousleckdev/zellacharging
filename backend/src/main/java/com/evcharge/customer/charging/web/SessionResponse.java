@@ -32,14 +32,15 @@ record SessionResponse(
         BigDecimal lastPowerKw,
         FeesResponse fees,
         EstimatedCostResponse estimatedCost,
-        Long pricePerKwhMinor) {
+        Long pricePerKwhMinor,
+        Instant waitingUntil) {
 
     static SessionResponse from(ChargingSession s, Metering metering, LastReading last, Optional<Money> estimate,
-                                Optional<FeeBreakdown> fees, Long pricePerKwhMinor) {
+                                Optional<FeeBreakdown> fees, Long pricePerKwhMinor, Instant waitingUntil) {
         return new SessionResponse(s.id(), s.stationId(), s.connectorId(), s.state().name(), s.failureCode(),
                 s.startedAt(), s.stoppedAt(), s.energyKwh(), s.costMinor(), s.currency(), s.currencyDecimals(),
                 s.stopReason(), s.createdAt(), MeteringResponse.from(metering),
                 last.startBatteryPercent(), last.batteryPercent(), last.voltage(), last.powerKw(), FeesResponse.from(s, fees),
-                EstimatedCostResponse.from(estimate), pricePerKwhMinor);
+                EstimatedCostResponse.from(estimate), pricePerKwhMinor, waitingUntil);
     }
 }

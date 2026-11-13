@@ -35,5 +35,7 @@ public interface SessionRepository {
 
     Map<String, Set<Integer>> liveConnectors();
 
+    List<ChargingSession> live();
+
     List<ChargingSession> history(UUID customerId, int limit);
 }

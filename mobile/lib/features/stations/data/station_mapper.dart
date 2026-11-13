@@ -10,6 +10,7 @@ abstract final class StationMapper {
         startable: json['startable'] as bool?,
         connectorType: json['connectorType'] as String?,
         maxPowerKw: (json['maxPowerKw'] as num?)?.toDouble(),
+        freeInMinutes: (json['freeInMinutes'] as num?)?.toInt(),
       );
 
   static Station station(Map<String, dynamic> json) => Station(

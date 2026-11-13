@@ -33,6 +33,7 @@ export const frOverview = {
       offlineStations: "Bornes hors ligne",
       liveSessions: "Recharges en cours",
     },
+    complimentary: { title: "Recharges offertes", text: "Énergie consommée sans paiement, jamais comptée dans les ventes.", energy: "Énergie offerte", value: "Valeur au tarif" },
     countries: { title: "Ventes par pays", text: "Comparaison sur la période choisie.", charges: "{count} recharges", new: "Nouveau" },
     commissions: { title: "Commissions", all: "Tout voir", empty: "Aucune commission pour le moment." },
     recent: { charges: "Dernières recharges", all: "Tout voir", empty: "Aucune recharge pour le moment." },

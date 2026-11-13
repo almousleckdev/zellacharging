@@ -14,6 +14,7 @@ import { useSeries } from "../api/useSeries";
 import { periodsByCurrency } from "../seriesMath";
 import { overviewTotals } from "../totals";
 import { AttentionCard } from "./AttentionCard";
+import { ComplimentaryCard } from "./ComplimentaryCard";
 import { CountryRevenue } from "./CountryRevenue";
 import { OverviewSkeleton } from "./OverviewSkeleton";
 import { QuickAccess } from "./QuickAccess";
@@ -71,6 +72,7 @@ export function OverviewPage() {
         <aside className="flex min-w-0 flex-col gap-4">
           <PendingWithdrawalsPanel />
           {overview.data && <AttentionCard totals={overviewTotals(overview.data.countries)} />}
+          {overview.data && <ComplimentaryCard countries={overview.data.countries} />}
           <QuickAccess />
           {ready && series.data && series.data.countries.length > 1 && primary && <CountryRevenue series={series.data} days={days} />}
         </aside>

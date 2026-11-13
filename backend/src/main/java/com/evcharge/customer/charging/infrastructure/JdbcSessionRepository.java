@@ -106,6 +106,11 @@ class JdbcSessionRepository implements SessionRepository {
     }
 
     @Override
+    public List<ChargingSession> live() {
+        return jdbc.sql("select * from charging_session where state in " + LIVE).query(MAPPER).list();
+    }
+
+    @Override
     public Optional<ChargingSession> findOwned(UUID id, UUID customerId) {
         return jdbc.sql("select * from charging_session where id = :id and customer_id = :customerId and hidden_at is null")
                 .param("id", id).param("customerId", customerId).query(MAPPER).optional();

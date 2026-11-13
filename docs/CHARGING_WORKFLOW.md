@@ -206,9 +206,9 @@ sent by the station after it reboots (firmware dependent), by a new `StartTransa
 `PowerLoss`, no price), or by the 24 h orphan sweep.
 
 What we do:
-- Meter samples arrive about every 10 s. Each new sample stamps `charging_session.reading_at` with our own clock (the sample
-  time is the charger's clock and is not trusted). After `ZELLA_SILENT_AFTER` (25 s, checked every 5 s by `SessionSweeper.watchChargers`) without a new sample, `ChargerSilence`
-  polls the platform once to confirm. Still nothing: `StalledSessionCloser` closes the charge `ABANDONED` (ended at the last reading), failure code
+- Meter samples arrive at the interval the charger is set to (30 to 60 s on the field, 0 means none). Each new sample stamps `charging_session.reading_at` with our own clock (the sample
+  time is the charger's clock and is not trusted). After `ZELLA_SILENT_AFTER` (150 s, never lower: `StallSettings` ignores a smaller value; checked every 2 s by `SessionSweeper.watchChargers`)
+  without a new sample and without any energy progress, `ChargerSilence` polls the platform once to confirm. Still nothing: `StalledSessionCloser` closes the charge `ABANDONED` (ended at the last reading), failure code
   `CHARGER_OFFLINE`, stop reason `PowerLoss`, bills the energy delivered plus the fee and releases the rest of the hold.
   The stop command is skipped (the charger cannot answer; the call only blocks the sweep). If the platform cannot be asked,
   nothing is closed. The 5 min `ZELLA_STALL_AFTER` rule stays as a second net.
@@ -220,3 +220,22 @@ What we do:
 - If the platform later reports the same charge `ABANDONED` (no energy, no cost), `SessionReconciler` bills the energy we
   measured ourselves (`last_energy_kwh`) instead of leaving the cost empty, so the customer is never charged nothing for
   energy received.
+
+
+## Live figures between two charger reports
+
+The charger reports every 30 to 60 s, so the last report is always behind the charger display. `MeteringProjection` advances
+energy, battery (from the percent gained per kWh since the start), duration and therefore the estimated cost from the last
+measured power, for at most 120 s after the report arrived. The final bill always uses the energy the charger settled.
+
+## Waiting for the cable and busy connectors
+
+- A charge in `START_ACCEPTED` can be cancelled by the driver (`POST /v1/sessions/{id}/stop`): the hold is released and the
+  charger gets a best-effort stop. The response carries `waitingUntil`, the moment the wait times out by itself.
+- Each busy connector in the catalog carries `freeInMinutes` (`ConnectorWait`): the time to the plug-in timeout, or the time
+  until the battery is full or the paid budget is spent, whichever comes first. It is empty when the power is unknown.
+
+## Free charges
+
+Complimentary customers (waived funding hold) are counted apart: the admin overview, stations, daily reports and customer
+digests exclude their sessions from revenue and spent, and the overview adds `complimentaryKwh` and `complimentaryValueMinor`.

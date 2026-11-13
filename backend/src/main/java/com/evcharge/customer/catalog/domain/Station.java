@@ -3,6 +3,7 @@ package com.evcharge.customer.catalog.domain;
 import java.math.BigDecimal;
 import java.time.Instant;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import java.util.Optional;
 
@@ -21,12 +22,13 @@ public record Station(
         return connectors.stream().filter(c -> c.connectorId() == connectorId).findFirst();
     }
 
-    public Station occupying(Set<Integer> busy) {
+    public Station occupying(Set<Integer> busy, Map<Integer, Integer> minutesLeft) {
         if (busy == null || busy.isEmpty()) {
             return this;
         }
+        Map<Integer, Integer> minutes = minutesLeft == null ? Map.of() : minutesLeft;
         List<StationConnector> marked = connectors.stream()
-                .map(c -> busy.contains(c.connectorId()) ? c.inUse() : c).toList();
+                .map(c -> busy.contains(c.connectorId()) ? c.inUse(minutes.get(c.connectorId())) : c).toList();
         return new Station(id, isoCode, vendor, model, online, lastSeenAt, latitude, longitude, marked);
     }
 

@@ -9,7 +9,7 @@ function country(code: string, currency: string, overrides: Partial<CountryFigur
     currency,
     currencyDecimals: 0,
     customers: { total: 10, active: 8, newLast30Days: 2 },
-    sessions: { live: 1, completed: 5, startedLast24Hours: 3, energyKwh: 40.5, revenueMinor: 6000 },
+    sessions: { live: 1, completed: 5, startedLast24Hours: 3, energyKwh: 40.5, revenueMinor: 6000, complimentaryKwh: 0, complimentaryValueMinor: 0 },
     wallets: {
       count: 9,
       balanceMinor: 5000,

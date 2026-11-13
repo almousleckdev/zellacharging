@@ -27,7 +27,8 @@ class JdbcStationStatistics implements StationStatistics {
         jdbc.sql("select station_id, count(*) as sessions, "
                         + "count(*) filter (where state in ('REQUESTED', 'START_ACCEPTED', 'ACTIVE', 'STOPPING')) "
                         + "as live, coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) as energy, "
-                        + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED'), 0)::bigint as revenue, "
+                        + "coalesce(sum(cost_minor) filter (where state = 'COMPLETED' and "
+                        + SessionBilling.PAID + "), 0)::bigint as revenue, "
                         + "max(created_at) as last_at from charging_session "
                         + "where country_code = current_setting('app.country', true) and created_at >= :since "
                         + "group by station_id")

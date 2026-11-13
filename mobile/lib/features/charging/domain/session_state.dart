@@ -24,4 +24,6 @@ enum SessionState {
       this == stopping;
 
   bool get canStop => this == active;
+
+  bool get canCancel => this == startAccepted;
 }

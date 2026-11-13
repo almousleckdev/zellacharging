@@ -25,12 +25,19 @@ class ChargingPage extends ConsumerStatefulWidget {
 }
 
 class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
-  Future<void> _stop() async {
+  Future<void> _stop(ChargingSession session) async {
+    final cancelling = session.state.canCancel;
     final confirmed = await showConfirmDialog(
       context,
-      title: ChargeText.stopConfirmTitle,
-      message: ChargeText.stopConfirmBody,
-      confirmLabel: ChargeText.stopCharging,
+      title: cancelling
+          ? ChargeText.cancelConfirmTitle
+          : ChargeText.stopConfirmTitle,
+      message: cancelling
+          ? ChargeText.cancelConfirmBody
+          : ChargeText.stopConfirmBody,
+      confirmLabel: cancelling
+          ? ChargeText.cancelCharge
+          : ChargeText.stopCharging,
       destructive: true,
     );
     if (!confirmed) return;
@@ -79,16 +86,18 @@ class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
           ],
         ),
       ),
-      if (session.state.canStop)
+      if (session.state.canStop || session.state.canCancel)
         SafeArea(
           top: false,
           child: Padding(
             padding: const EdgeInsets.all(AppSpacing.md),
             child: PrimaryButton(
-              label: ChargeText.stopCharging,
+              label: session.state.canCancel
+                  ? ChargeText.cancelCharge
+                  : ChargeText.stopCharging,
               icon: AppIcons.stopCircle,
               loading: loading,
-              onPressed: _stop,
+              onPressed: () => _stop(session),
             ),
           ),
         ),

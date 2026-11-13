@@ -6,6 +6,7 @@ class StationConnector {
     bool? startable,
     this.connectorType,
     this.maxPowerKw,
+    this.freeInMinutes,
   }) : startable = startable ?? available;
 
   final int connectorId;
@@ -14,4 +15,5 @@ class StationConnector {
   final bool startable;
   final String? connectorType;
   final double? maxPowerKw;
+  final int? freeInMinutes;
 }

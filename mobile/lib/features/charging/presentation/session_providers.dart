@@ -8,8 +8,8 @@ import '../domain/quote_request.dart';
 import '../domain/session_quote.dart';
 import '../domain/session_repository.dart';
 import '../domain/start_charge.dart';
+import 'live_session_poller.dart';
 
-const _pollInterval = Duration(seconds: 2);
 const _quoteDebounce = Duration(milliseconds: 400);
 const _settleDelay = Duration(seconds: 3);
 
@@ -51,13 +51,7 @@ final sessionByIdProvider = FutureProvider.autoDispose
 final liveSessionProvider = StreamProvider.autoDispose
     .family<ChargingSession, String>((ref, id) async* {
       final repository = ref.watch(sessionRepositoryProvider);
-      var session = await repository.get(id);
-      yield session;
-      while (session.state.isLive) {
-        await Future<void>.delayed(_pollInterval);
-        session = await repository.get(id);
-        yield session;
-      }
+      yield* LiveSessionPoller(repository).watch(id, alive: () => ref.mounted);
       if (!ref.mounted) return;
       ref.invalidate(activeSessionProvider);
       ref.invalidate(historyProvider);

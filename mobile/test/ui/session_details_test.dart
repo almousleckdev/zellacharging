@@ -83,7 +83,7 @@ void main() {
       HistoryText.totalDuration,
       HistoryText.batteryLevels,
       HistoryText.locationTitle,
-      HistoryText.feeDetails,
+      HistoryText.payment,
       HistoryText.deviceInfo,
     ];
     final tops = [
@@ -93,16 +93,18 @@ void main() {
     await _close(tester);
   });
 
-  testWidgets('shows the totals and the fee breakdown', (tester) async {
+  testWidgets('shows the totals and one Zella Charge amount, no fee lines', (
+    tester,
+  ) async {
     await _open(tester);
 
     expect(find.text('1h 15m'), findsOneWidget);
     expect(find.text('18.500 kWh'), findsOneWidget);
-    expect(find.text(_money(1000)), findsOneWidget);
-    expect(find.text(_money(180)), findsOneWidget);
-    expect(find.text(_money(50)), findsOneWidget);
-    expect(find.text(_money(0)), findsNothing);
+    expect(find.text(HistoryText.zellaCharge), findsOneWidget);
     expect(find.text(_money(1230)), findsWidgets);
+    expect(find.text(_money(1000)), findsNothing);
+    expect(find.text(_money(180)), findsNothing);
+    expect(find.text(_money(50)), findsNothing);
     await _close(tester);
   });
 

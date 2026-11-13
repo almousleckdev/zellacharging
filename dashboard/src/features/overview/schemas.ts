@@ -12,6 +12,8 @@ const sessionsSchema = z.object({
   startedLast24Hours: z.number(),
   energyKwh: z.number(),
   revenueMinor: z.number(),
+  complimentaryKwh: z.number().default(0),
+  complimentaryValueMinor: z.number().default(0),
 });
 
 const walletsSchema = z.object({

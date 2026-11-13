@@ -70,9 +70,23 @@ class ConnectorTile extends StatelessWidget {
               onPressed: onStart,
             )
           else
-            StatusChip(
-              label: ConnectorStatusStyle.label(connector.status),
-              color: ConnectorStatusStyle.color(connector.status),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                StatusChip(
+                  label: ConnectorStatusStyle.label(connector.status),
+                  color: ConnectorStatusStyle.color(connector.status),
+                ),
+                if (connector.freeInMinutes != null) ...[
+                  const SizedBox(height: AppSpacing.xs),
+                  Text(
+                    StationText.freeIn(connector.freeInMinutes!),
+                    style: theme.textTheme.bodySmall?.copyWith(
+                      color: AppColors.textSecondary,
+                    ),
+                  ),
+                ],
+              ],
             ),
         ],
       ),

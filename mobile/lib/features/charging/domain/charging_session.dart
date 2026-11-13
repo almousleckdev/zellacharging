@@ -26,6 +26,7 @@ class ChargingSession {
     this.estimatedCost,
     this.pricePerKwhMinor,
     this.stopReason,
+    this.waitingUntil,
   });
 
   final String id;
@@ -49,6 +50,7 @@ class ChargingSession {
   final EstimatedCost? estimatedCost;
   final int? pricePerKwhMinor;
   final String? stopReason;
+  final DateTime? waitingUntil;
 
   double? get shownEnergyKwh => state.isLive
       ? metering?.totalKwh ?? energyKwh

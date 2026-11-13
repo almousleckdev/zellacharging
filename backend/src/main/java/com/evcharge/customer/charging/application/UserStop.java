@@ -35,6 +35,14 @@ public class UserStop {
         throw new ApiException(HttpStatus.CONFLICT, "STOP_REFUSED", "The charger refused to stop");
     }
 
+    public void releaseWaitingCharger(ChargingSession session) {
+        try {
+            stopper.issue(session);
+        } catch (RuntimeException e) {
+            return;
+        }
+    }
+
     private CommandOutcome attempt(ChargingSession session) {
         try {
             return stopper.issue(session);

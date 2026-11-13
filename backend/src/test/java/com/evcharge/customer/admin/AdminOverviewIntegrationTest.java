@@ -104,6 +104,27 @@ class AdminOverviewIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void freeChargesAreCountedApartAndNeverAsRevenue() throws Exception {
+        String root = fixtures.create(AdminRole.SUPER_ADMIN, Set.of()).accessToken();
+        String before = json(root, "GA");
+        UUID paying = data.customer("GA", "ACTIVE");
+        UUID guest = data.customer("GA", "ACTIVE");
+        data.session("GA", paying, 1, "COMPLETED", "10.000", 1500L);
+        data.complimentarySession("GA", guest, "20.000", 3000L);
+
+        String after = json(root, "GA");
+
+        assertThat(figure(after, "GA", ".sessions.revenueMinor").longValue()
+                - figure(before, "GA", ".sessions.revenueMinor").longValue()).isEqualTo(1500);
+        assertThat(figure(after, "GA", ".sessions.complimentaryKwh").doubleValue()
+                - figure(before, "GA", ".sessions.complimentaryKwh").doubleValue()).isEqualTo(20.0);
+        assertThat(figure(after, "GA", ".sessions.complimentaryValueMinor").longValue()
+                - figure(before, "GA", ".sessions.complimentaryValueMinor").longValue()).isEqualTo(3000);
+        assertThat(figure(after, "GA", ".sessions.energyKwh").doubleValue()
+                - figure(before, "GA", ".sessions.energyKwh").doubleValue()).isEqualTo(30.0);
+    }
+
+    @Test
     void aCountryScopeReturnsOnlyThatCountry() throws Exception {
         String root = fixtures.create(AdminRole.SUPER_ADMIN, Set.of()).accessToken();
 

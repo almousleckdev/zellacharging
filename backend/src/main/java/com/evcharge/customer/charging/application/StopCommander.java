@@ -31,7 +31,7 @@ public class StopCommander {
 
     public CommandOutcome issue(ChargingSession session) {
         CommandOutcome outcome = gateway.stop(session.stationId(), session.connectorId(),
-                "stop:" + session.id() + ":" + clock.instant().toEpochMilli());
+                "stop:" + session.id());
         if (outcome.accepted()) {
             sessions.update(session.withState(SessionState.STOPPING, null, clock.instant()));
         } else {

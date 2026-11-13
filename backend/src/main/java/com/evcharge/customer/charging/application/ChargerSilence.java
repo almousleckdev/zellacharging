@@ -13,7 +13,7 @@ import java.time.Instant;
 @Component
 public class ChargerSilence {
 
-    private static final Duration START_GRACE = Duration.ofSeconds(90);
+    private static final Duration START_GRACE = Duration.ofSeconds(120);
 
     private final SessionTelemetry telemetry;
     private final ChargingGateway gateway;
@@ -50,8 +50,11 @@ public class ChargerSilence {
     }
 
     private boolean silent(ChargingSession session, Duration quietFor) {
-        return telemetry.readingAtOf(session.id())
-                .map(at -> at.plus(quietFor).isBefore(clock.instant()))
+        Instant limit = clock.instant().minus(quietFor);
+        Instant progressAt = telemetry.progressOf(session.id()).at();
+        boolean progressing = progressAt != null && progressAt.isAfter(limit);
+        return !progressing && telemetry.readingAtOf(session.id())
+                .map(at -> at.isBefore(limit))
                 .orElse(false);
     }
 }

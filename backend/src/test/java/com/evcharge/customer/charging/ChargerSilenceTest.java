@@ -6,6 +6,7 @@ import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.Metering;
+import com.evcharge.customer.charging.domain.SessionProgress;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.ApiException;
 import org.junit.jupiter.api.Test;
@@ -33,7 +34,11 @@ class ChargerSilenceTest {
     private final SessionTelemetry telemetry = mock(SessionTelemetry.class);
     private final ChargingGateway gateway = mock(ChargingGateway.class);
     private final ChargerSilence silence = new ChargerSilence(telemetry, gateway,
-            new StallSettings(Duration.ofMinutes(5), Duration.ofSeconds(90)), Clock.fixed(NOW, ZoneOffset.UTC));
+            new StallSettings(Duration.ofMinutes(5), Duration.ofSeconds(60)), Clock.fixed(NOW, ZoneOffset.UTC));
+
+    {
+        when(telemetry.progressOf(any())).thenReturn(SessionProgress.none());
+    }
 
     private ChargingSession active(Integer transactionId) {
         return new ChargingSession(UUID.randomUUID(), UUID.randomUUID(), "CP-1", 1, "Z-X", SessionState.ACTIVE,

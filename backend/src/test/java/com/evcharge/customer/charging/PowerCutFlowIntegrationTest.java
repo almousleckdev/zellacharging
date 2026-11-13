@@ -100,7 +100,7 @@ class PowerCutFlowIntegrationTest extends PostgresTestBase {
         mvc.perform(get("/v1/sessions/active").with(TestTenants.customer(customer)))
                 .andExpect(status().isOk()).andExpect(jsonPath("$.state").value("ACTIVE"));
 
-        jdbc.update("update charging_session set reading_at = now() - interval '5 minutes' where id = ?::uuid",
+        jdbc.update("update charging_session set reading_at = now() - interval '5 minutes', progress_at = now() - interval '5 minutes' where id = ?::uuid",
                 sessionId);
         TenantContext.runAs("GA", () -> closer.closeIfStalled(
                 sessions.findById(UUID.fromString(sessionId)).orElseThrow()));
@@ -147,7 +147,7 @@ class PowerCutFlowIntegrationTest extends PostgresTestBase {
         platformShowsTheChargeRunning(jdbc.queryForObject(
                 "select id_tag from customer_id_tag where customer_id = ?", String.class, customer));
         mvc.perform(get("/v1/sessions/active").with(TestTenants.customer(customer))).andExpect(status().isOk());
-        jdbc.update("update charging_session set reading_at = now() - interval '5 minutes' where id = ?::uuid",
+        jdbc.update("update charging_session set reading_at = now() - interval '5 minutes', progress_at = now() - interval '5 minutes' where id = ?::uuid",
                 sessionId);
 
         mvc.perform(post("/v1/sessions/" + sessionId + "/stop").with(TestTenants.customer(customer))

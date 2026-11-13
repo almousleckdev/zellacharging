@@ -115,7 +115,7 @@
         <dependency>
             <groupId>com.googlecode.libphonenumber</groupId>
             <artifactId>libphonenumber</artifactId>
-            <version>9.0.42</version>
+            <version>9.0.43</version>
         </dependency>
         <!-- Boot 4 split auto-configuration per technology: without this Flyway never runs. -->
         <dependency>

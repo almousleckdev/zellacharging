@@ -35,6 +35,12 @@ public class PartnerFixtures {
         return id;
     }
 
+    public void signedInWithGoogle(String country, UUID customer) {
+        TenantContext.runAs(country, () -> jdbc.update("insert into customer_identity (id, customer_id, provider, "
+                + "subject, created_at) values (?, ?, 'GOOGLE', ?, now())", UUID.randomUUID(), customer,
+                UUID.randomUUID().toString()));
+    }
+
     public void suspend(String country, UUID customer, long owedMinor, String... numbers) {
         TenantContext.runAs(country, () -> {
             jdbc.update("insert into partner_link (partner, customer_id, linked_at) values ('NDZELA', ?, now()) "

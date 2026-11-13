@@ -25,12 +25,14 @@ class JdbcCustomerContacts implements CustomerContacts {
         if (emails.isEmpty() && phonesE164.isEmpty()) {
             return List.of();
         }
-        return jdbc.sql("select id, first_name, last_name, email, phone_e164 from customer "
+        return jdbc.sql("select id, first_name, last_name, email, phone_e164, "
+                        + "exists (select 1 from customer_identity i where i.customer_id = customer.id "
+                        + "and i.country_code = customer.country_code) as proven from customer "
                         + "where status = 'ACTIVE' and country_code = current_setting('app.country') "
                         + "and (email in (:emails) or phone_e164 in (:phones))")
                 .param("emails", orNothing(emails)).param("phones", orNothing(phonesE164))
                 .query((rs, row) -> new CustomerMatch(rs.getObject("id", UUID.class), rs.getString("first_name"),
-                        rs.getString("last_name"), rs.getString("email"), rs.getString("phone_e164")))
+                        rs.getString("last_name"), rs.getString("email"), rs.getString("phone_e164"), rs.getBoolean("proven")))
                 .list();
     }
 

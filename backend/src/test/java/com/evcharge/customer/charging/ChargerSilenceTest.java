@@ -34,7 +34,7 @@ class ChargerSilenceTest {
     private final SessionTelemetry telemetry = mock(SessionTelemetry.class);
     private final ChargingGateway gateway = mock(ChargingGateway.class);
     private final ChargerSilence silence = new ChargerSilence(telemetry, gateway,
-            new StallSettings(Duration.ofMinutes(5), Duration.ofSeconds(60)), Clock.fixed(NOW, ZoneOffset.UTC));
+            new StallSettings(Duration.ofMinutes(5), Duration.ofSeconds(150)), Clock.fixed(NOW, ZoneOffset.UTC));
 
     {
         when(telemetry.progressOf(any())).thenReturn(SessionProgress.none());
@@ -83,7 +83,7 @@ class ChargerSilenceTest {
     @Test
     void silenceIsConfirmedOnlyWhenAFreshPollBringsNothingNew() {
         ChargingSession session = active(7);
-        when(telemetry.readingAtOf(session.id())).thenReturn(Optional.of(NOW.minusSeconds(120)));
+        when(telemetry.readingAtOf(session.id())).thenReturn(Optional.of(NOW.minusSeconds(200)));
         when(gateway.metering(7)).thenReturn(Optional.of(sample()));
 
         assertThat(silence.confirmed(session)).isTrue();
@@ -95,7 +95,7 @@ class ChargerSilenceTest {
     void aFreshSampleFoundByThePollMeansTheChargerIsAlive() {
         ChargingSession session = active(7);
         when(telemetry.readingAtOf(session.id()))
-                .thenReturn(Optional.of(NOW.minusSeconds(120)), Optional.of(NOW));
+                .thenReturn(Optional.of(NOW.minusSeconds(200)), Optional.of(NOW));
         when(gateway.metering(7)).thenReturn(Optional.of(sample()));
 
         assertThat(silence.confirmed(session)).isFalse();

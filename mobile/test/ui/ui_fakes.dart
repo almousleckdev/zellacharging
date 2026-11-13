@@ -26,6 +26,7 @@ import 'package:zella/features/charging/domain/session_quote.dart';
 import 'package:zella/features/charging/domain/session_repository.dart';
 import 'package:zella/features/charging/domain/session_state.dart';
 import 'package:zella/features/profile/domain/profile.dart';
+import 'package:zella/features/profile/domain/otp_delivery.dart';
 import 'package:zella/features/profile/domain/profile_repository.dart';
 import 'package:zella/features/stations/domain/resolved_connector.dart';
 import 'package:zella/features/stations/domain/station.dart';
@@ -279,6 +280,7 @@ class FakeProfile implements ProfileRepository {
 
   final emailsAdded = <String>[];
   final phonesAdded = <String>[];
+  final deliveries = <OtpDelivery>[];
   final confirmed = <String>[];
 
   @override
@@ -291,9 +293,19 @@ class FakeProfile implements ProfileRepository {
   }
 
   @override
-  Future<Profile> addPhone(String phone) async {
+  Future<void> addPhone(String phone, OtpDelivery delivery) async {
     phonesAdded.add(phone);
-    return Profile(firstName: 'A', lastName: 'B', phone: phone);
+    deliveries.add(delivery);
+  }
+
+  @override
+  Future<void> sendPhoneCode(OtpDelivery delivery) async =>
+      deliveries.add(delivery);
+
+  @override
+  Future<Profile> confirmPhone(String code) async {
+    confirmed.add(code);
+    return const Profile(firstName: 'A', lastName: 'B', phone: '+24177000000');
   }
 
   @override

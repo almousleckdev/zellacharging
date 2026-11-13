@@ -2,7 +2,7 @@ package com.evcharge.customer.account;
 
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.account.application.port.VerificationSender;
-import com.evcharge.customer.account.domain.Channel;
+import com.evcharge.customer.account.domain.CodeDelivery;
 import com.jayway.jsonpath.JsonPath;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -44,9 +44,9 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
         return mvc.perform(post(path).contentType(MediaType.APPLICATION_JSON).content(json));
     }
 
-    private String lastCode(Channel channel, String target) {
+    private String lastCode(CodeDelivery delivery, String target) {
         ArgumentCaptor<String> code = ArgumentCaptor.forClass(String.class);
-        verify(sender, atLeastOnce()).send(eq(channel), eq(target), code.capture());
+        verify(sender, atLeastOnce()).send(eq(delivery), eq(target), code.capture());
         return code.getValue();
     }
 
@@ -56,7 +56,7 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
                 """.formatted(email)).andExpect(status().isCreated());
         postJson("/v1/auth/verify", """
                 {"channel":"EMAIL","target":"%s","code":"%s"}
-                """.formatted(email, lastCode(Channel.EMAIL, email))).andExpect(status().isNoContent());
+                """.formatted(email, lastCode(CodeDelivery.EMAIL, email))).andExpect(status().isNoContent());
     }
 
     @Test
@@ -71,7 +71,7 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
                 .andExpect(jsonPath("$.code").value("ACCOUNT_NOT_VERIFIED"));
         postJson("/v1/auth/verify", """
                 {"channel":"EMAIL","target":"%s","code":"%s"}
-                """.formatted(email, lastCode(Channel.EMAIL, email))).andExpect(status().isNoContent());
+                """.formatted(email, lastCode(CodeDelivery.EMAIL, email))).andExpect(status().isNoContent());
 
         String body = postJson("/v1/auth/login", """
                 {"identifier":"%s","password":"Secret123!"}
@@ -117,8 +117,8 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
                  "password":"Secret123!"}
                 """).andExpect(status().isCreated());
 
-        assertThat(lastCode(Channel.EMAIL, "jean@example.com")).matches("\\d{6}");
-        verify(sender, never()).send(eq(Channel.PHONE), anyString(), anyString());
+        assertThat(lastCode(CodeDelivery.EMAIL, "jean@example.com")).matches("\\d{6}");
+        verify(sender, never()).send(eq(CodeDelivery.WHATSAPP), anyString(), anyString());
         assertThat(jdbc.queryForObject("select phone_e164 from customer where email = ?", String.class,
                 "jean@example.com")).isEqualTo("+24177123456");
         assertThat(jdbc.queryForObject("select phone_verified_at from customer where email = ?",

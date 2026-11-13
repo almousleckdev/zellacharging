@@ -1,6 +1,7 @@
 import 'dart:typed_data';
 
 import '../../auth/domain/social_credential.dart';
+import 'otp_delivery.dart';
 import 'profile.dart';
 
 abstract class ProfileRepository {
@@ -8,7 +9,9 @@ abstract class ProfileRepository {
   Future<Profile> updateName(String firstName, String lastName);
   Future<void> addEmail(String email);
   Future<Profile> confirmEmail(String code);
-  Future<Profile> addPhone(String phone);
+  Future<void> addPhone(String phone, OtpDelivery delivery);
+  Future<void> sendPhoneCode(OtpDelivery delivery);
+  Future<Profile> confirmPhone(String code);
   Future<Uint8List?> fetchAvatar();
   Future<void> uploadAvatar(Uint8List bytes, String contentType);
   Future<void> deleteAvatar();

@@ -19,6 +19,7 @@ enum ApiErrorKind {
     'CHARGER_UNREACHABLE',
     'PROVIDER_UNAVAILABLE',
     'STOP_REFUSED',
+    'CODE_NOT_SENT',
   };
 
   static ApiErrorKind of(String code, int? status) {

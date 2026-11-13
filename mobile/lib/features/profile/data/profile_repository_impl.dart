@@ -4,6 +4,7 @@ import 'package:dio/dio.dart';
 
 import '../../../core/network/api_error.dart';
 import '../../auth/domain/social_credential.dart';
+import '../domain/otp_delivery.dart';
 import '../domain/profile.dart';
 import '../domain/profile_repository.dart';
 
@@ -59,8 +60,27 @@ class ProfileRepositoryImpl implements ProfileRepository {
   );
 
   @override
-  Future<Profile> addPhone(String phone) => _profile(
-    _client.post<Map<String, dynamic>>('/v1/me/phone', data: {'phone': phone}),
+  Future<void> addPhone(String phone, OtpDelivery delivery) => _guard(
+    () => _client.post<void>(
+      '/v1/me/phone',
+      data: {'phone': phone, 'delivery': delivery.wire},
+    ),
+  );
+
+  @override
+  Future<void> sendPhoneCode(OtpDelivery delivery) => _guard(
+    () => _client.post<void>(
+      '/v1/me/phone/code',
+      data: {'delivery': delivery.wire},
+    ),
+  );
+
+  @override
+  Future<Profile> confirmPhone(String code) => _profile(
+    _client.post<Map<String, dynamic>>(
+      '/v1/me/phone/verify',
+      data: {'code': code},
+    ),
   );
 
   @override

@@ -20,9 +20,10 @@ import '../../features/stations/presentation/locations_page.dart';
 import '../../features/coupons/presentation/coupons_page.dart';
 import '../../features/profile/presentation/change_password_page.dart';
 import '../../features/profile/presentation/delete_account_page.dart';
+import '../../features/profile/domain/contact_confirmation.dart';
 import '../../features/profile/domain/contact_kind.dart';
 import '../../features/profile/presentation/add_contact_page.dart';
-import '../../features/profile/presentation/confirm_email_page.dart';
+import '../../features/profile/presentation/confirm_contact_page.dart';
 import '../../features/profile/presentation/edit_profile_page.dart';
 import '../../features/profile/presentation/settings_page.dart';
 import '../../features/support/presentation/contact_page.dart';
@@ -128,7 +129,17 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.confirmEmail,
-        builder: (_, state) => ConfirmEmailPage(email: state.extra as String),
+        builder: (_, state) => ConfirmContactPage(
+          kind: ContactKind.email,
+          confirmation: state.extra as ContactConfirmation,
+        ),
+      ),
+      GoRoute(
+        path: Routes.confirmPhone,
+        builder: (_, state) => ConfirmContactPage(
+          kind: ContactKind.phone,
+          confirmation: state.extra as ContactConfirmation,
+        ),
       ),
       GoRoute(path: Routes.settings, builder: (_, _) => const SettingsPage()),
       GoRoute(

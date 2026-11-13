@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
@@ -7,12 +8,37 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/info_card.dart';
+import '../../../shared/submit_mixin.dart';
+import '../domain/contact_confirmation.dart';
 import '../domain/profile.dart';
+import 'otp_channel_sheet.dart';
+import 'profile_providers.dart';
 
-class ContactSection extends StatelessWidget {
+class ContactSection extends ConsumerStatefulWidget {
   const ContactSection({super.key, required this.profile});
 
   final Profile profile;
+
+  @override
+  ConsumerState<ContactSection> createState() => _ContactSectionState();
+}
+
+class _ContactSectionState extends ConsumerState<ContactSection>
+    with SubmitMixin {
+  Profile get profile => widget.profile;
+
+  Future<void> _verifyPhone() async {
+    final delivery = await showOtpChannelSheet(context);
+    if (delivery == null) return;
+    await submit(() async {
+      await ref.read(profileRepositoryProvider).sendPhoneCode(delivery);
+      if (!mounted) return;
+      context.push(
+        Routes.confirmPhone,
+        extra: ContactConfirmation(target: profile.phone!, delivery: delivery),
+      );
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -35,6 +61,8 @@ class ContactSection extends StatelessWidget {
           verified: profile.phoneVerified,
           addLabel: ProfileText.addPhone,
           onAdd: () => context.push(Routes.addPhone),
+          onVerify: _verifyPhone,
+          verifying: loading,
         ),
       ],
     );
@@ -49,6 +77,8 @@ class _ContactRow extends StatelessWidget {
     required this.verified,
     required this.addLabel,
     required this.onAdd,
+    this.onVerify,
+    this.verifying = false,
   });
 
   final IconData icon;
@@ -57,6 +87,8 @@ class _ContactRow extends StatelessWidget {
   final bool verified;
   final String addLabel;
   final VoidCallback onAdd;
+  final VoidCallback? onVerify;
+  final bool verifying;
 
   @override
   Widget build(BuildContext context) {
@@ -100,13 +132,19 @@ class _ContactRow extends StatelessWidget {
             ],
           ),
         ),
-        Text(
-          verified ? ProfileText.verified : ProfileText.notVerified,
-          style: theme.textTheme.bodySmall?.copyWith(
-            color: color,
-            fontWeight: FontWeight.w700,
+        if (!verified && onVerify != null)
+          TextButton(
+            onPressed: verifying ? null : onVerify,
+            child: Text(ProfileText.verifyAction),
+          )
+        else
+          Text(
+            verified ? ProfileText.verified : ProfileText.notVerified,
+            style: theme.textTheme.bodySmall?.copyWith(
+              color: color,
+              fontWeight: FontWeight.w700,
+            ),
           ),
-        ),
       ],
     );
   }

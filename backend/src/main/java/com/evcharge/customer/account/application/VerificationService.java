@@ -4,6 +4,7 @@ import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.VerificationCodeRepository;
 import com.evcharge.customer.account.application.port.VerificationSender;
 import com.evcharge.customer.account.domain.Channel;
+import com.evcharge.customer.account.domain.CodeDelivery;
 import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.account.domain.CustomerStatus;
@@ -49,12 +50,17 @@ public class VerificationService {
 
     @Transactional
     public void issue(Customer customer, ContactPoint contact, Channel stream) {
+        issue(customer, contact, stream, CodeDelivery.defaultFor(contact.channel()));
+    }
+
+    @Transactional
+    public void issue(Customer customer, ContactPoint contact, Channel stream, CodeDelivery delivery) {
         String code = "%06d".formatted(random.nextInt(1_000_000));
         Instant now = clock.instant();
         codes.save(new VerificationCode(UUID.randomUUID(), customer.id(), stream,
                 hash(customer.id(), stream, code),
                 now.plus(settings.verification().codeTtl()), 0, null, now));
-        sender.send(contact.channel(), contact.target(), code);
+        sender.send(delivery, contact.target(), code);
     }
 
     @Transactional
@@ -93,6 +99,10 @@ public class VerificationService {
     }
 
     public void reissue(Customer customer, ContactPoint contact, Channel stream) {
+        reissue(customer, contact, stream, CodeDelivery.defaultFor(contact.channel()));
+    }
+
+    public void reissue(Customer customer, ContactPoint contact, Channel stream, CodeDelivery delivery) {
         boolean tooSoon = codes.findLatest(customer.id(), stream)
                 .filter(previous -> previous.createdAt()
                         .plus(settings.verification().resendCooldown()).isAfter(clock.instant()))
@@ -101,7 +111,7 @@ public class VerificationService {
             throw new ApiException(HttpStatus.TOO_MANY_REQUESTS, "VERIFICATION_COOLDOWN",
                     "Please wait before requesting another code");
         }
-        issue(customer, contact, stream);
+        issue(customer, contact, stream, delivery);
     }
 
     private String hash(UUID customerId, Channel channel, String code) {

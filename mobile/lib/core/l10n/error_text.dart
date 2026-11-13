@@ -33,6 +33,14 @@ abstract final class ErrorText {
       fr: 'Aucune adresse e-mail en attente de confirmation. Recommencez.',
       en: 'No email is waiting for confirmation. Please start again.',
     ),
+    'NO_PENDING_PHONE': AppLanguage.pick(
+      fr: 'Aucun numéro en attente de confirmation. Recommencez.',
+      en: 'No phone number is waiting for confirmation. Please start again.',
+    ),
+    'CODE_NOT_SENT': AppLanguage.pick(
+      fr: 'Le code n’a pas pu être envoyé sur WhatsApp. Vérifiez le numéro et réessayez.',
+      en: 'The code could not be sent on WhatsApp. Check the number and try again.',
+    ),
     'ACCOUNT_LOCKED': AppLanguage.pick(
       fr: 'Trop de tentatives. Compte bloqué pendant 30 minutes.',
       en: 'Too many attempts. Account locked for 30 minutes.',

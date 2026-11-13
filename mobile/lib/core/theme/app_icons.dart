@@ -19,6 +19,8 @@ abstract final class AppIcons {
   static const crosshair = PhosphorIconsRegular.crosshair;
   static const search = PhosphorIconsRegular.magnifyingGlass;
   static const phone = PhosphorIconsRegular.phone;
+  static const whatsapp = PhosphorIconsFill.whatsappLogo;
+  static const sms = PhosphorIconsRegular.chatText;
   static const envelope = PhosphorIconsRegular.envelope;
   static const lock = PhosphorIconsRegular.lock;
   static const eye = PhosphorIconsRegular.eye;

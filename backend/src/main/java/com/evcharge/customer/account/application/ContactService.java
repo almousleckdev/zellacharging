@@ -2,7 +2,9 @@ package com.evcharge.customer.account.application;
 
 import com.evcharge.customer.account.application.port.CustomerRepository;
 import com.evcharge.customer.account.application.port.PendingEmailRepository;
+import com.evcharge.customer.account.application.port.PendingPhoneRepository;
 import com.evcharge.customer.account.domain.Channel;
+import com.evcharge.customer.account.domain.CodeDelivery;
 import com.evcharge.customer.account.domain.ContactPoint;
 import com.evcharge.customer.account.domain.Customer;
 import com.evcharge.customer.shared.ApiException;
@@ -12,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -20,17 +23,19 @@ public class ContactService {
     private final ProfileService profiles;
     private final CustomerRepository customers;
     private final PendingEmailRepository pending;
+    private final PendingPhoneRepository pendingPhones;
     private final VerificationService verification;
     private final ContactNormalizer contacts;
     private final AccountCountries countries;
     private final Clock clock;
 
     public ContactService(ProfileService profiles, CustomerRepository customers, PendingEmailRepository pending,
-                          VerificationService verification, ContactNormalizer contacts, AccountCountries countries,
+                          PendingPhoneRepository pendingPhones, VerificationService verification, ContactNormalizer contacts, AccountCountries countries,
                           Clock clock) {
         this.profiles = profiles;
         this.customers = customers;
         this.pending = pending;
+        this.pendingPhones = pendingPhones;
         this.verification = verification;
         this.contacts = contacts;
         this.countries = countries;
@@ -60,7 +65,8 @@ public class ContactService {
     }
 
     @Transactional
-    public void addPhone(UUID customerId, String rawPhone) {
+    public void startPhone(UUID customerId, String rawPhone, CodeDelivery delivery) {
+        requirePhoneDelivery(delivery);
         Customer customer = profiles.get(customerId);
         if (customer.phone() != null) {
             throw conflict("PHONE_ALREADY_SET");
@@ -71,7 +77,43 @@ public class ContactService {
                     "The number does not belong to your country");
         }
         requireUnused(phone);
-        customers.attachPhone(customerId, phone.target());
+        pendingPhones.save(customerId, phone.target(), clock.instant());
+        verification.reissue(customer, phone, Channel.PHONE, delivery);
+    }
+
+    @Transactional
+    public void sendPhoneCode(UUID customerId, CodeDelivery delivery) {
+        requirePhoneDelivery(delivery);
+        Customer customer = profiles.get(customerId);
+        String target = pendingPhones.find(customerId).orElse(customer.phone());
+        if (target == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "NO_PHONE", "No phone number to verify");
+        }
+        if (customer.phone() != null && customers.isVerified(customerId, Channel.PHONE)) {
+            throw conflict("PHONE_ALREADY_VERIFIED");
+        }
+        verification.reissue(customer, new ContactPoint(Channel.PHONE, target), Channel.PHONE, delivery);
+    }
+
+    @Transactional(noRollbackFor = ApiException.class)
+    public void confirmPhone(UUID customerId, String code) {
+        Customer customer = profiles.get(customerId);
+        Optional<String> pendingPhone = pendingPhones.find(customerId);
+        if (pendingPhone.isEmpty() && (customer.phone() == null || customers.isVerified(customerId, Channel.PHONE))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "NO_PENDING_PHONE",
+                    "No phone number is waiting for confirmation");
+        }
+        verification.confirm(customer, Channel.PHONE, code);
+        pendingPhone.ifPresent(phone -> customers.attachPhone(customerId, phone));
+        customers.markContactVerified(customerId, Channel.PHONE, clock.instant());
+        pendingPhones.delete(customerId);
+    }
+
+    private static void requirePhoneDelivery(CodeDelivery delivery) {
+        if (delivery == null || !delivery.isPhone()) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "CHANNEL_NOT_SUPPORTED",
+                    "Choose WhatsApp or SMS to receive the code");
+        }
     }
 
     private void requireUnused(ContactPoint point) {

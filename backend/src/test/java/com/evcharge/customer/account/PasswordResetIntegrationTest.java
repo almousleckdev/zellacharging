@@ -2,7 +2,7 @@ package com.evcharge.customer.account;
 
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.account.application.port.VerificationSender;
-import com.evcharge.customer.account.domain.Channel;
+import com.evcharge.customer.account.domain.CodeDelivery;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,7 +40,7 @@ class PasswordResetIntegrationTest extends PostgresTestBase {
 
     private String lastCode(String email) {
         ArgumentCaptor<String> code = ArgumentCaptor.forClass(String.class);
-        verify(sender, atLeastOnce()).send(eq(Channel.EMAIL), eq(email), code.capture());
+        verify(sender, atLeastOnce()).send(eq(CodeDelivery.EMAIL), eq(email), code.capture());
         return code.getValue();
     }
 
@@ -96,7 +96,7 @@ class PasswordResetIntegrationTest extends PostgresTestBase {
                 {"email":"%s","code":"123456","newPassword":"NewSecret456!"}
                 """.formatted(stranger)).andExpect(status().isBadRequest());
 
-        verify(sender, never()).send(eq(Channel.EMAIL), eq(stranger), anyString());
+        verify(sender, never()).send(eq(CodeDelivery.EMAIL), eq(stranger), anyString());
     }
 
     @Test

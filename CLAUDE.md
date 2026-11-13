@@ -50,4 +50,4 @@ cd backend && SPRING_PROFILES_ACTIVE=dev ./mvnw spring-boot:run
 ./mvnw verify
 ```
 
-Maildev inbox: http://localhost:1080. Phone OTP codes (6 digits) are written to the backend log for now.
+Maildev inbox: http://localhost:1080. Phone OTP codes (6 digits) go out on WhatsApp through Twilio (`docs/phone-verification.md`); without the Twilio variables they are written to the backend log.

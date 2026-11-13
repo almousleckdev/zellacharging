@@ -171,15 +171,12 @@ abstract final class ProfileText {
   );
 
   static String get addPhoneHint => AppLanguage.pick(
-    fr: 'Ce numéro vous servira à vous connecter. La vérification par SMS arrivera bientôt.',
-    en: 'This number can be used to sign in. SMS verification is coming soon.',
+    fr: 'Nous enverrons un code de vérification sur WhatsApp à ce numéro.',
+    en: 'We will send a verification code to this number on WhatsApp.',
   );
 
   static String get sendCode =>
       AppLanguage.pick(fr: 'Envoyer le code', en: 'Send the code');
-
-  static String get savePhone =>
-      AppLanguage.pick(fr: 'Ajouter ce numéro', en: 'Add this number');
 
   static String get confirmEmailTitle =>
       AppLanguage.pick(fr: 'Confirmer l’e-mail', en: 'Confirm your email');
@@ -188,6 +185,36 @@ abstract final class ProfileText {
     fr: 'Saisissez le code à 6 chiffres envoyé à $email.',
     en: 'Enter the 6-digit code sent to $email.',
   );
+
+  static String get confirmPhoneTitle =>
+      AppLanguage.pick(fr: 'Confirmer le numéro', en: 'Confirm your number');
+
+  static String confirmPhoneBody(String phone, {bool bySms = false}) => bySms
+      ? AppLanguage.pick(
+          fr: 'Saisissez le code à 6 chiffres reçu par SMS au $phone.',
+          en: 'Enter the 6-digit code received by SMS at $phone.',
+        )
+      : AppLanguage.pick(
+          fr: 'Saisissez le code à 6 chiffres reçu sur WhatsApp au $phone.',
+          en: 'Enter the 6-digit code received on WhatsApp at $phone.',
+        );
+
+  static String get otpSheetTitle => AppLanguage.pick(
+    fr: 'Où souhaitez-vous recevoir le code de vérification ?',
+    en: 'Where would you like to receive the verification code?',
+  );
+
+  static String get otpViaWhatsapp =>
+      AppLanguage.pick(fr: 'Recevoir via WhatsApp', en: 'Receive via WhatsApp');
+
+  static String get otpViaSms =>
+      AppLanguage.pick(fr: 'Recevoir par SMS', en: 'Receive via SMS message');
+
+  static String get recommended =>
+      AppLanguage.pick(fr: 'Recommandé', en: 'Recommended');
+
+  static String get verifyAction =>
+      AppLanguage.pick(fr: 'Vérifier', en: 'Verify');
 
   static String get emailAdded =>
       AppLanguage.pick(fr: 'Adresse e-mail ajoutée', en: 'Email address added');

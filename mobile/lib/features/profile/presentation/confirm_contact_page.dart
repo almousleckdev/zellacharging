@@ -11,21 +11,31 @@ import '../../../shared/app_toast.dart';
 import '../../../shared/submit_mixin.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../domain/contact_confirmation.dart';
+import '../domain/contact_kind.dart';
+import '../domain/otp_delivery.dart';
 import 'profile_providers.dart';
 
-class ConfirmEmailPage extends ConsumerStatefulWidget {
-  const ConfirmEmailPage({super.key, required this.email});
+class ConfirmContactPage extends ConsumerStatefulWidget {
+  const ConfirmContactPage({
+    super.key,
+    required this.kind,
+    required this.confirmation,
+  });
 
-  final String email;
+  final ContactKind kind;
+  final ContactConfirmation confirmation;
 
   @override
-  ConsumerState<ConfirmEmailPage> createState() => _ConfirmEmailPageState();
+  ConsumerState<ConfirmContactPage> createState() => _ConfirmContactPageState();
 }
 
-class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage>
+class _ConfirmContactPageState extends ConsumerState<ConfirmContactPage>
     with SubmitMixin {
   final _formKey = GlobalKey<FormState>();
   final _code = TextEditingController();
+
+  bool get _isEmail => widget.kind == ContactKind.email;
 
   @override
   void dispose() {
@@ -36,17 +46,30 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage>
   void _confirm() {
     if (!_formKey.currentState!.validate()) return;
     submit(() async {
-      await ref.read(profileRepositoryProvider).confirmEmail(_code.text.trim());
+      final repository = ref.read(profileRepositoryProvider);
+      final code = _code.text.trim();
+      await (_isEmail
+          ? repository.confirmEmail(code)
+          : repository.confirmPhone(code));
       ref.invalidate(profileProvider);
       if (!mounted) return;
-      AppToast.success(context, ProfileText.emailAdded);
+      AppToast.success(
+        context,
+        _isEmail ? ProfileText.emailAdded : ProfileText.phoneAdded,
+      );
       context.pop();
     });
   }
 
   void _resend() {
     submit(() async {
-      await ref.read(profileRepositoryProvider).addEmail(widget.email);
+      final repository = ref.read(profileRepositoryProvider);
+      await (_isEmail
+          ? repository.addEmail(widget.confirmation.target)
+          : repository.addPhone(
+              widget.confirmation.target,
+              widget.confirmation.delivery ?? OtpDelivery.whatsapp,
+            ));
       if (mounted) AppToast.success(context, AuthText.codeResent);
     });
   }
@@ -55,13 +78,24 @@ class _ConfirmEmailPageState extends ConsumerState<ConfirmEmailPage>
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.surfaceMuted,
-      appBar: AppBar(title: Text(ProfileText.confirmEmailTitle)),
+      appBar: AppBar(
+        title: Text(
+          _isEmail
+              ? ProfileText.confirmEmailTitle
+              : ProfileText.confirmPhoneTitle,
+        ),
+      ),
       body: SafeArea(
         child: ListView(
           padding: const EdgeInsets.all(AppSpacing.lg),
           children: [
             Text(
-              ProfileText.confirmEmailBody(widget.email),
+              _isEmail
+                  ? ProfileText.confirmEmailBody(widget.confirmation.target)
+                  : ProfileText.confirmPhoneBody(
+                      widget.confirmation.target,
+                      bySms: widget.confirmation.delivery == OtpDelivery.sms,
+                    ),
               style: Theme.of(
                 context,
               ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),

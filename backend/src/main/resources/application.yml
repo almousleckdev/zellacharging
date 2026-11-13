@@ -53,6 +53,14 @@ management:
         include: health,info
 
 zella:
+  twilio:
+    account: ${ZELLA_TWILIO_COMPTE:}
+    key: ${ZELLA_TWILIO_CLE:}
+    secret: ${ZELLA_TWILIO_SECRET:}
+    service: ${ZELLA_TWILIO_SERVICE:}
+    template: ${ZELLA_TWILIO_MODELE:}
+    sms-service: ${ZELLA_TWILIO_SMS_SERVICE:}
+    sms-number: ${ZELLA_TWILIO_SMS_NUMERO:}
   rate-limit:
     store: ${ZELLA_RATE_LIMIT_STORE:memory}
     login-per-ip-per-minute: 20

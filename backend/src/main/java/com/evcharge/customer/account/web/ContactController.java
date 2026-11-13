@@ -30,14 +30,26 @@ class ContactController {
     }
 
     @PostMapping("/email/verify")
-    ProfileResponse confirmEmail(CustomerPrincipal me, @Valid @RequestBody ConfirmEmailRequest request) {
+    ProfileResponse confirmEmail(CustomerPrincipal me, @Valid @RequestBody ConfirmCodeRequest request) {
         contacts.confirmEmail(me.id(), request.code());
         return ProfileResponse.from(profiles.view(me.id()));
     }
 
     @PostMapping("/phone")
-    ProfileResponse addPhone(CustomerPrincipal me, @Valid @RequestBody AddPhoneRequest request) {
-        contacts.addPhone(me.id(), request.phone());
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void addPhone(CustomerPrincipal me, @Valid @RequestBody AddPhoneRequest request) {
+        contacts.startPhone(me.id(), request.phone(), request.delivery());
+    }
+
+    @PostMapping("/phone/code")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void sendPhoneCode(CustomerPrincipal me, @Valid @RequestBody PhoneCodeRequest request) {
+        contacts.sendPhoneCode(me.id(), request.delivery());
+    }
+
+    @PostMapping("/phone/verify")
+    ProfileResponse confirmPhone(CustomerPrincipal me, @Valid @RequestBody ConfirmCodeRequest request) {
+        contacts.confirmPhone(me.id(), request.code());
         return ProfileResponse.from(profiles.view(me.id()));
     }
 }

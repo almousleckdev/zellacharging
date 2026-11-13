@@ -8,11 +8,13 @@ import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
-import '../../../shared/app_toast.dart';
 import '../../../shared/submit_mixin.dart';
 import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
+import '../domain/contact_confirmation.dart';
 import '../domain/contact_kind.dart';
+import '../domain/otp_delivery.dart';
+import 'otp_channel_sheet.dart';
 import 'profile_providers.dart';
 
 class AddContactPage extends ConsumerStatefulWidget {
@@ -37,21 +39,25 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
     super.dispose();
   }
 
-  void _save() {
+  Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
     final value = _value.text.trim();
-    submit(() async {
+    final OtpDelivery? delivery = _isEmail
+        ? null
+        : await showOtpChannelSheet(context);
+    if (!_isEmail && delivery == null) return;
+    await submit(() async {
       final repository = ref.read(profileRepositoryProvider);
       if (_isEmail) {
         await repository.addEmail(value);
-        if (mounted) context.pushReplacement(Routes.confirmEmail, extra: value);
-        return;
+      } else {
+        await repository.addPhone(value, delivery!);
       }
-      await repository.addPhone(value);
-      ref.invalidate(profileProvider);
       if (!mounted) return;
-      AppToast.success(context, ProfileText.phoneAdded);
-      context.pop();
+      context.pushReplacement(
+        _isEmail ? Routes.confirmEmail : Routes.confirmPhone,
+        extra: ContactConfirmation(target: value, delivery: delivery),
+      );
     });
   }
 
@@ -90,7 +96,7 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
             ),
             const SizedBox(height: AppSpacing.xl),
             PrimaryButton(
-              label: _isEmail ? ProfileText.sendCode : ProfileText.savePhone,
+              label: ProfileText.sendCode,
               loading: loading,
               onPressed: _save,
             ),

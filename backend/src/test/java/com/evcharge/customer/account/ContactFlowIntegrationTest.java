@@ -3,7 +3,7 @@ package com.evcharge.customer.account;
 import com.evcharge.customer.PostgresTestBase;
 import com.evcharge.customer.TestTenants;
 import com.evcharge.customer.account.application.port.VerificationSender;
-import com.evcharge.customer.account.domain.Channel;
+import com.evcharge.customer.account.domain.CodeDelivery;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -58,8 +58,12 @@ class ContactFlowIntegrationTest extends PostgresTestBase {
     }
 
     private String lastCode(String email) {
+        return lastCode(CodeDelivery.EMAIL, email);
+    }
+
+    private String lastCode(CodeDelivery delivery, String target) {
         ArgumentCaptor<String> code = ArgumentCaptor.forClass(String.class);
-        verify(sender, atLeastOnce()).send(eq(Channel.EMAIL), eq(email), code.capture());
+        verify(sender, atLeastOnce()).send(eq(delivery), eq(target), code.capture());
         return code.getValue();
     }
 
@@ -107,14 +111,59 @@ class ContactFlowIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void aCustomerWithOnlyAnEmailAddsAPhoneThatStaysUnverified() throws Exception {
+    void aCustomerWithOnlyAnEmailAddsAPhoneAndConfirmsItWithTheWhatsAppCode() throws Exception {
         UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", null);
         String phone = freshPhone();
 
-        submit(id, "/v1/me/phone", "{\"phone\":\"" + phone + "\"}").andExpect(status().isOk())
-                .andExpect(jsonPath("$.phone").value(phone)).andExpect(jsonPath("$.phoneVerified").value(false));
-        submit(id, "/v1/me/phone", "{\"phone\":\"" + freshPhone() + "\"}").andExpect(status().isConflict())
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + phone + "\",\"delivery\":\"WHATSAPP\"}").andExpect(status().isNoContent());
+        mvc.perform(get("/v1/me").with(TestTenants.customer(id))).andExpect(jsonPath("$.phone").doesNotExist());
+
+        submit(id, "/v1/me/phone/verify", "{\"code\":\"" + lastCode(CodeDelivery.WHATSAPP, phone) + "\"}")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value(phone))
+                .andExpect(jsonPath("$.phoneVerified").value(true));
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + freshPhone() + "\",\"delivery\":\"WHATSAPP\"}").andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("PHONE_ALREADY_SET"));
+    }
+
+    @Test
+    void aNumberAlreadyOnTheAccountIsVerifiedWithACodeReceivedBySms() throws Exception {
+        String phone = freshPhone();
+        UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", phone);
+
+        submit(id, "/v1/me/phone/code", "{\"delivery\":\"SMS\"}").andExpect(status().isNoContent());
+        mvc.perform(get("/v1/me").with(TestTenants.customer(id))).andExpect(jsonPath("$.phoneVerified").value(false));
+
+        submit(id, "/v1/me/phone/verify", "{\"code\":\"" + lastCode(CodeDelivery.SMS, phone) + "\"}")
+                .andExpect(status().isOk()).andExpect(jsonPath("$.phone").value(phone))
+                .andExpect(jsonPath("$.phoneVerified").value(true));
+        submit(id, "/v1/me/phone/code", "{\"delivery\":\"SMS\"}").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("PHONE_ALREADY_VERIFIED"));
+    }
+
+    @Test
+    void emailIsNotAChoiceForAPhoneCode() throws Exception {
+        UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", freshPhone());
+
+        submit(id, "/v1/me/phone/code", "{\"delivery\":\"EMAIL\"}").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("CHANNEL_NOT_SUPPORTED"));
+    }
+
+    @Test
+    void aWrongWhatsAppCodeLeavesThePhoneUnattached() throws Exception {
+        UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", null);
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + freshPhone() + "\",\"delivery\":\"WHATSAPP\"}").andExpect(status().isNoContent());
+
+        submit(id, "/v1/me/phone/verify", "{\"code\":\"000000\"}").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("INVALID_CODE"));
+        mvc.perform(get("/v1/me").with(TestTenants.customer(id))).andExpect(jsonPath("$.phone").doesNotExist());
+    }
+
+    @Test
+    void confirmingWithoutAPhoneWaitingIsRefused() throws Exception {
+        UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", null);
+
+        submit(id, "/v1/me/phone/verify", "{\"code\":\"123456\"}").andExpect(status().isBadRequest())
+                .andExpect(jsonPath("$.code").value("NO_PENDING_PHONE"));
     }
 
     @Test
@@ -123,11 +172,11 @@ class ContactFlowIntegrationTest extends PostgresTestBase {
         customer(null, used);
         UUID id = customer("mail-" + UUID.randomUUID() + "@example.com", null);
 
-        submit(id, "/v1/me/phone", "{\"phone\":\"" + used + "\"}").andExpect(status().isConflict())
+        submit(id, "/v1/me/phone", "{\"phone\":\"" + used + "\",\"delivery\":\"SMS\"}").andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("CONTACT_ALREADY_USED"));
-        submit(id, "/v1/me/phone", "{\"phone\":\"+22370123456\"}").andExpect(status().isBadRequest())
+        submit(id, "/v1/me/phone", "{\"phone\":\"+22370123456\",\"delivery\":\"SMS\"}").andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value(anyOf(is("UNSUPPORTED_COUNTRY"), is("PHONE_COUNTRY_MISMATCH"))));
-        submit(id, "/v1/me/phone", "{\"phone\":\"abc\"}").andExpect(status().isBadRequest())
+        submit(id, "/v1/me/phone", "{\"phone\":\"abc\",\"delivery\":\"SMS\"}").andExpect(status().isBadRequest())
                 .andExpect(jsonPath("$.code").value("INVALID_PHONE"));
     }
 }

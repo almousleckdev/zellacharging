@@ -5,9 +5,11 @@ class ContactConfirmation {
     required this.target,
     this.delivery,
     this.changing = false,
+    this.existing = false,
   });
 
   final String target;
   final OtpDelivery? delivery;
   final bool changing;
+  final bool existing;
 }

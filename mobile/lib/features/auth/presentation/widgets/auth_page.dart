@@ -11,14 +11,14 @@ class AuthPage extends StatelessWidget {
     required this.title,
     required this.children,
     this.subtitle,
-    this.showBack = false,
+    this.showBack,
     this.backgroundColor = AppColors.background,
   });
 
   final String title;
   final String? subtitle;
   final List<Widget> children;
-  final bool showBack;
+  final bool? showBack;
   final Color backgroundColor;
 
   @override
@@ -26,7 +26,7 @@ class AuthPage extends StatelessWidget {
     final theme = Theme.of(context);
     return Scaffold(
       backgroundColor: backgroundColor,
-      appBar: showBack
+      appBar: (showBack ?? Navigator.canPop(context))
           ? AppBar(
               backgroundColor: backgroundColor,
               leading: const BackButton(),

@@ -23,33 +23,31 @@ Future<void> _submit(WidgetTester tester) async {
 void main() {
   setUpAll(loadTestFonts);
 
-  testWidgets('the contact is required', (tester) async {
+  testWidgets('the email and the phone are both required', (tester) async {
     await pumpApp(tester, const RegisterPage(), overrides: overrides());
 
     await _type(tester, 0, 'Aline');
     await _type(tester, 1, 'Obame');
-    await _type(tester, 3, 'Secret123!');
     await _type(tester, 4, 'Secret123!');
+    await _type(tester, 5, 'Secret123!');
     await _submit(tester);
 
-    expect(find.text(Strings.required), findsOneWidget);
+    expect(find.text(Strings.required), findsNWidgets(2));
     await closeApp(tester);
   });
 
-  testWidgets('the phone tab offers a country picker that starts on Gabon', (
+  testWidgets('the phone is fixed to Gabon with no country picker', (
     tester,
   ) async {
     await pumpApp(tester, const RegisterPage(), overrides: overrides());
 
-    await tester.tap(find.text(AuthText.signUpWithPhone));
-    await settle(tester);
-
     expect(find.text('+241'), findsOneWidget);
     expect(find.text(AuthText.phoneNumberLabel), findsOneWidget);
+    expect(find.text(AuthText.emailLabel), findsOneWidget);
     await closeApp(tester);
   });
 
-  testWidgets('a phone registration sends the full number and the chosen way', (
+  testWidgets('a registration sends both contacts and the chosen way', (
     tester,
   ) async {
     final auth = FakeAuth();
@@ -62,13 +60,12 @@ void main() {
       ],
     );
 
-    await tester.tap(find.text(AuthText.signUpWithPhone));
-    await settle(tester);
     await _type(tester, 0, 'Aline');
     await _type(tester, 1, 'Obame');
-    await _type(tester, 2, '077 12 34 56');
-    await _type(tester, 3, 'Secret123!');
+    await _type(tester, 2, 'aline@example.com');
+    await _type(tester, 3, '077 12 34 56');
     await _type(tester, 4, 'Secret123!');
+    await _type(tester, 5, 'Secret123!');
     await tester.ensureVisible(find.byType(Checkbox).first);
     await tester.tap(find.byType(Checkbox).first);
     await settle(tester);
@@ -77,7 +74,7 @@ void main() {
     await settle(tester);
 
     expect(auth.registered.single.phone, '+24177123456');
-    expect(auth.registered.single.email, isNull);
+    expect(auth.registered.single.email, 'aline@example.com');
     expect(auth.registered.single.delivery, OtpDelivery.sms);
     await tester.pump(const Duration(seconds: 5));
     await closeApp(tester);
@@ -89,8 +86,9 @@ void main() {
     await _type(tester, 0, 'Aline');
     await _type(tester, 1, 'Obame');
     await _type(tester, 2, 'aline@example.com');
-    await _type(tester, 3, 'Secret123!');
-    await _type(tester, 4, 'Other123!');
+    await _type(tester, 3, '077123456');
+    await _type(tester, 4, 'Secret123!');
+    await _type(tester, 5, 'Other123!');
     await _submit(tester);
 
     expect(find.text(AuthText.passwordsDiffer), findsOneWidget);

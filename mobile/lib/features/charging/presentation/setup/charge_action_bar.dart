@@ -1,28 +1,47 @@
 import 'package:flutter/widgets.dart';
 
+import '../../../../core/format/money_format.dart';
 import '../../../../core/l10n/strings.dart';
 import '../../../../shared/widgets/pay/action_bar.dart';
 import '../../domain/charge_plan.dart';
+import '../../domain/charge_readiness.dart';
 
 class ChargeActionBar extends StatelessWidget {
   const ChargeActionBar({
     super.key,
     required this.plan,
-    required this.connectorChosen,
+    required this.readiness,
     required this.onPressed,
   });
 
   final ChargePlan plan;
-  final bool connectorChosen;
+  final ChargeReadiness readiness;
   final VoidCallback onPressed;
+
+  String get _label {
+    if (readiness == ChargeReadiness.needsTopup) return PayText.rechargeAccount;
+    if (plan.freeCharging || !readiness.canStart) return PayText.startCharging;
+    return SetupText.startFor(
+      MoneyFormat.format(plan.amountMinor, plan.currency, plan.decimals),
+    );
+  }
+
+  String? get _hint => switch (readiness) {
+    ChargeReadiness.chooseConnector => PayText.selectConnectorFirst,
+    ChargeReadiness.plugIn => SetupText.plugInFirst,
+    ChargeReadiness.enterAmount => SetupText.enterAmountFirst,
+    _ => null,
+  };
+
+  bool get _enabled =>
+      readiness.canStart || readiness == ChargeReadiness.needsTopup;
 
   @override
   Widget build(BuildContext context) {
-    final low = plan.needsTopup;
     return ActionBar(
-      label: low ? PayText.rechargeAccount : PayText.startCharging,
-      hint: low || connectorChosen ? null : PayText.selectConnectorFirst,
-      onPressed: onPressed,
+      label: _label,
+      hint: _hint,
+      onPressed: _enabled ? onPressed : null,
     );
   }
 }

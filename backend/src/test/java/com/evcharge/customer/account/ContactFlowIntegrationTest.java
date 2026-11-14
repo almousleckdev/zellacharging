@@ -68,6 +68,17 @@ class ContactFlowIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void anEmailTheCustomerAlreadyHasIsVerifiedWithACodeSentToIt() throws Exception {
+        String email = "own-" + UUID.randomUUID() + "@example.com";
+        UUID id = customer(email, freshPhone());
+        submit(id, "/v1/me/email/code", "{}").andExpect(status().isNoContent());
+        submit(id, "/v1/me/email/verify", "{\"code\":\"" + lastCode(email) + "\"}").andExpect(status().isOk())
+                .andExpect(jsonPath("$.emailVerified").value(true));
+        submit(id, "/v1/me/email/code", "{}").andExpect(status().isConflict())
+                .andExpect(jsonPath("$.code").value("EMAIL_ALREADY_VERIFIED"));
+    }
+
+    @Test
     void aCustomerWithOnlyAPhoneAddsAnEmailAndConfirmsItWithTheCodeSentThere() throws Exception {
         UUID id = customer(null, freshPhone());
         String email = "new-" + id + "@example.com";

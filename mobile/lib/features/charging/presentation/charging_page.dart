@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../../core/l10n/strings.dart';
+import '../../../core/refresh/on_resume.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -62,12 +63,15 @@ class _ChargingPageState extends ConsumerState<ChargingPage> with SubmitMixin {
               backgroundColor: Colors.transparent,
               title: Text(ChargeText.chargingTitle),
             ),
-      body: AsyncBody(
-        value: live,
-        onRetry: () => ref.invalidate(liveSessionProvider(widget.sessionId)),
-        builder: (data) => data.state.isLive
-            ? _liveBody(data)
-            : SessionDetailsView(session: data),
+      body: OnResume(
+        onResume: () => ref.invalidate(liveSessionProvider(widget.sessionId)),
+        child: AsyncBody(
+          value: live,
+          onRetry: () => ref.invalidate(liveSessionProvider(widget.sessionId)),
+          builder: (data) => data.state.isLive
+              ? _liveBody(data)
+              : SessionDetailsView(session: data),
+        ),
       ),
     );
   }

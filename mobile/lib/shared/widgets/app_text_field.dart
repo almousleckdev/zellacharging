@@ -21,6 +21,7 @@ class AppTextField extends StatefulWidget {
     this.inputFormatters,
     this.suffixText,
     this.helper,
+    this.errorText,
     this.onChanged,
   });
 
@@ -37,6 +38,7 @@ class AppTextField extends StatefulWidget {
   final List<TextInputFormatter>? inputFormatters;
   final String? suffixText;
   final String? helper;
+  final String? errorText;
   final ValueChanged<String>? onChanged;
 
   @override
@@ -96,6 +98,7 @@ class _AppTextFieldState extends State<AppTextField> {
             suffixIcon: _suffix,
             suffixText: widget.suffixText,
             helperText: widget.helper,
+            errorText: widget.errorText,
             helperMaxLines: 3,
           ),
         ),

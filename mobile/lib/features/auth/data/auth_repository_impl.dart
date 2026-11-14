@@ -32,8 +32,8 @@ class AuthRepositoryImpl implements AuthRepository {
             'firstName': data.firstName,
             'lastName': data.lastName,
             'password': data.password,
-            if (data.email != null) 'email': data.email,
-            if (data.phone != null) 'phone': data.phone,
+            'email': data.email,
+            'phone': data.phone,
             if (data.delivery != null) 'delivery': data.delivery!.wire,
           },
         );

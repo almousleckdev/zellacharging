@@ -4,12 +4,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/router/routes.dart';
-import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_icons.dart';
 import '../../../core/theme/app_spacing.dart';
+import '../../../core/format/phone_number.dart';
 import '../../../core/validation/validators.dart';
+import '../../auth/presentation/widgets/auth_field.dart';
+import '../../auth/presentation/widgets/auth_page.dart';
+import '../../auth/presentation/widgets/phone_field.dart';
 import '../../../shared/submit_mixin.dart';
-import '../../../shared/widgets/app_text_field.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../domain/contact_confirmation.dart';
 import '../domain/contact_kind.dart';
@@ -56,7 +58,9 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
 
   Future<void> _save() async {
     if (!_formKey.currentState!.validate()) return;
-    final value = _value.text.trim();
+    final value = _isEmail
+        ? _value.text.trim()
+        : PhoneNumber.e164(PhoneNumber.defaultCountry, _value.text);
     final OtpDelivery? delivery = _isEmail
         ? null
         : await showOtpChannelSheet(context);
@@ -82,44 +86,34 @@ class _AddContactPageState extends ConsumerState<AddContactPage>
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: AppColors.surfaceMuted,
-      appBar: AppBar(title: Text(_title)),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            Text(
-              _hint,
-              style: Theme.of(
-                context,
-              ).textTheme.bodyMedium?.copyWith(color: AppColors.textSecondary),
-            ),
-            const SizedBox(height: AppSpacing.lg),
-            Form(
-              key: _formKey,
-              child: AppTextField(
-                controller: _value,
-                label: _isEmail ? AuthText.emailLabel : AuthText.phoneLabel,
-                icon: _isEmail ? AppIcons.envelope : AppIcons.phone,
-                validator: _isEmail
-                    ? Validators.email
-                    : Validators.requiredPhone,
-                keyboardType: _isEmail
-                    ? TextInputType.emailAddress
-                    : TextInputType.phone,
-                textInputAction: TextInputAction.done,
-              ),
-            ),
-            const SizedBox(height: AppSpacing.xl),
-            PrimaryButton(
-              label: ProfileText.sendCode,
-              loading: loading,
-              onPressed: _save,
-            ),
-          ],
+    return AuthPage(
+      title: _title,
+      subtitle: _hint,
+      children: [
+        Form(
+          key: _formKey,
+          child: _isEmail
+              ? AuthField(
+                  controller: _value,
+                  hint: AuthText.emailLabel,
+                  icon: AppIcons.envelope,
+                  validator: Validators.email,
+                  keyboardType: TextInputType.emailAddress,
+                  textInputAction: TextInputAction.done,
+                  autofillHints: const [AutofillHints.email],
+                )
+              : PhoneField(
+                  controller: _value,
+                  textInputAction: TextInputAction.done,
+                ),
         ),
-      ),
+        const SizedBox(height: AppSpacing.xl),
+        PrimaryButton(
+          label: ProfileText.sendCode,
+          loading: loading,
+          onPressed: _save,
+        ),
+      ],
     );
   }
 }

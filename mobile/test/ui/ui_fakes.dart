@@ -290,6 +290,11 @@ class FakeProfile implements ProfileRepository {
   @override
   Future<void> addEmail(String email) async => emailsAdded.add(email);
 
+  var emailCodesSent = 0;
+
+  @override
+  Future<void> sendEmailCode() async => emailCodesSent++;
+
   @override
   Future<Profile> confirmEmail(String code) async {
     confirmed.add(code);
@@ -445,9 +450,7 @@ class FakeAuth implements AuthRepository {
   @override
   Future<VerificationTarget> register(RegistrationData data) async {
     registered.add(data);
-    return data.email != null
-        ? VerificationTarget(channel: ContactChannel.email, value: data.email!)
-        : VerificationTarget(channel: ContactChannel.phone, value: data.phone!);
+    return VerificationTarget(channel: ContactChannel.phone, value: data.phone);
   }
 
   @override

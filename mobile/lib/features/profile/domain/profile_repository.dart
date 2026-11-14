@@ -8,6 +8,7 @@ abstract class ProfileRepository {
   Future<Profile> fetch();
   Future<Profile> updateName(String firstName, String lastName);
   Future<void> addEmail(String email);
+  Future<void> sendEmailCode();
   Future<Profile> confirmEmail(String code);
   Future<void> addPhone(String phone, OtpDelivery delivery);
   Future<void> sendPhoneCode(OtpDelivery delivery);

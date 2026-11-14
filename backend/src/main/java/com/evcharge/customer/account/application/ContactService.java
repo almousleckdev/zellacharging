@@ -51,13 +51,29 @@ public class ContactService {
         verification.reissue(customer, email);
     }
 
+    @Transactional
+    public void sendEmailCode(UUID customerId) {
+        Customer customer = profiles.get(customerId);
+        if (customer.email() == null) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "NO_EMAIL", "No email address to verify");
+        }
+        if (customers.isVerified(customerId, Channel.EMAIL)) {
+            throw conflict("EMAIL_ALREADY_VERIFIED");
+        }
+        verification.reissue(customer, new ContactPoint(Channel.EMAIL, customer.email()));
+    }
+
     @Transactional(noRollbackFor = ApiException.class)
     public void confirmEmail(UUID customerId, String code) {
         Customer customer = profiles.get(customerId);
-        String email = pending.find(customerId).orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST,
-                "NO_PENDING_EMAIL", "No email is waiting for confirmation"));
+        Optional<String> pendingEmail = pending.find(customerId);
+        if (pendingEmail.isEmpty() && (customer.email() == null || customers.isVerified(customerId, Channel.EMAIL))) {
+            throw new ApiException(HttpStatus.BAD_REQUEST, "NO_PENDING_EMAIL",
+                    "No email is waiting for confirmation");
+        }
         verification.confirm(customer, Channel.EMAIL, code);
-        customers.attachEmail(customerId, email, clock.instant());
+        pendingEmail.ifPresent(email -> customers.attachEmail(customerId, email, clock.instant()));
+        customers.markContactVerified(customerId, Channel.EMAIL, clock.instant());
         pending.delete(customerId);
     }
 

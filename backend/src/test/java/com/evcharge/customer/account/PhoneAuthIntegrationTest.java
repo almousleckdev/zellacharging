@@ -53,8 +53,8 @@ class PhoneAuthIntegrationTest extends PostgresTestBase {
 
     private String register(String phone, CodeDelivery delivery) throws Exception {
         sendJson("/v1/auth/register", """
-                {"firstName":"Aline","lastName":"Obame","phone":"%s","password":"Secret123!","delivery":"%s"}
-                """.formatted(phone, delivery)).andExpect(status().isCreated())
+                {"firstName":"Aline","lastName":"Obame","email":"%s","phone":"%s","password":"Secret123!","delivery":"%s"}
+                """.formatted(phone.substring(1) + "@example.com", phone, delivery)).andExpect(status().isCreated())
                 .andExpect(jsonPath("$.channel").value("PHONE")).andExpect(jsonPath("$.target").value(phone));
         return lastCode(delivery, phone);
     }

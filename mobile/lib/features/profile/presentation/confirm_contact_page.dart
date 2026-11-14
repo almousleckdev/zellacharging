@@ -3,7 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
-import '../../../core/theme/app_colors.dart';
+import '../../auth/presentation/widgets/auth_page.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../core/validation/validators.dart';
 import '../../../shared/app_toast.dart';
@@ -72,56 +72,43 @@ class _ConfirmContactPageState extends ConsumerState<ConfirmContactPage>
   Future<void> _resend() async {
     await submit(() async {
       final repository = ref.read(profileRepositoryProvider);
-      await (_isEmail
-          ? repository.addEmail(_confirmation.target)
-          : repository.addPhone(
-              _confirmation.target,
-              _confirmation.delivery ?? OtpDelivery.whatsapp,
-            ));
+      final delivery = _confirmation.delivery ?? OtpDelivery.whatsapp;
+      if (_isEmail) {
+        await (_confirmation.existing
+            ? repository.sendEmailCode()
+            : repository.addEmail(_confirmation.target));
+      } else {
+        await (_confirmation.existing
+            ? repository.sendPhoneCode(delivery)
+            : repository.addPhone(_confirmation.target, delivery));
+      }
       if (mounted) AppToast.success(context, AuthText.codeResent);
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    final theme = Theme.of(context);
-    return Scaffold(
-      backgroundColor: AppColors.surfaceMuted,
-      appBar: AppBar(
-        title: Text(
-          _isEmail
-              ? ProfileText.confirmEmailTitle
-              : ProfileText.confirmPhoneTitle,
-        ),
-      ),
-      body: SafeArea(
-        child: ListView(
-          padding: const EdgeInsets.all(AppSpacing.lg),
-          children: [
-            Text(
-              _isEmail
-                  ? ProfileText.confirmEmailBody(_confirmation.target)
-                  : ProfileText.confirmPhoneBody(
-                      _confirmation.target,
-                      bySms: _confirmation.delivery == OtpDelivery.sms,
-                    ),
-              style: theme.textTheme.bodyMedium?.copyWith(
-                color: AppColors.textSecondary,
-              ),
+    return AuthPage(
+      title: _isEmail
+          ? ProfileText.confirmEmailTitle
+          : ProfileText.confirmPhoneTitle,
+      subtitle: _isEmail
+          ? ProfileText.confirmEmailBody(_confirmation.target)
+          : ProfileText.confirmPhoneBody(
+              _confirmation.target,
+              bySms: _confirmation.delivery == OtpDelivery.sms,
             ),
-            const SizedBox(height: AppSpacing.lg),
-            OtpBoxes(controller: _code),
-            const SizedBox(height: AppSpacing.md),
-            ResendCountdown(onResend: _resend),
-            const SizedBox(height: AppSpacing.xl),
-            PrimaryButton(
-              label: AuthText.verify,
-              loading: loading,
-              onPressed: _confirm,
-            ),
-          ],
+      children: [
+        OtpBoxes(controller: _code),
+        const SizedBox(height: AppSpacing.md),
+        ResendCountdown(onResend: _resend),
+        const SizedBox(height: AppSpacing.xl),
+        PrimaryButton(
+          label: AuthText.verify,
+          loading: loading,
+          onPressed: _confirm,
         ),
-      ),
+      ],
     );
   }
 }

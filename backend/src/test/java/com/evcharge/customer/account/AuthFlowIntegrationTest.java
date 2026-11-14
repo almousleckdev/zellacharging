@@ -50,10 +50,14 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
         return code.getValue();
     }
 
+    private static String phoneFor(String email) {
+        return "+24177" + String.format("%06d", Math.abs(email.hashCode()) % 1000000);
+    }
+
     private void registerAndVerifyEmail(String email) throws Exception {
         postJson("/v1/auth/register", """
-                {"firstName":"Aline","lastName":"Obame","email":"%s","password":"Secret123!"}
-                """.formatted(email)).andExpect(status().isCreated());
+                {"firstName":"Aline","lastName":"Obame","email":"%s","phone":"%s","password":"Secret123!"}
+                """.formatted(email, phoneFor(email))).andExpect(status().isCreated());
         postJson("/v1/auth/verify", """
                 {"channel":"EMAIL","target":"%s","code":"%s"}
                 """.formatted(email, lastCode(CodeDelivery.EMAIL, email))).andExpect(status().isNoContent());
@@ -63,8 +67,8 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
     void fullLifecycleWithRefreshRotationAndReuseDetection() throws Exception {
         String email = "aline@example.com";
         postJson("/v1/auth/register", """
-                {"firstName":"Aline","lastName":"Obame","email":"%s","password":"Secret123!"}
-                """.formatted(email)).andExpect(status().isCreated());
+                {"firstName":"Aline","lastName":"Obame","email":"%s","phone":"%s","password":"Secret123!"}
+                """.formatted(email, phoneFor(email))).andExpect(status().isCreated());
         postJson("/v1/auth/login", """
                 {"identifier":"%s","password":"Secret123!"}
                 """.formatted(email)).andExpect(status().isForbidden())
@@ -94,17 +98,23 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void registrationNeedsAnEmailOrAPhone() throws Exception {
+    void registrationNeedsBothAnEmailAndAPhone() throws Exception {
         postJson("/v1/auth/register", """
                 {"firstName":"No","lastName":"Contact","password":"Secret123!"}
                 """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CONTACT_REQUIRED"));
         postJson("/v1/auth/register", """
-                {"firstName":"No","lastName":"Contact","email":"  ","password":"Secret123!"}
+                {"firstName":"No","lastName":"Phone","email":"nophone@example.com","password":"Secret123!"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CONTACT_REQUIRED"));
+        postJson("/v1/auth/register", """
+                {"firstName":"No","lastName":"Email","phone":"077123499","password":"Secret123!"}
+                """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CONTACT_REQUIRED"));
+        postJson("/v1/auth/register", """
+                {"firstName":"No","lastName":"Email","email":"  ","phone":"077123499","password":"Secret123!"}
                 """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("CONTACT_REQUIRED"));
     }
 
     @Test
-    void aPhoneNumberNextToAnEmailIsStoredNormalizedAndKeepsTheEmailAsTheOneToVerify() throws Exception {
+    void registrationSendsACodeToEachContactAndStoresThePhoneNormalized() throws Exception {
         postJson("/v1/auth/register", """
                 {"firstName":"Jean","lastName":"Mba","email":"jean@example.com","phone":"123","password":"Secret123!"}
                 """).andExpect(status().isBadRequest()).andExpect(jsonPath("$.code").value("INVALID_PHONE"));
@@ -112,10 +122,10 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
         postJson("/v1/auth/register", """
                 {"firstName":"Jean","lastName":"Mba","email":"jean@example.com","phone":"077123456",
                  "password":"Secret123!"}
-                """).andExpect(status().isCreated());
+                """).andExpect(status().isCreated()).andExpect(jsonPath("$.channel").value("PHONE"));
 
         assertThat(lastCode(CodeDelivery.EMAIL, "jean@example.com")).matches("\\d{6}");
-        verify(sender, never()).send(eq(CodeDelivery.WHATSAPP), anyString(), anyString());
+        assertThat(lastCode(CodeDelivery.WHATSAPP, "+24177123456")).matches("\\d{6}");
         assertThat(jdbc.queryForObject("select phone_e164 from customer where email = ?", String.class,
                 "jean@example.com")).isEqualTo("+24177123456");
         assertThat(jdbc.queryForObject("select phone_verified_at from customer where email = ?",
@@ -138,7 +148,7 @@ class AuthFlowIntegrationTest extends PostgresTestBase {
     void duplicateEmailsAreRejected() throws Exception {
         registerAndVerifyEmail("dup@example.com");
         postJson("/v1/auth/register", """
-                {"firstName":"B","lastName":"B","email":"DUP@example.com","password":"Secret123!"}
+                {"firstName":"B","lastName":"B","email":"DUP@example.com","phone":"077555000","password":"Secret123!"}
                 """).andExpect(status().isConflict()).andExpect(jsonPath("$.code").value("CONTACT_ALREADY_USED"));
     }
 

@@ -52,6 +52,10 @@ class ProfileRepositoryImpl implements ProfileRepository {
       _guard(() => _client.post<void>('/v1/me/email', data: {'email': email}));
 
   @override
+  Future<void> sendEmailCode() =>
+      _guard(() => _client.post<void>('/v1/me/email/code'));
+
+  @override
   Future<Profile> confirmEmail(String code) => _profile(
     _client.post<Map<String, dynamic>>(
       '/v1/me/email/verify',

@@ -6,10 +6,13 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/l10n/strings.dart';
 import '../../../../core/router/routes.dart';
-import '../../../../shared/app_toast.dart';
 import '../../../../shared/widgets/async_body.dart';
+import '../../../../core/format/amount_input.dart';
+import '../../../stations/domain/station.dart';
+import '../../../stations/domain/station_connector.dart';
 import '../../../stations/presentation/station_providers.dart';
 import '../../domain/charge_plan.dart';
+import '../../domain/charge_readiness.dart';
 import '../../domain/charge_request.dart';
 import '../charge_flow_controller.dart';
 import '../charge_flow_state.dart';
@@ -36,6 +39,7 @@ class ChargeSetupPage extends ConsumerStatefulWidget {
 class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
     with ConnectorSelectionMixin {
   final _formKey = GlobalKey<FormState>();
+  final _amount = TextEditingController();
   late String _attempt = _newAttempt();
   Timer? _refresh;
 
@@ -52,21 +56,26 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   @override
   void dispose() {
     _refresh?.cancel();
+    _amount.dispose();
     super.dispose();
   }
 
   String _newAttempt() => DateTime.now().microsecondsSinceEpoch.toString();
 
-  Future<void> _start(ChargePlan plan) async {
-    if (plan.needsTopup) {
+  StationConnector? _selected(Station? station) {
+    final chosen = connector;
+    if (station == null || chosen == null) return null;
+    final matching = station.connectors.where((c) => c.connectorId == chosen);
+    return matching.isEmpty ? null : matching.first;
+  }
+
+  Future<void> _start(ChargePlan plan, ChargeReadiness readiness) async {
+    if (readiness == ChargeReadiness.needsTopup) {
       context.push(Routes.topup);
       return;
     }
     final chosen = connector;
-    if (chosen == null) {
-      AppToast.warning(context, PayText.selectConnectorFirst);
-      return;
-    }
+    if (chosen == null || !readiness.canStart) return;
     final session = await ref
         .read(chargeFlowProvider.notifier)
         .launch(
@@ -98,7 +107,11 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
       ref,
       stationId: widget.stationId,
       connector: connector,
+      entered: AmountInput.parse(_amount.text),
     );
+    final station = ref.watch(stationProvider(widget.stationId)).value;
+    final selected = _selected(station);
+    final readiness = ChargeReadiness.of(plan: plan, connector: selected);
     final idle = flow.phase == ChargePhase.idle;
     return Scaffold(
       appBar: AppBar(title: Text(ChargeText.setupTitle)),
@@ -110,7 +123,10 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
                 formKey: _formKey,
                 station: station,
                 plan: plan,
-                connector: connector,
+                readiness: readiness,
+                connector: selected,
+                amount: _amount,
+                onAmount: () => setState(() {}),
                 onConnector: (value) => setState(() => connector = value),
               ),
             )
@@ -122,8 +138,8 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
       bottomNavigationBar: idle
           ? ChargeActionBar(
               plan: plan,
-              connectorChosen: connector != null,
-              onPressed: () => _start(plan),
+              readiness: readiness,
+              onPressed: () => _start(plan, readiness),
             )
           : null,
     );

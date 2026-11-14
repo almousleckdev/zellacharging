@@ -29,6 +29,12 @@ class ContactController {
         contacts.startEmail(me.id(), request.email());
     }
 
+    @PostMapping("/email/code")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void sendEmailCode(CustomerPrincipal me) {
+        contacts.sendEmailCode(me.id());
+    }
+
     @PostMapping("/email/verify")
     ProfileResponse confirmEmail(CustomerPrincipal me, @Valid @RequestBody ConfirmCodeRequest request) {
         contacts.confirmEmail(me.id(), request.code());

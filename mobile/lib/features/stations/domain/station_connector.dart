@@ -16,4 +16,6 @@ class StationConnector {
   final String? connectorType;
   final double? maxPowerKw;
   final int? freeInMinutes;
+
+  bool get pluggedIn => status == 'Preparing';
 }

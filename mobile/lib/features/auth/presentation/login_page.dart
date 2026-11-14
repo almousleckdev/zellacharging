@@ -95,7 +95,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
         .resendCode(target, delivery: delivery);
     if (!mounted) return;
     AppToast.info(context, VerificationText.resumed);
-    context.go(
+    context.push(
       Routes.otp,
       extra: OtpArgs.registration(target, delivery: delivery),
     );
@@ -150,7 +150,7 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
         AuthSwitchLink(
           prompt: AuthText.noAccount,
           action: AuthText.signUp,
-          onTap: () => context.go(Routes.register),
+          onTap: () => context.push(Routes.register),
         ),
       ],
     );

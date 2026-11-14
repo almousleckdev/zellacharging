@@ -60,8 +60,10 @@ class WalletFlowIntegrationTest extends PostgresTestBase {
 
     private UUID newCustomer() {
         UUID id = UUID.randomUUID();
-        jdbc.update("insert into customer (id, first_name, last_name, email, password_hash, status, created_at) "
-                + "values (?, 'A', 'B', ?, 'x', 'ACTIVE', now())", id, id + "@example.com");
+        jdbc.update("insert into customer (id, first_name, last_name, email, phone_e164, email_verified_at, "
+                + "phone_verified_at, password_hash, status, created_at) "
+                + "values (?, 'A', 'B', ?, ?, now(), now(), 'x', 'ACTIVE', now())", id, id + "@example.com",
+                "+24177" + String.format("%07d", Math.abs(id.hashCode()) % 10000000));
         return id;
     }
 

@@ -57,6 +57,7 @@ public class SessionService {
     public ChargingSession start(UUID customerId, String stationId, int connectorId, long amountMinor,
                                  String idempotencyKey) {
         standing.requireActive(customerId);
+        standing.requireVerifiedContacts(customerId);
         Optional<ChargingSession> earlier = starts.earlier(customerId, idempotencyKey, stationId, connectorId,
                 amountMinor);
         if (earlier.isPresent()) {

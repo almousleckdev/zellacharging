@@ -83,11 +83,22 @@ public class NotificationDispatcher {
                 case RETRY -> retry = true;
             }
         }
+        report(notification, targets.size(), delivered);
         if (retry && delivered == 0) {
             retryOrBury(notification, now);
         } else {
             outbox.markSent(notification.id(), now, delivered);
         }
+    }
+
+    private void report(PendingNotification notification, int devices, int delivered) {
+        if (devices == 0) {
+            log.warn("Push {} for customer {} not sent: no device is registered", notification.type(),
+                    notification.customerId());
+            return;
+        }
+        log.info("Push {} for customer {}: accepted by Firebase for {} of {} devices", notification.type(),
+                notification.customerId(), delivered, devices);
     }
 
     private void retryOrBury(PendingNotification notification, Instant now) {

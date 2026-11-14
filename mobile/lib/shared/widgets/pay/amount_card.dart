@@ -15,9 +15,10 @@ class AmountCard extends StatelessWidget {
     required this.hint,
     required this.controller,
     required this.currency,
-    required this.validator,
     required this.onChanged,
+    this.validator,
     this.helper,
+    this.errorText,
     this.quickAmounts = const [],
   });
 
@@ -25,9 +26,10 @@ class AmountCard extends StatelessWidget {
   final String hint;
   final TextEditingController controller;
   final String currency;
-  final String? Function(String?) validator;
+  final String? Function(String?)? validator;
   final VoidCallback onChanged;
   final String? helper;
+  final String? errorText;
   final List<int> quickAmounts;
 
   @override
@@ -41,6 +43,7 @@ class AmountCard extends StatelessWidget {
             hint: hint,
             icon: AppIcons.wallet,
             helper: helper,
+            errorText: errorText,
             validator: validator,
             keyboardType: TextInputType.number,
             inputFormatters: [AmountInput.formatter],

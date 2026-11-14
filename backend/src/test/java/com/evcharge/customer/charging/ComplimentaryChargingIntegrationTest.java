@@ -60,8 +60,10 @@ class ComplimentaryChargingIntegrationTest extends PostgresTestBase {
 
     private UUID emptyWallet() {
         UUID id = UUID.randomUUID();
-        jdbc.update("insert into customer (id, first_name, last_name, email, password_hash, status, created_at) "
-                + "values (?, 'A', 'B', ?, 'x', 'ACTIVE', now())", id, id + "@example.com");
+        jdbc.update("insert into customer (id, first_name, last_name, email, phone_e164, email_verified_at, "
+                + "phone_verified_at, password_hash, status, created_at) "
+                + "values (?, 'A', 'B', ?, ?, now(), now(), 'x', 'ACTIVE', now())", id, id + "@example.com",
+                "+24177" + String.format("%07d", Math.abs(id.hashCode()) % 10000000));
         jdbc.update("insert into wallet (customer_id, currency, decimals, balance_minor, created_at) "
                 + "values (?, 'XOF', 0, 0, now())", id);
         return id;

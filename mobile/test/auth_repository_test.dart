@@ -19,7 +19,7 @@ class _RecordingAdapter implements HttpClientAdapter {
   ) async {
     requests.add(options);
     return ResponseBody.fromString(
-      '{"customerId":"c1","channel":"${options.data['phone'] != null && options.data['email'] == null ? 'PHONE' : 'EMAIL'}","target":"${options.data['email'] ?? options.data['phone']}"}',
+      '{"customerId":"c1","channel":"PHONE","target":"${options.data['phone']}"}',
       201,
       headers: {
         Headers.contentTypeHeader: ['application/json'],
@@ -47,56 +47,25 @@ void main() {
   Map<String, dynamic> sentBody() =>
       adapter.requests.single.data as Map<String, dynamic>;
 
-  test('registration sends the email and the optional phone', () async {
-    final target = await repository.register(
-      const RegistrationData(
-        firstName: 'Aline',
-        lastName: 'Obame',
-        password: 'Secret123!',
-        email: 'aline@example.com',
-        phone: '077123456',
-      ),
-    );
-
-    expect(adapter.requests.single.path, '/v1/auth/register');
-    expect(sentBody()['email'], 'aline@example.com');
-    expect(sentBody()['phone'], '077123456');
-    expect(target.channel, ContactChannel.email);
-    expect(target.value, 'aline@example.com');
-  });
-
   test(
-    'registration with a phone only verifies the phone it was sent to',
+    'registration sends both contacts and the code goes to the phone',
     () async {
       final target = await repository.register(
         const RegistrationData(
           firstName: 'Aline',
           lastName: 'Obame',
           password: 'Secret123!',
+          email: 'aline@example.com',
           phone: '+24177123456',
           delivery: OtpDelivery.sms,
         ),
       );
 
-      expect(sentBody().containsKey('email'), isFalse);
+      expect(sentBody()['email'], 'aline@example.com');
       expect(sentBody()['phone'], '+24177123456');
       expect(sentBody()['delivery'], 'SMS');
       expect(target.channel, ContactChannel.phone);
       expect(target.value, '+24177123456');
     },
   );
-
-  test('registration without a phone does not send one', () async {
-    final target = await repository.register(
-      const RegistrationData(
-        firstName: 'Aline',
-        lastName: 'Obame',
-        password: 'Secret123!',
-        email: 'aline@example.com',
-      ),
-    );
-
-    expect(sentBody().containsKey('phone'), isFalse);
-    expect(target.channel, ContactChannel.email);
-  });
 }

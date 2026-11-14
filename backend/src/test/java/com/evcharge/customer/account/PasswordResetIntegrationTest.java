@@ -44,11 +44,15 @@ class PasswordResetIntegrationTest extends PostgresTestBase {
         return code.getValue();
     }
 
+    private static String phoneFor(String email) {
+        return "+24177" + String.format("%06d", Math.abs(email.hashCode()) % 1000000);
+    }
+
     private String verifiedAccount() throws Exception {
         String email = "reset-" + UUID.randomUUID() + "@example.com";
         postJson("/v1/auth/register", """
-                {"firstName":"Aline","lastName":"Obame","email":"%s","password":"OldSecret123!"}
-                """.formatted(email)).andExpect(status().isCreated());
+                {"firstName":"Aline","lastName":"Obame","email":"%s","phone":"%s","password":"OldSecret123!"}
+                """.formatted(email, phoneFor(email))).andExpect(status().isCreated());
         postJson("/v1/auth/verify", """
                 {"channel":"EMAIL","target":"%s","code":"%s"}
                 """.formatted(email, lastCode(email))).andExpect(status().isNoContent());
@@ -103,8 +107,8 @@ class PasswordResetIntegrationTest extends PostgresTestBase {
     void anAccountWhoseEmailIsNotVerifiedGetsNoResetCode() throws Exception {
         String email = "pending-" + UUID.randomUUID() + "@example.com";
         postJson("/v1/auth/register", """
-                {"firstName":"Aline","lastName":"Obame","email":"%s","password":"OldSecret123!"}
-                """.formatted(email)).andExpect(status().isCreated());
+                {"firstName":"Aline","lastName":"Obame","email":"%s","phone":"%s","password":"OldSecret123!"}
+                """.formatted(email, phoneFor(email))).andExpect(status().isCreated());
         String registrationCode = lastCode(email);
 
         postJson("/v1/auth/password/forgot", "{\"email\":\"" + email + "\"}").andExpect(status().isNoContent());

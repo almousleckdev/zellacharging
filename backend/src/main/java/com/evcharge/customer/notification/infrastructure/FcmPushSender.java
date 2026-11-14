@@ -75,6 +75,7 @@ class FcmPushSender implements PushSender {
             return PushResult.INVALID_TOKEN;
         }
         log.warn("Firebase refused a push with status {}: {}", status.value(), body);
-        return status.value() == 400 ? PushResult.INVALID_TOKEN : PushResult.RETRY;
+        boolean badToken = status.value() == 400 && body.contains("registration token");
+        return badToken ? PushResult.INVALID_TOKEN : PushResult.RETRY;
     }
 }

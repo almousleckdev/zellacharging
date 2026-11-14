@@ -70,9 +70,19 @@ class ChargePlan {
 
   bool get needsPayment => shortfallMinor > 0;
 
-  bool get needsTopup => belowMinimum && !freeCharging;
+  int get floorMinor => minimumMinor ?? minimumChargeMinor;
 
-  bool get belowMinimum => amountMinor < (minimumMinor ?? minimumChargeMinor);
+  int get ceilingMinor => maximumMinor ?? maximumChargeMinor;
+
+  bool get belowMinimum => amountMinor < floorMinor;
+
+  bool get aboveMaximum => amountMinor > ceilingMinor;
+
+  bool get exceedsBalance => !freeCharging && amountMinor > availableMinor;
+
+  bool get balanceTooLow => !freeCharging && availableMinor < floorMinor;
+
+  bool get needsTopup => balanceTooLow;
 
   int get fromWalletMinor => amountMinor - shortfallMinor;
 

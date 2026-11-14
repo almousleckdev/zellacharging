@@ -62,8 +62,10 @@ class StartRulesIntegrationTest extends PostgresTestBase {
 
     private UUID customerWith(long balance) {
         UUID id = UUID.randomUUID();
-        jdbc.update("insert into customer (id, first_name, last_name, email, password_hash, status, created_at) "
-                + "values (?, 'A', 'B', ?, 'x', 'ACTIVE', now())", id, id + "@example.com");
+        jdbc.update("insert into customer (id, first_name, last_name, email, phone_e164, email_verified_at, "
+                + "phone_verified_at, password_hash, status, created_at) "
+                + "values (?, 'A', 'B', ?, ?, now(), now(), 'x', 'ACTIVE', now())", id, id + "@example.com",
+                "+24177" + String.format("%07d", Math.abs(id.hashCode()) % 10000000));
         jdbc.update("insert into wallet (customer_id, currency, decimals, balance_minor, created_at) "
                 + "values (?, 'XOF', 0, ?, now())", id, balance);
         return id;
@@ -94,6 +96,18 @@ class StartRulesIntegrationTest extends PostgresTestBase {
     void aFreeOrPluggedInConnectorCanStart() throws Exception {
         start(customerWith(10000), "CP-OK", 2000, null).andExpect(status().isCreated());
         start(customerWith(10000), "CP-PLUGGED", 2000, null).andExpect(status().isCreated());
+    }
+
+    @Test
+    void aCustomerWithAnUnverifiedContactCannotStartAndNothingIsReserved() throws Exception {
+        UUID customer = customerWith(10000);
+        jdbc.update("update customer set phone_verified_at = null where id = ?", customer);
+        start(customer, "CP-OK", 2000, null).andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("CONTACTS_NOT_VERIFIED"));
+        jdbc.update("update customer set phone_verified_at = now(), email_verified_at = null where id = ?", customer);
+        start(customer, "CP-OK", 2000, null).andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("CONTACTS_NOT_VERIFIED"));
+        assertThat(reserved(customer)).isZero();
     }
 
     @Test

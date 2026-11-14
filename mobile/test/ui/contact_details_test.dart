@@ -154,7 +154,7 @@ void main() {
       overrides: overridesWith(profile: profile),
     );
 
-    await tester.enterText(find.byType(TextFormField), '+24162820745');
+    await tester.enterText(find.byType(TextFormField), '62 82 07 45');
     await tester.tap(find.text(ProfileText.sendCode));
     await settle(tester);
     await tester.tap(find.text(ProfileText.otpViaWhatsapp));

@@ -17,9 +17,6 @@ class Profile {
   final bool phoneVerified;
   final bool hasPassword;
 
-  bool get contactsComplete =>
-      email != null && phone != null && emailVerified && phoneVerified;
-
   String get fullName => '$firstName $lastName'.trim();
 
   String get initials => [firstName, lastName]

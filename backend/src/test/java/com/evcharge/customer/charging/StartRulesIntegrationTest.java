@@ -99,18 +99,6 @@ class StartRulesIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void aCustomerWithAnUnverifiedContactCannotStartAndNothingIsReserved() throws Exception {
-        UUID customer = customerWith(10000);
-        jdbc.update("update customer set phone_verified_at = null where id = ?", customer);
-        start(customer, "CP-OK", 2000, null).andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("CONTACTS_NOT_VERIFIED"));
-        jdbc.update("update customer set phone_verified_at = now(), email_verified_at = null where id = ?", customer);
-        start(customer, "CP-OK", 2000, null).andExpect(status().isForbidden())
-                .andExpect(jsonPath("$.code").value("CONTACTS_NOT_VERIFIED"));
-        assertThat(reserved(customer)).isZero();
-    }
-
-    @Test
     void aBusyFaultyOrOfflineConnectorNeverStartsAndNoFundsAreReserved() throws Exception {
         UUID customer = customerWith(10000);
         start(customer, "CP-BUSY", 2000, null).andExpect(status().isConflict())

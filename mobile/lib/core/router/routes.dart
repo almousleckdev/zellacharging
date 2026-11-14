@@ -8,7 +8,6 @@ abstract final class Routes {
   static const resetPassword = '/reset-password';
   static const resetSuccess = '/reset-success';
   static const welcomeBack = '/welcome-back';
-  static const completeProfile = '/complete-profile';
   static const home = '/home';
   static const locations = '/locations';
   static const history = '/history';

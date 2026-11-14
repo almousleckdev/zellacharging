@@ -1,6 +1,5 @@
 import 'charging_error_text.dart';
 import 'app_language.dart';
-import 'contact_gate_text.dart';
 
 abstract final class ErrorText {
   static String withReference(String message, String? reference) {
@@ -14,7 +13,6 @@ abstract final class ErrorText {
       fr: 'E-mail, téléphone ou mot de passe incorrect.',
       en: 'Incorrect email, phone or password.',
     ),
-    'CONTACTS_NOT_VERIFIED': ContactGateText.notVerifiedError,
     'ACCOUNT_NOT_VERIFIED': AppLanguage.pick(
       fr: 'Veuillez d’abord vérifier votre compte.',
       en: 'Please verify your account first.',

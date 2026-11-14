@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
@@ -36,17 +37,21 @@ public class RegistrationService {
 
     @Transactional
     public RegisteredAccount register(RegisterCommand command) {
-        ContactPoint email = new ContactPoint(Channel.EMAIL, contacts.email(required(command.email())));
-        ContactPoint phone = new ContactPoint(Channel.PHONE, contacts.phone(required(command.phone())));
-        requireUnused(email);
-        requireUnused(phone);
+        Optional<ContactPoint> email = Optional.ofNullable(command.email()).filter(RegistrationService::hasText)
+                .map(raw -> new ContactPoint(Channel.EMAIL, contacts.email(raw)));
+        Optional<ContactPoint> phone = Optional.ofNullable(command.phone()).filter(RegistrationService::hasText)
+                .map(raw -> new ContactPoint(Channel.PHONE, contacts.phone(raw)));
+        ContactPoint toVerify = email.or(() -> phone).orElseThrow(() -> new ApiException(HttpStatus.BAD_REQUEST,
+                "CONTACT_REQUIRED", "An email or a phone number is required"));
+        email.ifPresent(this::requireUnused);
+        phone.ifPresent(this::requireUnused);
         Customer customer = new Customer(UUID.randomUUID(), TenantContext.require(), command.firstName().trim(),
-                command.lastName().trim(), email.target(), phone.target(), passwords.hash(command.password()),
+                command.lastName().trim(), email.map(ContactPoint::target).orElse(null),
+                phone.map(ContactPoint::target).orElse(null), passwords.hash(command.password()),
                 CustomerStatus.PENDING_VERIFICATION, 0, null, clock.instant());
         customers.save(customer);
-        verification.issue(customer, phone, phone.channel(), deliveryFor(phone, command.delivery()));
-        verification.issue(customer, email, email.channel(), CodeDelivery.EMAIL);
-        return new RegisteredAccount(customer.id(), phone);
+        verification.issue(customer, toVerify, toVerify.channel(), deliveryFor(toVerify, command.delivery()));
+        return new RegisteredAccount(customer.id(), toVerify);
     }
 
     static CodeDelivery deliveryFor(ContactPoint contact, CodeDelivery requested) {
@@ -62,11 +67,7 @@ public class RegistrationService {
         }
     }
 
-    private static String required(String value) {
-        if (value == null || value.isBlank()) {
-            throw new ApiException(HttpStatus.BAD_REQUEST, "CONTACT_REQUIRED",
-                    "An email and a phone number are required");
-        }
-        return value;
+    private static boolean hasText(String value) {
+        return value != null && !value.isBlank();
     }
 }

@@ -245,6 +245,12 @@ abstract final class AuthText {
   static String get phoneNumberLabel =>
       AppLanguage.pick(fr: 'Numéro de téléphone', en: 'Phone number');
 
+  static String get signUpWithEmail =>
+      AppLanguage.pick(fr: 'E-mail', en: 'Email');
+
+  static String get signUpWithPhone =>
+      AppLanguage.pick(fr: 'Téléphone', en: 'Phone');
+
   static String get signInIdentifierLabel => AppLanguage.pick(
     fr: 'E-mail ou numéro de téléphone',
     en: 'Email or phone number',

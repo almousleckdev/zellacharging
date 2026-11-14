@@ -1,0 +1,63 @@
+import 'package:flutter/material.dart';
+
+import '../../../../core/l10n/strings.dart';
+import '../../../../core/theme/app_colors.dart';
+import '../../../../core/theme/app_spacing.dart';
+import '../../domain/contact_channel.dart';
+
+class ContactModeSwitch extends StatelessWidget {
+  const ContactModeSwitch({
+    super.key,
+    required this.selected,
+    required this.onChanged,
+  });
+
+  final ContactChannel selected;
+  final ValueChanged<ContactChannel> onChanged;
+
+  @override
+  Widget build(BuildContext context) {
+    return Center(
+      child: Container(
+        padding: const EdgeInsets.all(AppSpacing.xs),
+        decoration: BoxDecoration(
+          color: AppColors.surfaceMuted,
+          borderRadius: BorderRadius.circular(AppSpacing.radius),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            _option(context, ContactChannel.email, AuthText.signUpWithEmail),
+            _option(context, ContactChannel.phone, AuthText.signUpWithPhone),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _option(BuildContext context, ContactChannel channel, String label) {
+    final active = channel == selected;
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () => onChanged(channel),
+      child: AnimatedContainer(
+        duration: const Duration(milliseconds: 150),
+        padding: const EdgeInsets.symmetric(
+          horizontal: AppSpacing.lg,
+          vertical: AppSpacing.xs + 2,
+        ),
+        decoration: BoxDecoration(
+          color: active ? AppColors.surface : AppColors.surfaceMuted,
+          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+        ),
+        child: Text(
+          label,
+          style: Theme.of(context).textTheme.bodySmall?.copyWith(
+            color: active ? AppColors.primary : AppColors.textSecondary,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
+      ),
+    );
+  }
+}

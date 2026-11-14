@@ -450,7 +450,9 @@ class FakeAuth implements AuthRepository {
   @override
   Future<VerificationTarget> register(RegistrationData data) async {
     registered.add(data);
-    return VerificationTarget(channel: ContactChannel.phone, value: data.phone);
+    return data.email != null
+        ? VerificationTarget(channel: ContactChannel.email, value: data.email!)
+        : VerificationTarget(channel: ContactChannel.phone, value: data.phone!);
   }
 
   @override

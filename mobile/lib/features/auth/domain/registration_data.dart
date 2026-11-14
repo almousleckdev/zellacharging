@@ -5,15 +5,15 @@ class RegistrationData {
     required this.firstName,
     required this.lastName,
     required this.password,
-    required this.email,
-    required this.phone,
+    this.email,
+    this.phone,
     this.delivery,
   });
 
   final String firstName;
   final String lastName;
   final String password;
-  final String email;
-  final String phone;
+  final String? email;
+  final String? phone;
   final OtpDelivery? delivery;
 }

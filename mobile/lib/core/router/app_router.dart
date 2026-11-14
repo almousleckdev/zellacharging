@@ -19,8 +19,6 @@ import '../../features/home/presentation/home_page.dart';
 import '../../features/stations/presentation/locations_page.dart';
 import '../../features/coupons/presentation/coupons_page.dart';
 import '../../features/profile/presentation/change_password_page.dart';
-import '../../features/profile/presentation/complete_profile_page.dart';
-import '../../features/profile/presentation/profile_providers.dart';
 import '../../features/profile/presentation/delete_account_page.dart';
 import '../../features/profile/domain/contact_confirmation.dart';
 import '../../features/profile/domain/contact_kind.dart';
@@ -57,27 +55,10 @@ const _publicRoutes = {
   Routes.welcomeBack,
 };
 
-const _contactRoutes = {
-  Routes.completeProfile,
-  Routes.addEmail,
-  Routes.addPhone,
-  Routes.confirmEmail,
-  Routes.confirmPhone,
-};
-
-String? _contactsRedirect(bool? complete, String location) {
-  if (complete == null) return null;
-  if (!complete && !_contactRoutes.contains(location)) {
-    return Routes.completeProfile;
-  }
-  return complete && location == Routes.completeProfile ? Routes.home : null;
-}
-
 final routerProvider = Provider<GoRouter>((ref) {
   final refresh = ValueNotifier<int>(0);
   ref.listen(sessionControllerProvider, (_, _) => refresh.value++);
   ref.listen(splashDoneProvider, (_, _) => refresh.value++);
-  ref.listen(contactsCompleteProvider, (_, _) => refresh.value++);
   ref.onDispose(refresh.dispose);
 
   return GoRouter(
@@ -98,7 +79,7 @@ final routerProvider = Provider<GoRouter>((ref) {
       final isPublic = _publicRoutes.contains(location);
       if (signedIn && isPublic) return Routes.home;
       if (!signedIn && !isPublic) return Routes.login;
-      return _contactsRedirect(ref.read(contactsCompleteProvider), location);
+      return null;
     },
     routes: [
       GoRoute(path: Routes.splash, builder: (_, _) => const SplashPage()),
@@ -124,10 +105,6 @@ final routerProvider = Provider<GoRouter>((ref) {
       GoRoute(
         path: Routes.resetSuccess,
         builder: (_, _) => const ResetSuccessPage(),
-      ),
-      GoRoute(
-        path: Routes.completeProfile,
-        builder: (_, _) => const CompleteProfilePage(),
       ),
       GoRoute(
         path: Routes.welcomeBack,

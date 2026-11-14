@@ -57,10 +57,6 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
     await submit(() async {
       await ref.read(authRepositoryProvider).verify(_target, _code.text.trim());
       if (!mounted) return;
-      if (widget.args.followUp != null) {
-        context.pushReplacement(Routes.otp, extra: widget.args.next);
-        return;
-      }
       AppToast.success(context, AuthText.accountVerified);
       context.go(Routes.login);
     });
@@ -82,29 +78,13 @@ class _OtpPageState extends ConsumerState<OtpPage> with SubmitMixin {
     });
   }
 
-  String get _title => widget.args.totalSteps == 1
-      ? AuthText.otpTitle
-      : _target.channel == ContactChannel.phone
-      ? ContactGateText.verifyPhoneTitle
-      : ContactGateText.verifyEmailTitle;
-
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     return AuthPage(
-      title: _title,
+      title: AuthText.otpTitle,
       subtitle: AuthText.otpSentTo,
       children: [
-        if (widget.args.totalSteps > 1) ...[
-          Text(
-            ContactGateText.step(widget.args.step, widget.args.totalSteps),
-            style: theme.textTheme.bodySmall?.copyWith(
-              color: AppColors.primary,
-              fontWeight: FontWeight.w600,
-            ),
-          ),
-          const SizedBox(height: AppSpacing.sm),
-        ],
         Text(
           _target.value,
           style: theme.textTheme.bodyLarge?.copyWith(

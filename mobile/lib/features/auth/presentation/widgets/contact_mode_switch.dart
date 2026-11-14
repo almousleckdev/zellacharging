@@ -17,44 +17,42 @@ class ContactModeSwitch extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        padding: const EdgeInsets.all(AppSpacing.xs),
-        decoration: BoxDecoration(
-          color: AppColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(AppSpacing.radius),
-        ),
-        child: Row(
-          mainAxisSize: MainAxisSize.min,
-          children: [
-            _option(context, ContactChannel.email, AuthText.signUpWithEmail),
-            _option(context, ContactChannel.phone, AuthText.signUpWithPhone),
-          ],
-        ),
+    return Container(
+      padding: const EdgeInsets.all(AppSpacing.xs),
+      decoration: BoxDecoration(
+        color: AppColors.surfaceMuted,
+        borderRadius: BorderRadius.circular(AppSpacing.radius),
+      ),
+      child: Row(
+        children: [
+          _option(context, ContactChannel.email, AuthText.signUpWithEmail),
+          _option(context, ContactChannel.phone, AuthText.signUpWithPhone),
+        ],
       ),
     );
   }
 
   Widget _option(BuildContext context, ContactChannel channel, String label) {
     final active = channel == selected;
-    return GestureDetector(
-      behavior: HitTestBehavior.opaque,
-      onTap: () => onChanged(channel),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 150),
-        padding: const EdgeInsets.symmetric(
-          horizontal: AppSpacing.lg,
-          vertical: AppSpacing.xs + 2,
-        ),
-        decoration: BoxDecoration(
-          color: active ? AppColors.surface : AppColors.surfaceMuted,
-          borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
-        ),
-        child: Text(
-          label,
-          style: Theme.of(context).textTheme.bodySmall?.copyWith(
-            color: active ? AppColors.primary : AppColors.textSecondary,
-            fontWeight: FontWeight.w600,
+    return Expanded(
+      child: GestureDetector(
+        behavior: HitTestBehavior.opaque,
+        onTap: () => onChanged(channel),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 150),
+          height: 44,
+          alignment: Alignment.center,
+          decoration: BoxDecoration(
+            color: active ? AppColors.surface : AppColors.surfaceMuted,
+            borderRadius: BorderRadius.circular(AppSpacing.radiusSmall),
+            border: active ? Border.all(color: AppColors.primary) : null,
+          ),
+          child: Text(
+            label,
+            style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+              color: active ? AppColors.primary : AppColors.textSecondary,
+              fontWeight: FontWeight.w600,
+            ),
           ),
         ),
       ),

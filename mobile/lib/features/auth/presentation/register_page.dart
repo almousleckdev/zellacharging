@@ -76,7 +76,9 @@ class _RegisterPageState extends ConsumerState<RegisterPage> with SubmitMixin {
               lastName: _lastName.text.trim(),
               password: _password.text,
               email: _byPhone ? null : _email.text.trim(),
-              phone: _byPhone ? PhoneNumber.e164(PhoneNumber.defaultCountry, _phone.text) : null,
+              phone: _byPhone
+                  ? PhoneNumber.e164(PhoneNumber.defaultCountry, _phone.text)
+                  : null,
               delivery: delivery,
             ),
           );

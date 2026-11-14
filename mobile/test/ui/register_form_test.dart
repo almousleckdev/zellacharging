@@ -36,9 +36,7 @@ void main() {
     await closeApp(tester);
   });
 
-  testWidgets('the phone tab shows the Gabon number field', (
-    tester,
-  ) async {
+  testWidgets('the phone tab shows the Gabon number field', (tester) async {
     await pumpApp(tester, const RegisterPage(), overrides: overrides());
 
     await tester.tap(find.text(AuthText.signUpWithPhone));

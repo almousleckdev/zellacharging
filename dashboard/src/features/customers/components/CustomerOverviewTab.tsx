@@ -5,8 +5,10 @@ import { useFormatters } from "@/shared/i18n/useFormatters";
 import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
 import type { CustomerDetail } from "../schemas";
+import { AccessCard } from "./AccessCard";
 import { FreeAccessCard } from "./FreeAccessCard";
 import { IdentityCard } from "./IdentityCard";
+import { NdzelaCard } from "./NdzelaCard";
 
 export function CustomerOverviewTab({ customer }: { customer: CustomerDetail }) {
   const { t } = useI18n();
@@ -26,6 +28,8 @@ export function CustomerOverviewTab({ customer }: { customer: CustomerDetail }) 
         <MetricCard label={labels.lastSession} value={sessions.lastSessionAt ? format.date(sessions.lastSessionAt) : labels.never} compact />
       </MetricBand>
       <IdentityCard customer={customer} />
+      <AccessCard customer={customer} />
+      <NdzelaCard customer={customer} />
       <FreeAccessCard customer={customer} />
     </div>
   );

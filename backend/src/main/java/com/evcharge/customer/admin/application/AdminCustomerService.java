@@ -7,9 +7,12 @@ import com.evcharge.customer.account.CustomerPage;
 import com.evcharge.customer.account.CustomerPicture;
 import com.evcharge.customer.account.CustomerQuery;
 import com.evcharge.customer.account.CustomerRecord;
+import com.evcharge.customer.account.CustomerSupport;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
+import com.evcharge.customer.charging.CustomerIdTags;
 import com.evcharge.customer.charging.SessionStatistics;
+import com.evcharge.customer.partner.PartnerLinking;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.Sort;
 import com.evcharge.customer.shared.TenantContext;
@@ -33,17 +36,24 @@ public class AdminCustomerService {
     private final SessionStatistics sessions;
     private final CustomerModeration moderation;
     private final ComplimentaryAccess complimentary;
+    private final CustomerSupport support;
+    private final PartnerLinking linking;
+    private final CustomerIdTags idTags;
     private final AdminAudit audit;
 
     public AdminCustomerService(AdminAccessService access, CustomerDirectory customers, WalletStatistics wallets,
                                 SessionStatistics sessions, CustomerModeration moderation,
-                                ComplimentaryAccess complimentary, AdminAudit audit) {
+                                ComplimentaryAccess complimentary, CustomerSupport support, PartnerLinking linking,
+                                CustomerIdTags idTags, AdminAudit audit) {
         this.access = access;
         this.customers = customers;
         this.wallets = wallets;
         this.sessions = sessions;
         this.moderation = moderation;
         this.complimentary = complimentary;
+        this.support = support;
+        this.linking = linking;
+        this.idTags = idTags;
         this.audit = audit;
     }
 
@@ -87,7 +97,8 @@ public class AdminCustomerService {
             CustomerRecord record = customers.find(id).orElseThrow(() -> new ApiException(HttpStatus.NOT_FOUND,
                     "CUSTOMER_NOT_FOUND", "Customer not found"));
             return new CustomerDetail(code, record, wallets.ofCustomer(id).orElse(null), sessions.ofCustomer(id),
-                    complimentary.find(id).orElse(null));
+                    complimentary.find(id).orElse(null), support.state(id),
+                    new NdzelaLink(linking.linked(id), idTags.existing(List.of(id)).get(id)));
         });
     }
 

@@ -1,6 +1,7 @@
 package com.evcharge.customer.admin.web;
 
 import com.evcharge.customer.account.Complimentary;
+import com.evcharge.customer.account.CustomerSupportState;
 import com.evcharge.customer.admin.application.CustomerDetail;
 import com.evcharge.customer.charging.CustomerSessions;
 import com.evcharge.customer.wallet.CustomerWallet;
@@ -12,14 +13,26 @@ import java.util.UUID;
 record CustomerDetailResponse(UUID id, String country, String firstName, String lastName, String email,
                               String phone, String status, boolean emailVerified, boolean phoneVerified,
                               Instant createdAt, Long avatarVersion, Wallet wallet, Sessions sessions,
-                              FreeAccess freeAccess) {
+                              FreeAccess freeAccess, Access access, Ndzela ndzela) {
 
     static CustomerDetailResponse from(CustomerDetail detail) {
         var customer = detail.customer();
         return new CustomerDetailResponse(customer.id(), detail.country(), customer.firstName(), customer.lastName(),
                 customer.email(), customer.phone(), customer.status(), customer.emailVerified(),
                 customer.phoneVerified(), customer.createdAt(), customer.avatarVersion(), Wallet.from(detail.wallet()),
-                Sessions.from(detail.sessions()), FreeAccess.from(detail.complimentary()));
+                Sessions.from(detail.sessions()), FreeAccess.from(detail.complimentary()),
+                Access.from(detail.support()), new Ndzela(detail.ndzela().linked(), detail.ndzela().idTag()));
+    }
+
+    record Access(Instant lockedUntil, int failedLoginAttempts, String pendingEmail, String pendingPhone) {
+
+        static Access from(CustomerSupportState state) {
+            return new Access(state.lockedUntil(), state.failedLoginAttempts(), state.pendingEmail(),
+                    state.pendingPhone());
+        }
+    }
+
+    record Ndzela(boolean linked, String idTag) {
     }
 
     record FreeAccess(String reason, UUID grantedBy, Instant grantedAt, Instant expiresAt) {

@@ -50,7 +50,18 @@ const freeAccessSchema = z.object({
   expiresAt: z.string().nullable(),
 });
 
+const accessSchema = z.object({
+  lockedUntil: z.string().nullable(),
+  failedLoginAttempts: z.number(),
+  pendingEmail: z.string().nullable(),
+  pendingPhone: z.string().nullable(),
+});
+
+const ndzelaSchema = z.object({ linked: z.boolean(), idTag: z.string().nullable() });
+
 export const customerDetailSchema = customerItemSchema.extend({
+  access: accessSchema,
+  ndzela: ndzelaSchema,
   emailVerified: z.boolean(),
   phoneVerified: z.boolean(),
   wallet: walletSchema.nullable(),

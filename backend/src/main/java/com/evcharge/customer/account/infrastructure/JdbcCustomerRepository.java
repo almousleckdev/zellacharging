@@ -143,6 +143,18 @@ class JdbcCustomerRepository implements CustomerRepository {
     }
 
     @Override
+    public void replaceContact(UUID id, Channel channel, String value) {
+        String columns = channel == Channel.EMAIL ? "email = :value, email_verified_at = null"
+                : "phone_e164 = :value, phone_verified_at = null";
+        try {
+            jdbc.sql("update customer set " + columns + " where id = :id")
+                    .param("value", value).param("id", id).update();
+        } catch (DuplicateKeyException e) {
+            throw new ApiException(HttpStatus.CONFLICT, "CONTACT_ALREADY_USED", "Contact already registered");
+        }
+    }
+
+    @Override
     public boolean updateStatus(UUID id, String from, String to) {
         return jdbc.sql("update customer set status = :to where id = :id and status = :from")
                 .param("to", to).param("id", id).param("from", from).update() == 1;

@@ -23,6 +23,8 @@ const detail = {
   status: "ACTIVE",
   createdAt: "2026-10-01T10:00:00Z",
   emailVerified: true,
+  access: { lockedUntil: null, failedLoginAttempts: 0, pendingEmail: null, pendingPhone: null },
+  ndzela: { linked: false, idTag: null },
   phoneVerified: false,
   wallet: {
     currency: "XAF",

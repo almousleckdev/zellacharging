@@ -22,6 +22,8 @@ const customer: CustomerDetail = {
   status: "ACTIVE",
   createdAt: "2026-10-01T10:00:00Z",
   emailVerified: true,
+  access: { lockedUntil: null, failedLoginAttempts: 0, pendingEmail: null, pendingPhone: null },
+  ndzela: { linked: false, idTag: null },
   phoneVerified: false,
   wallet: null,
   sessions: { completed: 0, live: 0, energyKwh: 0, spentMinor: 0, lastSessionAt: null },

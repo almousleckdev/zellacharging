@@ -36,7 +36,8 @@ class JdbcActivityFlows implements ActivityFlows {
                         + "count(*) filter (where state = 'FAILED') as failed, "
                         + "coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) as energy, "
                         + "coalesce(sum(cost_minor) filter (where " + BILLED + "), 0)::bigint as revenue, "
-                        + "coalesce(sum(round(cost_minor * :service / 100)) filter (where " + BILLED
+                        + "coalesce(sum(coalesce((select c2.service_fee_minor from session_charge c2 where c2.session_id = "
+                        + "charging_session.id), round(cost_minor * :service / 100))) filter (where " + BILLED
                         + "), 0)::bigint as service, "
                         + "coalesce(sum(round(cost_minor * :vat / 100)) filter (where " + BILLED
                         + "), 0)::bigint as vat from charging_session "

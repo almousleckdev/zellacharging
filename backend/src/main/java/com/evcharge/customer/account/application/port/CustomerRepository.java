@@ -20,6 +20,7 @@ public interface CustomerRepository {
     void updatePasswordHash(UUID id, String passwordHash);
     void attachEmail(UUID id, String email, Instant verifiedAt);
     void attachPhone(UUID id, String phone);
+    void replaceContact(UUID id, Channel channel, String value);
     boolean updateStatus(UUID id, String from, String to);
     void markDeleted(UUID id, String unusablePasswordHash);
     boolean hasPassword(UUID id);

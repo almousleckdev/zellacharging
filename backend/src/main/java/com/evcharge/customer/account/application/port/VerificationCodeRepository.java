@@ -12,4 +12,5 @@ public interface VerificationCodeRepository {
     Optional<VerificationCode> findLatest(UUID customerId, Channel channel);
     void incrementAttempts(UUID id);
     void consume(UUID id, Instant at);
+    void resetAttempts(UUID customerId, Channel channel);
 }

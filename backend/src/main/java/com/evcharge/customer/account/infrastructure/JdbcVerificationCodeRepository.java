@@ -54,6 +54,13 @@ class JdbcVerificationCodeRepository implements VerificationCodeRepository {
     }
 
     @Override
+    public void resetAttempts(UUID customerId, Channel channel) {
+        jdbc.sql("update verification_code set attempts = 0 where customer_id = :customerId and channel = :channel "
+                        + "and consumed_at is null")
+                .param("customerId", customerId).param("channel", channel.name()).update();
+    }
+
+    @Override
     public void consume(UUID id, Instant at) {
         jdbc.sql("update verification_code set consumed_at = :at where id = :id")
                 .param("at", Timestamps.toDb(at)).param("id", id).update();

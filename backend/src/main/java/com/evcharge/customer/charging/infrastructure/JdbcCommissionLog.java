@@ -22,7 +22,8 @@ class JdbcCommissionLog implements CommissionLog {
             + "and s.state in ('COMPLETED', 'ABANDONED') and s.cost_minor > 0";
     private static final String TEXT_FILTER = " and (lower(s.station_id) like :pattern escape '\\' "
             + "or lower(c.first_name || ' ' || c.last_name) like :pattern escape '\\')";
-    private static final String SERVICE = "coalesce(sum(round(s.cost_minor * :service / 100)), 0)::bigint";
+    private static final String SERVICE = "coalesce(sum(coalesce((select c2.service_fee_minor from session_charge c2 "
+            + "where c2.session_id = s.id), round(s.cost_minor * :service / 100))), 0)::bigint";
     private static final String VAT = "coalesce(sum(round(s.cost_minor * :vat / 100)), 0)::bigint";
 
     private final JdbcClient jdbc;

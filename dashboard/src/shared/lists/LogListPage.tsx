@@ -50,6 +50,7 @@ type LogListPageProps<Row, Out extends Listing<Row>> = {
   exportName?: string;
   rowActions?: Column<Row>;
   above?: (data: Out) => ReactNode;
+  headerActions?: ReactNode;
 };
 
 export function LogListPage<Row, Out extends Listing<Row>>(props: LogListPageProps<Row, Out>) {
@@ -110,7 +111,12 @@ export function LogListPage<Row, Out extends Listing<Row>>(props: LogListPagePro
       <PageHeader
         title={labels.title}
         subtitle={labels.subtitle}
-        actions={data && <p className="text-sm text-muted">{interpolate(labels.results, { count: format.number(data.total) })}</p>}
+        actions={
+          <>
+            {data && <p className="text-sm text-muted">{interpolate(labels.results, { count: format.number(data.total) })}</p>}
+            {props.headerActions}
+          </>
+        }
       />
       {data && above?.(data)}
       {panel}

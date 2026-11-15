@@ -85,6 +85,7 @@ export const frCustomers = {
       deliveryLabel: "Envoyer par",
       newValueLabel: "Nouvelle valeur",
       phoneHint: "Avec l'indicatif du pays, par exemple +241 06 12 34 56.",
+      name: { button: "Modifier le nom", title: "Modifier le nom du client", message: "Seul un super admin peut modifier le nom. La modification est enregistrée dans le journal d'audit.", confirm: "Enregistrer", done: "Nom modifié." },
       deliveries: { EMAIL: "E-mail", WHATSAPP: "WhatsApp", SMS: "SMS" },
       dialogs: {
         "resend-code": { title: "Renvoyer le code", message: "Un nouveau code à 6 chiffres est envoyé maintenant, même si un code vient d'être envoyé.", confirm: "Envoyer le code" },

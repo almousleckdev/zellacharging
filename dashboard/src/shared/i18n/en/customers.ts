@@ -87,6 +87,7 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
       deliveryLabel: "Send by",
       newValueLabel: "New value",
       phoneHint: "With the country code, for example +241 06 12 34 56.",
+      name: { button: "Edit name", title: "Edit the customer's name", message: "Only a super admin can change the name. The change is recorded in the audit log.", confirm: "Save", done: "Name updated." },
       deliveries: { EMAIL: "Email", WHATSAPP: "WhatsApp", SMS: "SMS" },
       dialogs: {
         "resend-code": { title: "Resend code", message: "A new 6-digit code is sent now, even if one was just sent.", confirm: "Send code" },

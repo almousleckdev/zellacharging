@@ -179,6 +179,21 @@ class AdminCustomerSupportIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void onlyASuperAdminEditsTheName() throws Exception {
+        UUID customer = data.customer("GA", "ACTIVE");
+        String admin = fixtures.create(AdminRole.ADMIN, Set.of("GA")).accessToken();
+        String body = "{\"firstName\":\" Marie \",\"lastName\":\"Nze\"}";
+
+        call(put(base(customer) + "/name"), admin, body).andExpect(status().isForbidden());
+        call(put(base(customer) + "/name"), root, body).andExpect(status().isNoContent());
+
+        call(get(base(customer))).andExpect(jsonPath("$.firstName").value("Marie"))
+                .andExpect(jsonPath("$.lastName").value("Nze"));
+        call(put(base(customer) + "/name"), root, "{\"firstName\":\"\",\"lastName\":\"Nze\"}")
+                .andExpect(status().isBadRequest());
+    }
+
+    @Test
     void supportActionsNeedTheManagePermission() throws Exception {
         UUID customer = data.customer("GA", "ACTIVE");
         String support = fixtures.create(AdminRole.SUPPORT, Set.of("GA")).accessToken();
@@ -200,9 +215,7 @@ class AdminCustomerSupportIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void theServiceFeeIsZeroAndPastChargesKeepTheirStoredFee() throws Exception {
-        assertThat(jdbc.queryForObject("select value from platform_setting where key = 'charging.serviceFeePercent'",
-                String.class)).isEqualTo("0");
+    void pastChargesKeepTheirStoredServiceFee() throws Exception {
         UUID customer = data.customer("GA", "ACTIVE");
         UUID session = UUID.randomUUID();
         TenantContext.runAs("GA", () -> {

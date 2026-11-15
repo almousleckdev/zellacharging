@@ -14,5 +14,7 @@ public interface CustomerSupport {
 
     void markVerified(UUID customerId, String channel);
 
+    void changeName(UUID customerId, String firstName, String lastName);
+
     void changeContact(UUID customerId, String channel, String value);
 }

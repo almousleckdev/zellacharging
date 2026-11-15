@@ -52,6 +52,13 @@ class AdminCustomerSupportController {
         support.unlockLogin(admin, country, id);
     }
 
+    @PutMapping("/name")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void changeName(AdminAccess admin, @PathVariable String country, @PathVariable UUID id,
+                    @Valid @RequestBody CustomerNameRequest request) {
+        support.changeName(admin, country, id, request.firstName(), request.lastName());
+    }
+
     @PutMapping("/contact")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void changeContact(AdminAccess admin, @PathVariable String country, @PathVariable UUID id,

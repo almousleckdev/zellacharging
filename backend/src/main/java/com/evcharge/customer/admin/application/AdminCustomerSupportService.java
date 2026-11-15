@@ -3,9 +3,12 @@ package com.evcharge.customer.admin.application;
 import com.evcharge.customer.account.CustomerCreation;
 import com.evcharge.customer.account.CustomerSupport;
 import com.evcharge.customer.admin.domain.AdminAccess;
+import com.evcharge.customer.admin.domain.AdminRole;
 import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.partner.PartnerLinking;
+import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.TenantContext;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.UUID;
@@ -53,6 +56,13 @@ public class AdminCustomerSupportService {
     public void markVerified(AdminAccess admin, String country, UUID id, String channel) {
         act(admin, country, id, "CUSTOMER_CONTACT_VERIFIED", "channel=" + channel,
                 () -> support.markVerified(id, channel));
+    }
+
+    public void changeName(AdminAccess admin, String country, UUID id, String firstName, String lastName) {
+        if (admin.role() != AdminRole.SUPER_ADMIN) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "PERMISSION_DENIED", "Only a super admin can do this");
+        }
+        act(admin, country, id, "CUSTOMER_NAME_CHANGED", null, () -> support.changeName(id, firstName, lastName));
     }
 
     public void changeContact(AdminAccess admin, String country, UUID id, String channel, String value) {

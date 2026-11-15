@@ -52,6 +52,7 @@ public abstract class PostgresTestBase {
         registry.add("zella.tenancy.country-cache-ttl", () -> "0s");
         registry.add("zella.charging.sweep-interval", () -> "1h");
         registry.add("zella.fees.service-fee-percent", () -> "0");
+        registry.add("zella.ocpp.requests-per-minute", () -> "100000");
     }
 
     @BeforeEach

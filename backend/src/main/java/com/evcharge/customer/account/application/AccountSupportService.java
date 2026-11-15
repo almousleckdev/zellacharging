@@ -28,17 +28,20 @@ class AccountSupportService implements CustomerSupport {
     private final VerificationCodeRepository codes;
     private final VerificationService verification;
     private final ContactChange change;
+    private final ProfileService profiles;
     private final Clock clock;
 
     AccountSupportService(CustomerRepository customers, PendingEmailRepository pendingEmails,
                           PendingPhoneRepository pendingPhones, VerificationCodeRepository codes,
-                          VerificationService verification, ContactChange change, Clock clock) {
+                          VerificationService verification, ContactChange change, ProfileService profiles,
+                          Clock clock) {
         this.customers = customers;
         this.pendingEmails = pendingEmails;
         this.pendingPhones = pendingPhones;
         this.codes = codes;
         this.verification = verification;
         this.change = change;
+        this.profiles = profiles;
         this.clock = clock;
     }
 
@@ -96,6 +99,13 @@ class AccountSupportService implements CustomerSupport {
         Channel channel = contactChannel(channelName);
         load(customerId);
         change.apply(customerId, channel, value);
+    }
+
+    @Override
+    @Transactional
+    public void changeName(UUID customerId, String firstName, String lastName) {
+        load(customerId);
+        profiles.updateName(customerId, firstName, lastName);
     }
 
     private String targetOf(Customer customer, Channel channel) {

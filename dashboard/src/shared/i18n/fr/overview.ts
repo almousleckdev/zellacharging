@@ -8,6 +8,15 @@ export const frOverview = {
     loadError: "Impossible de charger les indicateurs.",
     unitKwh: "kWh",
     period: { label: "Période", days: "j" },
+    today: {
+      collected: "Encaissé aujourd'hui",
+      collectedHint: "Total prélevé aux clients aujourd'hui",
+      charges: "Recharges aujourd'hui",
+      chargesHint: "{completed} terminées · {failed} en échec",
+      energy: "Énergie aujourd'hui",
+      energyHint: "Livrée aujourd'hui",
+      versus: "vs hier",
+    },
     kpi: {
       sales: "Ventes",
       commission: "Commission Zella",

@@ -10,6 +10,15 @@ export const enOverview: Pick<Dictionary, "overview"> = {
     loadError: "We couldn't load the indicators.",
     unitKwh: "kWh",
     period: { label: "Period", days: "d" },
+    today: {
+      collected: "Collected today",
+      collectedHint: "Total taken from customers today",
+      charges: "Charges today",
+      chargesHint: "{completed} completed · {failed} failed",
+      energy: "Energy today",
+      energyHint: "Delivered today",
+      versus: "vs yesterday",
+    },
     kpi: {
       sales: "Sales",
       commission: "Zella commission",

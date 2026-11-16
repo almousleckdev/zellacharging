@@ -141,6 +141,18 @@ describe("OverviewPage", () => {
     }
   });
 
+  it("shows what was collected today with today's charges", async () => {
+    navigation.search = new URLSearchParams("country=GA");
+    serve([figures("GA", "Gabon", "XAF", 1)]);
+
+    renderConsole(<OverviewPage />, profileOf([gabon], "COUNTRY_ADMIN"));
+
+    const collected = (await screen.findByText("Encaissé aujourd'hui")).closest("article") as HTMLElement;
+    expect(text(collected)).toContain("138 FCFA");
+    const charges = screen.getByText("Recharges aujourd'hui").closest("article") as HTMLElement;
+    expect(text(charges)).toContain("5 terminées · 1 en échec");
+  });
+
   it("puts what needs attention in front: incidents, offline stations and live charges", async () => {
     navigation.search = new URLSearchParams("country=GA");
     serve([figures("GA", "Gabon", "XAF", 3)]);

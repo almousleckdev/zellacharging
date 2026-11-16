@@ -136,3 +136,18 @@ Still open: expected volume (150 cars, charges per day) to size rate limits.
 2. Zella builds the lookup endpoint and an NDZela API key, with tests and audit.
 3. NDZela builds Phase 2: store `idTag -> driver`, show driver and car on Sessions du réseau.
 4. Zella builds the sessions payment feed; NDZela builds Phase 3 on top.
+
+## 10. Zella reads the contract and the car of a linked driver (2026-11-16)
+
+The customer page of the Zella dashboard shows, in **NDZela driver**, the driver's contract number, contract period and
+daily rent, and the car (fleet number such as `V001`, plate, model, colour). The data stays in NDZela: Zella asks for it
+when an admin opens the page of a **linked** customer, and keeps no copy.
+
+- Zella calls `GET {ZELLA_NDZELA_BASE_URL}/api/v1/partners/zella/customers/{customerId}/driver` with
+  `X-Api-Key: {ZELLA_NDZELA_API_KEY}`. `customerId` is the Zella customer id NDZela already stores on the link.
+- NDZela answers `{driver, contract, car}` (`contract` and `car` are null when the driver has no active contract). It
+  never returns identity documents, addresses, birth data, VIN or prices. Not linked, or unknown: 404.
+- Endpoint: `GET /v1/admin/customers/{country}/{id}/ndzela-driver` (permission `CUSTOMERS_READ`). Errors:
+  `NDZELA_NOT_LINKED` (404), `NDZELA_DRIVER_NOT_FOUND` (404), `NDZELA_UNAVAILABLE` (503, not configured or unreachable).
+- Keys: NDZela holds `ZELLA_PARTNER_KEY`, Zella holds the same value as `ZELLA_NDZELA_API_KEY`. Generate a long random
+  value and share it through a password manager, never email or chat. Rotate by changing both.

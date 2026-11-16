@@ -11,6 +11,7 @@ import { Card } from "@/shared/ui/Card";
 import { ConfirmDialog } from "@/shared/ui/ConfirmDialog";
 import { useToast } from "@/shared/ui/ToastProvider";
 import { useCustomerSupport } from "../api/useCustomerSupport";
+import { NdzelaDriverDetails } from "./NdzelaDriverDetails";
 import type { CustomerDetail } from "../schemas";
 
 export function NdzelaCard({ customer }: { customer: CustomerDetail }) {
@@ -43,6 +44,7 @@ export function NdzelaCard({ customer }: { customer: CustomerDetail }) {
         <p>{linked ? labels.linked : labels.notLinked}</p>
         {idTag && <p className="text-muted">{`${labels.idTag}: ${idTag}`}</p>}
       </div>
+      {linked && <NdzelaDriverDetails customer={customer} />}
       <ConfirmDialog
         open={confirming}
         title={linked ? labels.unlinkTitle : labels.linkTitle}

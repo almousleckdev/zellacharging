@@ -21,6 +21,7 @@ import { QuickAccess } from "./QuickAccess";
 import { RecentCharges } from "./RecentCharges";
 import { RevenueChart } from "./RevenueCharts";
 import { RevenueKpis } from "./RevenueKpis";
+import { TodayBand } from "./TodayBand";
 import { TopCommissions } from "./TopCommissions";
 
 const PERIODS = [7, 30, 90] as const;
@@ -62,6 +63,7 @@ export function OverviewPage() {
         </div>
       )}
       {(overview.isError || series.isError) && <ErrorState message={t.overview.loadError} onRetry={() => void overview.refetch()} />}
+      {ready && primary && <TodayBand period={primary} />}
       {ready && primary && <RevenueKpis period={primary} days={days} />}
       <div className="grid items-start gap-6 xl:grid-cols-[minmax(0,1fr)_20rem]">
         <div className="flex min-w-0 flex-col gap-6">

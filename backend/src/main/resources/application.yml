@@ -193,3 +193,6 @@ zella:
     default-feed-limit: 100
     max-feed-limit: 500
     feed-lag: ${ZELLA_PARTNER_FEED_LAG:10s}
+  ndzela:
+    base-url: ${ZELLA_NDZELA_BASE_URL:}
+    api-key: ${ZELLA_NDZELA_API_KEY:}

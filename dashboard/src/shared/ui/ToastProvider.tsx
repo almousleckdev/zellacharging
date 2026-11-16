@@ -1,6 +1,6 @@
 "use client";
 
-import { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { cn } from "@/shared/lib/cn";
@@ -24,6 +24,21 @@ const TONES: Record<Tone, string> = {
 export function ToastProvider({ children }: { children: ReactNode }) {
   const { t } = useI18n();
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const layer = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const element = layer.current;
+    if (!element || typeof element.showPopover !== "function") {
+      return;
+    }
+    element.setAttribute("popover", "manual");
+    if (element.matches(":popover-open")) {
+      element.hidePopover();
+    }
+    if (toasts.length > 0) {
+      element.showPopover();
+    }
+  }, [toasts]);
 
   const dismiss = useCallback((id: number) => {
     setToasts((current) => current.filter((toast) => toast.id !== id));
@@ -43,7 +58,11 @@ export function ToastProvider({ children }: { children: ReactNode }) {
   return (
     <ToastContext value={api}>
       {children}
-      <div aria-live="polite" className="pointer-events-none fixed bottom-4 right-4 z-50 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2">
+      <div
+        ref={layer}
+        aria-live="polite"
+        className="pointer-events-none fixed inset-auto bottom-4 right-4 z-50 m-0 flex w-80 max-w-[calc(100vw-2rem)] flex-col gap-2 overflow-visible border-0 bg-transparent p-0"
+      >
         {toasts.map((toast) => (
           <div
             key={toast.id}

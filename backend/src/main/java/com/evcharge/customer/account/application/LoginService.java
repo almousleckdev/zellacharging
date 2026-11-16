@@ -41,6 +41,9 @@ public class LoginService {
         Customer customer = customers.findByContact(contact.channel(), contact.target())
                 .orElseThrow(LoginService::invalidCredentials);
         failures.requireNotLocked(customer);
+        if (customer.status() == CustomerStatus.ACTIVE && !customers.hasPassword(customer.id())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "PASSWORD_SETUP_REQUIRED", "Password must be set first");
+        }
         if (!passwords.matches(password, customer.passwordHash())) {
             failures.registerFailure(customer.id());
             audit.record("LOGIN_FAILED", customer.id(), "customer", null);

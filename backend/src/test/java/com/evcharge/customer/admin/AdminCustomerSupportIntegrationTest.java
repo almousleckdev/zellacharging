@@ -172,6 +172,9 @@ class AdminCustomerSupportIntegrationTest extends PostgresTestBase {
         call(get(base(id))).andExpect(jsonPath("$.firstName").value("Ada"))
                 .andExpect(jsonPath("$.email").value("ada.o@example.com")).andExpect(jsonPath("$.status").value("ACTIVE"))
                 .andExpect(jsonPath("$.emailVerified").value(true)).andExpect(jsonPath("$.phoneVerified").value(true));
+        mvc.perform(post("/v1/auth/login").contentType(MediaType.APPLICATION_JSON)
+                        .content("{\"identifier\":\"ada.o@example.com\",\"password\":\"Whatever12345\"}"))
+                .andExpect(status().isForbidden()).andExpect(jsonPath("$.code").value("PASSWORD_SETUP_REQUIRED"));
         call(post("/v1/admin/customers/GA"), root, body).andExpect(status().isConflict())
                 .andExpect(jsonPath("$.code").value("CONTACT_ALREADY_USED"));
         call(post("/v1/admin/customers/GA"), root, "{\"firstName\":\"A\",\"lastName\":\"B\"}")

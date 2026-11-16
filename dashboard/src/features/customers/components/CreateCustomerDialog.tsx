@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { ALL_COUNTRIES } from "@/features/session/countryScope";
 import { useSession } from "@/features/session/SessionProvider";
 import { ApiError } from "@/shared/api/adminFetch";
 import { errorMessage } from "@/shared/i18n/errorMessage";
@@ -20,7 +21,7 @@ export function CreateCustomerDialog({ onClose }: { onClose: () => void }) {
   const { profile, country: current } = useSession();
   const create = useCreateCustomer();
   const labels = t.customers.create;
-  const [country, setCountry] = useState(current);
+  const [country, setCountry] = useState(current === ALL_COUNTRIES ? (profile.countries[0]?.code ?? current) : current);
   const [form, setForm] = useState(EMPTY);
   const set = (key: keyof typeof EMPTY) => (event: { target: { value: string } }) => setForm({ ...form, [key]: event.target.value });
   const valid = form.firstName.trim() !== "" && form.lastName.trim() !== "" && (form.email.trim() !== "" || form.phone.trim() !== "");

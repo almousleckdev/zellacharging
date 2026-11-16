@@ -7,6 +7,7 @@ class SignInWithPassword {
   const SignInWithPassword(this._repository);
 
   static const unverifiedCode = 'ACCOUNT_NOT_VERIFIED';
+  static const passwordSetupCode = 'PASSWORD_SETUP_REQUIRED';
 
   final AuthRepository _repository;
 

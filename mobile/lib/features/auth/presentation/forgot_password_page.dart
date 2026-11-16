@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../../core/l10n/password_setup_text.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_icons.dart';
@@ -19,7 +20,9 @@ import 'widgets/auth_field.dart';
 import 'widgets/auth_page.dart';
 
 class ForgotPasswordPage extends ConsumerStatefulWidget {
-  const ForgotPasswordPage({super.key});
+  const ForgotPasswordPage({super.key, this.setupIdentifier});
+
+  final String? setupIdentifier;
 
   @override
   ConsumerState<ForgotPasswordPage> createState() => _ForgotPasswordPageState();
@@ -28,7 +31,9 @@ class ForgotPasswordPage extends ConsumerStatefulWidget {
 class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
     with SubmitMixin {
   final _formKey = GlobalKey<FormState>();
-  final _identifier = TextEditingController();
+  late final _identifier = TextEditingController(text: widget.setupIdentifier);
+
+  bool get _setup => widget.setupIdentifier != null;
 
   @override
   void dispose() {
@@ -63,8 +68,8 @@ class _ForgotPasswordPageState extends ConsumerState<ForgotPasswordPage>
   @override
   Widget build(BuildContext context) {
     return AuthPage(
-      title: AuthText.forgotTitle,
-      subtitle: AuthText.forgotBody,
+      title: _setup ? PasswordSetupText.title : AuthText.forgotTitle,
+      subtitle: _setup ? PasswordSetupText.body : AuthText.forgotBody,
       showBack: true,
       children: [
         Form(

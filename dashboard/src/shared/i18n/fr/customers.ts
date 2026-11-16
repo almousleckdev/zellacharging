@@ -120,7 +120,7 @@ export const frCustomers = {
     create: {
       button: "Créer un client",
       title: "Créer un client",
-      hint: "Indiquez un e-mail, un numéro de téléphone ou les deux. Ils sont marqués comme vérifiés. Le client choisit ensuite son mot de passe avec « Mot de passe oublié » dans l'application.",
+      hint: "Indiquez un e-mail, un numéro de téléphone ou les deux. Ils sont marqués comme vérifiés. Le client choisit lui-même son mot de passe à sa première connexion dans l'application.",
       phoneHint: "Avec l'indicatif du pays, par exemple +241 06 12 34 56.",
       submit: "Créer",
       done: "Client créé.",

@@ -95,7 +95,8 @@ final routerProvider = Provider<GoRouter>((ref) {
       ),
       GoRoute(
         path: Routes.forgotPassword,
-        builder: (_, _) => const ForgotPasswordPage(),
+        builder: (_, state) =>
+            ForgotPasswordPage(setupIdentifier: state.extra as String?),
       ),
       GoRoute(
         path: Routes.resetPassword,

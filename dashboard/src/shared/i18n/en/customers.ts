@@ -122,7 +122,7 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
     create: {
       button: "Create customer",
       title: "Create a customer",
-      hint: "Give an email, a phone number or both. They are marked as verified. The customer then chooses a password with \"Forgot password\" in the app.",
+      hint: "Give an email, a phone number or both. They are marked as verified. The customer sets their own password the first time they sign in to the app.",
       phoneHint: "With the country code, for example +241 06 12 34 56.",
       submit: "Create",
       done: "Customer created.",

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/l10n/strings.dart';
 import '../../../core/l10n/suspension_text.dart';
+import '../../../core/network/api_error.dart';
 import '../../../core/l10n/verification_text.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/session/session_controller.dart';
@@ -19,6 +20,7 @@ import '../../../shared/submit_mixin.dart';
 import '../../../shared/widgets/otp_channel_sheet.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../domain/contact_channel.dart';
+import '../domain/sign_in_with_password.dart';
 import '../domain/verification_target.dart';
 import 'auth_providers.dart';
 import 'auth_switch_link.dart';
@@ -71,9 +73,16 @@ class _LoginPageState extends ConsumerState<LoginPage> with SubmitMixin {
     if (!_formKey.currentState!.validate()) return;
     submit(() async {
       final identifier = _identifier.text.trim();
-      final unverified = await ref
-          .read(signInWithPasswordProvider)
-          .call(identifier: identifier, password: _password.text);
+      final VerificationTarget? unverified;
+      try {
+        unverified = await ref
+            .read(signInWithPasswordProvider)
+            .call(identifier: identifier, password: _password.text);
+      } on ApiError catch (error) {
+        if (error.code != SignInWithPassword.passwordSetupCode) rethrow;
+        if (mounted) context.push(Routes.forgotPassword, extra: identifier);
+        return;
+      }
       if (unverified != null) {
         await _resumeVerification(unverified);
         return;

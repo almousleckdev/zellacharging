@@ -51,10 +51,12 @@ class AccountCreationService implements CustomerCreation {
         }
         points.forEach(point -> change.validate(point, null));
         Instant now = clock.instant();
+        String unusableHash = passwords.hash(unusablePassword());
         Customer customer = new Customer(UUID.randomUUID(), TenantContext.require(), firstName.trim(),
                 lastName.trim(), target(points, Channel.EMAIL), target(points, Channel.PHONE),
-                passwords.hash(unusablePassword()), CustomerStatus.PENDING_VERIFICATION, 0, null, now);
+                unusableHash, CustomerStatus.PENDING_VERIFICATION, 0, null, now);
         customers.save(customer);
+        customers.markPasswordless(customer.id(), unusableHash);
         points.forEach(point -> customers.markContactVerified(customer.id(), point.channel(), now));
         return customer.id();
     }

@@ -7,6 +7,7 @@ import com.evcharge.customer.wallet.WalletFunding;
 import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
+import java.time.Instant;
 import java.util.Optional;
 
 @Component
@@ -36,6 +37,15 @@ public class SessionCostEstimator {
             return Optional.empty();
         }
         return priced(session, session.energyKwh());
+    }
+
+    public ChargingSession withinReserve(ChargingSession session, Instant now) {
+        Money reserved = funding.reserved(session.id());
+        if (session.costMinor() == null || reserved.minor() <= 0
+                || fees.of(session.costMinor()).totalMinor() <= reserved.minor()) {
+            return session;
+        }
+        return session.withCost(fees.electricWithin(reserved.minor()), reserved.currency(), reserved.decimals(), now);
     }
 
     public Optional<Money> forEnergy(ChargingSession session, BigDecimal kwh) {

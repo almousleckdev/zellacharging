@@ -54,4 +54,11 @@ class FeeCalculatorTest {
         assertThat(calculator("0", "2").of(125).serviceMinor()).isEqualTo(3);
         assertThat(calculator("0", "2").of(124).serviceMinor()).isEqualTo(2);
     }
+
+    @Test
+    void theElectricShareThatFitsATotalNeverExceedsIt() {
+        assertThat(calculator("0", "0").electricWithin(7000)).isEqualTo(7000);
+        assertThat(calculator("18", "2").electricWithin(7000)).isEqualTo(5833);
+        assertThat(calculator("18", "2").of(5833).totalMinor()).isLessThanOrEqualTo(7000);
+    }
 }

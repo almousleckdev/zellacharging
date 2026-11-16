@@ -102,9 +102,10 @@ public class SessionReconciler {
         if (!finished) {
             return session;
         }
-        return estimator.finalCost(session)
+        ChargingSession costed = estimator.finalCost(session)
                 .map(cost -> session.withCost(cost.minor(), cost.currency(), cost.decimals(), now))
                 .orElse(session);
+        return estimator.withinReserve(costed, now);
     }
 
     private SessionState nextState(ChargingSession session, RemoteSession remote) {

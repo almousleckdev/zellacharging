@@ -23,6 +23,8 @@ public record ChargingSession(
         Instant createdAt,
         Instant updatedAt) {
 
+    private static final java.time.Duration CLOCK_TOLERANCE = java.time.Duration.ofMinutes(10);
+
     public static ChargingSession requested(UUID id, UUID customerId, String stationId, int connectorId,
                                             String idTag, Instant now) {
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, SessionState.REQUESTED,
@@ -36,9 +38,19 @@ public record ChargingSession(
 
     public ChargingSession withRemote(RemoteSession remote, SessionState next, Instant now) {
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, next, failureCode,
-                remote.transactionId(), remote.startedAt(), remote.stoppedAt(), remote.energyKwh(),
+                remote.transactionId(), believed(remote.startedAt(), startedAt, now),
+                believed(remote.stoppedAt(), null, now), remote.energyKwh(),
                 remote.costMinor(), remote.currency(), remote.currencyDecimals(), remote.stopReason(),
                 createdAt, now);
+    }
+
+    private Instant believed(Instant reported, Instant fallback, Instant now) {
+        if (reported == null) {
+            return null;
+        }
+        boolean plausible = !reported.isBefore(createdAt.minus(CLOCK_TOLERANCE))
+                && !reported.isAfter(now.plus(CLOCK_TOLERANCE));
+        return plausible ? reported : (fallback != null ? fallback : now);
     }
 
     public ChargingSession withCost(long minor, String costCurrency, int decimals, Instant now) {

@@ -82,6 +82,17 @@ class PvitGatewayTest {
     }
 
     @Test
+    void anInactiveCollectionAccountFailsDefinitivelyInsteadOfStayingPending() {
+        server.expect(requestTo("http://pvit.test/v2/PAYCODE/rest")).andRespond(withStatus(HttpStatus.FORBIDDEN)
+                .contentType(MediaType.APPLICATION_JSON)
+                .body("{\"status_code\":3003,\"error\":\"OPERATION_ACCOUNT_TRANSACTION_TYPE_NOT_ACTIVE\"}"));
+        PaymentOutcome outcome = gateway.collect(request());
+        assertThat(outcome.state()).isEqualTo(TopupState.FAILED);
+        assertThat(outcome.failureCode()).isEqualTo("PROVIDER_REFUSED");
+        server.verify();
+    }
+
+    @Test
     void aServerErrorLeavesTheOutcomeUnknown() {
         server.expect(requestTo("http://pvit.test/v2/PAYCODE/rest")).andRespond(withStatus(HttpStatus.BAD_GATEWAY));
         assertThatThrownBy(() -> gateway.collect(request())).isInstanceOf(PvitException.class);

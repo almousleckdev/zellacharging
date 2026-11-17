@@ -14,7 +14,7 @@ import java.util.List;
 class JdbcIncidentFeed implements IncidentFeed {
 
     private static final String SESSIONS = "select case when s.state = 'FAILED' then 'SESSION_FAILED' "
-            + "else 'SESSION_ABANDONED' end as kind, case when s.state = 'FAILED' then 'MEDIUM' else 'LOW' end "
+            + "else 'SESSION_ABANDONED' end as kind, case when s.state = 'FAILED' then 'MEDIUM' when s.failure_code = 'CHARGER_OFFLINE' then 'HIGH' else 'LOW' end "
             + "as severity, 'session' as subject_type, s.id as subject_id, s.customer_id, "
             + "c.first_name || ' ' || c.last_name as customer_name, coalesce(s.failure_code, s.stop_reason) as code, "
             + "s.cost_minor as amount, s.currency, s.currency_decimals as decimals, "

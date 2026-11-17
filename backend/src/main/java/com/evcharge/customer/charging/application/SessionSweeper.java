@@ -25,11 +25,13 @@ public class SessionSweeper {
     private final FundsGuard guard;
     private final StalledSessionCloser stalled;
     private final OrphanChargeGuard orphans;
+    private final LostChargerStopper lostChargers;
     private final CountryDirectory countries;
 
     public SessionSweeper(WalletFunding funding, SessionRepository sessions, SessionReconciler reconciler,
                           SessionSettlement settlement, FundsGuard guard,
-                         StalledSessionCloser stalled, OrphanChargeGuard orphans, CountryDirectory countries) {
+                         StalledSessionCloser stalled, OrphanChargeGuard orphans, LostChargerStopper lostChargers,
+                         CountryDirectory countries) {
         this.funding = funding;
         this.sessions = sessions;
         this.reconciler = reconciler;
@@ -37,6 +39,7 @@ public class SessionSweeper {
         this.guard = guard;
         this.stalled = stalled;
         this.orphans = orphans;
+        this.lostChargers = lostChargers;
         this.countries = countries;
     }
 
@@ -68,12 +71,21 @@ public class SessionSweeper {
 
     private void sweepCountry() {
         stopOrphans();
+        stopLostChargers();
         for (UUID id : funding.openHoldSessions()) {
             try {
                 sessions.findById(id).ifPresent(this::tend);
             } catch (RuntimeException e) {
                 log.warn("Sweep failed for session {}", id, e);
             }
+        }
+    }
+
+    private void stopLostChargers() {
+        try {
+            lostChargers.stopWhatIsStillCharging();
+        } catch (RuntimeException e) {
+            log.warn("Lost charger check failed", e);
         }
     }
 

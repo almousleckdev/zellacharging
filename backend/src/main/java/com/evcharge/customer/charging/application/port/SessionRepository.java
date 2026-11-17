@@ -37,5 +37,7 @@ public interface SessionRepository {
 
     List<ChargingSession> live();
 
+    List<ChargingSession> closedWithoutCharger(Instant since);
+
     List<ChargingSession> history(UUID customerId, int limit);
 }

@@ -111,6 +111,13 @@ class JdbcSessionRepository implements SessionRepository {
     }
 
     @Override
+    public List<ChargingSession> closedWithoutCharger(Instant since) {
+        return jdbc.sql("select * from charging_session where state = 'ABANDONED' and failure_code = 'CHARGER_OFFLINE' "
+                        + "and transaction_id is not null and updated_at >= :since")
+                .param("since", java.sql.Timestamp.from(since)).query(MAPPER).list();
+    }
+
+    @Override
     public Optional<ChargingSession> findOwned(UUID id, UUID customerId) {
         return jdbc.sql("select * from charging_session where id = :id and customer_id = :customerId and hidden_at is null")
                 .param("id", id).param("customerId", customerId).query(MAPPER).optional();

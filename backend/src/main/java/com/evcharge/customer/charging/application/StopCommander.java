@@ -15,6 +15,7 @@ import java.time.Clock;
 public class StopCommander {
 
     private static final Logger log = LoggerFactory.getLogger(StopCommander.class);
+    private static final long ATTEMPT_SECONDS = 10;
 
     private final ChargingGateway gateway;
     private final SessionRepository sessions;
@@ -30,14 +31,15 @@ public class StopCommander {
     }
 
     public CommandOutcome issue(ChargingSession session) {
+        long attempt = clock.instant().getEpochSecond() / ATTEMPT_SECONDS;
         CommandOutcome outcome = gateway.stop(session.stationId(), session.connectorId(),
-                "stop:" + session.id());
+                "stop:" + session.id() + ":" + attempt);
         if (outcome.accepted()) {
             sessions.update(session.withState(SessionState.STOPPING, null, clock.instant()));
         } else {
             metrics.stopRefused();
-            log.error("ALERT stop not accepted for session {} at {} connector {}: {}", session.id(),
-                    session.stationId(), session.connectorId(), outcome.reasonCode());
+            log.error("ALERT stop not accepted for session {} at {} connector {}: {} {}", session.id(),
+                    session.stationId(), session.connectorId(), outcome.reasonCode(), outcome.message());
         }
         return outcome;
     }

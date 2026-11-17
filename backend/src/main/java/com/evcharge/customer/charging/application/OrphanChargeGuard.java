@@ -64,7 +64,7 @@ public class OrphanChargeGuard {
         log.error("ALERT transaction {} at {} connector {} is charging with no session of ours: stopping it",
                 remote.transactionId(), remote.stationId(), remote.connectorId());
         try {
-            gateway.stop(remote.stationId(), remote.connectorId(), "orphan:" + remote.transactionId());
+            gateway.stop(remote.stationId(), remote.connectorId(), "orphan:" + remote.transactionId() + ":" + java.time.Instant.now().getEpochSecond() / 10);
         } catch (RuntimeException e) {
             log.warn("Stop of untracked transaction {} could not be sent", remote.transactionId(), e);
         }

@@ -134,7 +134,7 @@ zella:
     silence-check-interval: 2s
     stop-retry-after: 30s
     stop-threshold-percent: 100
-    stop-lead-time: ${ZELLA_STOP_LEAD_TIME:45s}
+    stop-lead-time: ${ZELLA_STOP_LEAD_TIME:90s}
     user-refresh-interval: 5s
     metering-interval: 10s
     stall:

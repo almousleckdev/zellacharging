@@ -88,6 +88,8 @@ export const frCommon = {
     SESSION_STILL_ACTIVE: "Ce client a une recharge en cours.",
     WALLET_NOT_EMPTY: "Le portefeuille contient encore de l'argent : il doit être vide.",
     SESSION_NOT_FOUND: "Recharge introuvable.",
+    SESSION_NOT_ACTIVE: "Cette recharge n'est plus en cours.",
+    STOP_REFUSED: "La borne a refusé l'arrêt. Réessayez dans un instant.",
     PAYMENT_NOT_FOUND: "Paiement introuvable.",
     INVALID_RANGE: "Cette période n'est pas valide.",
     INVALID_INCIDENT_STATUS: "Ce statut n'est pas valide.",

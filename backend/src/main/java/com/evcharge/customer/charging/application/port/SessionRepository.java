@@ -27,6 +27,8 @@ public interface SessionRepository {
 
     Optional<ChargingSession> findById(UUID id);
 
+    Optional<ChargingSession> findByTransactionId(int transactionId);
+
     Optional<ChargingSession> findLive(UUID customerId);
 
     Optional<ChargingSession> findLiveAt(String stationId, int connectorId, String idTag);

@@ -8,6 +8,7 @@ import type { Column } from "@/shared/ui/DataTable";
 import { sessionCost } from "../format";
 import type { SessionItem } from "../schemas";
 import { SessionStateBadge } from "./SessionStateBadge";
+import { StopChargeButton } from "./StopChargeButton";
 
 export function useSessionColumns(): Column<SessionItem>[] {
   const { t } = useI18n();
@@ -54,5 +55,6 @@ export function useSessionColumns(): Column<SessionItem>[] {
       text: (row) => format.dateTime(row.startedAt ?? row.createdAt),
       cell: (row) => format.dateTime(row.startedAt ?? row.createdAt),
     },
+    { key: "stop", header: "", align: "right", text: () => "", cell: (row) => <StopChargeButton session={row} compact /> },
   ];
 }

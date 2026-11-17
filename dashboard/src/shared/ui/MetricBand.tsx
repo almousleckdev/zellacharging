@@ -4,6 +4,7 @@ import { cn } from "@/shared/lib/cn";
 const COLUMNS = {
   3: "sm:grid-cols-3",
   4: "sm:grid-cols-2 xl:grid-cols-4",
+  5: "sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5",
 } as const;
 
 type MetricBandProps = {

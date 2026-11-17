@@ -13,6 +13,7 @@ import { percentLabel } from "../format";
 import { RelatedLinks } from "@/shared/ui/RelatedLinks";
 import { SessionBilling } from "./SessionBilling";
 import { SessionStateBadge } from "./SessionStateBadge";
+import { StopChargeButton } from "./StopChargeButton";
 
 export function SessionDetailPage() {
   const { t } = useI18n();
@@ -36,6 +37,7 @@ export function SessionDetailPage() {
       notFound={labels.notFound}
       loadError={labels.loadError}
       badge={session && <SessionStateBadge state={session.state} />}
+      actions={session && <StopChargeButton session={session} />}
     >
       {data && session && (
         <div className="grid items-start gap-6 lg:grid-cols-2">

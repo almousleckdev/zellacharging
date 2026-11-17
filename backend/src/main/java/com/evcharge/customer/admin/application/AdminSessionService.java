@@ -2,6 +2,7 @@ package com.evcharge.customer.admin.application;
 
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
+import com.evcharge.customer.charging.ChargeStopper;
 import com.evcharge.customer.charging.SessionDetail;
 import com.evcharge.customer.charging.SessionDigest;
 import com.evcharge.customer.charging.SessionDigestPage;
@@ -26,11 +27,16 @@ public class AdminSessionService {
     private final AdminAccessService access;
     private final SessionLog sessions;
     private final SessionDigests digests;
+    private final ChargeStopper stopper;
+    private final AdminAudit audit;
 
-    public AdminSessionService(AdminAccessService access, SessionLog sessions, SessionDigests digests) {
+    public AdminSessionService(AdminAccessService access, SessionLog sessions, SessionDigests digests,
+                               ChargeStopper stopper, AdminAudit audit) {
         this.access = access;
         this.sessions = sessions;
         this.digests = digests;
+        this.stopper = stopper;
+        this.audit = audit;
     }
 
     public CountryListing<SessionRecord> list(AdminAccess admin, Permission required, String country, String state, String text,
@@ -59,6 +65,12 @@ public class AdminSessionService {
         SessionDetail found = TenantContext.callAs(code, () -> sessions.find(id)).orElseThrow(
                 () -> new ApiException(HttpStatus.NOT_FOUND, "SESSION_NOT_FOUND", "Session not found"));
         return new CountryEntry<>(code, found, found.record().createdAt());
+    }
+
+    public void stop(AdminAccess admin, String country, UUID id) {
+        String code = AdminCountries.single(access.scope(admin, Permission.SESSIONS_STOP, country));
+        TenantContext.runAs(code, () -> stopper.stop(id));
+        audit.record(admin.id(), code, "SESSION_STOPPED_BY_ADMIN", id.toString(), null);
     }
 
     private static String blank(String value) {

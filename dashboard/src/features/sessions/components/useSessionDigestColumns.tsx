@@ -8,6 +8,7 @@ import type { Column } from "@/shared/ui/DataTable";
 import { sessionCost } from "../format";
 import type { SessionDigest } from "../schemas";
 import { SessionStateBadge } from "./SessionStateBadge";
+import { StopChargeButton } from "./StopChargeButton";
 
 export function useSessionDigestColumns(): Column<SessionDigest>[] {
   const { t } = useI18n();
@@ -57,5 +58,6 @@ export function useSessionDigestColumns(): Column<SessionDigest>[] {
       cell: (row) => `${format.number(row.energyKwh, 1)} ${t.sessions.unitKwh}`,
     },
     { key: "spent", header: labels.spent, align: "right", sortKey: "spent", text: money, cell: (row) => <span className="figure font-semibold">{money(row)}</span> },
+    { key: "stop", header: "", align: "right", text: () => "", cell: (row) => <StopChargeButton session={row.last} compact /> },
   ];
 }

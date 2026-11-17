@@ -4,7 +4,10 @@ import com.evcharge.customer.admin.application.AdminSessionService;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.shared.LogFilter;
+import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,5 +53,11 @@ class AdminSessionController {
     @GetMapping("/{country}/{id}")
     SessionDetailResponse detail(AdminAccess admin, @PathVariable String country, @PathVariable UUID id) {
         return SessionDetailResponse.from(sessions.detail(admin, Permission.SESSIONS_READ, country, id));
+    }
+
+    @PostMapping("/{country}/{id}/stop")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void stop(AdminAccess admin, @PathVariable String country, @PathVariable UUID id) {
+        sessions.stop(admin, country, id);
     }
 }

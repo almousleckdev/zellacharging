@@ -136,6 +136,13 @@ class JdbcSessionRepository implements SessionRepository {
     }
 
     @Override
+    public Optional<ChargingSession> findByTransactionId(int transactionId) {
+        return jdbc.sql("select * from charging_session where transaction_id = :transactionId "
+                        + "order by created_at desc limit 1")
+                .param("transactionId", transactionId).query(MAPPER).optional();
+    }
+
+    @Override
     public Optional<ChargingSession> findLive(UUID customerId) {
         return jdbc.sql("select * from charging_session where customer_id = :customerId and state in " + LIVE)
                 .param("customerId", customerId).query(MAPPER).optional();

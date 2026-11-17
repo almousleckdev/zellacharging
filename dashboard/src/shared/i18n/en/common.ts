@@ -90,6 +90,8 @@ export const enCommon: Pick<Dictionary, "language" | "brand" | "common" | "error
     SESSION_STILL_ACTIVE: "This customer has a charge in progress.",
     WALLET_NOT_EMPTY: "The wallet still holds money: it must be empty first.",
     SESSION_NOT_FOUND: "Session not found.",
+    SESSION_NOT_ACTIVE: "This charge is no longer running.",
+    STOP_REFUSED: "The charger refused to stop. Try again in a moment.",
     PAYMENT_NOT_FOUND: "Payment not found.",
     INVALID_RANGE: "This date range is not valid.",
     INVALID_INCIDENT_STATUS: "This status is not valid.",

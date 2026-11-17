@@ -4,6 +4,7 @@ import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
 import { sessionDigestSchema } from "../schemas";
+import { CollectionBand } from "./CollectionBand";
 import { useSessionDigestColumns } from "./useSessionDigestColumns";
 
 const STATES = ["ACTIVE", "COMPLETED", "FAILED", "ABANDONED", "STOPPING", "START_ACCEPTED", "REQUESTED"] as const;
@@ -27,6 +28,7 @@ export function SessionsByCustomerPage({ stationId }: { stationId?: string }) {
       filters={[{ key: "state", label: t.sessions.stateLabel, allLabel: t.sessions.allStates, options: STATES.map((value) => ({ value, label: states[value] })) }]}
       fixed={stationId ? { station: stationId } : undefined}
       searchable={stationId === undefined}
+      above={() => <CollectionBand />}
       embedded={stationId !== undefined}
     />
   );

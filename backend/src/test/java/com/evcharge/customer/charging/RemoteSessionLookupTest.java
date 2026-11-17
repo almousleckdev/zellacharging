@@ -70,6 +70,18 @@ class RemoteSessionLookupTest {
     }
 
     @Test
+    void aFinishedSessionIsFoundByItsTransactionWhateverTheChargerClockSays() {
+        when(gateway.activeSessions()).thenReturn(List.of());
+        RemoteSession finished = new RemoteSession(980, "CP-1", 1, "COMPLETED", Instant.parse("2025-03-06T18:12:03Z"),
+                Instant.parse("2025-03-06T18:54:00Z"), null, null, null, null, null, 350L, "Z-A", null, null);
+        when(gateway.session(980)).thenReturn(Optional.of(finished));
+
+        Optional<RemoteSession> found = lookup.find(local("CP-1", "Z-A", 980, SessionState.STOPPING));
+
+        assertThat(found).map(RemoteSession::status).contains("COMPLETED");
+    }
+
+    @Test
     void aSessionThatLeftTheActiveListIsLookedUpOnceByItsTransaction() {
         when(gateway.activeSessions()).thenReturn(List.of());
         when(gateway.session(7)).thenReturn(Optional.of(remote(7, "CP-1", "Z-A", "COMPLETED")));

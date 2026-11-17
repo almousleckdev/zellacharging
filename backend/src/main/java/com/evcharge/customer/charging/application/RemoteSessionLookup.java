@@ -117,9 +117,14 @@ public class RemoteSessionLookup {
 
     private static boolean matches(RemoteSession remote, ChargingSession session) {
         boolean sameOwner = remote.idTag() == null || remote.idTag().equals(session.idTag());
-        return sameOwner && remote.stationId().equals(session.stationId())
-                && remote.connectorId() == session.connectorId()
-                && remote.startedAt() != null && startedAfterRequest(remote, session);
+        boolean sameSpot = remote.stationId().equals(session.stationId()) && remote.connectorId() == session.connectorId();
+        if (!sameOwner || !sameSpot) {
+            return false;
+        }
+        if (session.transactionId() != null) {
+            return session.transactionId() == remote.transactionId();
+        }
+        return remote.startedAt() != null && startedAfterRequest(remote, session);
     }
 
     private static boolean startedAfterRequest(RemoteSession remote, ChargingSession session) {

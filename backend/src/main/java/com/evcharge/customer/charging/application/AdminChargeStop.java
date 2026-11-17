@@ -16,6 +16,7 @@ import java.util.UUID;
 public class AdminChargeStop implements ChargeStopper {
 
     private static final long ATTEMPT_SECONDS = 10;
+    private static final String STILL_CHARGING = "ACTIVE";
 
     private final SessionRepository sessions;
     private final SessionRefresher refresher;
@@ -60,6 +61,11 @@ public class AdminChargeStop implements ChargeStopper {
     }
 
     private void stopClosedCharge(ChargingSession session) {
+        boolean running = gateway.session(session.transactionId()).map(remote -> STILL_CHARGING.equals(remote.status()))
+                .orElse(false);
+        if (!running) {
+            throw new ApiException(HttpStatus.CONFLICT, "SESSION_NOT_ACTIVE", "No active charge to stop");
+        }
         String key = "admin-stop:" + session.id() + ":" + clock.instant().getEpochSecond() / ATTEMPT_SECONDS;
         if (!gateway.stop(session.stationId(), session.connectorId(), key).accepted()) {
             throw new ApiException(HttpStatus.CONFLICT, "STOP_REFUSED", "The charger refused to stop");

@@ -7,6 +7,7 @@ import com.evcharge.customer.charging.application.port.ChargingGateway;
 import com.evcharge.customer.charging.application.port.SessionRepository;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.CommandOutcome;
+import com.evcharge.customer.charging.domain.RemoteSession;
 import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.ApiException;
 import org.junit.jupiter.api.Test;
@@ -55,9 +56,25 @@ class AdminChargeStopTest {
         verify(userStop).perform(session);
     }
 
+    private RemoteSession platform(String status) {
+        return new RemoteSession(960, "DY1", 2, status, null, null, null, null, null, null, null, null, null, null,
+                null);
+    }
+
+    @Test
+    void aClosedChargeThatTheChargerAlreadyEndedIsNotStoppedAgain() {
+        ChargingSession session = session(SessionState.ABANDONED);
+        when(gateway.session(960)).thenReturn(Optional.of(platform("COMPLETED")));
+
+        assertThatThrownBy(() -> stop.stop(session.id())).isInstanceOf(ApiException.class)
+                .extracting(e -> ((ApiException) e).code()).isEqualTo("SESSION_NOT_ACTIVE");
+        verify(gateway, never()).stop(anyString(), anyInt(), anyString());
+    }
+
     @Test
     void aClosedChargeThatKeepsRunningIsStoppedOnTheCharger() {
         ChargingSession session = session(SessionState.ABANDONED);
+        when(gateway.session(960)).thenReturn(Optional.of(platform("ACTIVE")));
         when(gateway.stop(anyString(), anyInt(), anyString())).thenReturn(CommandOutcome.success());
 
         stop.stop(session.id());
@@ -69,6 +86,7 @@ class AdminChargeStopTest {
     @Test
     void aRefusedStopOnAClosedChargeIsReported() {
         ChargingSession session = session(SessionState.ABANDONED);
+        when(gateway.session(960)).thenReturn(Optional.of(platform("ACTIVE")));
         when(gateway.stop(anyString(), anyInt(), anyString())).thenReturn(CommandOutcome.refused("CHARGER_REFUSED", null));
 
         assertThatThrownBy(() -> stop.stop(session.id())).isInstanceOf(ApiException.class)

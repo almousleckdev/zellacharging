@@ -36,7 +36,7 @@ class SecurityConfiguration {
                         .requestMatchers("/v1/auth/**", "/v1/admin/auth/**", "/v1/payments/callback",
                                 "/v1/ocpp/webhooks").permitAll()
                         .requestMatchers(HttpMethod.POST, "/v1/contact", "/").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/actuator/health", "/actuator/health/**", "/v1/app/download").permitAll()
                         .anyRequest().authenticated())
                 .oauth2ResourceServer(oauth -> oauth.jwt(jwt -> { }).authenticationEntryPoint(problems)
                         .accessDeniedHandler(problems))

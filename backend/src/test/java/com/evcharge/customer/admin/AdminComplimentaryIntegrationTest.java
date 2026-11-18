@@ -126,4 +126,29 @@ class AdminComplimentaryIntegrationTest extends PostgresTestBase {
         call(grant(UUID.randomUUID(), "{\"reason\":\"CEO\"}"), root).andExpect(status().isNotFound());
         assertThat(grants(customer)).isZero();
     }
+
+    @Test
+    void ndzelaStaffAreListedWithTheEnergyTheyTookAndEachChargeIsMarked() throws Exception {
+        UUID staff = data.customer("GA", "ACTIVE");
+        UUID guest = data.customer("GA", "ACTIVE");
+        call(grant(staff, "{\"reason\":\"Equipe\",\"category\":\"NDZELA_STAFF\"}"), root)
+                .andExpect(status().isNoContent());
+        call(grant(guest, "{\"reason\":\"Invite\"}"), root).andExpect(status().isNoContent());
+        data.complimentarySession("GA", staff, "10.5", 2100);
+        data.complimentarySession("GA", staff, "4.5", 900);
+        data.complimentarySession("GA", guest, "7", 1400);
+
+        call(get("/v1/admin/complimentary/usage?country=GA"), root).andExpect(status().isOk())
+                .andExpect(jsonPath("$.length()").value(1))
+                .andExpect(jsonPath("$[0].customerId").value(staff.toString()))
+                .andExpect(jsonPath("$[0].sessions").value(2))
+                .andExpect(jsonPath("$[0].energyKwh").value(15.0))
+                .andExpect(jsonPath("$[0].valueMinor").value(3000));
+        call(get("/v1/admin/complimentary?country=GA"), root)
+                .andExpect(jsonPath("$[?(@.customerId == '" + staff + "')].category").value("NDZELA_STAFF"))
+                .andExpect(jsonPath("$[?(@.customerId == '" + guest + "')].category").value("OTHER"));
+        call(get("/v1/admin/sessions?country=GA"), root).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[?(@.customerId == '" + staff + "')].freeCategory")
+                        .value(org.hamcrest.Matchers.everyItem(org.hamcrest.Matchers.is("NDZELA_STAFF"))));
+    }
 }

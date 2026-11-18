@@ -7,6 +7,7 @@ import { CellLink } from "@/shared/ui/CellLink";
 import type { Column } from "@/shared/ui/DataTable";
 import { sessionCost } from "../format";
 import type { SessionDigest } from "../schemas";
+import { FreeBadge } from "./FreeBadge";
 import { SessionStateBadge } from "./SessionStateBadge";
 import { StopChargeButton } from "./StopChargeButton";
 
@@ -49,7 +50,13 @@ export function useSessionDigestColumns(): Column<SessionDigest>[] {
         </span>
       ),
     },
-    { key: "lastCost", header: labels.lastAmount, align: "right", text: lastCost, cell: lastCost },
+    {
+      key: "lastCost",
+      header: labels.lastAmount,
+      align: "right",
+      text: (row) => (row.last.freeCategory ? t.sessions.free[row.last.freeCategory] : lastCost(row)),
+      cell: (row) => (row.last.freeCategory ? <FreeBadge category={row.last.freeCategory} /> : lastCost(row)),
+    },
     {
       key: "energy",
       header: labels.energy,

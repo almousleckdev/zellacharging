@@ -22,7 +22,7 @@ final class SessionFilters {
             rs.getBigDecimal("energy_kwh"), rs.getObject("cost_minor", Long.class), rs.getString("currency"),
             rs.getObject("currency_decimals", Integer.class), rs.getBigDecimal("start_battery_percent"),
             rs.getBigDecimal("battery_percent"), Timestamps.read(rs, "started_at"),
-            Timestamps.read(rs, "stopped_at"), Timestamps.read(rs, "created_at"));
+            Timestamps.read(rs, "stopped_at"), Timestamps.read(rs, "created_at"), rs.getString("free_category"));
 
     private static final String TEXT_FILTER = " and (lower(s.station_id) like :pattern escape '\\' "
             + "or lower(c.first_name || ' ' || c.last_name) like :pattern escape '\\')";

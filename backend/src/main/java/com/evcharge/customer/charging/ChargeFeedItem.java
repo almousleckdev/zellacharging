@@ -9,5 +9,6 @@ public record ChargeFeedItem(UUID sessionId, int transactionId, UUID customerId,
                              BigDecimal energyKwh, Long energyCostMinor, Long vatMinor, Long serviceFeeMinor,
                              Long totalChargedMinor, String currency, Integer currencyDecimals,
                              String paymentState, boolean breakdownEstimated, BigDecimal batteryStartPercent,
-                             BigDecimal batteryPercent, BigDecimal powerKw, Long pricePerKwhMinor, Instant updatedAt) {
+                             BigDecimal batteryPercent, BigDecimal powerKw, Long pricePerKwhMinor, Instant updatedAt,
+                             String freeCategory) {
 }

@@ -12,6 +12,7 @@ export const frSessions = {
     allStates: "Tous les états",
     connector: "Connecteur",
     unitKwh: "kWh",
+    free: { NDZELA_STAFF: "Personnel NDZela", OTHER: "Offert" },
     states: {
       REQUESTED: "Demandée",
       START_ACCEPTED: "Démarrage accepté",

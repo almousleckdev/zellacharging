@@ -46,6 +46,7 @@ const sessionsSchema = z.object({
 
 const freeAccessSchema = z.object({
   reason: z.string(),
+  category: z.enum(["NDZELA_STAFF", "OTHER"]),
   grantedAt: z.string(),
   expiresAt: z.string().nullable(),
 });

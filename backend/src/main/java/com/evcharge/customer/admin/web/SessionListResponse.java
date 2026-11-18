@@ -19,14 +19,14 @@ record SessionListResponse(long total, int page, int size, List<Item> items) {
     record Item(UUID id, String country, UUID customerId, String customerName, String stationId, int connectorId,
                 String state, String failureCode, BigDecimal energyKwh, Long costMinor, String currency,
                 Integer decimals, BigDecimal startBatteryPercent, BigDecimal endBatteryPercent, Instant startedAt,
-                Instant stoppedAt, Instant createdAt) {
+                Instant stoppedAt, Instant createdAt, String freeCategory) {
 
         static Item from(CountryEntry<SessionRecord> entry) {
             SessionRecord s = entry.item();
             return new Item(s.id(), entry.country(), s.customerId(), s.customerName(), s.stationId(),
                     s.connectorId(), s.state(), s.failureCode(), s.energyKwh(), s.costMinor(), s.currency(),
                     s.decimals(), s.startBatteryPercent(), s.endBatteryPercent(), s.startedAt(), s.stoppedAt(),
-                    s.createdAt());
+                    s.createdAt(), s.freeCategory());
         }
     }
 }

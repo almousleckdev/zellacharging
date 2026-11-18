@@ -19,13 +19,13 @@ import java.util.UUID;
 @Repository
 class JdbcComplimentaryAccess implements ComplimentaryAccess, FreeCharging {
 
-    private static final String SELECT = "select g.customer_id, c.first_name, c.last_name, g.reason, g.granted_by, "
+    private static final String SELECT = "select g.customer_id, c.first_name, c.last_name, g.reason, g.category, g.granted_by, "
             + "g.granted_at, g.expires_at from customer_complimentary g join customer c on c.id = g.customer_id "
             + "and c.country_code = g.country_code where g.country_code = current_setting('app.country', true)";
 
     private static final RowMapper<Complimentary> MAPPER = (rs, row) -> new Complimentary(
             rs.getObject("customer_id", UUID.class), rs.getString("first_name"), rs.getString("last_name"),
-            rs.getString("reason"), rs.getObject("granted_by", UUID.class), Timestamps.read(rs, "granted_at"),
+            rs.getString("reason"), rs.getString("category"), rs.getObject("granted_by", UUID.class), Timestamps.read(rs, "granted_at"),
             Timestamps.read(rs, "expires_at"));
 
     private final JdbcClient jdbc;
@@ -37,13 +37,13 @@ class JdbcComplimentaryAccess implements ComplimentaryAccess, FreeCharging {
     }
 
     @Override
-    public void grant(UUID customerId, UUID grantedBy, String reason, Instant expiresAt) {
-        int written = jdbc.sql("insert into customer_complimentary (customer_id, granted_by, reason, granted_at, "
-                        + "expires_at) select id, :by, :reason, :now, :expires from customer where id = :id "
+    public void grant(UUID customerId, UUID grantedBy, String reason, String category, Instant expiresAt) {
+        int written = jdbc.sql("insert into customer_complimentary (customer_id, granted_by, reason, category, granted_at, "
+                        + "expires_at) select id, :by, :reason, :category, :now, :expires from customer where id = :id "
                         + "and country_code = current_setting('app.country', true) and status <> 'DELETED' "
                         + "on conflict (customer_id) do update set granted_by = excluded.granted_by, "
-                        + "reason = excluded.reason, granted_at = excluded.granted_at, expires_at = excluded.expires_at")
-                .param("id", customerId).param("by", grantedBy).param("reason", reason)
+                        + "reason = excluded.reason, category = excluded.category, granted_at = excluded.granted_at, expires_at = excluded.expires_at")
+                .param("id", customerId).param("by", grantedBy).param("reason", reason).param("category", category)
                 .param("now", Timestamps.toDb(clock.instant())).param("expires", Timestamps.toDb(expiresAt)).update();
         if (written == 0) {
             throw new ApiException(HttpStatus.NOT_FOUND, "CUSTOMER_NOT_FOUND", "Customer not found");

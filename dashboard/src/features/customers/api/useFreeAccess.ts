@@ -4,7 +4,9 @@ import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { z } from "zod";
 import { adminFetch } from "@/shared/api/adminFetch";
 
-export type FreeAccessRequest = { reason: string; expiresAt: string | null };
+export type FreeAccessCategory = "NDZELA_STAFF" | "OTHER";
+
+export type FreeAccessRequest = { reason: string; category: FreeAccessCategory; expiresAt: string | null };
 
 export function useFreeAccess(country: string, id: string) {
   const client = useQueryClient();

@@ -30,6 +30,7 @@ function session(state: string, failureCode: string | null = null): SessionItem 
     startedAt: new Date().toISOString(),
     stoppedAt: null,
     createdAt: new Date().toISOString(),
+    freeCategory: null,
   };
 }
 

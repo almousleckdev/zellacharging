@@ -31,7 +31,7 @@ const customer: CustomerDetail = {
 
 const granted: CustomerDetail = {
   ...customer,
-  freeAccess: { reason: "PDG", grantedAt: "2026-11-12T10:00:00Z", expiresAt: null },
+  freeAccess: { reason: "PDG", category: "OTHER", grantedAt: "2026-11-12T10:00:00Z", expiresAt: null },
 };
 
 const manager = { ...profileOf(), permissions: ["OVERVIEW_READ", "COMPLIMENTARY_MANAGE"] };
@@ -69,7 +69,21 @@ describe("FreeAccessCard", () => {
     const [url, init] = fetchMock.mock.calls[0];
     expect(String(url)).toBe("/api/admin/customers/GA/c1/complimentary");
     expect(init?.method).toBe("PUT");
-    expect(JSON.parse(String(init?.body))).toEqual({ reason: "DG", expiresAt: null });
+    expect(JSON.parse(String(init?.body))).toEqual({ reason: "DG", category: "NDZELA_STAFF", expiresAt: null });
+  });
+
+  it("lets the admin choose another type of access", async () => {
+    const fetchMock = serve();
+    const user = userEvent.setup();
+    renderConsole(<FreeAccessCard customer={customer} />, manager);
+
+    await user.click(screen.getByRole("button", { name: "Accorder la recharge gratuite" }));
+    await user.selectOptions(screen.getByLabelText("Type d'accès"), "OTHER");
+    await user.type(screen.getByLabelText("Motif (par exemple PDG)"), "Invité");
+    await user.click(screen.getByRole("button", { name: "Accorder l'accès" }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toMatchObject({ category: "OTHER" });
   });
 
   it("removes free charging after a confirmation", async () => {

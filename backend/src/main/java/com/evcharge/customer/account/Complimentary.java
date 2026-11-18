@@ -3,6 +3,6 @@ package com.evcharge.customer.account;
 import java.time.Instant;
 import java.util.UUID;
 
-public record Complimentary(UUID customerId, String firstName, String lastName, String reason, UUID grantedBy,
+public record Complimentary(UUID customerId, String firstName, String lastName, String reason, String category, UUID grantedBy,
                             Instant grantedAt, Instant expiresAt) {
 }

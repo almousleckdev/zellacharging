@@ -68,6 +68,7 @@ export function FreeAccessCard({ customer }: { customer: CustomerDetail }) {
         <p>{grant ? labels.active : labels.inactive}</p>
         {grant && (
           <>
+            <p className="text-muted">{`${labels.category}: ${labels.categories[grant.category]}`}</p>
             <p className="text-muted">{`${labels.reason}: ${grant.reason}`}</p>
             <p className="text-muted">{interpolate(labels.since, { date: format.date(grant.grantedAt) })}</p>
             {grant.expiresAt && <p className="text-muted">{interpolate(labels.until, { date: format.date(grant.expiresAt) })}</p>}

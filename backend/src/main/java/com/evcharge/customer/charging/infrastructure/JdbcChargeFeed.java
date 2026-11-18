@@ -23,7 +23,8 @@ class JdbcChargeFeed implements ChargeFeed {
             + "coalesce(c.state, 'PENDING') as payment_state, c.energy_cost_minor, c.vat_minor, c.service_fee_minor, "
             + "c.total_minor, coalesce(c.currency, s.currency) as currency, "
             + "coalesce(c.decimals, s.currency_decimals) as decimals, coalesce(c.estimated, false) as estimated, "
-            + "greatest(s.updated_at, coalesce(c.updated_at, s.updated_at)) as feed_at "
+            + "greatest(s.updated_at, coalesce(c.updated_at, s.updated_at)) as feed_at, "
+            + SessionBilling.FREE_CATEGORY + " "
             + "from charging_session s left join session_charge c on c.session_id = s.id "
             + "where %s and s.transaction_id is not null "
             + "and s.country_code = current_setting('app.country')) f "
@@ -41,7 +42,8 @@ class JdbcChargeFeed implements ChargeFeed {
             nullableLong(rs, "vat_minor"), nullableLong(rs, "service_fee_minor"), nullableLong(rs, "total_minor"),
             rs.getString("currency"), nullableInt(rs, "decimals"), rs.getString("payment_state"),
             rs.getBoolean("estimated"), rs.getBigDecimal("start_battery_percent"), rs.getBigDecimal("battery_percent"),
-            rs.getBigDecimal("last_power_kw"), nullableLong(rs, "price_per_kwh_minor"), Timestamps.read(rs, "feed_at"));
+            rs.getBigDecimal("last_power_kw"), nullableLong(rs, "price_per_kwh_minor"), Timestamps.read(rs, "feed_at"),
+            rs.getString("free_category"));
 
     private final JdbcClient jdbc;
 

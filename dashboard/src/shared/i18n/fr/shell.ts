@@ -29,6 +29,7 @@ export const frShell = {
     overview: "Vue d'ensemble",
     stations: "Bornes",
     sessions: "Sessions",
+    staff: "Personnel NDZela",
     incidents: "Incidents",
     customers: "Clients",
     payments: "Paiements",

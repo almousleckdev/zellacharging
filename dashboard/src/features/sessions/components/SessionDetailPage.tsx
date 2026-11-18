@@ -12,6 +12,7 @@ import { useSessionDetail } from "../api/useSessionDetail";
 import { percentLabel } from "../format";
 import { RelatedLinks } from "@/shared/ui/RelatedLinks";
 import { SessionBilling } from "./SessionBilling";
+import { FreeBadge } from "./FreeBadge";
 import { SessionStateBadge } from "./SessionStateBadge";
 import { StopChargeButton } from "./StopChargeButton";
 
@@ -36,7 +37,12 @@ export function SessionDetailPage() {
       query={query}
       notFound={labels.notFound}
       loadError={labels.loadError}
-      badge={session && <SessionStateBadge state={session.state} />}
+      badge={session && (
+        <>
+          <SessionStateBadge state={session.state} />
+          {session.freeCategory && <FreeBadge category={session.freeCategory} />}
+        </>
+      )}
       actions={session && <StopChargeButton session={session} />}
     >
       {data && session && (

@@ -35,10 +35,11 @@ record CustomerDetailResponse(UUID id, String country, String firstName, String 
     record Ndzela(boolean linked, String idTag) {
     }
 
-    record FreeAccess(String reason, UUID grantedBy, Instant grantedAt, Instant expiresAt) {
+    record FreeAccess(String reason, String category, UUID grantedBy, Instant grantedAt, Instant expiresAt) {
 
         static FreeAccess from(Complimentary grant) {
-            return grant == null ? null : new FreeAccess(grant.reason(), grant.grantedBy(), grant.grantedAt(),
+            return grant == null ? null : new FreeAccess(grant.reason(), grant.category(), grant.grantedBy(),
+                    grant.grantedAt(),
                     grant.expiresAt());
         }
     }

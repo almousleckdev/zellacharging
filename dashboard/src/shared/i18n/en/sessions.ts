@@ -14,6 +14,7 @@ export const enSessions: Pick<Dictionary, "sessions"> = {
     allStates: "All states",
     connector: "Connector",
     unitKwh: "kWh",
+    free: { NDZELA_STAFF: "NDZela staff", OTHER: "Free" },
     states: {
       REQUESTED: "Requested",
       START_ACCEPTED: "Start accepted",

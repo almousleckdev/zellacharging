@@ -18,6 +18,7 @@ export const sessionItemSchema = z.object({
   startedAt: z.string().nullable(),
   stoppedAt: z.string().nullable(),
   createdAt: z.string(),
+  freeCategory: z.enum(["NDZELA_STAFF", "OTHER"]).nullable(),
 });
 
 export const sessionListSchema = z.object({

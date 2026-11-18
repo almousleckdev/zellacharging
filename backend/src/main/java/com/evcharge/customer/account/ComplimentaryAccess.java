@@ -7,7 +7,7 @@ import java.util.UUID;
 
 public interface ComplimentaryAccess {
 
-    void grant(UUID customerId, UUID grantedBy, String reason, Instant expiresAt);
+    void grant(UUID customerId, UUID grantedBy, String reason, String category, Instant expiresAt);
 
     boolean revoke(UUID customerId);
 

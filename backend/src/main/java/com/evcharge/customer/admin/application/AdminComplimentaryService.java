@@ -1,6 +1,7 @@
 package com.evcharge.customer.admin.application;
 
 import com.evcharge.customer.account.ComplimentaryAccess;
+import com.evcharge.customer.account.ComplimentaryCategory;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
 import com.evcharge.customer.shared.ApiException;
@@ -38,14 +39,17 @@ public class AdminComplimentaryService {
         return items;
     }
 
-    public void grant(AdminAccess admin, String country, UUID customerId, String reason, Instant expiresAt) {
+    public void grant(AdminAccess admin, String country, UUID customerId, String reason,
+                      ComplimentaryCategory category, Instant expiresAt) {
         String code = AdminCountries.single(access.scope(admin, Permission.COMPLIMENTARY_MANAGE, country));
         if (reason == null || reason.isBlank() || (expiresAt != null && !expiresAt.isAfter(clock.instant()))) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_COMPLIMENTARY",
                     "A reason and a future end date are required");
         }
-        TenantContext.runAs(code, () -> complimentary.grant(customerId, admin.id(), reason.trim(), expiresAt));
-        audit.record(admin.id(), code, "COMPLIMENTARY_GRANTED", customerId.toString(), reason.trim());
+        ComplimentaryCategory kind = category == null ? ComplimentaryCategory.OTHER : category;
+        TenantContext.runAs(code, () -> complimentary.grant(customerId, admin.id(), reason.trim(), kind.name(), expiresAt));
+        audit.record(admin.id(), code, "COMPLIMENTARY_GRANTED", customerId.toString(),
+                kind + ": " + reason.trim());
     }
 
     public void revoke(AdminAccess admin, String country, UUID customerId) {

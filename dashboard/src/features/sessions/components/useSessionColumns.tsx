@@ -6,6 +6,7 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { CellLink } from "@/shared/ui/CellLink";
 import type { Column } from "@/shared/ui/DataTable";
 import { sessionCost } from "../format";
+import { FreeBadge } from "./FreeBadge";
 import type { SessionItem } from "../schemas";
 import { SessionStateBadge } from "./SessionStateBadge";
 import { StopChargeButton } from "./StopChargeButton";
@@ -46,7 +47,9 @@ export function useSessionColumns(): Column<SessionItem>[] {
     },
     { key: "state", header: labels.state, text: (row) => states[row.state] ?? row.state, cell: (row) => <SessionStateBadge state={row.state} /> },
     { key: "energy", header: labels.energy, align: "right", sortKey: "energy", text: energy, cell: energy },
-    { key: "cost", header: labels.cost, align: "right", sortKey: "amount", text: cost, cell: (row) => <span className="figure font-semibold">{cost(row)}</span> },
+    { key: "cost", header: labels.cost, align: "right", sortKey: "amount", text: (row) => (row.freeCategory ? t.sessions.free[row.freeCategory] : cost(row)),
+      cell: (row) => (row.freeCategory ? <FreeBadge category={row.freeCategory} /> : <span className="figure font-semibold">{cost(row)}</span>),
+    },
     {
       key: "date",
       header: labels.date,

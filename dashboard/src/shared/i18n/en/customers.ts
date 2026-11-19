@@ -13,6 +13,7 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
     emptyTitle: "No customers found",
     emptyText: "Change your search or filters to see results.",
     columns: { balance: "Balance", charges: "Charges", spent: "Spent", lastCharge: "Last charge", firstName: "First name", lastName: "Last name", email: "Email", customer: "Customer", phone: "Phone", country: "Country", status: "Status", joined: "Joined" },
+    counts: { total: "Customers", publicUsers: "Public", ndzelaDrivers: "NDZela drivers", ndzelaStaff: "NDZela staff", suspended: "Suspended" },
     statuses: {
       ACTIVE: "Active",
       BLOCKED: "Suspended",

@@ -11,6 +11,7 @@ export const frCustomers = {
     emptyTitle: "Aucun client trouvé",
     emptyText: "Modifiez votre recherche ou vos filtres pour afficher des résultats.",
     columns: { balance: "Solde", charges: "Recharges", spent: "Dépensé", lastCharge: "Dernière recharge", firstName: "Prénom", lastName: "Nom", email: "E-mail", customer: "Client", phone: "Téléphone", country: "Pays", status: "Statut", joined: "Inscrit le" },
+    counts: { total: "Clients", publicUsers: "Public", ndzelaDrivers: "Chauffeurs NDZela", ndzelaStaff: "Personnel NDZela", suspended: "Suspendus" },
     statuses: {
       ACTIVE: "Actif",
       BLOCKED: "Suspendu",

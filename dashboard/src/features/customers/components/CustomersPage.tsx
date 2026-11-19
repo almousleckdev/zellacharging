@@ -4,6 +4,7 @@ import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
 import { customerListSchema } from "../schemas";
+import { CustomerCountsBand } from "./CustomerCountsBand";
 import { CreateCustomerButton } from "./CreateCustomerButton";
 import { CustomerActions } from "./CustomerActions";
 import { useCustomerColumns } from "./useCustomerColumns";
@@ -22,6 +23,7 @@ export function CustomersPage() {
       schema={customerListSchema}
       labels={t.customers}
       icon="users"
+      above={() => <CustomerCountsBand />}
       headerActions={<CreateCustomerButton />}
       columns={columns}
       rowKey={(row) => `${row.country}-${row.id}`}

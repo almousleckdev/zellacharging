@@ -22,6 +22,7 @@ export const seriesSchema = z.object({
       name: z.string(),
       currency: z.string(),
       decimals: z.number(),
+      today: z.string(),
       points: z.array(seriesPointSchema),
     }),
   ),

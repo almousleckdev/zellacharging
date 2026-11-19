@@ -3,6 +3,7 @@ package com.evcharge.customer.admin.web;
 import com.evcharge.customer.admin.application.CountrySeries;
 import com.evcharge.customer.admin.application.SeriesPoint;
 
+import java.time.LocalDate;
 import java.util.List;
 
 record SeriesResponse(List<Country> countries) {
@@ -11,12 +12,13 @@ record SeriesResponse(List<Country> countries) {
         return new SeriesResponse(series.stream().map(Country::from).toList());
     }
 
-    record Country(String code, String name, String currency, int decimals, List<SeriesPoint> points) {
+    record Country(String code, String name, String currency, int decimals, LocalDate today,
+                   List<SeriesPoint> points) {
 
         static Country from(CountrySeries series) {
             var country = series.country();
             return new Country(country.code(), country.name(), country.currency(), country.currencyDecimals(),
-                    series.points());
+                    series.today(), series.points());
         }
     }
 }

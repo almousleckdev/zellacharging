@@ -23,7 +23,7 @@ function point(day: string, capturedMinor: number): SeriesPoint {
 function period(amounts: number[]): CurrencyPeriod {
   const daily = amounts.map((amount, index) => point(`2026-11-${String(index + 1).padStart(2, "0")}`, amount));
   const empty = point("", 0);
-  return { currency: "XAF", decimals: 0, daily, current: empty, previous: empty };
+  return { currency: "XAF", decimals: 0, today: "2026-11-09", daily, current: empty, previous: empty };
 }
 
 describe("todayFigures", () => {

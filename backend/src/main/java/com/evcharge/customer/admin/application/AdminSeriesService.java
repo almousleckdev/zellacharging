@@ -18,6 +18,7 @@ import java.math.BigDecimal;
 import java.time.Duration;
 import java.time.Instant;
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.List;
 import java.util.Map;
 import java.util.TreeMap;
@@ -65,7 +66,7 @@ public class AdminSeriesService {
                     base.withdrawalsMinor(), base.capturedMinor(), day.sessions(), day.completed(), day.failed(),
                     day.energyKwh(), day.revenueMinor(), day.serviceFeeMinor(), day.vatMinor()));
         }
-        return new CountrySeries(country, List.copyOf(points.values()));
+        return new CountrySeries(country, LocalDate.now(ZoneId.of(country.timeZone())), List.copyOf(points.values()));
     }
 
     private static Bucket parse(String value) {

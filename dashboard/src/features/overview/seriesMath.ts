@@ -5,6 +5,7 @@ export type Totals = Omit<SeriesPoint, "day">;
 export type CurrencyPeriod = {
   currency: string;
   decimals: number;
+  today: string;
   daily: SeriesPoint[];
   current: Totals;
   previous: Totals;
@@ -49,17 +50,18 @@ function add(total: Totals, point: Totals): Totals {
 export function seriesWindow(days: number, now = new Date()): { from: string; to: string } {
   const today = new Date(`${isoDay(now)}T00:00:00Z`);
   return {
-    from: new Date(today.getTime() - (days * 2 - 1) * DAY_MS).toISOString(),
-    to: new Date(today.getTime() + DAY_MS).toISOString(),
+    from: new Date(today.getTime() - days * 2 * DAY_MS).toISOString(),
+    to: new Date(today.getTime() + 2 * DAY_MS).toISOString(),
   };
 }
 
-type CurrencyGroup = { decimals: number; byDay: Map<string, SeriesPoint> };
+type CurrencyGroup = { decimals: number; today: string; byDay: Map<string, SeriesPoint> };
 
 function groupByCurrency(response: SeriesResponse): Map<string, CurrencyGroup> {
   const groups = new Map<string, CurrencyGroup>();
   for (const country of response.countries) {
-    const group = groups.get(country.currency) ?? { decimals: country.decimals, byDay: new Map() };
+    const group = groups.get(country.currency) ?? { decimals: country.decimals, today: country.today, byDay: new Map() };
+    group.today = country.today > group.today ? country.today : group.today;
     for (const point of country.points) {
       const known = group.byDay.get(point.day);
       group.byDay.set(point.day, known ? { day: point.day, ...add(known, point) } : point);
@@ -69,10 +71,10 @@ function groupByCurrency(response: SeriesResponse): Map<string, CurrencyGroup> {
   return groups;
 }
 
-export function periodsByCurrency(response: SeriesResponse, days: number, now = new Date()): CurrencyPeriod[] {
-  const today = new Date(`${isoDay(now)}T00:00:00Z`).getTime();
+export function periodsByCurrency(response: SeriesResponse, days: number): CurrencyPeriod[] {
   const groups = groupByCurrency(response);
   return [...groups.entries()].map(([currency, group]) => {
+    const today = new Date(`${group.today}T00:00:00Z`).getTime();
     const all = Array.from({ length: days * 2 }, (_, index) => {
       const day = isoDay(new Date(today - (days * 2 - 1 - index) * DAY_MS));
       return group.byDay.get(day) ?? { day, ...EMPTY };
@@ -81,6 +83,7 @@ export function periodsByCurrency(response: SeriesResponse, days: number, now = 
     return {
       currency,
       decimals: group.decimals,
+      today: group.today,
       daily: all.slice(days),
       current: sum(all.slice(days)),
       previous: sum(all.slice(0, days)),

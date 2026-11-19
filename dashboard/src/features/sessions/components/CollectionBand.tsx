@@ -25,7 +25,7 @@ export function CollectionBand() {
   }
 
   const labels = t.sessions.collection;
-  const figures = collectionFigures(period.daily);
+  const figures = collectionFigures(period.daily, period.today);
   const money = (minor: number) => format.money([{ currency: period.currency, decimals: period.decimals, minor }])[0];
 
   return (

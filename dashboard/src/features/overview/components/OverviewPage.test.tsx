@@ -80,6 +80,7 @@ function serve(countries: ReturnType<typeof figures>[], since?: string) {
           name: item.name,
           currency: item.currency,
           decimals: 0,
+          today: new Date().toISOString().slice(0, 10),
           points: [point(index + 1)],
         })),
       });

@@ -46,7 +46,7 @@ class PlatformEventsTest {
     }
 
     private void aLiveSession() {
-        when(countries.active()).thenReturn(List.of(new Country("GA", "Gabon", "XAF", 0, "GA")));
+        when(countries.active()).thenReturn(List.of(new Country("GA", "Gabon", "XAF", 0, "GA", "Africa/Libreville")));
         when(sessions.findLiveAt("CP-9", 1, "Z-A")).thenReturn(Optional.of(live));
     }
 
@@ -63,7 +63,7 @@ class PlatformEventsTest {
 
     @Test
     void aSessionThatIsNotLiveHereIsIgnored() {
-        when(countries.active()).thenReturn(List.of(new Country("GA", "Gabon", "XAF", 0, "GA")));
+        when(countries.active()).thenReturn(List.of(new Country("GA", "Gabon", "XAF", 0, "GA", "Africa/Libreville")));
         when(sessions.findLiveAt("CP-9", 1, "Z-A")).thenReturn(Optional.empty());
 
         events.accept(event("e1", "session.metering", new Metering(null, null, null, null, null, null, NOW)));
@@ -104,8 +104,8 @@ class PlatformEventsTest {
 
     @Test
     void eachCountryIsSearchedUnderItsOwnTenant() {
-        when(countries.active()).thenReturn(List.of(new Country("GA", "Gabon", "XAF", 0, "GA"),
-                new Country("ML", "Mali", "XOF", 0, "ML")));
+        when(countries.active()).thenReturn(List.of(new Country("GA", "Gabon", "XAF", 0, "GA", "Africa/Libreville"),
+                new Country("ML", "Mali", "XOF", 0, "ML", "Africa/Bamako")));
         AtomicReference<String> foundUnder = new AtomicReference<>();
         when(sessions.findLiveAt("CP-9", 1, "Z-A")).thenAnswer(call -> {
             String tenant = TenantContext.current().orElseThrow();

@@ -20,7 +20,7 @@ function point(day: string, capturedMinor: number, sessions = 1): SeriesPoint {
 }
 
 describe("collectionFigures", () => {
-  const now = new Date("2026-11-18T10:00:00Z");
+  const today = "2026-11-18";
   const daily = [
     point("2026-10-31", 900),
     point("2026-11-01", 100),
@@ -31,17 +31,17 @@ describe("collectionFigures", () => {
   ];
 
   it("reads today and yesterday from the last two days", () => {
-    const figures = collectionFigures(daily, now);
+    const figures = collectionFigures(daily, today);
 
     expect(figures.today.capturedMinor).toBe(500);
     expect(figures.yesterdayMinor).toBe(400);
   });
 
   it("adds the days since Monday for the week", () => {
-    expect(collectionFigures(daily, now).weekMinor).toBe(300 + 400 + 500);
+    expect(collectionFigures(daily, today).weekMinor).toBe(300 + 400 + 500);
   });
 
   it("adds the days since the first of the month for the month", () => {
-    expect(collectionFigures(daily, now).monthMinor).toBe(100 + 200 + 300 + 400 + 500);
+    expect(collectionFigures(daily, today).monthMinor).toBe(100 + 200 + 300 + 400 + 500);
   });
 });

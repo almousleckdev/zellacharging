@@ -18,9 +18,9 @@ class JdbcCountryCatalog implements CountryCatalog {
 
     @Override
     public List<Country> all() {
-        return jdbc.sql("select code, name, currency, currency_decimals, phone_region from country order by code")
+        return jdbc.sql("select code, name, currency, currency_decimals, phone_region, time_zone from country order by code")
                 .query((rs, rowNum) -> new Country(rs.getString("code").trim(), rs.getString("name"),
                         rs.getString("currency").trim(), rs.getInt("currency_decimals"),
-                        rs.getString("phone_region").trim())).list();
+                        rs.getString("phone_region").trim(), rs.getString("time_zone"))).list();
     }
 }

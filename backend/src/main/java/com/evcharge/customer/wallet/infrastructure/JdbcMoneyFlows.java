@@ -1,6 +1,7 @@
 package com.evcharge.customer.wallet.infrastructure;
 
 import com.evcharge.customer.shared.Bucket;
+import com.evcharge.customer.shared.LocalDays;
 import com.evcharge.customer.shared.ReportingWindow;
 import com.evcharge.customer.shared.Timestamps;
 import com.evcharge.customer.wallet.DailyMoney;
@@ -19,7 +20,6 @@ class JdbcMoneyFlows implements MoneyFlows {
 
     private static final String SCOPE = " where country_code = current_setting('app.country', true) "
             + "and created_at >= greatest(:from, :since) and created_at < :to";
-    private static final String DAY = "date_trunc('%s', created_at at time zone 'UTC')::date as day";
 
     private final JdbcClient jdbc;
     private final ReportingWindow reporting;
@@ -32,7 +32,7 @@ class JdbcMoneyFlows implements MoneyFlows {
     @Override
     public List<DailyMoney> between(Instant from, Instant to, Bucket bucket) {
         Map<LocalDate, long[]> days = new TreeMap<>();
-        String day = DAY.formatted(bucket.truncation());
+        String day = LocalDays.bucket("created_at", bucket) + " as day";
         collect(days, "select " + day + ", coalesce(sum(amount_minor), 0)::bigint, count(*) from topup" + SCOPE
                 + " and state = 'SUCCEEDED' and (provider_ref is null or provider_ref not like 'sandbox-%') "
                 + "group by 1", from, to, 0, 1);

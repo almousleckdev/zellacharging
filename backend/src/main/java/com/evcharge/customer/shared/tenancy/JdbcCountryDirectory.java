@@ -27,10 +27,11 @@ class JdbcCountryDirectory implements CountryDirectory {
     public List<Country> active() {
         long now = System.nanoTime();
         if (cached.isEmpty() || now - loadedAt > settings.countryCacheTtl().toNanos()) {
-            cached = jdbc.sql("select code, name, currency, currency_decimals, phone_region from country "
+            cached = jdbc.sql("select code, name, currency, currency_decimals, phone_region, time_zone from country "
                             + "where active order by code")
                     .query((rs, rowNum) -> new Country(rs.getString("code"), rs.getString("name"),
-                            rs.getString("currency"), rs.getInt("currency_decimals"), rs.getString("phone_region")))
+                            rs.getString("currency"), rs.getInt("currency_decimals"), rs.getString("phone_region"),
+                            rs.getString("time_zone")))
                     .list();
             loadedAt = now;
         }

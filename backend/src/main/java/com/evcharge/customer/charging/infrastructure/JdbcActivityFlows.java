@@ -4,6 +4,7 @@ import com.evcharge.customer.charging.ActivityFlows;
 import com.evcharge.customer.charging.DailyActivity;
 import com.evcharge.customer.charging.application.FeeRates;
 import com.evcharge.customer.shared.Bucket;
+import com.evcharge.customer.shared.LocalDays;
 import com.evcharge.customer.shared.ReportingWindow;
 import com.evcharge.customer.shared.Timestamps;
 import org.springframework.jdbc.core.simple.JdbcClient;
@@ -31,7 +32,7 @@ class JdbcActivityFlows implements ActivityFlows {
 
     @Override
     public List<DailyActivity> between(Instant from, Instant to, Bucket bucket) {
-        return jdbc.sql("select date_trunc('" + bucket.truncation() + "', created_at at time zone 'UTC')::date as day, "
+        return jdbc.sql("select " + LocalDays.bucket("created_at", bucket) + " as day, "
                         + "count(*) as sessions, count(*) filter (where state = 'COMPLETED') as completed, "
                         + "count(*) filter (where state = 'FAILED') as failed, "
                         + "coalesce(sum(energy_kwh) filter (where state = 'COMPLETED'), 0) as energy, "

@@ -30,6 +30,7 @@ const session = {
   stoppedAt: "2026-10-28T15:48:00Z",
   createdAt: "2026-10-28T15:46:00Z",
   freeCategory: null,
+  ndzelaDriver: false,
 };
 
 describe("SessionsPage", () => {

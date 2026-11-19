@@ -18,7 +18,7 @@ record CustomerListResponse(long total, int page, int size, List<Item> items) {
     record Item(UUID id, String country, String firstName, String lastName, String email, String phone,
                 String status, Instant createdAt, Long balanceMinor, String currency, Integer decimals,
                 long completedSessions, long spentMinor, BigDecimal energyKwh, Instant lastSessionAt,
-                Long avatarVersion) {
+                Long avatarVersion, boolean ndzelaDriver) {
 
         static Item from(CountryCustomer entry) {
             var customer = entry.customer();
@@ -30,7 +30,8 @@ record CustomerListResponse(long total, int page, int size, List<Item> items) {
                     wallet == null ? null : wallet.decimals(), sessions == null ? 0 : sessions.completed(),
                     sessions == null ? 0 : sessions.spentMinor(),
                     sessions == null ? BigDecimal.ZERO : sessions.energyKwh(),
-                    sessions == null ? null : sessions.lastSessionAt(), customer.avatarVersion());
+                    sessions == null ? null : sessions.lastSessionAt(), customer.avatarVersion(),
+                    entry.summary().ndzelaDriver());
         }
     }
 }

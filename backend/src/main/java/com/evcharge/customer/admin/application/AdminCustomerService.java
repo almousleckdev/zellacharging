@@ -85,8 +85,10 @@ public class AdminCustomerService {
         return TenantContext.callAs(code, () -> {
             var wallets = this.wallets.ofCustomers(ids);
             var activity = sessions.ofCustomers(ids);
+            var drivers = linking.linkedAmong(ids);
             return records.stream().map(record -> new CountryCustomer(code, record,
-                    new CustomerSummary(wallets.get(record.id()), activity.get(record.id())))).toList();
+                    new CustomerSummary(wallets.get(record.id()), activity.get(record.id()),
+                            drivers.contains(record.id())))).toList();
         });
     }
 

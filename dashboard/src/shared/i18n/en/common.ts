@@ -40,6 +40,7 @@ export const enCommon: Pick<Dictionary, "language" | "brand" | "common" | "error
     back: "Back",
     related: "Related records",
     none: "",
+    ndzelaDriver: "NDZela driver",
     retry: "Try again",
     loading: "Loading…",
     skipToContent: "Skip to main content",

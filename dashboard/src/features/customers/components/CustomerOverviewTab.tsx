@@ -4,6 +4,7 @@ import { useI18n } from "@/shared/i18n/I18nProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { MetricBand } from "@/shared/ui/MetricBand";
 import { MetricCard } from "@/shared/ui/MetricCard";
+import { UsageBand } from "@/features/sessions/components/UsageBand";
 import type { CustomerDetail } from "../schemas";
 import { AccessCard } from "./AccessCard";
 import { FreeAccessCard } from "./FreeAccessCard";
@@ -21,6 +22,7 @@ export function CustomerOverviewTab({ customer }: { customer: CustomerDetail }) 
 
   return (
     <div className="flex flex-col gap-6">
+      <UsageBand scope={{ customerId: customer.id }} />
       <MetricBand>
         <MetricCard label={labels.spent} value={money(sessions.spentMinor)} />
         <MetricCard label={labels.completed} value={format.number(sessions.completed)} hint={sessions.live > 0 ? labels.live : undefined} />

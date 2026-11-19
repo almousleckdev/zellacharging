@@ -4,6 +4,7 @@ import { useSession } from "@/features/session/SessionProvider";
 import { useFormatters } from "@/shared/i18n/useFormatters";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { CellLink } from "@/shared/ui/CellLink";
+import { NdzelaDriverBadge } from "@/shared/ui/NdzelaDriverBadge";
 import type { Column } from "@/shared/ui/DataTable";
 import { sessionCost } from "../format";
 import { FreeBadge } from "./FreeBadge";
@@ -40,9 +41,12 @@ export function useSessionColumns(): Column<SessionItem>[] {
       header: labels.customer,
       text: (row) => row.customerName,
       cell: (row) => (
-        <CellLink href={scopedHref(`/customers/${row.country}/${row.customerId}`)} className="font-medium">
-          {row.customerName}
-        </CellLink>
+        <span className="flex flex-wrap items-center gap-2">
+          <CellLink href={scopedHref(`/customers/${row.country}/${row.customerId}`)} className="font-medium">
+            {row.customerName}
+          </CellLink>
+          {row.ndzelaDriver && <NdzelaDriverBadge />}
+        </span>
       ),
     },
     { key: "state", header: labels.state, text: (row) => states[row.state] ?? row.state, cell: (row) => <SessionStateBadge state={row.state} /> },

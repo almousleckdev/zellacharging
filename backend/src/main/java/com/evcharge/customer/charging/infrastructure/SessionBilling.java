@@ -8,6 +8,8 @@ final class SessionBilling {
             + "on g.customer_id = h.customer_id and g.country_code = s.country_code "
             + "where h.session_id = s.id and h.waived) as free_category";
     static final String PAID = "not " + FREE;
+    static final String NDZELA_DRIVER = "exists (select 1 from partner_link l where l.partner = 'NDZELA' "
+            + "and l.customer_id = s.customer_id) as ndzela_driver";
 
     private SessionBilling() {
     }

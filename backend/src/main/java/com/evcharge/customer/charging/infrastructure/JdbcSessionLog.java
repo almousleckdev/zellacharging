@@ -40,7 +40,7 @@ class JdbcSessionLog implements SessionLog {
         long total = SessionFilters.bind(jdbc.sql("select count(*)" + SessionFilters.FROM + where), query,
                 reporting.since()).query(Long.class).single();
         var items = SessionFilters.bind(jdbc.sql("select s.*, c.first_name, c.last_name, " + SessionBilling.FREE_CATEGORY
-                + SessionFilters.FROM + where
+                + ", " + SessionBilling.NDZELA_DRIVER + SessionFilters.FROM + where
                 + query.sort().orderBy(SORTS, "s.id") + " limit :limit"), query, reporting.since())
                 .param("limit", query.limit()).query(SessionFilters.MAPPER).list();
         return new SessionPage(total, items);
@@ -48,7 +48,7 @@ class JdbcSessionLog implements SessionLog {
 
     @Override
     public Optional<SessionDetail> find(UUID id) {
-        return jdbc.sql("select s.*, c.first_name, c.last_name, " + SessionBilling.FREE_CATEGORY + ", h.reserved_minor, h.captured_minor, "
+        return jdbc.sql("select s.*, c.first_name, c.last_name, " + SessionBilling.FREE_CATEGORY + ", " + SessionBilling.NDZELA_DRIVER + ", h.reserved_minor, h.captured_minor, "
                         + "h.state as hold_state from charging_session s join customer c on c.id = s.customer_id "
                         + "left join funding_hold h on h.session_id = s.id "
                         + "where s.country_code = current_setting('app.country', true) and s.id = :id")

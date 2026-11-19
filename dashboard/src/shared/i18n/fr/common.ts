@@ -38,6 +38,7 @@ export const frCommon = {
     back: "Retour",
     related: "Enregistrements liés",
     none: "",
+    ndzelaDriver: "Chauffeur NDZela",
     retry: "Réessayer",
     loading: "Chargement…",
     skipToContent: "Aller au contenu principal",

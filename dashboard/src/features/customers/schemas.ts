@@ -17,6 +17,7 @@ export const customerItemSchema = z.object({
   energyKwh: z.number().optional(),
   lastSessionAt: z.string().nullable().optional(),
   avatarVersion: z.number().nullable().optional(),
+  ndzelaDriver: z.boolean().optional(),
 });
 
 export const customerListSchema = z.object({

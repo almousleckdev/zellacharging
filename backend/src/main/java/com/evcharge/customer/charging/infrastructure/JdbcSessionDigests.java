@@ -26,7 +26,8 @@ class JdbcSessionDigests implements SessionDigests {
     @Override
     public SessionDigestPage search(SessionLogQuery query) {
         String scoped = "select s.*, c.first_name, c.last_name, exists (select 1 from funding_hold h "
-                + "where h.session_id = s.id and h.waived) as free, " + SessionBilling.FREE_CATEGORY + SessionFilters.FROM + SessionFilters.where(query);
+                + "where h.session_id = s.id and h.waived) as free, " + SessionBilling.FREE_CATEGORY + ", "
+                + SessionBilling.NDZELA_DRIVER + SessionFilters.FROM + SessionFilters.where(query);
         long total = SessionFilters.bind(jdbc.sql("select count(distinct s.customer_id)" + SessionFilters.FROM
                 + SessionFilters.where(query)), query, reporting.since()).query(Long.class).single();
         var items = SessionFilters.bind(jdbc.sql("with scoped as (" + scoped + "), agg as ("

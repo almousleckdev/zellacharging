@@ -7,6 +7,7 @@ import { DetailShell } from "@/shared/ui/DetailShell";
 import { useCustomer } from "../api/useCustomer";
 import { CustomerActions } from "./CustomerActions";
 import { CustomerTabs } from "./CustomerTabs";
+import { NdzelaDriverBadge } from "@/shared/ui/NdzelaDriverBadge";
 import { CustomerStatusBadge } from "./CustomerStatusBadge";
 
 export function CustomerDetailPage() {
@@ -28,7 +29,12 @@ export function CustomerDetailPage() {
       query={customer}
       notFound={labels.notFound}
       loadError={labels.loadError}
-      badge={data && <CustomerStatusBadge status={data.status} />}
+      badge={data && (
+        <span className="flex items-center gap-2">
+          <CustomerStatusBadge status={data.status} />
+          {data.ndzela.linked && <NdzelaDriverBadge />}
+        </span>
+      )}
       actions={data && <CustomerActions customer={data} afterDelete={() => router.replace(scopedHref("/customers"))} />}
     >
       {data && <CustomerTabs customer={data} />}

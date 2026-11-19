@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.Clock;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -33,6 +36,14 @@ class AdminPartnerLinking implements PartnerLinking {
     @Transactional(readOnly = true)
     public boolean linked(UUID customerId) {
         return links.isLinked(PARTNER, customerId);
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Set<UUID> linkedAmong(Collection<UUID> customerIds) {
+        Set<UUID> linked = new HashSet<>(links.linkedCustomerIds(PARTNER));
+        linked.retainAll(customerIds);
+        return linked;
     }
 
     @Override

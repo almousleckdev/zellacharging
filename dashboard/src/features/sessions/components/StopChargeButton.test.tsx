@@ -31,6 +31,7 @@ function session(state: string, failureCode: string | null = null): SessionItem 
     stoppedAt: null,
     createdAt: new Date().toISOString(),
     freeCategory: null,
+    ndzelaDriver: false,
   };
 }
 

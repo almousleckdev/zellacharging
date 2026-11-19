@@ -21,6 +21,8 @@ class JdbcMoneyFlows implements MoneyFlows {
     private static final String SCOPE = " where country_code = current_setting('app.country', true) "
             + "and created_at >= greatest(:from, :since) and created_at < :to";
 
+    private static final String STARTED = "coalesce(s.created_at, l.created_at)";
+
     private final JdbcClient jdbc;
     private final ReportingWindow reporting;
 
@@ -38,8 +40,10 @@ class JdbcMoneyFlows implements MoneyFlows {
                 + "group by 1", from, to, 0, 1);
         collect(days, "select " + day + ", coalesce(sum(amount_minor), 0)::bigint from withdrawal" + SCOPE
                 + " and state = 'PAID' group by 1", from, to, 2);
-        collect(days, "select " + day + ", coalesce(sum(amount_minor), 0)::bigint from ledger_entry" + SCOPE
-                + " and type = 'CAPTURE' group by 1", from, to, 3);
+        collect(days, "select " + LocalDays.bucket(STARTED, bucket) + " as day, coalesce(sum(l.amount_minor), 0)::bigint "
+                + "from ledger_entry l left join charging_session s on s.id = l.session_id "
+                + "where l.country_code = current_setting('app.country', true) and l.type = 'CAPTURE' and "
+                + STARTED + " >= greatest(:from, :since) and " + STARTED + " < :to group by 1", from, to, 3);
         return days.entrySet().stream().map(entry -> new DailyMoney(entry.getKey(), entry.getValue()[0],
                 entry.getValue()[1], entry.getValue()[2], entry.getValue()[3])).toList();
     }

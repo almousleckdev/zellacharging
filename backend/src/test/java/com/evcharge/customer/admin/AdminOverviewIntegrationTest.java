@@ -92,7 +92,7 @@ class AdminOverviewIntegrationTest extends PostgresTestBase {
         assertThat(figure(after, "GA", ".sessions.completed").longValue() - figure(before, "GA", ".sessions.completed").longValue()).isEqualTo(1);
         assertThat(figure(after, "GA", ".sessions.live").longValue() - figure(before, "GA", ".sessions.live").longValue()).isEqualTo(1);
         assertThat(figure(after, "GA", ".sessions.revenueMinor").longValue() - figure(before, "GA", ".sessions.revenueMinor").longValue()).isEqualTo(1875);
-        assertThat(figure(after, "GA", ".sessions.energyKwh").doubleValue() - figure(before, "GA", ".sessions.energyKwh").doubleValue()).isEqualTo(12.5);
+        assertThat(figure(after, "GA", ".sessions.energyKwh").doubleValue() - figure(before, "GA", ".sessions.energyKwh").doubleValue()).isCloseTo(12.5, org.assertj.core.api.Assertions.within(0.001));
         assertThat(figure(after, "GA", ".wallets.topupsSucceededMinor").longValue() - figure(before, "GA", ".wallets.topupsSucceededMinor").longValue()).isEqualTo(5000);
         assertThat(figure(after, "GA", ".wallets.capturedMinor").longValue() - figure(before, "GA", ".wallets.capturedMinor").longValue()).isEqualTo(138);
         assertThat(figure(after, "GA", ".wallets.pendingTopups").longValue() - figure(before, "GA", ".wallets.pendingTopups").longValue()).isEqualTo(1);

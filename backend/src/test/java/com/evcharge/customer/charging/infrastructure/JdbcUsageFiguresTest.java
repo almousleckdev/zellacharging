@@ -5,6 +5,7 @@ import com.evcharge.customer.admin.AdminTestData;
 import com.evcharge.customer.charging.UsageFigures;
 import com.evcharge.customer.charging.UsageSummary;
 import com.evcharge.customer.shared.TenantContext;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -23,6 +24,12 @@ class JdbcUsageFiguresTest extends PostgresTestBase {
 
     @Autowired
     JdbcTemplate jdbc;
+
+    @AfterEach
+    void releaseTheStaffGrant() {
+        TenantContext.runAs("GA", () -> jdbc.update("delete from customer_complimentary where granted_by is not null "
+                + "and reason = 'staff'"));
+    }
 
     @Test
     void aCustomerGetsTheirPaidEnergyApartFromTheStaffEnergyWhichIsNeverCollected() {

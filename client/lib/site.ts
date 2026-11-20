@@ -12,7 +12,7 @@ export const site = {
   privacyEmail: process.env.NEXT_PUBLIC_PRIVACY_EMAIL ?? "confidentialite@zella-tech.com",
   phone: process.env.NEXT_PUBLIC_PHONE ?? "062820745",
   legalName: process.env.NEXT_PUBLIC_LEGAL_NAME ?? "Zella Charging",
-  appStoreUrl: process.env.NEXT_PUBLIC_APP_STORE_URL ?? "",
+  appStoreUrl: process.env.NEXT_PUBLIC_APP_STORE_URL ?? "https://apps.apple.com/ga/app/zella-charge-gabon/id6829306300",
   playStoreUrl: process.env.NEXT_PUBLIC_PLAY_STORE_URL ?? "https://play.google.com/store/apps/details?id=com.zella.charging.gabon",
   copyrightYear: 2026,
   updated: "2026-10-30",

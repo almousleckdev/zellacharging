@@ -15,7 +15,7 @@ Set these variables at build time (all optional, placeholders are used otherwise
 | `NEXT_PUBLIC_SITE_URL` | Public URL, used by the sitemap and metadata |
 | `NEXT_PUBLIC_CONTACT_EMAIL`, `NEXT_PUBLIC_TEAM_EMAIL`, `NEXT_PUBLIC_PRIVACY_EMAIL`, `NEXT_PUBLIC_PHONE` | Contact page values (defaults are the Zella ones) |
 | `NEXT_PUBLIC_LEGAL_NAME` | Publisher name shown in the footer |
-| `NEXT_PUBLIC_APP_STORE_URL` | App Store link (button shows "Coming soon" while empty) |
+| `NEXT_PUBLIC_APP_STORE_URL` | App Store link (defaults to the published Zella listing; button shows "Coming soon" if set empty) |
 | `NEXT_PUBLIC_PLAY_STORE_URL` | Google Play link (same behaviour) |
 
 Store listings use `/<lang>/privacy`, `/<lang>/terms` and `/<lang>/delete-account`.

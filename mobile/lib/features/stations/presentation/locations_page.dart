@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'station_list_skeleton.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -55,6 +56,10 @@ class _LocationsPageState extends ConsumerState<LocationsPage> {
               child: AsyncBody(
                 value: stations,
                 onRetry: () => ref.invalidate(nearbyStationsProvider),
+                loading: ListView(
+                  padding: const EdgeInsets.all(AppSpacing.md),
+                  children: const [StationListSkeleton(count: 6)],
+                ),
                 builder: (data) => _list(context, _visible(data)),
               ),
             ),

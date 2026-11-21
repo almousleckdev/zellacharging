@@ -15,22 +15,26 @@ class AsyncBody<T> extends StatelessWidget {
     required this.onRetry,
     required this.builder,
     this.shrinkWrap = false,
+    this.loading,
   });
 
   final AsyncValue<T> value;
   final VoidCallback onRetry;
   final Widget Function(T data) builder;
   final bool shrinkWrap;
+  final Widget? loading;
 
   @override
   Widget build(BuildContext context) {
     return value.when(
       skipLoadingOnReload: value.hasValue,
       data: builder,
-      loading: () => const Padding(
-        padding: EdgeInsets.all(AppSpacing.lg),
-        child: Center(child: AdaptiveSpinner()),
-      ),
+      loading: () =>
+          loading ??
+          const Padding(
+            padding: EdgeInsets.all(AppSpacing.lg),
+            child: Center(child: AdaptiveSpinner()),
+          ),
       error: (error, _) => Center(
         child: Column(
           mainAxisSize: MainAxisSize.min,

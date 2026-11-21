@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import '../../stations/presentation/station_list_skeleton.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_spacing.dart';
@@ -46,6 +47,7 @@ class HomePage extends ConsumerWidget {
                 value: stations,
                 onRetry: () => ref.invalidate(nearbyStationsProvider),
                 shrinkWrap: true,
+                loading: const StationListSkeleton(),
                 builder: (data) => StationList(stations: data.take(3).toList()),
               ),
               const RecentSessions(),

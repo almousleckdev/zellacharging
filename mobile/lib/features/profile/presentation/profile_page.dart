@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'profile_skeleton.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/async_body.dart';
@@ -25,6 +26,7 @@ class ProfilePage extends ConsumerWidget {
             child: AsyncBody(
               value: profile,
               onRetry: () => ref.invalidate(profileProvider),
+              loading: const ProfileSkeleton(),
               builder: (data) => ListView(
                 padding: const EdgeInsets.all(AppSpacing.md),
                 children: [

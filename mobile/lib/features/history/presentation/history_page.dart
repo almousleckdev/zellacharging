@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
+import 'history_skeleton.dart';
 import '../../../core/l10n/strings.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_colors.dart';
@@ -53,6 +54,7 @@ class _HistoryPageState extends ConsumerState<HistoryPage> {
               child: AsyncBody(
                 value: history,
                 onRetry: () => ref.invalidate(historyProvider),
+                loading: const HistorySkeleton(),
                 builder: _content,
               ),
             ),

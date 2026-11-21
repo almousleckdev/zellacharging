@@ -88,7 +88,7 @@ zella:
     jwt-secret: ${ZELLA_JWT_SECRET:${NDZELA_JWT_SECRET}}
     code-pepper: ${ZELLA_CODE_PEPPER:${NDZELA_CODE_PEPPER}}
     access-token-ttl: 15m
-    refresh-token-ttl: 30d
+    refresh-token-ttl: ${ZELLA_REFRESH_TOKEN_TTL:180d}
     max-failed-logins: 5
     lockout: 30m
   admin:

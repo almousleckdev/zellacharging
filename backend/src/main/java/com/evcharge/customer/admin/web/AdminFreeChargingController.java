@@ -4,7 +4,7 @@ import com.evcharge.customer.admin.application.AdminFreeChargingService;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.partner.FreeAgreement;
 import com.evcharge.customer.partner.FreeChargingUsePage;
-import com.evcharge.customer.partner.FreeDriverOption;
+import com.evcharge.customer.partner.FreeDriverPage;
 import com.evcharge.customer.shared.FreeSundayWindow;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -63,9 +63,10 @@ class AdminFreeChargingController {
     }
 
     @GetMapping("/drivers")
-    List<FreeDriverOption> drivers(AdminAccess admin, @RequestParam(defaultValue = "") String q,
-                                   @RequestParam(defaultValue = "20") int size) {
-        return service.drivers(admin, q, size);
+    FreeDriverPage drivers(AdminAccess admin, @RequestParam(defaultValue = "") String q,
+                           @RequestParam(defaultValue = "ALL") String membership, @RequestParam(defaultValue = "0") int page,
+                           @RequestParam(defaultValue = "25") int size) {
+        return service.drivers(admin, q, membership, page, size);
     }
 
     @GetMapping("/window")

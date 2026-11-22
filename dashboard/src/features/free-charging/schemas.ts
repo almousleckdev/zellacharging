@@ -66,8 +66,15 @@ export const driverOptionSchema = z.object({
   status: z.string(),
   linked: z.boolean(),
   inProgram: z.boolean(),
+  agreementId: z.string().nullable().optional(),
+  agreementStatus: z.string().nullable().optional(),
 });
 
-export const driverOptionListSchema = z.array(driverOptionSchema);
+export const driverPageSchema = z.object({
+  items: z.array(driverOptionSchema),
+  page: z.number(),
+  size: z.number(),
+  total: z.number(),
+});
 
 export type DriverOption = z.infer<typeof driverOptionSchema>;

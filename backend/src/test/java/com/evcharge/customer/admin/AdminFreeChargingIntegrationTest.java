@@ -432,27 +432,29 @@ class AdminFreeChargingIntegrationTest extends PostgresTestBase {
         assertThat(CALLS.get()).isZero();
     }
 
-    private static final String DRIVER_JSON = "[{\"driverId\":\"" + UUID.randomUUID() + "\",\"customerId\":\"" + UUID.randomUUID()
+    private static final String DRIVER_JSON = "{\"items\":[{\"driverId\":\"" + UUID.randomUUID() + "\",\"customerId\":\"" + UUID.randomUUID()
             + "\",\"fullName\":\"NZE Paul\",\"phone\":\"+24177001122\",\"email\":\"paul@x.test\",\"fleetNumber\":\"V015\","
-            + "\"plate\":\"PL-0150\",\"status\":\"ACTIVE\",\"linked\":true,\"inProgram\":false}]";
+            + "\"plate\":\"PL-0150\",\"status\":\"ACTIVE\",\"linked\":true,\"inProgram\":true,\"agreementId\":\"" + UUID.randomUUID()
+            + "\",\"agreementStatus\":\"SUSPENDED\"}],\"page\":2,\"size\":10,\"total\":31}";
 
     @Test
     void anAdminSearchesNdzelaDriversAndTheTextIsPassedEncodedAndBounded() throws Exception {
         answerBody = DRIVER_JSON;
-        call(get("/v1/admin/free-charging/drivers").param("q", "V015 & {x}+1").param("size", "10")).andExpect(status().isOk())
-                .andExpect(jsonPath("$[0].fullName").value("NZE Paul")).andExpect(jsonPath("$[0].fleetNumber").value("V015"))
-                .andExpect(jsonPath("$[0].linked").value(true)).andExpect(jsonPath("$[0].inProgram").value(false));
+        call(get("/v1/admin/free-charging/drivers").param("q", "V015 & {x}+1").param("size", "10").param("page", "2").param("membership", "IN_PROGRAM")).andExpect(status().isOk())
+                .andExpect(jsonPath("$.items[0].fullName").value("NZE Paul")).andExpect(jsonPath("$.items[0].fleetNumber").value("V015"))
+                .andExpect(jsonPath("$.items[0].linked").value(true)).andExpect(jsonPath("$.items[0].inProgram").value(true))
+                .andExpect(jsonPath("$.items[0].agreementStatus").value("SUSPENDED")).andExpect(jsonPath("$.total").value(31)).andExpect(jsonPath("$.page").value(2));
         assertThat(METHOD.get()).isEqualTo("GET");
-        assertThat(TARGET.get()).startsWith(BASE + "/drivers?q=").endsWith("&size=10");
+        assertThat(TARGET.get()).startsWith(BASE + "/drivers?q=").contains("&membership=IN_PROGRAM").contains("&page=2").endsWith("&size=10");
         assertThat(TARGET.get()).doesNotContain(" ").doesNotContain("{").doesNotContain("&x").contains("%26");
         assertThat(SEEN_ACTOR.get()).isEqualTo(manager.email());
     }
 
     @Test
     void theSearchTextAndSizeAreBounded() throws Exception {
-        answerBody = "[]";
-        call(get("/v1/admin/free-charging/drivers").param("q", "a".repeat(300)).param("size", "100000")).andExpect(status().isOk());
-        assertThat(TARGET.get()).contains("size=50");
+        answerBody = "{\"items\":[],\"page\":0,\"size\":1,\"total\":0}";
+        call(get("/v1/admin/free-charging/drivers").param("q", "a".repeat(300)).param("size", "100000").param("page", "-5").param("membership", "evil")).andExpect(status().isOk());
+        assertThat(TARGET.get()).contains("size=100").contains("page=0").contains("membership=ALL");
         assertThat(TARGET.get().length()).isLessThan(BASE.length() + 200);
         call(get("/v1/admin/free-charging/drivers").param("size", "-4")).andExpect(status().isOk());
         assertThat(TARGET.get()).contains("size=1");

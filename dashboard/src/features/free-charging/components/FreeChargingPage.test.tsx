@@ -14,14 +14,16 @@ vi.mock("next/navigation", () => ({
 
 const DRIVER_ID = "3f2c1b7e-5a41-4c1d-9a47-0d2f6c8b9e10";
 const DRIVERS = [
-  { driverId: "d-jean", customerId: "c-jean", fullName: "MBA Jean", phone: "+24177000001", email: "jean@example.com", fleetNumber: "V015", plate: "PL-0150", status: "ACTIVE", linked: true, inProgram: false },
-  { driverId: "d-paul", customerId: "c-paul", fullName: "NDONG Paul", phone: "+24166000002", email: null, fleetNumber: "V030", plate: "PL-0300", status: "ACTIVE", linked: true, inProgram: false },
-  { driverId: "d-awa", customerId: "c-awa", fullName: "OBIANG Awa", phone: null, email: null, fleetNumber: null, plate: null, status: "ACTIVE", linked: true, inProgram: true },
-  { driverId: "d-luc", customerId: null, fullName: "ONDO Luc", phone: "+24162000004", email: null, fleetNumber: "V041", plate: "PL-0410", status: "ACTIVE", linked: false, inProgram: false },
+  { driverId: "d-jean", customerId: "c-jean", fullName: "MBA Jean", phone: "+24177000001", email: "jean@example.com", fleetNumber: "V015", plate: "PL-0150", status: "ACTIVE", linked: true, inProgram: false, agreementId: null, agreementStatus: null },
+  { driverId: "d-paul", customerId: "c-paul", fullName: "NDONG Paul", phone: "+24166000002", email: null, fleetNumber: "V030", plate: "PL-0300", status: "ACTIVE", linked: true, inProgram: false, agreementId: null, agreementStatus: null },
+  { driverId: "d-awa", customerId: "c-awa", fullName: "OBIANG Awa", phone: null, email: null, fleetNumber: null, plate: null, status: "ACTIVE", linked: true, inProgram: true, agreementId: "ag-awa", agreementStatus: "ACTIVE" },
+  { driverId: "d-luc", customerId: null, fullName: "ONDO Luc", phone: "+24162000004", email: null, fleetNumber: "V041", plate: "PL-0410", status: "ACTIVE", linked: false, inProgram: false, agreementId: null, agreementStatus: null },
+  { driverId: "d-zoe", customerId: "c-zoe", fullName: "ZOGO Zoé", phone: null, email: null, fleetNumber: null, plate: null, status: "ARCHIVED", linked: true, inProgram: false, agreementId: null, agreementStatus: null },
 ];
+const driverPage = (items = DRIVERS, total = items.length) => ({ items, page: 0, size: 25, total });
 
 function withDrivers(handler: Handler): Handler {
-  return (url, init) => (url.includes("/api/admin/free-charging/drivers") ? Response.json(DRIVERS) : handler(url, init));
+  return (url, init) => (url.includes("/api/admin/free-charging/drivers") ? Response.json(driverPage()) : handler(url, init));
 }
 
 function agreement(overrides: Record<string, unknown> = {}) {
@@ -215,25 +217,52 @@ describe("FreeChargingPage add and edit", () => {
 
   const created = (fetchMock: ReturnType<typeof serve>) => posts(fetchMock).filter(([url]) => String(url) === "/api/admin/free-charging/agreements").map(([, init]) => JSON.parse(String(init?.body)));
 
-  it("requires a driver and the start date", async () => {
+  const retire = (fetchMock: ReturnType<typeof serve>) => posts(fetchMock).filter(([url]) => String(url).endsWith("/revoke")).map(([url]) => String(url));
+  const reply = (url: string, init?: RequestInit) => (init?.method === "POST" ? Response.json(agreement(), { status: 201 }) : Response.json([]));
+
+  it("lists every driver in a table with their car, status and place in the program", async () => {
+    serve(withDrivers(() => Response.json([])));
+    const { dialog } = await openAddDialog();
+
+    const table = await within(dialog).findByRole("table");
+    expect(within(table).getAllByRole("row")).toHaveLength(DRIVERS.length + 1);
+    expect(within(table).getByText("V015 · PL-0150")).toBeInTheDocument();
+    expect(within(table).getByText("Démissionnaire")).toBeInTheDocument();
+    expect(within(table).getByText("Dans le programme")).toBeInTheDocument();
+    expect(within(table).getByText("Compte Zella non lié")).toBeInTheDocument();
+  });
+
+  it("shows a driver in the program as checked and one who is not as unchecked", async () => {
+    serve(withDrivers(() => Response.json([])));
+    const { dialog } = await openAddDialog();
+
+    expect(await within(dialog).findByRole("checkbox", { name: /OBIANG Awa/ })).toBeChecked();
+    expect(within(dialog).getByRole("checkbox", { name: /MBA Jean/ })).not.toBeChecked();
+    expect(within(dialog).getByRole("checkbox", { name: /ONDO Luc/ })).toBeDisabled();
+    expect(within(dialog).getByRole("checkbox", { name: /ZOGO/ })).toBeDisabled();
+  });
+
+  it("asks for at least one change", async () => {
     const fetchMock = serve(withDrivers(() => Response.json([])));
     const { userEvents, dialog } = await openAddDialog();
+    await within(dialog).findByRole("table");
 
-    await userEvents.click(within(dialog).getByRole("button", { name: "Ajouter" }));
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
 
-    expect(within(dialog).getByText("Choisissez au moins un chauffeur.")).toBeInTheDocument();
-    expect(within(dialog).getByText("Choisissez la date de début.")).toBeInTheDocument();
+    expect(within(dialog).getByText("Cochez ou décochez au moins un chauffeur.")).toBeInTheDocument();
     expect(posts(fetchMock)).toHaveLength(0);
   });
 
-  it("refuses an end date before the start date", async () => {
+  it("asks for the start date once a driver is ticked, and refuses an end before it", async () => {
     const fetchMock = serve(withDrivers(() => Response.json([])));
     const { userEvents, dialog } = await openAddDialog();
-
     await pick(userEvents, dialog, "MBA Jean");
+
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
+    expect(within(dialog).getByText("Choisissez la date de début.")).toBeInTheDocument();
     await userEvents.type(within(dialog).getByLabelText("Début"), "2026-11-10");
     await userEvents.type(within(dialog).getByLabelText("Fin (facultatif)"), "2026-11-02");
-    await userEvents.click(within(dialog).getByRole("button", { name: "Ajouter" }));
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
 
     expect(within(dialog).getByText("La fin ne peut pas précéder le début.")).toBeInTheDocument();
     expect(posts(fetchMock)).toHaveLength(0);
@@ -241,58 +270,66 @@ describe("FreeChargingPage add and edit", () => {
 
   it("explains what an empty end date means", async () => {
     serve(withDrivers(() => Response.json([])));
-    const { dialog } = await openAddDialog();
+    const { userEvents, dialog } = await openAddDialog();
+    await pick(userEvents, dialog, "MBA Jean");
 
     expect(within(dialog).getByText("Sans date de fin, l'accord reste actif jusqu'à ce que vous le suspendiez ou le retiriez.")).toBeInTheDocument();
   });
 
-  it("creates the agreement for the chosen driver with the entered terms", async () => {
-    const fetchMock = serve(withDrivers((url, init) => (init?.method === "POST" ? Response.json(agreement(), { status: 201 }) : Response.json([]))));
+  it("creates the agreement for a ticked driver with the entered terms", async () => {
+    const fetchMock = serve(withDrivers(reply));
     const { userEvents, dialog } = await openAddDialog();
 
     await pick(userEvents, dialog, "MBA Jean");
     await userEvents.type(within(dialog).getByLabelText("Début"), "2026-11-01");
     await userEvents.type(within(dialog).getByLabelText("Conditions (facultatif)"), "Loyer à jour");
-    await userEvents.click(within(dialog).getByRole("button", { name: "Ajouter" }));
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
 
     await waitFor(() => expect(created(fetchMock)).toEqual([{ customerId: "c-jean", startsOn: "2026-11-01", conditions: "Loyer à jour" }]));
-    expect(await screen.findByText("Chauffeur ajouté.")).toBeInTheDocument();
+    expect(await screen.findByText("1 ajouté(s), 0 retiré(s).")).toBeInTheDocument();
   });
 
-  it("adds several drivers in one go, one agreement each, and says how many", async () => {
-    const fetchMock = serve(withDrivers((url, init) => (init?.method === "POST" ? Response.json(agreement(), { status: 201 }) : Response.json([]))));
+  it("removes a driver from the program by unticking them, without asking for dates", async () => {
+    const fetchMock = serve(withDrivers(reply));
+    const { userEvents, dialog } = await openAddDialog();
+
+    await pick(userEvents, dialog, "OBIANG Awa");
+    expect(within(dialog).queryByLabelText("Début")).not.toBeInTheDocument();
+    expect(within(dialog).getByText("Sera retiré")).toBeInTheDocument();
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
+
+    await waitFor(() => expect(retire(fetchMock)).toEqual(["/api/admin/free-charging/agreements/ag-awa/revoke"]));
+    expect(created(fetchMock)).toHaveLength(0);
+  });
+
+  it("adds and removes in one save", async () => {
+    const fetchMock = serve(withDrivers(reply));
     const { userEvents, dialog } = await openAddDialog();
 
     await pick(userEvents, dialog, "MBA Jean");
     await pick(userEvents, dialog, "NDONG Paul");
+    await pick(userEvents, dialog, "OBIANG Awa");
+    expect(within(dialog).getByText("2 à ajouter · 1 à retirer")).toBeInTheDocument();
     await userEvents.type(within(dialog).getByLabelText("Début"), "2026-11-01");
-    await userEvents.click(within(dialog).getByRole("button", { name: "Ajouter 2 chauffeurs" }));
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
 
     await waitFor(() => expect(created(fetchMock).map((body) => body.customerId)).toEqual(["c-jean", "c-paul"]));
-    expect(await screen.findByText("2 chauffeurs ajoutés.")).toBeInTheDocument();
+    expect(retire(fetchMock)).toHaveLength(1);
   });
 
-  it("selects every driver who can be added with one click, never the blocked ones", async () => {
-    const fetchMock = serve(withDrivers((url, init) => (init?.method === "POST" ? Response.json(agreement(), { status: 201 }) : Response.json([]))));
-    const { userEvents, dialog } = await openAddDialog();
-
-    await userEvents.click(await within(dialog).findByRole("button", { name: "Tout sélectionner" }));
-    expect(within(dialog).getByText("2 chauffeurs choisis")).toBeInTheDocument();
-    await userEvents.type(within(dialog).getByLabelText("Début"), "2026-11-01");
-    await userEvents.click(within(dialog).getByRole("button", { name: "Ajouter 2 chauffeurs" }));
-
-    await waitFor(() => expect(created(fetchMock).map((body) => body.customerId)).toEqual(["c-jean", "c-paul"]));
-  });
-
-  it("shows who is already in the program or has no Zella account and cannot be chosen", async () => {
+  it("ticks every driver of the page who can be added in one click, never the blocked ones, and cancels them", async () => {
     serve(withDrivers(() => Response.json([])));
-    const { dialog } = await openAddDialog();
+    const { userEvents, dialog } = await openAddDialog();
+    await within(dialog).findByRole("table");
 
-    expect(await within(dialog).findByRole("checkbox", { name: /OBIANG Awa/ })).toBeDisabled();
-    expect(within(dialog).getByText("Déjà dans le programme")).toBeInTheDocument();
-    expect(within(dialog).getByRole("checkbox", { name: /ONDO Luc/ })).toBeDisabled();
-    expect(within(dialog).getByText("Compte Zella non lié")).toBeInTheDocument();
-    expect(within(dialog).getByText("V015 · PL-0150")).toBeInTheDocument();
+    await userEvents.click(within(dialog).getByRole("checkbox", { name: "Sélectionner les chauffeurs de la page" }));
+    expect(within(dialog).getByRole("checkbox", { name: /MBA Jean/ })).toBeChecked();
+    expect(within(dialog).getByRole("checkbox", { name: /NDONG Paul/ })).toBeChecked();
+    expect(within(dialog).getByRole("checkbox", { name: /ONDO Luc/ })).not.toBeChecked();
+    await userEvents.click(within(dialog).getByRole("button", { name: "Annuler les changements" }));
+
+    expect(within(dialog).getByRole("checkbox", { name: /MBA Jean/ })).not.toBeChecked();
+    expect(within(dialog).getByRole("checkbox", { name: /OBIANG Awa/ })).toBeChecked();
   });
 
   it("searches the drivers on the typed text, a car number included", async () => {
@@ -302,20 +339,37 @@ describe("FreeChargingPage add and edit", () => {
 
     await userEvents.type(within(dialog).getByRole("searchbox"), "V015");
 
-    await waitFor(() => expect(fetchMock.mock.calls.map(([url]) => String(url))).toContain("/api/admin/free-charging/drivers?size=20&q=V015"));
+    await waitFor(() => expect(fetchMock.mock.calls.map(([url]) => String(url))).toContain("/api/admin/free-charging/drivers?membership=ALL&page=0&size=25&q=V015"));
   });
 
-  it("removes a driver from the selection with its chip", async () => {
-    serve(withDrivers(() => Response.json([])));
+  it("filters the table on who is in the program", async () => {
+    const fetchMock = serve(withDrivers(() => Response.json([])));
+    const { userEvents, dialog } = await openAddDialog();
+    await within(dialog).findByRole("table");
+
+    await userEvents.click(within(dialog).getByRole("button", { name: "Dans le programme" }));
+
+    await waitFor(() => expect(fetchMock.mock.calls.map(([url]) => String(url))).toContain("/api/admin/free-charging/drivers?membership=IN_PROGRAM&page=0&size=25"));
+  });
+
+  it("keeps the ticks when the page changes", async () => {
+    const fetchMock = serve((url, init) => {
+      if (!url.includes("/free-charging/drivers")) return init?.method === "POST" ? Response.json(agreement(), { status: 201 }) : Response.json([]);
+      return url.includes("page=1") ? Response.json({ items: [DRIVERS[1]], page: 1, size: 25, total: 30 }) : Response.json({ items: [DRIVERS[0]], page: 0, size: 25, total: 30 });
+    });
     const { userEvents, dialog } = await openAddDialog();
     await pick(userEvents, dialog, "MBA Jean");
 
-    await userEvents.click(within(dialog).getByRole("button", { name: "Retirer MBA Jean de la sélection" }));
+    await userEvents.click(within(dialog).getByRole("button", { name: /Suivant/ }));
+    await pick(userEvents, dialog, "NDONG Paul");
+    expect(within(dialog).getByText("2 à ajouter · 0 à retirer")).toBeInTheDocument();
+    await userEvents.type(within(dialog).getByLabelText("Début"), "2026-11-01");
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
 
-    expect(within(dialog).queryByText("1 chauffeur choisi")).not.toBeInTheDocument();
+    await waitFor(() => expect(created(fetchMock).map((body) => body.customerId)).toEqual(["c-jean", "c-paul"]));
   });
 
-  it("lists the drivers that could not be added and retries only those", async () => {
+  it("lists the changes that failed and retries only those", async () => {
     let paulFails = true;
     const fetchMock = serve(withDrivers((url, init) => {
       if (init?.method !== "POST") return Response.json([]);
@@ -327,7 +381,7 @@ describe("FreeChargingPage add and edit", () => {
     await pick(userEvents, dialog, "NDONG Paul");
     await userEvents.type(within(dialog).getByLabelText("Début"), "2026-11-01");
 
-    await userEvents.click(within(dialog).getByRole("button", { name: "Ajouter 2 chauffeurs" }));
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
 
     expect(await within(dialog).findByText("1 chauffeur ajouté.")).toBeInTheDocument();
     expect(within(dialog).getByText("NDONG Paul : Ce chauffeur a déjà un accord de gratuité en cours.")).toBeInTheDocument();
@@ -347,7 +401,7 @@ describe("FreeChargingPage add and edit", () => {
 
     await pick(userEvents, dialog, "MBA Jean");
     await userEvents.type(within(dialog).getByLabelText("Début"), "2026-11-01");
-    await userEvents.click(within(dialog).getByRole("button", { name: "Ajouter" }));
+    await userEvents.click(within(dialog).getByRole("button", { name: "Enregistrer les changements" }));
 
     expect(await within(dialog).findByText(new RegExp(message.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")))).toBeInTheDocument();
     expect(screen.queryByText("raw server text")).not.toBeInTheDocument();

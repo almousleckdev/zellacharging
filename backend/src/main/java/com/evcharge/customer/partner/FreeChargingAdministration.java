@@ -19,7 +19,7 @@ public interface FreeChargingAdministration {
 
     FreeAgreement revoke(String actor, UUID agreementId);
 
-    List<FreeDriverOption> drivers(String actor, String query, int size);
+    FreeDriverPage drivers(String actor, String query, String membership, int page, int size);
 
     FreeSundayWindow window(String actor);
 

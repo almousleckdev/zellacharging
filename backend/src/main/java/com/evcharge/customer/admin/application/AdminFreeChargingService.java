@@ -6,7 +6,7 @@ import com.evcharge.customer.partner.AgreementTerms;
 import com.evcharge.customer.partner.FreeAgreement;
 import com.evcharge.customer.partner.FreeChargingAdministration;
 import com.evcharge.customer.partner.FreeChargingUsePage;
-import com.evcharge.customer.partner.FreeDriverOption;
+import com.evcharge.customer.partner.FreeDriverPage;
 import com.evcharge.customer.partner.PartnerLinking;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.CountryDirectory;
@@ -16,6 +16,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Function;
 
@@ -23,7 +24,8 @@ import java.util.function.Function;
 public class AdminFreeChargingService {
 
     private static final int MAXIMUM_PAGE_SIZE = 100;
-    private static final int MAXIMUM_SEARCH_SIZE = 50;
+    private static final int MAXIMUM_SEARCH_SIZE = 100;
+    private static final Set<String> MEMBERSHIPS = Set.of("ALL", "IN_PROGRAM", "NOT_IN_PROGRAM");
     private static final int MAXIMUM_SEARCH_LENGTH = 100;
 
     private final AdminAccessService access;
@@ -46,11 +48,13 @@ public class AdminFreeChargingService {
         return ndzela.list(FreeChargingActor.of(admin));
     }
 
-    public List<FreeDriverOption> drivers(AdminAccess admin, String query, int size) {
+    public FreeDriverPage drivers(AdminAccess admin, String query, String membership, int page, int size) {
         authorize(admin, Permission.FREE_CHARGING_MANAGE);
         String text = query == null ? "" : query.strip();
         String bounded = text.length() > MAXIMUM_SEARCH_LENGTH ? text.substring(0, MAXIMUM_SEARCH_LENGTH) : text;
-        return ndzela.drivers(FreeChargingActor.of(admin), bounded, Math.min(Math.max(size, 1), MAXIMUM_SEARCH_SIZE));
+        String filter = MEMBERSHIPS.contains(membership) ? membership : "ALL";
+        return ndzela.drivers(FreeChargingActor.of(admin), bounded, filter, Math.max(page, 0),
+                Math.min(Math.max(size, 1), MAXIMUM_SEARCH_SIZE));
     }
 
     public FreeSundayWindow window(AdminAccess admin) {

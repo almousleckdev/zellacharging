@@ -11,7 +11,7 @@ type ModalProps = {
   title: string;
   description?: string;
   busy?: boolean;
-  size?: "sm" | "lg";
+  size?: "sm" | "lg" | "xl";
   onClose: () => void;
   footer: ReactNode;
   children?: ReactNode;
@@ -59,7 +59,7 @@ export function Modal({ open, title, description, busy = false, size = "sm", onC
         "m-auto max-h-[calc(100dvh-2rem)] w-[calc(100%-2rem)] overflow-y-auto overflow-x-hidden rounded-xl",
         "whitespace-normal text-left normal-nums",
         "bg-background p-0 text-foreground shadow-xl backdrop:bg-slate-900/50 backdrop:backdrop-blur-sm",
-        size === "lg" ? "max-w-2xl" : "max-w-md",
+        size === "xl" ? "max-w-5xl" : size === "lg" ? "max-w-2xl" : "max-w-md",
         open && "flex flex-col",
       )}
     >
@@ -74,7 +74,7 @@ export function Modal({ open, title, description, busy = false, size = "sm", onC
             </p>
           )}
         </div>
-        {size === "lg" && (
+        {size !== "sm" && (
           <button
             type="button"
             onClick={requestClose}

@@ -82,6 +82,44 @@ class AdminCustomerIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void theNdzelaDriverFilterKeepsOnlyLinkedCustomersAndCountsOnlyThem() throws Exception {
+        UUID linked = data.customer("GA", "ACTIVE", marker + "Linked", "Obame", null, ago(1));
+        data.customer("GA", "ACTIVE", marker + "Plain", "Nzé", null, ago(2));
+        UUID abroad = data.customer("ML", "ACTIVE", marker + "Abroad", "Keita", null, ago(3));
+        TenantContext.runAs("GA", () -> jdbc.update(
+                "insert into partner_link (partner, customer_id, linked_at) values ('NDZELA', ?, now())", linked));
+        TenantContext.runAs("ML", () -> jdbc.update(
+                "insert into partner_link (partner, customer_id, linked_at) values ('NDZELA', ?, now())", abroad));
+        TenantContext.clear();
+
+        list(root, "country=GA&q=" + marker + "&ndzelaDriver=true").andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.items.length()").value(1)).andExpect(jsonPath("$.items[0].id").value(linked.toString()))
+                .andExpect(jsonPath("$.items[0].ndzelaDriver").value(true));
+        list(root, "country=GA&q=" + marker).andExpect(jsonPath("$.total").value(2));
+        list(root, "q=" + marker + "&ndzelaDriver=true").andExpect(jsonPath("$.total").value(2));
+    }
+
+    @Test
+    void theNdzelaDriverFilterCombinesWithStatusAndTextAndAnEmptyLinkSetIsEmpty() throws Exception {
+        UUID active = data.customer("GA", "ACTIVE", marker + "Active", "Obame", null, ago(1));
+        UUID blocked = data.customer("GA", "BLOCKED", marker + "Blocked", "Nzé", null, ago(2));
+        TenantContext.runAs("GA", () -> {
+            for (UUID id : new UUID[] {active, blocked}) {
+                jdbc.update("insert into partner_link (partner, customer_id, linked_at) values ('NDZELA', ?, now())", id);
+            }
+        });
+        TenantContext.clear();
+
+        list(root, "country=GA&q=" + marker + "&ndzelaDriver=true&status=BLOCKED").andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(blocked.toString()));
+        list(root, "country=GA&q=" + marker + "active&ndzelaDriver=true").andExpect(jsonPath("$.total").value(1))
+                .andExpect(jsonPath("$.items[0].id").value(active.toString()));
+        list(root, "country=GA&q=" + marker + "nobody&ndzelaDriver=true").andExpect(jsonPath("$.total").value(0));
+        list(root, "country=ML&q=" + marker + "&ndzelaDriver=true").andExpect(status().isOk())
+                .andExpect(jsonPath("$.total").value(0)).andExpect(jsonPath("$.items.length()").value(0));
+    }
+
+    @Test
     void searchTextIsTreatedLiterallyNotAsAPattern() throws Exception {
         data.customer("GA", "ACTIVE", marker + "Plain", "Name", null, ago(1));
 

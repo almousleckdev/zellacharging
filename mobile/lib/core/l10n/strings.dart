@@ -1,6 +1,7 @@
 export 'auth_text.dart';
 export 'charge_text.dart';
 export 'error_text.dart';
+export 'free_sunday_text.dart';
 export 'history_text.dart';
 export 'home_text.dart';
 export 'notification_text.dart';

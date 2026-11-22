@@ -15,7 +15,7 @@ class ApplicationBootTest extends PostgresTestBase {
 
     @Test
     void flywayAppliedAllMigrations() {
-        assertThat(flyway.info().applied()).hasSize(41);
+        assertThat(flyway.info().applied()).hasSize(45);
         assertThat(flyway.info().pending()).isEmpty();
     }
 }

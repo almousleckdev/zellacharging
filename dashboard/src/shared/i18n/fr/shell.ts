@@ -36,6 +36,7 @@ export const frShell = {
     withdrawals: "Retraits",
     commissions: "Commissions",
     tariffs: "Tarifs",
+    freeCharging: "Gratuité",
     reports: "Rapports",
     countries: "Pays",
     users: "Utilisateurs et rôles",

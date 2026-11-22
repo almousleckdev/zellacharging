@@ -24,6 +24,8 @@ import 'package:zella/core/links/link_providers.dart';
 import 'package:zella/core/media/media_providers.dart';
 import 'package:zella/core/storage/preference_providers.dart';
 import 'package:zella/features/coupons/domain/coupon.dart';
+import 'package:zella/features/free_sunday/domain/free_sunday_repository.dart';
+import 'package:zella/features/free_sunday/presentation/free_sunday_providers.dart';
 import 'package:zella/features/coupons/presentation/coupon_providers.dart';
 import 'package:zella/features/coupons/presentation/coupons_page.dart';
 import 'package:zella/features/profile/presentation/change_password_page.dart';
@@ -52,6 +54,7 @@ import 'package:zella/features/wallet/presentation/wallet_providers.dart';
 import 'package:zella/features/notifications/presentation/notification_providers.dart';
 import 'package:zella/features/notifications/presentation/notifications_page.dart';
 import 'package:zella/features/stations/presentation/detail/map_providers.dart';
+import 'package:zella/features/free_sunday/domain/free_sunday_offer.dart';
 import 'fake_notifications.dart';
 import 'ui_fakes.dart';
 
@@ -177,6 +180,7 @@ List<Override> overridesWith({
   FakeSupport? support,
   FakeCoupons? couponList,
   WalletRepository? wallet,
+  FreeSundayRepository? freeSunday,
   StationRepository? stationRepo,
   SessionRepository? sessionRepo,
   List<Override> extra = const [],
@@ -186,6 +190,9 @@ List<Override> overridesWith({
     sessionRepo ?? FakeSessions(state),
   ),
   walletRepositoryProvider.overrideWithValue(wallet ?? FakeWallet()),
+  freeSundayRepositoryProvider.overrideWithValue(
+    freeSunday ?? FakeFreeSunday(FreeSundayOffer.unavailable),
+  ),
   notificationRepositoryProvider.overrideWithValue(FakeNotifications()),
   mapTileProvider.overrideWithValue(NoTiles()),
   profileRepositoryProvider.overrideWithValue(profile ?? FakeProfile()),

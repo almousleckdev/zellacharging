@@ -8,7 +8,6 @@ import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.AuditTrail;
 import com.evcharge.customer.shared.CustomerStanding;
-import com.evcharge.customer.wallet.WalletFunding;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
@@ -30,7 +29,7 @@ public class SessionService {
     private final SessionSettlement settlement;
     private final UserStop userStop;
     private final StartCommander starter;
-    private final WalletFunding funding;
+    private final StartFunding funding;
     private final Clock clock;
     private final AuditTrail audit;
     private final CustomerStanding standing;
@@ -38,7 +37,7 @@ public class SessionService {
     public SessionService(SessionRepository sessions, IdTagService idTags,
                           SessionRefresher refresher, StartableConnectors connectors, IdempotentStarts starts,
                           SessionSettlement settlement,
-                          UserStop userStop, StartCommander starter, WalletFunding funding, Clock clock,
+                          UserStop userStop, StartCommander starter, StartFunding funding, Clock clock,
                           AuditTrail audit, CustomerStanding standing) {
         this.sessions = sessions;
         this.idTags = idTags;
@@ -69,17 +68,11 @@ public class SessionService {
         connectors.require(stationId, connectorId);
         String idTag = idTags.ensure(customerId);
         UUID sessionId = UUID.randomUUID();
-        funding.reserve(customerId, sessionId, amountMinor);
         ChargingSession session = ChargingSession.requested(sessionId, customerId, stationId, connectorId, idTag,
                 clock.instant());
-        try {
-            sessions.insert(session, idempotencyKey);
-        } catch (RuntimeException e) {
-            funding.release(sessionId);
-            throw e;
-        }
+        long budget = funding.fund(customerId, sessionId, amountMinor, () -> sessions.insert(session, idempotencyKey));
         audit.record("SESSION_START_REQUESTED", customerId, sessionId.toString(), stationId + "#" + connectorId
-                + " budget=" + amountMinor);
+                + " budget=" + budget);
         return dispatchStart(session);
     }
 

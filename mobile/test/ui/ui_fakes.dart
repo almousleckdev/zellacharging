@@ -15,6 +15,8 @@ import 'package:zella/features/auth/domain/social_authenticator.dart';
 import 'package:zella/features/auth/domain/social_credential.dart';
 import 'package:zella/features/auth/domain/social_provider.dart';
 import 'package:zella/features/coupons/domain/coupon.dart';
+import 'package:zella/features/free_sunday/domain/free_sunday_offer.dart';
+import 'package:zella/features/free_sunday/domain/free_sunday_repository.dart';
 import 'package:zella/features/coupons/domain/coupon_repository.dart';
 import 'package:zella/features/support/domain/support_info.dart';
 import 'package:zella/features/support/domain/support_repository.dart';
@@ -485,4 +487,20 @@ class FakeAuth implements AuthRepository {
 
   @override
   Future<void> socialLogin(SocialCredential credential) async {}
+}
+
+class FakeFreeSunday implements FreeSundayRepository {
+  FakeFreeSunday(this.offer, {this.failure});
+
+  final FreeSundayOffer offer;
+  final Object? failure;
+  var calls = 0;
+
+  @override
+  Future<FreeSundayOffer> current() async {
+    calls++;
+    final error = failure;
+    if (error != null) throw error;
+    return offer;
+  }
 }

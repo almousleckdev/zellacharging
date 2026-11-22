@@ -74,6 +74,7 @@ zella:
     topup-per-customer-per-minute: 10
     session-start-per-customer-per-minute: 10
     withdrawal-per-customer-per-minute: 5
+    free-sunday-per-customer-per-minute: 20
   social:
     google-client-ids: ${ZELLA_GOOGLE_CLIENT_IDS:}
     apple-client-ids: ${ZELLA_APPLE_CLIENT_IDS:}

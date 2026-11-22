@@ -18,7 +18,10 @@ loses nothing because the row is already stored.
 
 ## Events
 Top-up started, succeeded, failed. Withdrawal started, succeeded, failed. Charge started, completed, failed,
-interrupted. Password changed. Not wired: account registered (no device exists yet), a separate "charge stopped" push
+interrupted. Password changed. Free charge (NDZela drivers): `FREE_CHARGE_STARTED` (sent instead of `CHARGE_STARTED` when
+the session holds a free Sunday claim), `FREE_WINDOW_ENDING` (about 30 minutes before the window ends, once per session,
+sent by the sweep) and `FREE_WINDOW_ENDED` (when the window stop was accepted by the charger); their texts carry the end
+time of the window in the country time zone (23:59 for a window that runs to the end of the day). Not wired: account registered (no device exists yet), a separate "charge stopped" push
 (a stop ends in "completed"), balance-updated pushes, per-category preferences.
 
 ## API

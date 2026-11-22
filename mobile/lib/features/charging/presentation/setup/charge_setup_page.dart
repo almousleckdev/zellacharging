@@ -8,6 +8,7 @@ import '../../../../core/l10n/strings.dart';
 import '../../../../core/router/routes.dart';
 import '../../../../shared/widgets/async_body.dart';
 import '../../../../core/format/amount_input.dart';
+import '../../../free_sunday/presentation/free_sunday_providers.dart';
 import '../../../stations/domain/station.dart';
 import '../../../stations/domain/station_connector.dart';
 import '../../../stations/presentation/station_providers.dart';
@@ -47,6 +48,7 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   void initState() {
     super.initState();
     connector = widget.initialConnectorId;
+    ref.invalidate(freeSundayProvider);
     _refresh = Timer.periodic(
       const Duration(seconds: 5),
       (_) => ref.invalidate(stationProvider(widget.stationId)),

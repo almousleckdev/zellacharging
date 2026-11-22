@@ -76,6 +76,7 @@ class RateLimitFilter extends OncePerRequestFilter {
                 new RateRule("POST", "/v1/payments/callback", s.callbackPerIpPerMinute(), minute, false),
                 new RateRule("POST", "/v1/wallet/topups", s.topupPerCustomerPerMinute(), minute, true),
                 new RateRule("POST", "/v1/sessions", s.sessionStartPerCustomerPerMinute(), minute, true),
-                new RateRule("POST", "/v1/wallet/withdrawals", s.withdrawalPerCustomerPerMinute(), minute, true));
+                new RateRule("POST", "/v1/wallet/withdrawals", s.withdrawalPerCustomerPerMinute(), minute, true),
+                new RateRule("GET", "/v1/free-sunday", s.freeSundayPerCustomerPerMinute(), minute, true));
     }
 }

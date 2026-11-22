@@ -57,7 +57,8 @@ public class StalledSessionCloser {
         log.warn("ALERT session {} made no progress since {}: closing it, billing {} kWh and returning the rest",
                 session.id(), lastMoved(session, progress), delivered(progress));
         stopQuietly(session);
-        close(session.withEnergy(delivered(progress), now).withState(SessionState.ABANDONED, "STALLED", now));
+        close(session.withEnergy(progress.energyKwh(), now).withState(SessionState.ABANDONED, "STALLED", now),
+                delivered(progress));
         return true;
     }
 
@@ -88,15 +89,15 @@ public class StalledSessionCloser {
 
     public void closeLostCharger(ChargingSession session) {
         Instant now = clock.instant();
-        BigDecimal energy = delivered(telemetry.progressOf(session.id()));
+        SessionProgress progress = telemetry.progressOf(session.id());
         Instant lastSeen = telemetry.readingAtOf(session.id()).orElse(now);
         log.warn("ALERT session {} lost its charger: closing it, billing {} kWh and returning the rest",
-                session.id(), energy);
-        close(session.withEnergy(energy, now).lostPower(lastSeen, now));
+                session.id(), delivered(progress));
+        close(session.withEnergy(progress.energyKwh(), now).lostPower(lastSeen, now), delivered(progress));
     }
 
-    private void close(ChargingSession ended) {
-        ChargingSession closed = priced(ended, ended.energyKwh(), clock.instant());
+    private void close(ChargingSession ended, BigDecimal billed) {
+        ChargingSession closed = priced(ended, billed, clock.instant());
         sessions.update(closed);
         settlement.settle(closed);
     }

@@ -9,9 +9,13 @@ import com.evcharge.customer.notification.domain.PushContent;
 import com.evcharge.customer.notification.domain.PushResult;
 import com.evcharge.customer.shared.NotificationType;
 import com.evcharge.customer.shared.Notifier;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.read.ListAppender;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
@@ -101,6 +105,27 @@ class NotificationIntegrationTest extends PostgresTestBase {
         assertThat(contents.getValue().data()).containsEntry("type", "TOPUP_SUCCEEDED")
                 .containsEntry("screen", "wallet");
         assertThat(stateOf("k1")).isEqualTo("SENT");
+    }
+
+    @Test
+    void theDeliveryLogNamesThePlatformsButNeverTheToken() throws Exception {
+        register("secret-token-value", "IOS", "fr");
+        when(sender.send(any(), any())).thenReturn(PushResult.DELIVERED);
+        queue("k-log");
+        Logger logger = (Logger) LoggerFactory.getLogger(NotificationDispatcher.class);
+        ListAppender<ILoggingEvent> appender = new ListAppender<>();
+        appender.start();
+        logger.addAppender(appender);
+
+        try {
+            dispatcher.run();
+        } finally {
+            logger.detachAppender(appender);
+        }
+
+        assertThat(appender.list).extracting(ILoggingEvent::getFormattedMessage)
+                .anyMatch(line -> line.contains("accepted by Firebase for 1 of 1 devices (IOS)"))
+                .noneMatch(line -> line.contains("secret-token-value"));
     }
 
     @Test

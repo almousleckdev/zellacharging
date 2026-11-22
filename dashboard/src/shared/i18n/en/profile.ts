@@ -54,6 +54,8 @@ export const enProfile: Pick<Dictionary, "profile"> = {
       WITHDRAWALS_REVIEW: "Approve or decline withdrawals",
       AUDIT_READ: "View the audit log",
       COMPLIMENTARY_MANAGE: "Give or remove free charging",
+      FREE_CHARGING_READ: "View Sunday free charging",
+      FREE_CHARGING_MANAGE: "Manage free-charging agreements",
       ADMINS_MANAGE: "Manage administrators",
     },
   },

@@ -145,3 +145,14 @@ table, operator data, charger credentials. If the platform's `session` for a
   `CHARGED`, `NOT_CHARGED`, `UNDER_REVIEW` or `REFUNDED`; `energy_cost_minor`, `vat_minor`, `service_fee_minor` are the
   breakdown at that moment, `total_minor` is what the wallet captured; `estimated` marks rows backfilled for earlier
   settlements (total from the hold, parts from the rates at backfill time). RLS by country.
+
+- `free_sunday_claim` (`V42`): `id`, `country_code`, `customer_id`, `sunday_date`, `session_id`, `agreement_id`,
+  `window_ends_at`, `state` (`CLAIMED` or `RELEASED`), `claimed_at`, `released_at`, composite FK to `customer`, RLS by
+  country. A partial unique index on `(customer_id, sunday_date) where state = 'CLAIMED'` allows one free Sunday charge
+  per customer and day; releasing the claim frees the slot. `V43` adds the partial index `free_sunday_claim_open_claimed_at`
+  on `claimed_at` where `CLAIMED` (orphan-claim release). `V45` adds a second partial unique index on
+  `(agreement_id, sunday_date) where state = 'CLAIMED'`: one NDZela driver can have two linked Zella customers that
+  resolve to the same agreement, and only one of them can take that Sunday. The claim insert has no conflict target,
+  so either index makes it return "not claimed". The agreements themselves live in NDZela, never in Zella.
+- `V44` grants the admin permissions `FREE_CHARGING_READ` (roles `ADMIN`, `SUPPORT`, `FINANCE`, `OPERATIONS`) and
+  `FREE_CHARGING_MANAGE` (`ADMIN`) to existing admins in `admin_permission`.

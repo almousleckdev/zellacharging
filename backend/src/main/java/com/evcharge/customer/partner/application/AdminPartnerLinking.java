@@ -40,6 +40,12 @@ class AdminPartnerLinking implements PartnerLinking {
 
     @Override
     @Transactional(readOnly = true)
+    public Set<UUID> linkedIds() {
+        return new HashSet<>(links.linkedCustomerIds(PARTNER));
+    }
+
+    @Override
+    @Transactional(readOnly = true)
     public Set<UUID> linkedAmong(Collection<UUID> customerIds) {
         Set<UUID> linked = new HashSet<>(links.linkedCustomerIds(PARTNER));
         linked.retainAll(customerIds);

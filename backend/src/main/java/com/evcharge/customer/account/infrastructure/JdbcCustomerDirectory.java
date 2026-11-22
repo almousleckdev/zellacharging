@@ -42,7 +42,7 @@ class JdbcCustomerDirectory implements CustomerDirectory {
 
     @Override
     public CustomerPage search(CustomerQuery query) {
-        String where = SCOPE + statusFilter(query) + textFilter(query);
+        String where = SCOPE + statusFilter(query) + textFilter(query) + idFilter(query);
         long total = bind(jdbc.sql("select count(*) from customer where " + where), query).query(Long.class).single();
         var items = bind(jdbc.sql("select " + COLUMNS + " from customer where " + where
                 + query.sort().orderBy(SORTS, "id") + " limit :limit offset :offset"), query)
@@ -72,12 +72,22 @@ class JdbcCustomerDirectory implements CustomerDirectory {
         return query.text() == null ? "" : TEXT_FILTER;
     }
 
+    private static String idFilter(CustomerQuery query) {
+        if (query.onlyIds() == null) {
+            return "";
+        }
+        return query.onlyIds().isEmpty() ? " and false" : " and id in (:ids)";
+    }
+
     private static JdbcClient.StatementSpec bind(JdbcClient.StatementSpec spec, CustomerQuery query) {
         if (query.status() != null) {
             spec = spec.param("status", query.status());
         }
         if (query.text() != null) {
             spec = spec.param("pattern", LikePattern.contains(query.text()));
+        }
+        if (query.onlyIds() != null && !query.onlyIds().isEmpty()) {
+            spec = spec.param("ids", query.onlyIds());
         }
         return spec;
     }

@@ -28,12 +28,18 @@ class IdempotentStarts {
         }
         return sessions.findByIdempotencyKey(customerId, key).map(found -> {
             boolean same = found.stationId().equals(stationId) && found.connectorId() == connectorId
-                    && funding.reserved(found.id()).minor() == amountMinor;
+                    && sameBudget(found.id(), amountMinor);
             if (!same) {
                 throw new ApiException(HttpStatus.UNPROCESSABLE_ENTITY, "IDEMPOTENCY_KEY_REUSED",
                         "This key was already used for a different request");
             }
             return found;
         });
+    }
+
+    private boolean sameBudget(UUID sessionId, long amountMinor) {
+        long reserved = funding.reserved(sessionId).minor();
+        boolean freeAtMaximum = funding.waived(sessionId) && reserved == funding.startLimits().maximumMinor();
+        return reserved == amountMinor || freeAtMaximum;
     }
 }

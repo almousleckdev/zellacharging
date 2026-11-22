@@ -25,6 +25,7 @@ import java.util.UUID;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
@@ -78,6 +79,20 @@ class StalledSessionCloserTest {
         ArgumentCaptor<ChargingSession> closed = ArgumentCaptor.forClass(ChargingSession.class);
         verify(settlement).settle(closed.capture());
         assertThat(closed.getValue().costMinor()).isZero();
+    }
+
+    @Test
+    void unknownTelemetryIsBilledAsZeroButStaysUnknownOnTheSession() {
+        ChargingSession session = active();
+        when(telemetry.progressOf(session.id())).thenReturn(SessionProgress.none());
+        when(estimator.forEnergy(any(), any())).thenReturn(Optional.of(new Money(0, "XAF", 0)));
+
+        assertThat(closer.closeIfStalled(session)).isTrue();
+
+        ArgumentCaptor<ChargingSession> closed = ArgumentCaptor.forClass(ChargingSession.class);
+        verify(settlement).settle(closed.capture());
+        verify(estimator).forEnergy(any(), eq(BigDecimal.ZERO));
+        assertThat(closed.getValue().energyKwh()).isNull();
     }
 
     @Test

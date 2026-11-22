@@ -6,6 +6,7 @@ export type NavId =
   | "sessions"
   | "staff"
   | "incidents"
+  | "freeCharging"
   | "customers"
   | "payments"
   | "withdrawals"
@@ -40,6 +41,7 @@ export const NAV_GROUPS: NavGroup[] = [
       { id: "sessions", href: "/sessions", icon: "bolt", permission: "SESSIONS_READ" },
       { id: "staff", href: "/staff", icon: "users", permission: "COMPLIMENTARY_MANAGE" },
       { id: "incidents", href: "/incidents", icon: "bell", permission: "OVERVIEW_READ" },
+      { id: "freeCharging", href: "/free-charging", icon: "bolt", permission: "FREE_CHARGING_READ" },
     ],
   },
   {

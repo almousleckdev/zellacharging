@@ -8,6 +8,8 @@ public interface PartnerLinking {
 
     boolean linked(UUID customerId);
 
+    Set<UUID> linkedIds();
+
     Set<UUID> linkedAmong(Collection<UUID> customerIds);
 
     boolean link(UUID customerId, UUID adminId);

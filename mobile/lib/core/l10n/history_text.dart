@@ -73,6 +73,10 @@ abstract final class HistoryText {
         fr: 'Arrêt par le conducteur',
         en: 'Stopped by the driver',
       ),
+      'FREE_WINDOW_ENDED' => AppLanguage.pick(
+        fr: 'Fin du créneau gratuit',
+        en: 'Free window ended',
+      ),
       _ => AppLanguage.pick(fr: 'Montant atteint', en: 'Amount reached'),
     };
   }

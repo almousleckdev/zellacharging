@@ -239,3 +239,94 @@ measured power, for at most 120 s after the report arrived. The final bill alway
 
 Complimentary customers (waived funding hold) are counted apart: the admin overview, stations, daily reports and customer
 digests exclude their sessions from revenue and spent, and the overview adds `complimentaryKwh` and `complimentaryValueMinor`.
+
+## Free Sunday charge (NDZela drivers)
+
+NDZela decides eligibility (NDZela ADR-0048, contract in `INTEGRATION_CONTRACTS.md` 11b to 11d); Zella holds the claim,
+the free hold and the stop at the end of the window described here (the window is NDZela's country setting, default the
+whole Sunday, NDZela ADR-0049; the stop is shown as "22:00 stop" below because that was the first window).
+
+Notifications of a free session (`ChargeAnnouncements`, outbox, see `notifications.md`): `FREE_CHARGE_STARTED` replaces
+`CHARGE_STARTED` when the session holds a `CLAIMED` claim, `FREE_WINDOW_ENDING` is sent by `FreeWindowReminder` for
+active waived sessions whose `window_ends_at` is within the next 30 minutes (dedupe key `free-ending:<session>`, so once),
+and `FREE_WINDOW_ENDED` follows an accepted window stop (`free-ended:<session>`). A failure to queue a notice never
+breaks the sweep or the stop.
+
+- `SessionService.start` order: idempotent-earlier check, live-session check, connector check, then `StartFunding`
+  asks `FreeSundayAccess.claimFor(customer, sessionId)` (NDZela eligibility, fail closed, then the unique
+  `free_sunday_claim` row). On a claim the hold is `WalletFunding.reserveFree`: `waived = true`, no funds check, no
+  wallet reservation or ledger entry. Otherwise the ordinary paid `reserve` runs unchanged, so NDZela down or a
+  Sunday already used gives a normal paid start (or `INSUFFICIENT_FUNDS`).
+- The budget amount still has to be inside the start range (`INVALID_AMOUNT`), but for a claimed free start the
+  server ignores it and reserves the waived hold at `startLimits().maximumMinor`, so `FundsGuard` (which stops at the
+  reserved budget) never cuts a free charge at the client's amount (spec rule 5, no cap). The audit
+  `SESSION_START_REQUESTED` shows the real budget. An idempotent retry of a free start is accepted when the waived
+  hold sits at the maximum. Paid and complimentary starts keep the client amount.
+- A retried start with the same `Idempotency-Key` returns the earlier session before any claim is asked.
+- Two parallel starts of one customer: the unique claim index lets one claim win, the live-session index lets one
+  session win; the loser releases its own hold and its own claim.
+- One claim per agreement and Sunday as well (V45): two linked Zella customers of the same NDZela driver share the
+  agreement id NDZela returns, so the second one's claim is refused and its start is an ordinary paid start, and its
+  `GET /v1/free-sunday` answers `SUNDAY_USED`. Residual: an administrator who revokes the agreement and creates a new
+  one the same Sunday gives a new agreement id, so a second free charge is possible that day (audited admin action).
+- After `reserveFree` the claim is read again (`FreeSundayAccess.holdsClaim`). If it was released meanwhile (the
+  orphan release raced a slow start), the waived hold is discarded (`WalletFunding.discardWaived`, an `OPEN` waived
+  hold only) and the ordinary paid `reserve` runs, so a waived hold never exists without a `CLAIMED` claim.
+- Any exception in the claim step itself is logged as a WARN (session id and exception type only) and the start
+  continues as an ordinary paid charge; a claim row the failed step may have left is released.
+- The claim is released (state `RELEASED`, the Sunday is given back) only on positive evidence that nothing was
+  used: the reservation itself fails after the claim (e.g. `INVALID_AMOUNT`), the session insert fails, or
+  `SessionSettlement.settle` sees a final session (`FAILED`, `COMPLETED`, `ABANDONED`) that never started (no
+  `transactionId` and no `startedAt`) or whose measured energy is known and below the EarlyStopRetry negligible
+  threshold (0.05 kWh, so 0.0 counts). Every final state, including stalled, lost-charger, cancelled and orphan
+  closes, goes through `settle`. Releasing the hold and the claim are independent: a failure of one never skips the
+  other and never hides the original error.
+- Unknown energy keeps the claim. A started session whose energy is null (platform `ABANDONED`, stalled or lost
+  charger without MeterValues) keeps the Sunday used. The stalled and lost-charger closers still bill 0 kWh in that
+  case but store the energy as unknown (null) instead of 0.
+- A session that delivered energy keeps its claim, even when stopped early.
+- `GET /v1/free-sunday` (`charging/web/FreeSundayController`, through `shared.FreeSundayAccess.offer`) tells the app
+  whether the free Sunday can be used; it never claims. A session with a waived hold and a `CLAIMED` claim reports
+  `freeCategory = FREE_SUNDAY` (`SessionBilling.FREE_CATEGORY`); a released claim does not.
+- Customers without an NDZela partner link never reach NDZela: `offer` answers `NOT_LINKED` and `claimFor` returns
+  false before any HTTP call, so ordinary starts pay no NDZela latency. `GET /v1/free-sunday` is limited to 20 requests
+  per minute per customer. `offer` keeps NDZela's answer per customer for 30 seconds (an `UNAVAILABLE` answer for 5
+  seconds, an eligible answer never past its `windowEndsAt`, at most 10,000 customers), so display traffic stays well
+  under NDZela's per-customer read limit; `claimFor` always asks NDZela again, never the cache. The free start still
+  fails closed: if NDZela is unreachable or over its limit at start time, the start is an ordinary paid charge.
+- A free start that times out (`START_TIMEOUT`, never started) releases the claim. If the charger starts that charge
+  later (rule L), the orphan guard adopts it as an ordinary PAID session through `funding.reserve` (or stops it when
+  the wallet cannot fund it); it never becomes free.
+- **22:00 stop.** At the end of every per-country `SessionSweeper` pass (after the open holds were reconciled),
+  `FreeSundayUpkeep` runs `FreeWindowStopper.stopExpired`. It reads, through `shared.FreeSundayWindows`, the
+  `CLAIMED` claims whose `window_ends_at` (NDZela's answer, stored at claim time) is `<= now` and ended within the
+  last 24 hours, loads each session and stops only those still `ACTIVE` with a waived hold (a claim on a
+  non-waived session is never stopped). Immediately before each stop the session is read again and the stop is sent
+  only if it is still `ACTIVE` and its hold is still open, so a session that completed meanwhile (webhook) is never
+  rewritten as `STOPPING`. Claims stay `CLAIMED` after a session
+  finishes, so the 24-hour look-back keeps the query from growing every week; the state check (in code) is the
+  guard against stopping anything twice. After 24 hours past its window a still-active free session is no longer retried by this
+  stopper: the operator must stop it (runbook, `ALERT free Sunday session ...`). `STOPPING` and finished sessions are skipped (no duplicate stop);
+  `REQUESTED`/`START_ACCEPTED` are left until the car really charges (then stopped on the next sweep) or the plug-in
+  timeout fails them and releases the Sunday. Paid sessions have no claim and are never read.
+- The stop goes through `StopCommander.issue` with stop reason `FREE_WINDOW_ENDED`: on acceptance the session becomes
+  `STOPPING` with that `stop_reason`, and audit `FREE_SUNDAY_WINDOW_STOPPED` (subject = session id) is written. While
+  a session is `STOPPING`, a stop reason Zella set is kept when the charger's final report arrives
+  (`ChargingSession.withRemote`), so the session ends `COMPLETED` with its real energy and `stop_reason =
+  FREE_WINDOW_ENDED`. Settlement is the normal path: the waived hold closes with charge 0 (hold state `RELEASED`,
+  `captured_minor = 0`, no ledger entry) and the claim stays `CLAIMED` (energy was delivered).
+- A refused or unreachable stop leaves the session `ACTIVE`, logs `ALERT free Sunday session ... past its window`
+  and is retried on the next sweep (every `zella.charging.sweep-interval`, 15 s). An accepted stop that the charger
+  does not carry out is handled by the existing mechanisms, not by the window stopper: `FundsGuard` re-issues the stop
+  for a `STOPPING` session every `stop-retry-after`, and the stalled/silent closers end it.
+- **Per-sweep bound:** at most `FreeWindowStopper.MAX_STOPS_PER_SWEEP = 5` stop commands per country per sweep, so
+  at the 15 s interval no more than 20 window stops per minute per country, leaving most of the OCPP quota (60
+  requests per minute per key) to polling. Sessions not reached are stopped on the following sweeps; candidates are
+  ordered by their last attempt, so chargers that keep refusing cannot starve the others.
+- **Orphan claims:** in the same pass `FreeSundayUpkeep` releases `CLAIMED` claims that have no `charging_session`
+  row, no `OPEN` `funding_hold`, and were claimed between 1 day and 10 minutes ago (`FreeSundayUpkeep.ORPHAN_AFTER`,
+  long enough for a start still waiting on the wallet lock; a crash between claim and
+  session insert; index `free_sunday_claim_open_claimed_at`, V43, because the window index does not cover
+  `claimed_at`), audit
+  `FREE_SUNDAY_RELEASED` with detail `ORPHAN_CLAIM`, so the driver gets the Sunday back. A claim whose session row
+  exists is never released this way. Each step catches its own failure (WARN) so it never breaks the sweep.

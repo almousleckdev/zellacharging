@@ -13,6 +13,9 @@ import java.util.UUID;
 public class NotificationTexts {
 
     private static final String ENGLISH = "en";
+    private static final String TIME = "{time}";
+    private static final String TIME_CLAUSE_FR = " à {time}";
+    private static final String TIME_CLAUSE_EN = " at {time}";
 
     public PushContent render(PendingNotification notification, String language) {
         return render(notification.id(), notification.type(), notification.params(), language);
@@ -23,7 +26,14 @@ public class NotificationTexts {
         Map<String, String> data = new HashMap<>(params);
         data.put("type", type.name());
         data.put("notificationId", id.toString());
-        return new PushContent(text[0], text[1], data, 0);
+        return new PushContent(text[0], withTime(text[1], params.get("time")), data, 0);
+    }
+
+    private static String withTime(String body, String time) {
+        if (!body.contains(TIME)) {
+            return body;
+        }
+        return time == null || time.isBlank() ? body.replace(TIME_CLAUSE_FR, "").replace(TIME_CLAUSE_EN, "") : body.replace(TIME, time);
     }
 
     private static String[] textOf(NotificationType type, boolean en) {
@@ -71,6 +81,12 @@ public class NotificationTexts {
                     "Activity detected",
                     "A top-up from your number into another account was detected during your suspension. "
                             + "This breaks the terms of use: sanctions may apply.");
+            case FREE_CHARGE_STARTED -> pick(en, "Charge gratuite", "Cette charge est gratuite. Elle s'arrête à {time}.",
+                    "Free charge", "This charge is free. It stops at {time}.");
+            case FREE_WINDOW_ENDING -> pick(en, "Fin de la charge gratuite", "La charge gratuite s'arrête bientôt à {time}.",
+                    "Free charge ending soon", "The free charge stops soon at {time}.");
+            case FREE_WINDOW_ENDED -> pick(en, "Charge gratuite terminée", "Votre charge gratuite s'est arrêtée à {time}.",
+                    "Free charge ended", "Your free charge stopped at {time}.");
             case HELPER_WARNED -> pick(en, "Avertissement",
                     "Votre compte a servi à aider une personne suspendue à recharger. "
                             + "Cela enfreint les conditions d'utilisation : des sanctions peuvent s'appliquer.",

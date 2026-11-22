@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
+import java.util.function.BooleanSupplier;
 
 @Service
 public class FundingService implements WalletFunding {
@@ -43,6 +44,16 @@ public class FundingService implements WalletFunding {
     @Override
     @Transactional
     public Money reserve(UUID customerId, UUID sessionId, long amountMinor) {
+        return hold(customerId, sessionId, amountMinor, () -> free.allowed(customerId));
+    }
+
+    @Override
+    @Transactional
+    public Money reserveFree(UUID customerId, UUID sessionId, long amountMinor) {
+        return hold(customerId, sessionId, amountMinor, () -> true);
+    }
+
+    private Money hold(UUID customerId, UUID sessionId, long amountMinor, BooleanSupplier waiver) {
         wallets.ensure(customerId, settings.currency(), settings.decimals());
         WalletBalance wallet = wallets.lock(customerId);
         Optional<FundingHold> existing = holds.lock(sessionId);
@@ -52,16 +63,15 @@ public class FundingService implements WalletFunding {
         if (amountMinor < settings.minimumStartMinor() || amountMinor > settings.maximumStartMinor()) {
             throw new ApiException(HttpStatus.BAD_REQUEST, "INVALID_AMOUNT", "Amount is outside the allowed range");
         }
-        boolean waived = free.allowed(customerId);
+        boolean waived = waiver.getAsBoolean();
         if (!waived && wallet.availableMinor() < amountMinor) {
             throw new ApiException(HttpStatus.PAYMENT_REQUIRED, "INSUFFICIENT_FUNDS",
                     "Top up your wallet to start charging");
         }
         holds.insert(new FundingHold(sessionId, customerId, amountMinor, HoldState.OPEN, waived));
-        if (waived) {
-            return money(amountMinor);
+        if (!waived) {
+            closer.reserved(customerId, sessionId, amountMinor);
         }
-        closer.reserved(customerId, sessionId, amountMinor);
         return money(amountMinor);
     }
 
@@ -91,6 +101,13 @@ public class FundingService implements WalletFunding {
     @Transactional
     public void release(UUID sessionId) {
         holds.lock(sessionId).filter(FundingHold::isOpen).ifPresent(hold -> closer.close(hold, 0, HoldState.RELEASED));
+    }
+
+    @Override
+    @Transactional
+    public void discardWaived(UUID sessionId) {
+        holds.lock(sessionId).filter(hold -> hold.isOpen() && hold.waived())
+                .ifPresent(hold -> holds.delete(sessionId));
     }
 
     @Override

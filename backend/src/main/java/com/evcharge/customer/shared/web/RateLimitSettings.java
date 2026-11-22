@@ -13,5 +13,6 @@ record RateLimitSettings(
         int callbackPerIpPerMinute,
         int topupPerCustomerPerMinute,
         int sessionStartPerCustomerPerMinute,
-        int withdrawalPerCustomerPerMinute) {
+        int withdrawalPerCustomerPerMinute,
+        int freeSundayPerCustomerPerMinute) {
 }

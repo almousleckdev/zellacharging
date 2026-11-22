@@ -199,6 +199,54 @@ they do not add up.
 Admin key management (super admin, `ADMINS_MANAGE`): `POST /v1/admin/partners/NDZELA/keys` with `{"country":"GA"}`
 returns the key once; `GET` lists without key material; `DELETE /{keyId}` revokes at once.
 
+### 11b. Zella calls NDZela: free Sunday eligibility
+
+`GET {ZELLA_NDZELA_BASE_URL}/api/v1/partners/zella/customers/{customerId}/free-charging`, header `X-Api-Key`, answer
+`{eligible, reason, agreementId, sundayDate (yyyy-MM-dd), windowEndsAt (ISO instant), window {day, from, until, endOfDay}}`;
+the three middle fields are null when not eligible, `window` is present whenever the driver is known. Reasons from NDZela: `ELIGIBLE, NO_AGREEMENT, AGREEMENT_SUSPENDED, AGREEMENT_NOT_STARTED, AGREEMENT_ENDED,
+OUTSIDE_WINDOW, UNPAID_DAYS, DRIVER_SUSPENDED, NOT_LINKED`. Local reasons added by Zella: `UNAVAILABLE` (no usable
+answer, fail closed) and `SUNDAY_USED` (already claimed by this customer or by another customer on the same
+`agreementId`). NDZela limits this read to 30 per minute per customer under a 2000 per minute ceiling. See `NDZELA_INTEGRATION.md` section 11 and NDZela ADR-0048.
+
+### 11c. Customer app: free Sunday offer, and the feed category
+
+`GET /v1/free-sunday` (customer JWT, 401 without) answers `{available, reason, endsAt, window}` (`window` is `{day, from, until, endOfDay}` from NDZela, absent for a customer outside the program; the app builds its texts from it): `endsAt` is an ISO-8601 instant
+or null, `reason` is one of the stable codes of 11b (untranslated, the app localizes). It is read-only (it never claims)
+and never fails when NDZela is down: it answers 200 with `available=false`, `reason=UNAVAILABLE`.
+
+Only customers linked as NDZela drivers are ever checked with NDZela: an unlinked customer gets `NOT_LINKED` locally,
+with no HTTP call and no customer id sent to NDZela (also for the claim at session start). The route is rate limited per
+customer (`zella.rate-limit.free-sunday-per-customer-per-minute`, 20), 429 `TOO_MANY_REQUESTS` with `Retry-After`. A
+failure reading the claims answers `UNAVAILABLE` instead of an error. NDZela's answer is cached per customer for 30
+seconds (5 seconds when `UNAVAILABLE`, never past `windowEndsAt`) for this route only; the claim at start is never
+cached and still fails closed to a paid charge when NDZela is unreachable or over its limit.
+
+In the partner feed and the admin session views `freeCategory` is `NDZELA_STAFF` or `OTHER` for complimentary
+customers, `FREE_SUNDAY` when the session's hold is waived and its `free_sunday_claim` is `CLAIMED`, and null otherwise
+(a released claim never shows `FREE_SUNDAY`). Free sessions keep a zero charge.
+
+### 11d. Admin free-charging routes (Zella dashboard to Zella backend to NDZela)
+
+The free window (day, first moment, end) is a country setting kept by NDZela (NDZela ADR-0049):
+`GET /v1/admin/free-charging/window` (`FREE_CHARGING_READ`) and `PUT /v1/admin/free-charging/window {day, from, until?, endOfDay}`
+(`FREE_CHARGING_MANAGE`, country scope like every route here; each change is audited `FREE_WINDOW_CHANGED`). NDZela refuses an invalid
+window with `422 FREE_WINDOW_INVALID`, passed through.
+
+
+`/v1/admin/free-charging`: `GET /agreements` and `GET /usage?page&size` (permission `FREE_CHARGING_READ`), `POST /agreements`,
+`PUT /agreements/{id}`, `POST /agreements/{id}/suspend|resume|revoke` (permission `FREE_CHARGING_MANAGE`). `POST /agreements`
+takes `{customerId (the Zella customer, uuid), startsOn, endsOn?, conditions?}`; the customer must be linked to NDZela in the default
+country, Gabon (else 422 `FREE_AGREEMENT_NOT_LINKED`, NDZela not called; an admin without a grant on that country gets 403 `COUNTRY_FORBIDDEN`) and NDZela resolves the driver from `customerId`. Each is forwarded to
+NDZela `/api/v1/partners/zella/free-charging/...` with `X-Api-Key` and `X-Actor`. Agreement
+`{id, driverId, driverName, startsOn, endsOn, status, conditions, eligibility, unpaidDays, lastFreeUse}`; usage page
+`{items:[{sessionId, driverId, driverName, startedAt, energyKwh, stopReason}], page, size, total}`. Error `code`s:
+NDZela's own (`FREE_AGREEMENT_EXISTS`, `FREE_AGREEMENT_NOT_LINKED`, `FREE_AGREEMENT_DATES_INVALID`,
+`FREE_AGREEMENT_REVOKED`, `VALIDATION_ERROR`, `RESOURCE_NOT_FOUND`) with NDZela's 4xx status, `FREE_CHARGING_UNAVAILABLE` (503),
+`PERMISSION_DENIED` (403), `COUNTRY_FORBIDDEN` (403), `INVALID_PAGING` (400). See `NDZELA_INTEGRATION.md` section 12.
+The dashboard picker lists the customers with the existing `GET /v1/admin/customers?country&q&ndzelaDriver=true&size&sort=name,asc`
+(`CUSTOMERS_READ`): `ndzelaDriver=true` keeps only the customers linked to NDZela, filtered in the database so the total and the
+pages count only them (default `false`, no filter).
+
 ## 12. OCPP platform webhooks (incoming)
 
 `POST /v1/ocpp/webhooks` on the customer backend, public route, protected by the signature only.

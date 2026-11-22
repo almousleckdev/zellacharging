@@ -16,6 +16,7 @@ import { enPlatform } from "./platform";
 import { enStations } from "./stations";
 import { enWithdrawals } from "./withdrawals";
 import { enStaff } from "./staff";
+import { enFreeCharging } from "./freeCharging";
 
 export const en: Dictionary = {
   ...enCommon,
@@ -35,4 +36,5 @@ export const en: Dictionary = {
   ...enStations,
   ...enWithdrawals,
   ...enStaff,
+  ...enFreeCharging,
 };

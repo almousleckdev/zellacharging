@@ -13,6 +13,7 @@ zella:
     topup-per-customer-per-minute: 10000
     session-start-per-customer-per-minute: 10000
     withdrawal-per-customer-per-minute: 10000
+    free-sunday-per-customer-per-minute: 10000
   tenancy:
     require-restricted-role: false
   security:

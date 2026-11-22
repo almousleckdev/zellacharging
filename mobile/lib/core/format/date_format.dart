@@ -21,5 +21,10 @@ abstract final class DateFormatter {
     return '${_two(local.hour)}:${_two(local.minute)}';
   }
 
+  static String gabonTime(DateTime value) {
+    final gabon = value.toUtc().add(const Duration(hours: 1));
+    return '${_two(gabon.hour)}:${_two(gabon.minute)}';
+  }
+
   static String _two(int value) => value.toString().padLeft(2, '0');
 }

@@ -2,5 +2,8 @@ package com.evcharge.customer.account;
 
 import com.evcharge.customer.shared.Sort;
 
-public record CustomerQuery(String text, String status, Sort sort, int limit, int offset) {
+import java.util.Collection;
+import java.util.UUID;
+
+public record CustomerQuery(String text, String status, Collection<UUID> onlyIds, Sort sort, int limit, int offset) {
 }

@@ -3,6 +3,7 @@ package com.evcharge.customer.charging.application;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.FeeBreakdown;
 import com.evcharge.customer.charging.domain.SessionState;
+import com.evcharge.customer.shared.FreeSundayAccess;
 import com.evcharge.customer.shared.NotificationType;
 import com.evcharge.customer.shared.Notifier;
 import com.evcharge.customer.wallet.WalletFunding;
@@ -23,14 +24,19 @@ public class SessionSettlement {
     private final ChargingMetrics metrics;
     private final Notifier notifier;
     private final SessionChargeRecorder charges;
+    private final FreeSundayAccess freeSunday;
+    private final ChargeAnnouncements announcements;
 
     public SessionSettlement(WalletFunding funding, FeeCalculator fees, ChargingMetrics metrics,
-                             Notifier notifier, SessionChargeRecorder charges) {
+                             Notifier notifier, SessionChargeRecorder charges, FreeSundayAccess freeSunday,
+                             ChargeAnnouncements announcements) {
         this.funding = funding;
         this.fees = fees;
         this.metrics = metrics;
         this.notifier = notifier;
         this.charges = charges;
+        this.freeSunday = freeSunday;
+        this.announcements = announcements;
     }
 
     @Transactional
@@ -52,13 +58,22 @@ public class SessionSettlement {
             default -> {
             }
         }
+        if (usedNothing(session)) {
+            freeSunday.release(session.id());
+        }
+    }
+
+    private static boolean usedNothing(ChargingSession session) {
+        boolean ended = session.state() == SessionState.FAILED || session.state() == SessionState.COMPLETED
+                || session.state() == SessionState.ABANDONED;
+        return ended && (session.neverStarted() || session.measuredNegligibleEnergy());
     }
 
     @Transactional
     public void onChange(ChargingSession before, ChargingSession after) {
         settle(after);
         if (before.state() != SessionState.ACTIVE && after.state() == SessionState.ACTIVE) {
-            announce(after, NotificationType.CHARGE_STARTED);
+            announcements.started(after);
         }
     }
 

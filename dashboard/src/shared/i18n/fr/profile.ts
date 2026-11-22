@@ -52,6 +52,8 @@ export const frProfile = {
       WITHDRAWALS_REVIEW: "Valider ou refuser les retraits",
       AUDIT_READ: "Consulter le journal d'audit",
       COMPLIMENTARY_MANAGE: "Accorder ou retirer la recharge gratuite",
+      FREE_CHARGING_READ: "Consulter la gratuité du dimanche",
+      FREE_CHARGING_MANAGE: "Gérer les accords de gratuité",
       ADMINS_MANAGE: "Gérer les administrateurs",
     },
   },

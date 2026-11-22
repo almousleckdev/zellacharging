@@ -10,9 +10,13 @@ public interface WalletFunding {
 
     Money reserve(UUID customerId, UUID sessionId, long amountMinor);
 
+    Money reserveFree(UUID customerId, UUID sessionId, long amountMinor);
+
     void settle(UUID sessionId, Long costMinor, String currency);
 
     void release(UUID sessionId);
+
+    void discardWaived(UUID sessionId);
 
     List<UUID> openHoldSessions();
 

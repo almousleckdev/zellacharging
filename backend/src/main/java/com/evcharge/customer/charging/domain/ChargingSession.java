@@ -24,6 +24,15 @@ public record ChargingSession(
         Instant updatedAt) {
 
     private static final java.time.Duration CLOCK_TOLERANCE = java.time.Duration.ofMinutes(10);
+    private static final BigDecimal NEGLIGIBLE_KWH = new BigDecimal("0.05");
+
+    public boolean neverStarted() {
+        return transactionId == null && startedAt == null;
+    }
+
+    public boolean measuredNegligibleEnergy() {
+        return energyKwh != null && energyKwh.compareTo(NEGLIGIBLE_KWH) < 0;
+    }
 
     public static ChargingSession requested(UUID id, UUID customerId, String stationId, int connectorId,
                                             String idTag, Instant now) {
@@ -36,12 +45,21 @@ public record ChargingSession(
                 startedAt, stoppedAt, energyKwh, costMinor, currency, currencyDecimals, stopReason, createdAt, now);
     }
 
+    public ChargingSession withStopReason(String reason) {
+        return new ChargingSession(id, customerId, stationId, connectorId, idTag, state, failureCode, transactionId,
+                startedAt, stoppedAt, energyKwh, costMinor, currency, currencyDecimals, reason, createdAt, updatedAt);
+    }
+
     public ChargingSession withRemote(RemoteSession remote, SessionState next, Instant now) {
         return new ChargingSession(id, customerId, stationId, connectorId, idTag, next, failureCode,
                 remote.transactionId(), believed(remote.startedAt(), startedAt, now),
                 believed(remote.stoppedAt(), null, now), remote.energyKwh(),
-                remote.costMinor(), remote.currency(), remote.currencyDecimals(), remote.stopReason(),
+                remote.costMinor(), remote.currency(), remote.currencyDecimals(), stopReasonAfter(remote),
                 createdAt, now);
+    }
+
+    private String stopReasonAfter(RemoteSession remote) {
+        return state == SessionState.STOPPING && stopReason != null ? stopReason : remote.stopReason();
     }
 
     private Instant believed(Instant reported, Instant fallback, Instant now) {

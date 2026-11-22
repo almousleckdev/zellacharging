@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 import java.time.Clock;
 import java.time.Instant;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Component
 public class NotificationDispatcher {
@@ -83,7 +84,7 @@ public class NotificationDispatcher {
                 case RETRY -> retry = true;
             }
         }
-        report(notification, targets.size(), delivered);
+        report(notification, targets, delivered);
         if (retry && delivered == 0) {
             retryOrBury(notification, now);
         } else {
@@ -91,14 +92,15 @@ public class NotificationDispatcher {
         }
     }
 
-    private void report(PendingNotification notification, int devices, int delivered) {
-        if (devices == 0) {
+    private void report(PendingNotification notification, List<DeviceToken> devices, int delivered) {
+        if (devices.isEmpty()) {
             log.warn("Push {} for customer {} not sent: no device is registered", notification.type(),
                     notification.customerId());
             return;
         }
-        log.info("Push {} for customer {}: accepted by Firebase for {} of {} devices", notification.type(),
-                notification.customerId(), delivered, devices);
+        log.info("Push {} for customer {}: accepted by Firebase for {} of {} devices ({})", notification.type(),
+                notification.customerId(), delivered, devices.size(),
+                devices.stream().map(device -> device.platform().name()).collect(Collectors.joining(", ")));
     }
 
     private void retryOrBury(PendingNotification notification, Instant now) {

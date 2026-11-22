@@ -1,8 +1,8 @@
 # Zella Charging <-> NDZela: who charged, which car, what they paid
 
-Status: the Zella side is built (2026-11-05); the contract is in `docs/INTEGRATION_CONTRACTS.md` section 11 and the key
-procedure in `docs/OPERATIONS_RUNBOOK.md`. The NDZela side is not started. Sections 3 to 5 below are the original proposal;
-section 8b records what was agreed and the built contract wins on any difference.
+Status: both sides are built (Zella 2026-11-05, NDZela since); the contract is in `docs/INTEGRATION_CONTRACTS.md` section 11
+and the key procedure in `docs/OPERATIONS_RUNBOOK.md`. Sections 3 to 5 below are the original proposal; section 8b records
+what was agreed and the built contract wins on any difference.
 Written 2026-11-05 after reading both codebases (read-only on NDZela).
 
 ## 1. The goal
@@ -151,3 +151,66 @@ when an admin opens the page of a **linked** customer, and keeps no copy.
   `NDZELA_NOT_LINKED` (404), `NDZELA_DRIVER_NOT_FOUND` (404), `NDZELA_UNAVAILABLE` (503, not configured or unreachable).
 - Keys: NDZela holds `ZELLA_PARTNER_KEY`, Zella holds the same value as `ZELLA_NDZELA_API_KEY`. Generate a long random
   value and share it through a password manager, never email or chat. Rotate by changing both.
+
+## 11. Zella asks NDZela whether a driver may charge free on Sunday (2026-11-22)
+
+NDZela is the only judge of the free Sunday charge (agreement, the free window of the country, by default the whole
+Sunday 00:00 to 23:59 Gabon time and editable in the dashboards, zero unpaid days computed live at that moment); the
+decisions are NDZela ADR-0048 and ADR-0049. Zella has no window rule and no Sunday rule: it uses NDZela's answer
+as given and holds the one-per-Sunday claim. How the claim, the free start and the 22:00 stop work is in
+`CHARGING_WORKFLOW.md` (Free Sunday charge).
+
+- Zella calls `GET {ZELLA_NDZELA_BASE_URL}/api/v1/partners/zella/customers/{customerId}/free-charging` with
+  `X-Api-Key: {ZELLA_NDZELA_API_KEY}`. It reuses the settings, timeouts (3 s connect, 5 s read) and client of section 10.
+- NDZela answers `{eligible, reason, agreementId, sundayDate, windowEndsAt, window}`. The three middle fields are null when not eligible; `window` is `{day, from, until, endOfDay}` whenever the driver is known (`until` is `23:59` when the window runs to the end of the day) and Zella passes it on to the app so no client hard-codes the hours.
+  `reason` is `ELIGIBLE`, `NO_AGREEMENT`, `AGREEMENT_SUSPENDED`, `AGREEMENT_NOT_STARTED`, `AGREEMENT_ENDED`,
+  `OUTSIDE_WINDOW`, `UNPAID_DAYS`, `DRIVER_SUSPENDED` or `NOT_LINKED`.
+- Zella adds two local reasons: `UNAVAILABLE` (timeout, network error, non-2xx status, malformed JSON, missing settings,
+  or an eligible answer without agreement, date or end time) and `SUNDAY_USED` (NDZela says eligible but this customer
+  or another customer holds a claim on the same `agreementId`, for that `sundayDate`). Failure is closed: no free
+  benefit, the paid path continues. NDZela's own rate limit (30 reads per minute per customer under a ceiling of 2000
+  per minute for all customers, answered 422 `TOO_MANY_REQUESTS`) and a wrong key (401) also end as `UNAVAILABLE`; at
+  start time that means an ordinary paid charge. Failures are logged with the exception type and HTTP status only, never
+  the URL (it holds the customer id) or NDZela's answer body.
+- A customer without an NDZela partner link is answered `NOT_LINKED` inside Zella: no request and no customer id reach NDZela.
+- Inside Zella, `FreeSundayAccess.offer` is read-only and used for display, with a 30-second per-customer cache (5 seconds
+  for `UNAVAILABLE`). `FreeSundayAccess.claimFor` never uses the cache: it calls NDZela, then
+  takes the unique Sunday claim with NDZela's `agreementId`, `sundayDate` and `windowEndsAt`.
+
+## 12. Zella administrators manage free-charging agreements through NDZela (2026-11-22)
+
+NDZela owns the agreements. The Zella dashboard never stores one: each call is forwarded and NDZela answers.
+
+- Zella calls `{ZELLA_NDZELA_BASE_URL}/api/v1/partners/zella/free-charging/...` with `X-Api-Key` (same key and client as
+  sections 10 and 11, `Redirect.NEVER`, 3 s connect, 5 s read) and `X-Actor`, the acting administrator's e-mail with
+  control and non-ASCII characters removed, capped at 100 characters (their id when nothing remains). NDZela records it as
+  `zella:<actor>`. Routes: `GET|POST /agreements`, `PUT /agreements/{id}`, `POST /agreements/{id}/suspend|resume|revoke`,
+  `GET /usage?page&size`.
+- Zella admin routes, all under `/v1/admin/free-charging`. The country is the default country (Gabon): an admin without a
+  grant on it gets 403 `COUNTRY_FORBIDDEN` on every route before NDZela is called.
+
+| Route | Permission | Answer |
+|---|---|---|
+| `GET /agreements` | `FREE_CHARGING_READ` | array of agreements |
+| `POST /agreements` `{customerId, startsOn, endsOn?, conditions?}` | `FREE_CHARGING_MANAGE` | 201, the agreement |
+| `PUT /agreements/{id}` `{startsOn, endsOn?, conditions?}` | `FREE_CHARGING_MANAGE` | the agreement |
+| `POST /agreements/{id}/suspend`, `/resume`, `/revoke` | `FREE_CHARGING_MANAGE` | the agreement |
+| `GET /usage?page=0&size=20` (size 1 to 100) | `FREE_CHARGING_READ` | `{items, page, size, total}` |
+
+- An agreement is `{id, driverId, driverName, startsOn, endsOn, status, conditions, eligibility, unpaidDays, lastFreeUse}`.
+  A usage row is `{sessionId, driverId, driverName, startedAt, energyKwh, stopReason}`.
+- Errors: NDZela answers with 400, 404, 409 or 422 and a stable `code` (`FREE_AGREEMENT_EXISTS`,
+  `FREE_AGREEMENT_NOT_LINKED`, `FREE_AGREEMENT_DATES_INVALID`, `FREE_AGREEMENT_REVOKED`, `VALIDATION_ERROR`,
+  `RESOURCE_NOT_FOUND`): Zella passes the status and code through, with its own neutral message. Anything else (timeout,
+  5xx, 401, 403, 429, redirect, unreadable answer, missing settings) becomes 503 `FREE_CHARGING_UNAVAILABLE`. Zella's own:
+  `PERMISSION_DENIED` (403), `INVALID_PAGING` (400), 400 for a malformed id. The key and NDZela's wording never reach the
+  response or the logs.
+- Audit: one entry per successful mutation, only after NDZela accepted: `FREE_AGREEMENT_CREATED`, `UPDATED`, `SUSPENDED`,
+  `RESUMED`, `REVOKED`, subject the agreement id (the create entry holds "customer <uuid>"). No entry on refusal or outage.
+- Permissions (migration V44): `FREE_CHARGING_READ` for `ADMIN`, `SUPPORT`, `FINANCE`, `OPERATIONS`;
+  `FREE_CHARGING_MANAGE` for `ADMIN`; `SUPER_ADMIN` has both.
+
+- Dashboard page "Gratuité" (`/free-charging`, nav entry shown with `FREE_CHARGING_READ`, buttons with `FREE_CHARGING_MANAGE`):
+  tabs Drivers and History, code in `dashboard/src/features/free-charging`, calls these routes through the `/api/admin`
+  BFF proxy. The add form picks a Zella customer linked to NDZela (the admin API takes `customerId`; the backend checks the Zella link in the default country, then NDZela resolves the driver through a `LINKED` id tag only and answers `FREE_AGREEMENT_NOT_LINKED` if it has none). The page holds
+  no eligibility rule: it shows the reason code the backend returns.

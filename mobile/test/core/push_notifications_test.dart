@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:dio/dio.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:zella/core/notifications/device_registry.dart';
 import 'package:zella/core/notifications/push_message.dart';
@@ -15,13 +16,25 @@ class _FakeMessaging implements PushMessaging {
 
   final bool granted;
   String? current = 'token-1';
-  final refresh = StreamController<String>.broadcast();
+  final script = <Object?>[];
+  final calls = <String>[];
+  var tokenCalls = 0;
+  late final refresh = StreamController<String>.broadcast(
+    onListen: () => calls.add('listen'),
+  );
 
   @override
   Future<bool> requestPermission() async => granted;
 
   @override
-  Future<String?> token() async => current;
+  Future<String?> token() async {
+    calls.add('token');
+    tokenCalls++;
+    if (script.isEmpty) return current;
+    final next = script.removeAt(0);
+    if (next is Exception) throw next;
+    return next as String?;
+  }
 
   @override
   Stream<String> get tokenRefreshed => refresh.stream;
@@ -42,7 +55,7 @@ class _FakeMessaging implements PushMessaging {
 class _RecordingRegistry extends DeviceRegistry {
   _RecordingRegistry({this.failing = false}) : super(Dio());
 
-  final bool failing;
+  bool failing;
   final registered = <String>[];
   final unregistered = <String>[];
 
@@ -55,6 +68,18 @@ class _RecordingRegistry extends DeviceRegistry {
   @override
   Future<void> unregister(String token) async => unregistered.add(token);
 }
+
+Future<void> _instant(Duration _) async {}
+
+final _apnsNotSet = FirebaseException(
+  plugin: 'firebase_messaging',
+  code: 'apns-token-not-set',
+);
+
+PushRegistration _registration(_FakeMessaging m, _RecordingRegistry r) =>
+    PushRegistration(m, r, wait: _instant);
+
+Future<void> _flush() => Future<void>.delayed(Duration.zero);
 
 PushMessage _message(Map<String, String> data) =>
     PushMessage(title: 't', body: 'b', data: data);
@@ -114,6 +139,115 @@ void main() {
       await PushRegistration(_FakeMessaging(), registry).start();
 
       expect(registry.registered, isEmpty);
+    });
+
+    test('retries while the APNs token is not set yet', () async {
+      final registry = _RecordingRegistry();
+      final messaging = _FakeMessaging()
+        ..script.addAll([_apnsNotSet, _apnsNotSet, 'apns-ok']);
+
+      await _registration(messaging, registry).start();
+
+      expect(registry.registered, ['apns-ok']);
+    });
+
+    test('listens for refreshed tokens before asking for the token', () async {
+      final messaging = _FakeMessaging();
+
+      await _registration(messaging, _RecordingRegistry()).start();
+
+      expect(messaging.calls.take(2), ['listen', 'token']);
+    });
+
+    test(
+      'a token that is null at first is registered when it arrives',
+      () async {
+        final registry = _RecordingRegistry();
+        final messaging = _FakeMessaging()..current = null;
+        await _registration(messaging, registry).start();
+        expect(registry.registered, isEmpty);
+
+        messaging.refresh.add('late');
+        await _flush();
+
+        expect(registry.registered, ['late']);
+      },
+    );
+
+    test('refusing notifications registers nothing and never throws', () async {
+      final registry = _RecordingRegistry();
+      final messaging = _FakeMessaging(granted: false);
+
+      await _registration(messaging, registry).start();
+
+      expect(registry.registered, isEmpty);
+      expect(messaging.tokenCalls, 0);
+    });
+
+    test(
+      'a token that always fails never throws and registers later',
+      () async {
+        final registry = _RecordingRegistry();
+        final messaging = _FakeMessaging()
+          ..script.addAll(List.filled(50, _apnsNotSet));
+
+        await _registration(messaging, registry).start();
+        expect(registry.registered, isEmpty);
+
+        messaging.refresh.add('arrived');
+        await _flush();
+
+        expect(registry.registered, ['arrived']);
+      },
+    );
+
+    test('retryIfUnregistered registers after a server failure', () async {
+      final registry = _RecordingRegistry(failing: true);
+      final registration = _registration(_FakeMessaging(), registry);
+      await registration.start();
+      registry.failing = false;
+
+      await registration.retryIfUnregistered();
+
+      expect(registry.registered, ['token-1']);
+    });
+
+    test('the same token delivered twice is registered once', () async {
+      final registry = _RecordingRegistry();
+      final messaging = _FakeMessaging();
+      await _registration(messaging, registry).start();
+
+      messaging.refresh.add('token-1');
+      await _flush();
+
+      expect(registry.registered, ['token-1']);
+    });
+
+    test('retryIfUnregistered does nothing when already registered', () async {
+      final registry = _RecordingRegistry();
+      final messaging = _FakeMessaging();
+      final registration = _registration(messaging, registry);
+      await registration.start();
+      final calls = messaging.tokenCalls;
+
+      await registration.retryIfUnregistered();
+
+      expect(registry.registered, ['token-1']);
+      expect(messaging.tokenCalls, calls);
+    });
+
+    test('signing out cancels the listener and unregisters', () async {
+      final registry = _RecordingRegistry();
+      final messaging = _FakeMessaging();
+      final registration = _registration(messaging, registry);
+      await registration.start();
+
+      await registration.stop();
+      messaging.refresh.add('after');
+      await _flush();
+
+      expect(registry.unregistered, ['token-1']);
+      expect(registry.registered, ['token-1']);
     });
 
     test('signing out removes the device from the account', () async {

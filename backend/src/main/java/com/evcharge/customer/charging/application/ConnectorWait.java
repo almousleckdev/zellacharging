@@ -4,7 +4,6 @@ import com.evcharge.customer.charging.application.port.SessionTelemetry;
 import com.evcharge.customer.charging.domain.ChargingSession;
 import com.evcharge.customer.charging.domain.LastReading;
 import com.evcharge.customer.charging.domain.SessionProgress;
-import com.evcharge.customer.charging.domain.SessionState;
 import com.evcharge.customer.shared.Money;
 import com.evcharge.customer.wallet.WalletFunding;
 import org.springframework.stereotype.Component;

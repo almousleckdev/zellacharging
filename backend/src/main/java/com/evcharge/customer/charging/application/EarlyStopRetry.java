@@ -7,7 +7,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
-import java.math.BigDecimal;
 import java.time.Clock;
 import java.time.Duration;
 import java.time.Instant;
@@ -19,7 +18,6 @@ public class EarlyStopRetry {
     private static final String CHARGER_REASON = "Other";
     private static final String FAILURE = "CHARGER_STOPPED_EARLY";
     private static final Duration EARLY = Duration.ofSeconds(90);
-    private static final BigDecimal NEGLIGIBLE = new BigDecimal("0.05");
     private static final Duration SETTLE = Duration.ofSeconds(15);
     private static final int MAX_RESTARTS = 2;
 
@@ -61,7 +59,7 @@ public class EarlyStopRetry {
     }
 
     private static boolean noEnergy(ChargingSession session) {
-        return session.energyKwh() == null || session.energyKwh().compareTo(NEGLIGIBLE) < 0;
+        return session.energyKwh() == null || session.measuredNegligibleEnergy();
     }
 
     private static boolean brief(ChargingSession session) {

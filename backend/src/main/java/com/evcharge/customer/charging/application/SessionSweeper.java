@@ -26,12 +26,13 @@ public class SessionSweeper {
     private final StalledSessionCloser stalled;
     private final OrphanChargeGuard orphans;
     private final LostChargerStopper lostChargers;
+    private final FreeSundayUpkeep freeSunday;
     private final CountryDirectory countries;
 
     public SessionSweeper(WalletFunding funding, SessionRepository sessions, SessionReconciler reconciler,
                           SessionSettlement settlement, FundsGuard guard,
                          StalledSessionCloser stalled, OrphanChargeGuard orphans, LostChargerStopper lostChargers,
-                         CountryDirectory countries) {
+                         FreeSundayUpkeep freeSunday, CountryDirectory countries) {
         this.funding = funding;
         this.sessions = sessions;
         this.reconciler = reconciler;
@@ -40,6 +41,7 @@ public class SessionSweeper {
         this.stalled = stalled;
         this.orphans = orphans;
         this.lostChargers = lostChargers;
+        this.freeSunday = freeSunday;
         this.countries = countries;
     }
 
@@ -79,6 +81,7 @@ public class SessionSweeper {
                 log.warn("Sweep failed for session {}", id, e);
             }
         }
+        freeSunday.tend();
     }
 
     private void stopLostChargers() {

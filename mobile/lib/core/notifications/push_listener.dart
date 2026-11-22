@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
 
 import 'push_message.dart';
+import '../refresh/on_resume.dart';
 import '../session/session_verifier.dart';
 import 'push_providers.dart';
 import 'push_route.dart';
@@ -64,5 +65,9 @@ class _PushListenerState extends ConsumerState<PushListener> {
   }
 
   @override
-  Widget build(BuildContext context) => widget.child;
+  Widget build(BuildContext context) => OnResume(
+    onResume: () =>
+        unawaited(ref.read(pushRegistrationProvider).retryIfUnregistered()),
+    child: widget.child,
+  );
 }

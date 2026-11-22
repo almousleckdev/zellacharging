@@ -5,6 +5,7 @@ import '../../../../core/theme/app_spacing.dart';
 import '../../../../shared/widgets/dismissible_form.dart';
 import '../../../../shared/widgets/labeled_section.dart';
 import '../../../../shared/widgets/pay/secure_note.dart';
+import '../../../free_sunday/presentation/free_sunday_notice.dart';
 import '../../../stations/domain/station.dart';
 import '../../../stations/domain/station_connector.dart';
 import '../../domain/charge_plan.dart';
@@ -69,6 +70,7 @@ class SetupForm extends StatelessWidget {
           ),
           const SizedBox(height: AppSpacing.lg),
         ],
+        const FreeSundayNotice(),
         WalletBalanceCard(plan: plan),
         if (readiness.canStart && !plan.freeCharging) ...[
           const SizedBox(height: AppSpacing.lg),

@@ -24,6 +24,7 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 import java.util.UUID;
 import java.util.function.Consumer;
 
@@ -57,14 +58,16 @@ public class AdminCustomerService {
         this.audit = audit;
     }
 
-    public CustomerListing list(AdminAccess admin, String country, String text, String status, String sortBy,
-                                int page, int size) {
+    public CustomerListing list(AdminAccess admin, String country, String text, String status,
+                                boolean ndzelaDriversOnly, String sortBy, int page, int size) {
         List<String> scope = access.scope(admin, Permission.CUSTOMERS_READ, country);
         PageWindow window = PageWindow.of(page, size);
         Sort sort = Sort.parse(sortBy, SortOrders.CUSTOMER_FIELDS, "date");
-        CustomerQuery query = new CustomerQuery(blankToNull(text), blankToNull(status), sort, window.end(), 0);
+        String search = blankToNull(text);
+        String state = blankToNull(status);
         CountryListing<CustomerRecord> found = CountryMerge.ordered(scope, window, limit -> {
-            CustomerPage result = customers.search(new CustomerQuery(query.text(), query.status(), sort, limit, 0));
+            Set<UUID> only = ndzelaDriversOnly ? linking.linkedIds() : null;
+            CustomerPage result = customers.search(new CustomerQuery(search, state, only, sort, limit, 0));
             return new CountryMerge.Found<>(result.total(), result.items());
         }, CustomerRecord::createdAt, SortOrders.customers(sort));
         List<CountryCustomer> items = new ArrayList<>();

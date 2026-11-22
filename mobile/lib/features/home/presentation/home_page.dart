@@ -4,11 +4,14 @@ import 'package:go_router/go_router.dart';
 
 import '../../stations/presentation/station_list_skeleton.dart';
 import '../../../core/l10n/strings.dart';
+import '../../../core/refresh/on_resume.dart';
 import '../../../core/router/routes.dart';
 import '../../../core/theme/app_spacing.dart';
 import '../../../shared/widgets/async_body.dart';
 import '../../../shared/widgets/section_title.dart';
 import '../../charging/presentation/active_session_banner.dart';
+import '../../free_sunday/presentation/free_sunday_badge.dart';
+import '../../free_sunday/presentation/free_sunday_providers.dart';
 import '../../profile/presentation/profile_providers.dart';
 import '../../stations/presentation/station_list.dart';
 import '../../stations/presentation/station_providers.dart';
@@ -24,36 +27,41 @@ class HomePage extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final stations = ref.watch(nearbyStationsProvider);
     final profile = ref.watch(profileProvider).asData?.value;
-    return SafeArea(
-      child: ListView(
-        padding: const EdgeInsets.all(AppSpacing.md),
-        children: [
-          HomeHeader(profile: profile),
-          const SizedBox(height: AppSpacing.md),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const ActiveSessionBanner(),
-              HomeHeroCard(onFindStation: () => context.go(Routes.locations)),
-              const SizedBox(height: AppSpacing.md),
-              const QuickActions(),
-              const SizedBox(height: AppSpacing.lg),
-              SectionTitle(
-                title: StationText.nearbyStations,
-                onViewAll: () => context.go(Routes.locations),
-              ),
-              const SizedBox(height: AppSpacing.md),
-              AsyncBody(
-                value: stations,
-                onRetry: () => ref.invalidate(nearbyStationsProvider),
-                shrinkWrap: true,
-                loading: const StationListSkeleton(),
-                builder: (data) => StationList(stations: data.take(3).toList()),
-              ),
-              const RecentSessions(),
-            ],
-          ),
-        ],
+    return OnResume(
+      onResume: () => ref.invalidate(freeSundayProvider),
+      child: SafeArea(
+        child: ListView(
+          padding: const EdgeInsets.all(AppSpacing.md),
+          children: [
+            HomeHeader(profile: profile),
+            const SizedBox(height: AppSpacing.md),
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const ActiveSessionBanner(),
+                const FreeSundayBadge(),
+                HomeHeroCard(onFindStation: () => context.go(Routes.locations)),
+                const SizedBox(height: AppSpacing.md),
+                const QuickActions(),
+                const SizedBox(height: AppSpacing.lg),
+                SectionTitle(
+                  title: StationText.nearbyStations,
+                  onViewAll: () => context.go(Routes.locations),
+                ),
+                const SizedBox(height: AppSpacing.md),
+                AsyncBody(
+                  value: stations,
+                  onRetry: () => ref.invalidate(nearbyStationsProvider),
+                  shrinkWrap: true,
+                  loading: const StationListSkeleton(),
+                  builder: (data) =>
+                      StationList(stations: data.take(3).toList()),
+                ),
+                const RecentSessions(),
+              ],
+            ),
+          ],
+        ),
       ),
     );
   }

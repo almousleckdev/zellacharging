@@ -41,9 +41,10 @@ class AdminCustomerController {
 
     @GetMapping
     CustomerListResponse list(AdminAccess admin, @RequestParam(required = false) String country,
-                              @RequestParam(required = false) String q, @RequestParam(required = false) String status, @RequestParam(required = false) String sort,
+                              @RequestParam(required = false) String q, @RequestParam(required = false) String status, @RequestParam(defaultValue = "false") boolean ndzelaDriver,
+                              @RequestParam(required = false) String sort,
                               @RequestParam(defaultValue = "0") int page, @RequestParam(defaultValue = "20") int size) {
-        return CustomerListResponse.from(customers.list(admin, country, q, status, sort, page, size));
+        return CustomerListResponse.from(customers.list(admin, country, q, status, ndzelaDriver, sort, page, size));
     }
 
     @PostMapping("/{country}/{id}/suspend")

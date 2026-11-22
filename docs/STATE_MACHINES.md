@@ -76,9 +76,17 @@ Flag (not a state): `monitoring_degraded` (no fresh metering). Does **not** chan
 | START_ACCEPTED→START_FAILED | no start within `plugInWaitSeconds + 30 s` | – | reason `START_TIMEOUT`; payment VOID |
 | **Rule L** START_FAILED→CHARGING (late start) | `session.started` for a session already `START_FAILED(START_TIMEOUT)` | payment already `VOIDED` | **immediately** enqueue stop; session continues `CHARGING→STOPPING→COMPLETED` with `late_start=true`; operator absorbs energy; permitted only from reason `START_TIMEOUT`. Exists because the platform has no start-cancel (gap G2) |
 | CHARGING→STOPPING | limit watcher, user stop, operator stop | row lock; single winner | stop command created (§3) |
+| CHARGING→STOPPING (free window) | `FreeWindowStopper` in the sweep: `CLAIMED` free Sunday claim whose `window_ends_at <= now` (ended within the last 24 h), session `ACTIVE` with a waived hold, re-read just before the stop | at most 5 per country per sweep | stop reason `FREE_WINDOW_ENDED` kept through `STOPPING→COMPLETED`; refused stop leaves `ACTIVE` and is retried next sweep; audit `FREE_SUNDAY_WINDOW_STOPPED` |
 | CHARGING/STOPPING→COMPLETED | `session.stopped`, or `GET session` = `COMPLETED` | – | copy `stoppedAt, energyKwh, costMinor, stopReason, socEnd`; triggers settlement |
 | →ABANDONED | platform session `ABANDONED` (`PowerLoss`/`Other`) [V] | – | `energyKwh`/`costMinor` null [V]; settlement by review rule |
 | STOPPING stuck | no `session.stopped` 60 s after stop `ACCEPTED` | – | re-read platform; alert at 5 min; **stays `STOPPING`** |
+
+Free Sunday claim (`free_sunday_claim`, one `CLAIMED` row per customer and Sunday, and one per agreement and Sunday): `∅→CLAIMED` at start, before
+the waived hold is inserted; `CLAIMED→RELEASED` when the reservation or session insert fails, or when the session ends
+(`FAILED`/`COMPLETED`/`ABANDONED`) having never started or with measured energy below 0.05 kWh (applied in
+`SessionSettlement.settle`). A started session with energy, or with unknown (null) energy, keeps `CLAIMED`. `RELEASED` is terminal and frees the Sunday for a new claim. The sweep also releases a `CLAIMED` claim with no `charging_session` row and no `OPEN` hold once it is older than 10
+minutes and younger than 1 day (orphan claim); a start that finds its claim released right after taking the waived hold
+discards that hold and pays. A session stopped at 22:00 keeps `CLAIMED`.
 
 Idempotency: events keyed by `eventId` (inbox unique). Applying `session.started`
 twice, or after `COMPLETED`, is a no-op by the guard. `session.metering` is only applied

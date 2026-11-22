@@ -38,6 +38,7 @@ export const enShell: Pick<Dictionary, "shell" | "nav" | "dialogs"> = {
     withdrawals: "Withdrawals",
     commissions: "Commissions",
     tariffs: "Tariffs",
+    freeCharging: "Free charging",
     reports: "Reports",
     countries: "Countries",
     users: "Users and roles",

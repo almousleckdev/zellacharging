@@ -57,6 +57,11 @@ class JdbcHoldRepository implements HoldRepository {
     }
 
     @Override
+    public void delete(UUID sessionId) {
+        jdbc.sql("delete from funding_hold where session_id = :id").param("id", sessionId).update();
+    }
+
+    @Override
     public Optional<Long> captured(UUID sessionId) {
         return jdbc.sql("select captured_minor from funding_hold where session_id = :id and captured_minor is not null")
                 .param("id", sessionId).query(Long.class).optional();

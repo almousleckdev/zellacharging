@@ -4,6 +4,7 @@ import com.evcharge.customer.partner.AgreementTerms;
 import com.evcharge.customer.partner.FreeAgreement;
 import com.evcharge.customer.partner.FreeChargingAdministration;
 import com.evcharge.customer.partner.FreeChargingUsePage;
+import com.evcharge.customer.partner.FreeDriverOption;
 import com.evcharge.customer.shared.FreeSundayWindow;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
@@ -57,6 +58,13 @@ class HttpFreeChargingAdministration implements FreeChargingAdministration {
     @Override
     public FreeAgreement revoke(String actor, UUID agreementId) {
         return agreement(HttpMethod.POST, AGREEMENTS + "/" + agreementId + "/revoke", actor, null);
+    }
+
+    @Override
+    public List<FreeDriverOption> drivers(String actor, String query, int size) {
+        return answer(false, () -> ndzela.manage(HttpMethod.GET, "/drivers?q={q}&size={size}", actor, null, query, size)
+                .body(new ParameterizedTypeReference<List<FreeDriverOption>>() {
+                }));
     }
 
     @Override

@@ -227,6 +227,8 @@ customers, `FREE_SUNDAY` when the session's hold is waived and its `free_sunday_
 
 ### 11d. Admin free-charging routes (Zella dashboard to Zella backend to NDZela)
 
+`GET /v1/admin/free-charging/drivers?q=&size=` (`FREE_CHARGING_MANAGE`, country scope; `q` is cut at 100 characters, `size` bounded 1 to 50, both passed to NDZela URL-encoded) forwards the driver search of NDZela (name, e-mail, phone, fleet number or plate of the car held) and answers `[{driverId, customerId, fullName, phone, email, fleetNumber, plate, status, linked, inProgram}]`; the Gratuité page uses it to add several drivers at once (one `POST /agreements` with the `customerId` per driver), so it no longer needs the Customers permission. Agreement rows also carry `phone`, `email`, `fleetNumber` and `plate`.
+
 The free window (day, first moment, end) is a country setting kept by NDZela (NDZela ADR-0049):
 `GET /v1/admin/free-charging/window` (`FREE_CHARGING_READ`) and `PUT /v1/admin/free-charging/window {day, from, until?, endOfDay}`
 (`FREE_CHARGING_MANAGE`, country scope like every route here; each change is audited `FREE_WINDOW_CHANGED`). NDZela refuses an invalid

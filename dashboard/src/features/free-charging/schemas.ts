@@ -11,6 +11,10 @@ export const agreementSchema = z.object({
   eligibility: z.string(),
   unpaidDays: z.number().nullable(),
   lastFreeUse: z.string().nullable(),
+  phone: z.string().nullable().optional(),
+  email: z.string().nullable().optional(),
+  fleetNumber: z.string().nullable().optional(),
+  plate: z.string().nullable().optional(),
 });
 
 export const agreementListSchema = z.array(agreementSchema);
@@ -50,3 +54,20 @@ export const freeWindowSchema = z.object({
 });
 
 export type FreeWindow = z.infer<typeof freeWindowSchema>;
+
+export const driverOptionSchema = z.object({
+  driverId: z.string(),
+  customerId: z.string().nullable(),
+  fullName: z.string(),
+  phone: z.string().nullable(),
+  email: z.string().nullable(),
+  fleetNumber: z.string().nullable(),
+  plate: z.string().nullable(),
+  status: z.string(),
+  linked: z.boolean(),
+  inProgram: z.boolean(),
+});
+
+export const driverOptionListSchema = z.array(driverOptionSchema);
+
+export type DriverOption = z.infer<typeof driverOptionSchema>;

@@ -4,6 +4,7 @@ import com.evcharge.customer.admin.application.AdminFreeChargingService;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.partner.FreeAgreement;
 import com.evcharge.customer.partner.FreeChargingUsePage;
+import com.evcharge.customer.partner.FreeDriverOption;
 import com.evcharge.customer.shared.FreeSundayWindow;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
@@ -59,6 +60,12 @@ class AdminFreeChargingController {
     @PostMapping("/agreements/{id}/revoke")
     FreeAgreement revoke(AdminAccess admin, @PathVariable UUID id) {
         return service.revoke(admin, id);
+    }
+
+    @GetMapping("/drivers")
+    List<FreeDriverOption> drivers(AdminAccess admin, @RequestParam(defaultValue = "") String q,
+                                   @RequestParam(defaultValue = "20") int size) {
+        return service.drivers(admin, q, size);
     }
 
     @GetMapping("/window")

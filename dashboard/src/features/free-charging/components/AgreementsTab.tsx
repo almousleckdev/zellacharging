@@ -1,15 +1,20 @@
 "use client";
 
+import { useState } from "react";
 import { ApiError } from "@/shared/api/adminFetch";
 import { errorMessage } from "@/shared/i18n/errorMessage";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { ListPanel } from "@/shared/ui/ListPanel";
+import { SearchInput } from "@/shared/ui/SearchInput";
 import { useToast } from "@/shared/ui/ToastProvider";
 import { useAgreementMutations } from "../api/useAgreementMutations";
 import { useAgreements } from "../api/useAgreements";
 import type { FreeChargingDialog } from "../dialog";
+import { filterAgreements } from "../filterAgreements";
 import type { Agreement } from "../schemas";
-import { AgreementFormDialog } from "./AgreementFormDialog";
+import { AgreementStats } from "./AgreementStats";
+import { AgreementCreateDialog } from "./AgreementCreateDialog";
+import { AgreementEditDialog } from "./AgreementEditDialog";
 import { AgreementRevokeConfirm } from "./AgreementRevokeConfirm";
 import { AgreementsTable } from "./AgreementsTable";
 import type { AgreementAction } from "./AgreementsTable";
@@ -21,6 +26,8 @@ export function AgreementsTab({ dialog, onDialog }: { dialog: FreeChargingDialog
   const { suspend, resume } = useAgreementMutations();
   const labels = t.freeCharging;
   const items = agreements.data ?? [];
+  const [text, setText] = useState("");
+  const shown = filterAgreements(items, text);
 
   function toggle(action: "suspend" | "resume", agreement: Agreement) {
     const mutation = action === "suspend" ? suspend : resume;
@@ -50,9 +57,16 @@ export function AgreementsTab({ dialog, onDialog }: { dialog: FreeChargingDialog
         empty={{ icon: "bolt", title: labels.emptyTitle, text: labels.emptyText }}
         isEmpty={agreements.isSuccess && items.length === 0}
       >
-        {items.length > 0 && <AgreementsTable items={items} onAction={handle} />}
+        {items.length > 0 && (
+          <div className="flex flex-col gap-4">
+            <AgreementStats items={items} />
+            <SearchInput label={labels.search.label} placeholder={labels.search.placeholder} value={text} onSearch={setText} />
+            {shown.length > 0 ? <AgreementsTable items={shown} onAction={handle} /> : <p className="text-sm text-muted">{labels.search.noMatch}</p>}
+          </div>
+        )}
       </ListPanel>
-      {dialog?.kind === "form" && <AgreementFormDialog key={dialog.agreement?.id ?? "new"} agreement={dialog.agreement} onClose={() => onDialog(null)} />}
+      {dialog?.kind === "form" && dialog.agreement === null && <AgreementCreateDialog onClose={() => onDialog(null)} />}
+      {dialog?.kind === "form" && dialog.agreement !== null && <AgreementEditDialog key={dialog.agreement.id} agreement={dialog.agreement} onClose={() => onDialog(null)} />}
       {dialog?.kind === "revoke" && <AgreementRevokeConfirm agreement={dialog.agreement} onClose={() => onDialog(null)} />}
     </>
   );

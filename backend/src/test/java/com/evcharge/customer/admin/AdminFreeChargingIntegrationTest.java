@@ -127,7 +127,8 @@ class AdminFreeChargingIntegrationTest extends PostgresTestBase {
     private String agreementJson() {
         return "{\"id\":\"" + agreement + "\",\"driverId\":\"" + driver + "\",\"driverName\":\"Ada Obiang\","
                 + "\"startsOn\":\"2026-11-01\",\"endsOn\":null,\"status\":\"ACTIVE\",\"conditions\":null,"
-                + "\"eligibility\":\"ELIGIBLE\",\"unpaidDays\":0,\"lastFreeUse\":null}";
+                + "\"eligibility\":\"ELIGIBLE\",\"unpaidDays\":0,\"lastFreeUse\":null,\"phone\":\"+24177001122\","
+                + "\"email\":\"ada@x.test\",\"fleetNumber\":\"V015\",\"plate\":\"PL-0150\"}";
     }
 
     private ResultActions call(MockHttpServletRequestBuilder request, String token) throws Exception {
@@ -193,7 +194,9 @@ class AdminFreeChargingIntegrationTest extends PostgresTestBase {
                 .andExpect(jsonPath("$[0].id").value(agreement.toString()))
                 .andExpect(jsonPath("$[0].driverName").value("Ada Obiang"))
                 .andExpect(jsonPath("$[0].eligibility").value("ELIGIBLE"))
-                .andExpect(jsonPath("$[0].unpaidDays").value(0));
+                .andExpect(jsonPath("$[0].unpaidDays").value(0))
+                .andExpect(jsonPath("$[0].phone").value("+24177001122")).andExpect(jsonPath("$[0].fleetNumber").value("V015"))
+                .andExpect(jsonPath("$[0].plate").value("PL-0150")).andExpect(jsonPath("$[0].email").value("ada@x.test"));
         assertThat(TARGET.get()).isEqualTo(BASE + "/agreements");
         assertThat(SEEN_KEY.get()).isEqualTo(KEY);
         assertThat(SEEN_ACTOR.get()).isEqualTo(manager.email());
@@ -427,5 +430,49 @@ class AdminFreeChargingIntegrationTest extends PostgresTestBase {
         call(json(put("/v1/admin/free-charging/window"), WINDOW_JSON), abroad).andExpect(status().isForbidden())
                 .andExpect(jsonPath("$.code").value("COUNTRY_FORBIDDEN"));
         assertThat(CALLS.get()).isZero();
+    }
+
+    private static final String DRIVER_JSON = "[{\"driverId\":\"" + UUID.randomUUID() + "\",\"customerId\":\"" + UUID.randomUUID()
+            + "\",\"fullName\":\"NZE Paul\",\"phone\":\"+24177001122\",\"email\":\"paul@x.test\",\"fleetNumber\":\"V015\","
+            + "\"plate\":\"PL-0150\",\"status\":\"ACTIVE\",\"linked\":true,\"inProgram\":false}]";
+
+    @Test
+    void anAdminSearchesNdzelaDriversAndTheTextIsPassedEncodedAndBounded() throws Exception {
+        answerBody = DRIVER_JSON;
+        call(get("/v1/admin/free-charging/drivers").param("q", "V015 & {x}+1").param("size", "10")).andExpect(status().isOk())
+                .andExpect(jsonPath("$[0].fullName").value("NZE Paul")).andExpect(jsonPath("$[0].fleetNumber").value("V015"))
+                .andExpect(jsonPath("$[0].linked").value(true)).andExpect(jsonPath("$[0].inProgram").value(false));
+        assertThat(METHOD.get()).isEqualTo("GET");
+        assertThat(TARGET.get()).startsWith(BASE + "/drivers?q=").endsWith("&size=10");
+        assertThat(TARGET.get()).doesNotContain(" ").doesNotContain("{").doesNotContain("&x").contains("%26");
+        assertThat(SEEN_ACTOR.get()).isEqualTo(manager.email());
+    }
+
+    @Test
+    void theSearchTextAndSizeAreBounded() throws Exception {
+        answerBody = "[]";
+        call(get("/v1/admin/free-charging/drivers").param("q", "a".repeat(300)).param("size", "100000")).andExpect(status().isOk());
+        assertThat(TARGET.get()).contains("size=50");
+        assertThat(TARGET.get().length()).isLessThan(BASE.length() + 200);
+        call(get("/v1/admin/free-charging/drivers").param("size", "-4")).andExpect(status().isOk());
+        assertThat(TARGET.get()).contains("size=1");
+    }
+
+    @Test
+    void searchingDriversNeedsTheManagePermissionAndTheCountry() throws Exception {
+        String reader = fixtures.create(AdminRole.SUPPORT, Set.of("GA")).accessToken();
+        call(get("/v1/admin/free-charging/drivers"), reader).andExpect(status().isForbidden());
+        String abroad = fixtures.createWith(AdminRole.ADMIN, Set.of("ML"),
+                Set.of(Permission.FREE_CHARGING_READ, Permission.FREE_CHARGING_MANAGE)).accessToken();
+        call(get("/v1/admin/free-charging/drivers"), abroad).andExpect(status().isForbidden())
+                .andExpect(jsonPath("$.code").value("COUNTRY_FORBIDDEN"));
+        assertThat(CALLS.get()).isZero();
+    }
+
+    @Test
+    void anNdzelaOutageDuringTheSearchIsUnavailable() throws Exception {
+        answerStatus = 500;
+        call(get("/v1/admin/free-charging/drivers").param("q", "x")).andExpect(status().isServiceUnavailable())
+                .andExpect(jsonPath("$.code").value("FREE_CHARGING_UNAVAILABLE"));
     }
 }

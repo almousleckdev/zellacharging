@@ -6,5 +6,5 @@ import java.util.UUID;
 
 public record FreeAgreement(UUID id, UUID driverId, String driverName, LocalDate startsOn, LocalDate endsOn,
                             String status, String conditions, String eligibility, int unpaidDays,
-                            Instant lastFreeUse) {
+                            Instant lastFreeUse, String phone, String email, String fleetNumber, String plate) {
 }

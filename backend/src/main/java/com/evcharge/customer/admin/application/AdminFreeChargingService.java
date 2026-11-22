@@ -6,6 +6,7 @@ import com.evcharge.customer.partner.AgreementTerms;
 import com.evcharge.customer.partner.FreeAgreement;
 import com.evcharge.customer.partner.FreeChargingAdministration;
 import com.evcharge.customer.partner.FreeChargingUsePage;
+import com.evcharge.customer.partner.FreeDriverOption;
 import com.evcharge.customer.partner.PartnerLinking;
 import com.evcharge.customer.shared.ApiException;
 import com.evcharge.customer.shared.CountryDirectory;
@@ -22,6 +23,8 @@ import java.util.function.Function;
 public class AdminFreeChargingService {
 
     private static final int MAXIMUM_PAGE_SIZE = 100;
+    private static final int MAXIMUM_SEARCH_SIZE = 50;
+    private static final int MAXIMUM_SEARCH_LENGTH = 100;
 
     private final AdminAccessService access;
     private final FreeChargingAdministration ndzela;
@@ -41,6 +44,13 @@ public class AdminFreeChargingService {
     public List<FreeAgreement> list(AdminAccess admin) {
         authorize(admin, Permission.FREE_CHARGING_READ);
         return ndzela.list(FreeChargingActor.of(admin));
+    }
+
+    public List<FreeDriverOption> drivers(AdminAccess admin, String query, int size) {
+        authorize(admin, Permission.FREE_CHARGING_MANAGE);
+        String text = query == null ? "" : query.strip();
+        String bounded = text.length() > MAXIMUM_SEARCH_LENGTH ? text.substring(0, MAXIMUM_SEARCH_LENGTH) : text;
+        return ndzela.drivers(FreeChargingActor.of(admin), bounded, Math.min(Math.max(size, 1), MAXIMUM_SEARCH_SIZE));
     }
 
     public FreeSundayWindow window(AdminAccess admin) {

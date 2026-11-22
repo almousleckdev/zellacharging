@@ -41,6 +41,8 @@ export function AgreementsTable({ items, onAction }: AgreementsTableProps) {
 
   const columns: Column<Agreement>[] = [
     { key: "driver", header: labels.columns.driver, cell: (agreement) => <span className="font-medium">{agreement.driverName}</span> },
+    { key: "car", header: labels.columns.car, cell: (agreement) => (agreement.fleetNumber ? `${agreement.fleetNumber}${agreement.plate ? ` · ${agreement.plate}` : ""}` : "—") },
+    { key: "phone", header: labels.columns.phone, cell: (agreement) => agreement.phone ?? "—" },
     { key: "startsOn", header: labels.columns.startsOn, cell: (agreement) => formatDay(agreement.startsOn, locale) },
     { key: "endsOn", header: labels.columns.endsOn, cell: (agreement) => (agreement.endsOn ? formatDay(agreement.endsOn, locale) : labels.noEndDate) },
     { key: "status", header: labels.columns.status, cell: (agreement) => <AgreementStatusBadge status={agreement.status} /> },

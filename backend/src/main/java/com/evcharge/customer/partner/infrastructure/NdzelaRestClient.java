@@ -47,10 +47,10 @@ class NdzelaRestClient {
                 .retrieve(), NdzelaRestClient::unavailable);
     }
 
-    RestClient.ResponseSpec manage(HttpMethod method, String path, String actor, Object body) {
+    RestClient.ResponseSpec manage(HttpMethod method, String path, String actor, Object body, Object... uriVariables) {
         requireConfigured(NdzelaFailure::unavailable);
         RestClient.RequestBodySpec request = client.method(method)
-                .uri(settings.baseUrl() + MANAGEMENT + path)
+                .uri(settings.baseUrl() + MANAGEMENT + path, uriVariables)
                 .header("X-Api-Key", settings.apiKey())
                 .header("X-Actor", actor);
         if (body != null) {

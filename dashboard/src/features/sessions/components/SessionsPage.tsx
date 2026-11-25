@@ -3,6 +3,7 @@
 import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
+import { LIVE_REFRESH_MS } from "../api/liveRefresh";
 import { sessionListSchema } from "../schemas";
 import { useSessionColumns } from "./useSessionColumns";
 
@@ -16,6 +17,7 @@ export function SessionsPage({ customerId }: { customerId?: string }) {
 
   return (
     <LogListPage
+      refreshMs={LIVE_REFRESH_MS}
       resource="sessions"
       schema={sessionListSchema}
       labels={t.sessions}

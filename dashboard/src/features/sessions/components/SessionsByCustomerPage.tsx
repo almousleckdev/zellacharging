@@ -3,6 +3,7 @@
 import { useSession } from "@/features/session/SessionProvider";
 import { useI18n } from "@/shared/i18n/I18nProvider";
 import { LogListPage } from "@/shared/lists/LogListPage";
+import { LIVE_REFRESH_MS } from "../api/liveRefresh";
 import { sessionDigestSchema } from "../schemas";
 import { UsageBand } from "./UsageBand";
 import { useSessionDigestColumns } from "./useSessionDigestColumns";
@@ -17,6 +18,7 @@ export function SessionsByCustomerPage({ stationId }: { stationId?: string }) {
 
   return (
     <LogListPage
+      refreshMs={LIVE_REFRESH_MS}
       resource="sessions/by-customer"
       exportName="sessions"
       schema={sessionDigestSchema}

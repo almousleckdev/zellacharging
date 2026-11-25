@@ -8,6 +8,7 @@ import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.JdbcClient;
 import org.springframework.stereotype.Repository;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.Collection;
 import java.util.List;
@@ -23,12 +24,12 @@ class JdbcChargeFeed implements ChargeFeed {
             + "coalesce(c.state, 'PENDING') as payment_state, c.energy_cost_minor, c.vat_minor, c.service_fee_minor, "
             + "c.total_minor, coalesce(c.currency, s.currency) as currency, "
             + "coalesce(c.decimals, s.currency_decimals) as decimals, coalesce(c.estimated, false) as estimated, "
-            + "greatest(s.updated_at, coalesce(c.updated_at, s.updated_at)) as feed_at, "
+            + "s.feed_at, "
             + SessionBilling.FREE_CATEGORY + " "
             + "from charging_session s left join session_charge c on c.session_id = s.id "
             + "where %s and s.transaction_id is not null "
             + "and s.country_code = current_setting('app.country')) f "
-            + "where (f.feed_at, f.session_id) > (:at, :sid) and f.feed_at < :until order by f.feed_at, f.session_id limit :limit";
+            + "where (f.feed_at, f.session_id) > (:at, :sid) and f.feed_at < clock_timestamp() - make_interval(secs => :lag) order by f.feed_at, f.session_id limit :limit";
 
     private static final String OF_CUSTOMERS = "s.customer_id in (:ids)";
     private static final String NOT_OF_CUSTOMERS = "s.customer_id not in (:ids)";
@@ -53,28 +54,28 @@ class JdbcChargeFeed implements ChargeFeed {
 
     @Override
     public ChargeFeedPage after(Instant updatedAt, UUID sessionId, int limit, Collection<UUID> customerIds,
-                                Instant visibleBefore) {
+                                Duration lag) {
         if (customerIds.isEmpty()) {
             return new ChargeFeedPage(List.of(), false);
         }
-        return read(OF_CUSTOMERS, customerIds, updatedAt, sessionId, limit, visibleBefore);
+        return read(OF_CUSTOMERS, customerIds, updatedAt, sessionId, limit, lag);
     }
 
     @Override
     public ChargeFeedPage afterExcluding(Instant updatedAt, UUID sessionId, int limit,
-                                         Collection<UUID> excludedCustomerIds, Instant visibleBefore) {
+                                         Collection<UUID> excludedCustomerIds, Duration lag) {
         String filter = excludedCustomerIds.isEmpty() ? ANYONE : NOT_OF_CUSTOMERS;
-        return read(filter, excludedCustomerIds, updatedAt, sessionId, limit, visibleBefore);
+        return read(filter, excludedCustomerIds, updatedAt, sessionId, limit, lag);
     }
 
     private ChargeFeedPage read(String customerFilter, Collection<UUID> customerIds, Instant updatedAt,
-                                UUID sessionId, int limit, Instant visibleBefore) {
+                                UUID sessionId, int limit, Duration lag) {
         var statement = jdbc.sql(QUERY.formatted(customerFilter));
         if (!customerIds.isEmpty()) {
             statement = statement.param("ids", customerIds);
         }
         List<ChargeFeedItem> rows = statement.param("at", Timestamps.toDb(updatedAt)).param("sid", sessionId)
-                .param("limit", limit + 1).param("until", Timestamps.toDb(visibleBefore))
+                .param("limit", limit + 1).param("lag", lag.toMillis() / 1000.0)
                 .query(MAPPER).list();
         boolean more = rows.size() > limit;
         return new ChargeFeedPage(more ? rows.subList(0, limit) : rows, more);

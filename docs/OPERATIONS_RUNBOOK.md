@@ -66,7 +66,7 @@ Three start-up guards can stop the service on purpose. Each has an explicit over
    the key as `X-Api-Key`.
 3. Rotate: issue a second key, let NDZela switch, then `DELETE /v1/admin/partners/NDZELA/keys/{id}` for the old one.
 4. Revoke immediately if a key leaks: the same `DELETE`. `GET .../keys` shows `lastUsedAt` to confirm who still uses what.
-5. `ZELLA_PARTNER_RATE_PER_MINUTE` (default 120) changes the per-key limit and `ZELLA_PARTNER_FEED_LAG` (default 10s)
+5. `ZELLA_PARTNER_RATE_PER_MINUTE` (default 120) changes the per-key limit and `ZELLA_PARTNER_FEED_LAG` (default 2s)
    the delay before a change appears in the feed; both need a restart.
 
 ## Deploying free Sunday charging (2026-11-22)

@@ -4,6 +4,7 @@ import { useQuery } from "@tanstack/react-query";
 import { adminFetch } from "@/shared/api/adminFetch";
 import { queryKeys } from "@/shared/api/queryKeys";
 import { usageSchema } from "../usageSchema";
+import { LIVE_REFRESH_MS } from "./liveRefresh";
 
 export type UsageScope = { station?: string; customerId?: string };
 
@@ -20,6 +21,6 @@ export function useUsage(country: string, scope: UsageScope) {
       }
       return adminFetch(`usage?${query.toString()}`, usageSchema);
     },
-    refetchInterval: 15_000,
+    refetchInterval: LIVE_REFRESH_MS,
   });
 }

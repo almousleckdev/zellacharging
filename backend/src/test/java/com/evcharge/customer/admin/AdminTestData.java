@@ -8,6 +8,8 @@ import java.util.UUID;
 
 public class AdminTestData {
 
+    private static final String NEXT_TRANSACTION = "(select coalesce(max(transaction_id), 0) + 1 from charging_session)";
+
     private final JdbcTemplate jdbc;
 
     public AdminTestData(JdbcTemplate jdbc) {
@@ -34,8 +36,8 @@ public class AdminTestData {
 
     public void session(String country, UUID customer, int connector, String state, String energy, Long cost) {
         TenantContext.runAs(country, () -> jdbc.update("insert into charging_session (id, customer_id, station_id, "
-                + "connector_id, id_tag, state, started_at, energy_kwh, cost_minor, created_at, updated_at) "
-                + "values (?, ?, ?, ?, 'Z-x', ?, now(), ?::numeric, ?, now(), now())", UUID.randomUUID(), customer,
+                + "connector_id, id_tag, state, transaction_id, started_at, energy_kwh, cost_minor, created_at, "
+                + "updated_at) values (?, ?, ?, ?, 'Z-x', ?, " + NEXT_TRANSACTION + ", now(), ?::numeric, ?, now(), now())", UUID.randomUUID(), customer,
                 "CP-" + UUID.randomUUID(), connector, state, energy, cost));
     }
 
@@ -43,8 +45,8 @@ public class AdminTestData {
         UUID id = UUID.randomUUID();
         TenantContext.runAs(country, () -> {
             jdbc.update("insert into charging_session (id, customer_id, station_id, connector_id, id_tag, state, "
-                    + "started_at, energy_kwh, cost_minor, created_at, updated_at) values (?, ?, ?, 1, 'Z-x', "
-                    + "'COMPLETED', now(), ?::numeric, ?, now(), now())", id, customer, "CP-" + UUID.randomUUID(),
+                    + "transaction_id, started_at, energy_kwh, cost_minor, created_at, updated_at) values (?, ?, ?, 1, "
+                    + "'Z-x', 'COMPLETED', " + NEXT_TRANSACTION + ", now(), ?::numeric, ?, now(), now())", id, customer, "CP-" + UUID.randomUUID(),
                     energy, cost);
             jdbc.update("insert into funding_hold (session_id, customer_id, reserved_minor, state, waived, "
                     + "created_at) values (?, ?, ?, 'SETTLED', true, now())", id, customer, cost);
@@ -54,8 +56,8 @@ public class AdminTestData {
     public void sessionAt(String country, UUID customer, String station, int connector, String state, String energy,
                           Long cost) {
         TenantContext.runAs(country, () -> jdbc.update("insert into charging_session (id, customer_id, station_id, "
-                + "connector_id, id_tag, state, started_at, energy_kwh, cost_minor, created_at, updated_at) "
-                + "values (?, ?, ?, ?, 'Z-x', ?, now(), ?::numeric, ?, now(), now())", UUID.randomUUID(), customer,
+                + "connector_id, id_tag, state, transaction_id, started_at, energy_kwh, cost_minor, created_at, "
+                + "updated_at) values (?, ?, ?, ?, 'Z-x', ?, " + NEXT_TRANSACTION + ", now(), ?::numeric, ?, now(), now())", UUID.randomUUID(), customer,
                 station, connector, state, energy, cost));
     }
 

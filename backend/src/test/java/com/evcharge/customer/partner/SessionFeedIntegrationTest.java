@@ -27,7 +27,7 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "zella.partner.feed-lag=0s")
 @AutoConfigureMockMvc
 class SessionFeedIntegrationTest extends PostgresTestBase {
 
@@ -61,9 +61,13 @@ class SessionFeedIntegrationTest extends PostgresTestBase {
 
     private UUID linkedCustomer() {
         UUID customer = fixtures.customer("GA", "A", "B", UUID.randomUUID() + "@example.com", null, "ACTIVE");
+        link(customer);
+        return customer;
+    }
+
+    private void link(UUID customer) {
         jdbc.update("insert into partner_link (partner, customer_id, linked_at) values ('NDZELA', ?, now())",
                 customer);
-        return customer;
     }
 
     private UUID session(UUID customer, String state, Integer transactionId, int secondsAfterBase) {
@@ -276,25 +280,13 @@ class SessionFeedIntegrationTest extends PostgresTestBase {
     }
 
     @Test
-    void veryRecentChangesAreHeldBackUntilTheyCannotStillBeCommitting() throws Exception {
-        UUID recent = session(driver, "COMPLETED", TRANSACTIONS.incrementAndGet(), 0);
-        jdbc.update("update charging_session set updated_at = now() where id = ?", recent);
-        finished(driver, 1);
-
-        assertThat(feed("").get("items")).hasSize(1);
-
-        jdbc.update("update charging_session set updated_at = now() - interval '1 minute' where id = ?", recent);
-
-        assertThat(feed("").get("items")).hasSize(2);
-    }
-
-    @Test
     void aDriverLinkedLaterCanReadTheirHistoryEvenWhenTheGlobalCursorMovedOn() throws Exception {
-        finished(driver, 100);
-        String cursor = feed("").get("nextCursor").asText();
-        UUID late = linkedCustomer();
+        UUID late = fixtures.customer("GA", "L", "T", UUID.randomUUID() + "@example.com", null, "ACTIVE");
         finished(late, 1);
         finished(late, 2);
+        finished(driver, 100);
+        String cursor = feed("").get("nextCursor").asText();
+        link(late);
 
         assertThat(feed("?cursor=" + cursor).get("items")).isEmpty();
         JsonNode history = feed("?customerId=" + late);

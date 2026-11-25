@@ -61,4 +61,18 @@ describe("SessionsPage", () => {
     expect(within(table).queryByText("–")).not.toBeInTheDocument();
     expect(within(table).queryByText("—")).not.toBeInTheDocument();
   });
+
+  it("shows a charge that changed on the server without reloading the page", async () => {
+    vi.useFakeTimers({ shouldAdvanceTime: true });
+    let state = "ACTIVE";
+    vi.stubGlobal("fetch", vi.fn(async () => Response.json({ total: 1, page: 0, size: 20, items: [{ ...session, state }] })));
+    renderConsole(<SessionsPage />);
+    expect(within(await screen.findByRole("table")).getByText("En charge")).toBeInTheDocument();
+
+    state = "COMPLETED";
+    await vi.advanceTimersByTimeAsync(5_000);
+
+    expect(await within(screen.getByRole("table")).findByText("Terminée")).toBeInTheDocument();
+    vi.useRealTimers();
+  });
 });

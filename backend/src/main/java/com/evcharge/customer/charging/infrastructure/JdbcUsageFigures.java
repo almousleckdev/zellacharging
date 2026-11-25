@@ -56,9 +56,10 @@ class JdbcUsageFigures implements UsageFigures {
         return "with local as (select (now() at time zone " + ZONE + ")::date as t), b as (select t, "
                 + "t - (extract(isodow from t)::int - 1) as w, date_trunc('month', t)::date as m from local) "
                 + "select " + columns + " from b left join (select s.*, "
-                + "(s.created_at at time zone " + ZONE + ")::date as d, exists (select 1 from funding_hold h "
+                + "(s.started_at at time zone " + ZONE + ")::date as d, exists (select 1 from funding_hold h "
                 + "where h.session_id = s.id and h.waived) as free, " + SessionBilling.FREE_CATEGORY
                 + " from charging_session s where s.country_code = current_setting('app.country', true) "
+                + "and s.transaction_id is not null "
                 + "and s.created_at >= :since and s.created_at >= now() - interval '45 days'"
                 + (byStation ? " and s.station_id = :station" : "") + (byCustomer ? " and s.customer_id = :customer" : "")
                 + ") x on true group by b.t, b.w, b.m";

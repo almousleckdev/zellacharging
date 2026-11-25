@@ -20,7 +20,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
-@SpringBootTest
+@SpringBootTest(properties = "zella.partner.feed-lag=0s")
 @AutoConfigureMockMvc
 class FreeSundayFeedTest extends PostgresTestBase {
 

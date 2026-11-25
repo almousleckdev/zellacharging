@@ -8,8 +8,7 @@ import com.evcharge.customer.shared.AuditTrail;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
-import java.time.Clock;
-import java.time.Instant;
+import java.time.Duration;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,32 +19,29 @@ public class SessionFeedService {
     private final LinkService links;
     private final PartnerSettings settings;
     private final AuditTrail audit;
-    private final Clock clock;
 
-    SessionFeedService(ChargeFeed feed, LinkService links, PartnerSettings settings, AuditTrail audit,
-                       Clock clock) {
+    SessionFeedService(ChargeFeed feed, LinkService links, PartnerSettings settings, AuditTrail audit) {
         this.feed = feed;
         this.links = links;
         this.settings = settings;
         this.audit = audit;
-        this.clock = clock;
     }
 
     public FeedPage read(PartnerPrincipal principal, String cursor, Integer limit, UUID customerId) {
         List<UUID> customers = customers(principal, customerId);
         return page(principal, cursor, limit,
-                (from, size, until) -> feed.after(from.updatedAt(), from.sessionId(), size, customers, until));
+                (from, size, lag) -> feed.after(from.updatedAt(), from.sessionId(), size, customers, lag));
     }
 
     /** The sessions of the customers this partner has not linked: its own drivers are not in it. */
     public FeedPage readPublic(PartnerPrincipal principal, String cursor, Integer limit) {
         List<UUID> linked = links.linkedCustomerIds(principal);
         return page(principal, cursor, limit,
-                (from, size, until) -> feed.afterExcluding(from.updatedAt(), from.sessionId(), size, linked, until));
+                (from, size, lag) -> feed.afterExcluding(from.updatedAt(), from.sessionId(), size, linked, lag));
     }
 
     private interface Reader {
-        ChargeFeedPage read(FeedCursor from, int size, Instant visibleBefore);
+        ChargeFeedPage read(FeedCursor from, int size, Duration lag);
     }
 
     private FeedPage page(PartnerPrincipal principal, String cursor, Integer limit, Reader reader) {
@@ -55,7 +51,7 @@ public class SessionFeedService {
                     "The limit must be between 1 and " + settings.maxFeedLimit());
         }
         FeedCursor from = cursor == null || cursor.isBlank() ? FeedCursor.START : FeedCursor.decode(cursor);
-        ChargeFeedPage page = reader.read(from, size, clock.instant().minus(settings.feedLag()));
+        ChargeFeedPage page = reader.read(from, size, settings.feedLag());
         List<ChargeFeedItem> items = page.items();
         if (items.isEmpty()) {
             return new FeedPage(items, cursor == null || cursor.isBlank() ? null : cursor, false);

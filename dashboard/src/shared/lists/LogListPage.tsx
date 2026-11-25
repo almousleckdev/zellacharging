@@ -51,6 +51,7 @@ type LogListPageProps<Row, Out extends Listing<Row>> = {
   rowActions?: Column<Row>;
   above?: (data: Out) => ReactNode;
   headerActions?: ReactNode;
+  refreshMs?: number;
 };
 
 export function LogListPage<Row, Out extends Listing<Row>>(props: LogListPageProps<Row, Out>) {
@@ -59,7 +60,7 @@ export function LogListPage<Row, Out extends Listing<Row>>(props: LogListPagePro
   const format = useFormatters();
   const list = useListFilters(selects.map((select) => select.key), fixed);
   const { filters } = list;
-  const query = useLogList(resource, filters, schema);
+  const query = useLogList(resource, filters, schema, props.refreshMs);
   const sheet = useExportSheet(labels.title, props.exportName ?? resource, columns, filters);
   const data = query.data;
 

@@ -1,5 +1,6 @@
 package com.evcharge.customer.wallet.web;
 
+import com.evcharge.customer.wallet.WalletFunding;
 import com.evcharge.customer.wallet.application.TopupService;
 import com.evcharge.customer.wallet.application.WalletService;
 import com.evcharge.customer.wallet.application.WithdrawalSettings;
@@ -28,19 +29,22 @@ class WalletController {
     private final TopupService topups;
     private final WithdrawalSettings withdrawals;
     private final FreeCharging free;
+    private final WalletFunding funding;
 
     WalletController(WalletService wallets, TopupService topups, WithdrawalSettings withdrawals,
-                     FreeCharging free) {
+                     FreeCharging free, WalletFunding funding) {
         this.wallets = wallets;
         this.topups = topups;
         this.withdrawals = withdrawals;
         this.free = free;
+        this.funding = funding;
     }
 
     @GetMapping
     WalletResponse balance(CustomerPrincipal me) {
-        return WalletResponse.from(wallets.balance(me.id()), withdrawals.enabled(),
-                wallets.payoutSource(me.id()), wallets.payoutSources(me.id()), free.allowed(me.id()));
+        WalletResponse response = WalletResponse.from(wallets.balance(me.id()), withdrawals.enabled(),
+                wallets.payoutSource(me.id()), wallets.payoutSources(me.id()));
+        return free.allowed(me.id()) ? response.freeUpTo(funding.startLimits().maximumMinor()) : response;
     }
 
     @GetMapping("/transactions")

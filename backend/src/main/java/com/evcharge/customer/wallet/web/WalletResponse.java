@@ -14,11 +14,16 @@ record WalletResponse(long balanceMinor, long reservedMinor, long availableMinor
     }
 
     static WalletResponse from(WalletBalance wallet, boolean withdrawalsEnabled, Optional<Topup> payoutSource,
-                               List<Topup> payoutSources, boolean freeCharging) {
+                               List<Topup> payoutSources) {
         return new WalletResponse(wallet.balanceMinor(), wallet.reservedMinor(), wallet.availableMinor(),
                 wallet.currency(), wallet.decimals(), withdrawalsEnabled,
                 payoutSource.map(Topup::msisdn).orElse(null),
                 payoutSource.map(topup -> topup.operator().name()).orElse(null),
-                payoutSources.stream().map(t -> new PayoutNumber(t.msisdn(), t.operator().name())).toList(), freeCharging);
+                payoutSources.stream().map(t -> new PayoutNumber(t.msisdn(), t.operator().name())).toList(), false);
+    }
+
+    WalletResponse freeUpTo(long allowanceMinor) {
+        return new WalletResponse(balanceMinor, reservedMinor, Math.max(availableMinor, allowanceMinor), currency,
+                decimals, withdrawalsEnabled, payoutNumber, payoutOperator, payoutNumbers, true);
     }
 }

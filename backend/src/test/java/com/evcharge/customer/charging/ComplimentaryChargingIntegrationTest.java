@@ -135,6 +135,25 @@ class ComplimentaryChargingIntegrationTest extends PostgresTestBase {
     }
 
     @Test
+    void anOlderAppThatOnlyReadsTheAvailableAmountCanStartAFreeCharge() throws Exception {
+        UUID free = emptyWallet();
+        grant(free, null);
+        long allowance = funding.startLimits().maximumMinor();
+
+        mvc.perform(get("/v1/wallet").with(TestTenants.customer(free))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableMinor").value(allowance))
+                .andExpect(jsonPath("$.balanceMinor").value(0))
+                .andExpect(jsonPath("$.reservedMinor").value(0));
+    }
+
+    @Test
+    void aPayingWalletStillShowsOnlyWhatItHolds() throws Exception {
+        mvc.perform(get("/v1/wallet").with(TestTenants.customer(emptyWallet()))).andExpect(status().isOk())
+                .andExpect(jsonPath("$.availableMinor").value(0))
+                .andExpect(jsonPath("$.balanceMinor").value(0));
+    }
+
+    @Test
     void anExpiredFreeAccessNoLongerWaivesTheCharge() throws Exception {
         UUID customer = emptyWallet();
         grant(customer, Instant.now().minus(1, ChronoUnit.HOURS));

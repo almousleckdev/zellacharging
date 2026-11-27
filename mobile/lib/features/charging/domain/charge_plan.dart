@@ -14,6 +14,7 @@ class ChargePlan {
     this.serviceFeePercent = 0,
     this.energyKwh,
     this.freeCharging = false,
+    this.walletKnown = true,
   });
 
   static const minimumTopupMinor = 200;
@@ -39,6 +40,7 @@ class ChargePlan {
         serviceFeePercent: server.serviceFeePercent,
         energyKwh: server.estimatedEnergyKwh,
         freeCharging: free,
+        walletKnown: wallet != null,
       );
     }
     final available = wallet?.availableMinor ?? 0;
@@ -53,6 +55,7 @@ class ChargePlan {
       currency: wallet?.currency ?? '',
       decimals: wallet?.decimals ?? 0,
       freeCharging: free,
+      walletKnown: wallet != null,
     );
   }
 
@@ -67,6 +70,7 @@ class ChargePlan {
   final double serviceFeePercent;
   final double? energyKwh;
   final bool freeCharging;
+  final bool walletKnown;
 
   bool get needsPayment => shortfallMinor > 0;
 

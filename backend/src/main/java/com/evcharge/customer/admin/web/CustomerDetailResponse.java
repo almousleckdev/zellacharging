@@ -2,18 +2,21 @@ package com.evcharge.customer.admin.web;
 
 import com.evcharge.customer.account.Complimentary;
 import com.evcharge.customer.account.CustomerSupportState;
+import com.evcharge.customer.account.SignInMethod;
 import com.evcharge.customer.admin.application.CustomerDetail;
 import com.evcharge.customer.charging.CustomerSessions;
 import com.evcharge.customer.wallet.CustomerWallet;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.List;
 import java.util.UUID;
 
 record CustomerDetailResponse(UUID id, String country, String firstName, String lastName, String email,
                               String phone, String status, boolean emailVerified, boolean phoneVerified,
                               Instant createdAt, Long avatarVersion, Wallet wallet, Sessions sessions,
-                              FreeAccess freeAccess, Access access, Ndzela ndzela) {
+                              FreeAccess freeAccess, Access access, Ndzela ndzela,
+                              List<SignInMethod> signInMethods) {
 
     static CustomerDetailResponse from(CustomerDetail detail) {
         var customer = detail.customer();
@@ -21,7 +24,8 @@ record CustomerDetailResponse(UUID id, String country, String firstName, String 
                 customer.email(), customer.phone(), customer.status(), customer.emailVerified(),
                 customer.phoneVerified(), customer.createdAt(), customer.avatarVersion(), Wallet.from(detail.wallet()),
                 Sessions.from(detail.sessions()), FreeAccess.from(detail.complimentary()),
-                Access.from(detail.support()), new Ndzela(detail.ndzela().linked(), detail.ndzela().idTag()));
+                Access.from(detail.support()), new Ndzela(detail.ndzela().linked(), detail.ndzela().idTag()),
+                detail.signInMethods());
     }
 
     record Access(Instant lockedUntil, int failedLoginAttempts, String pendingEmail, String pendingPhone) {

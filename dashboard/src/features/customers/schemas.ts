@@ -61,7 +61,10 @@ const accessSchema = z.object({
 
 const ndzelaSchema = z.object({ linked: z.boolean(), idTag: z.string().nullable() });
 
+const signInMethodSchema = z.enum(["PASSWORD", "APPLE", "GOOGLE"]);
+
 export const customerDetailSchema = customerItemSchema.extend({
+  signInMethods: z.array(signInMethodSchema).optional(),
   access: accessSchema,
   ndzela: ndzelaSchema,
   emailVerified: z.boolean(),

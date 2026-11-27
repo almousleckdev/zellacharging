@@ -51,4 +51,13 @@ describe("IdentityCard", () => {
     expect(String(fetchMock.mock.calls[0][0])).toBe("/api/admin/customers/GA/c1/name");
     expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ firstName: "Marie", lastName: "Obame" });
   });
+
+  it("shows every way this customer signs in", () => {
+    renderConsole(<IdentityCard customer={{ ...customer, signInMethods: ["PASSWORD", "APPLE", "GOOGLE"] }} />, profileOf());
+
+    expect(screen.getByText("Connexion")).toBeInTheDocument();
+    expect(screen.getByText("Mot de passe (e-mail ou téléphone)")).toBeInTheDocument();
+    expect(screen.getByText("Apple")).toBeInTheDocument();
+    expect(screen.getByText("Google")).toBeInTheDocument();
+  });
 });

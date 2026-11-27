@@ -18,7 +18,11 @@ class WalletBalanceCard extends StatelessWidget {
     final theme = Theme.of(context);
     final free = plan.freeCharging;
     final low = plan.needsTopup;
-    final color = low ? AppColors.danger : AppColors.success;
+    final color = !plan.walletKnown
+        ? AppColors.textSecondary
+        : low
+        ? AppColors.danger
+        : AppColors.success;
     final minimum = MoneyFormat.format(
       plan.minimumMinor ?? ChargePlan.minimumChargeMinor,
       plan.currency,
@@ -36,7 +40,9 @@ class WalletBalanceCard extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  free
+                  !plan.walletKnown
+                      ? PayText.walletUnknown
+                      : free
                       ? PayText.freeCharging
                       : MoneyFormat.format(
                           plan.availableMinor,
@@ -49,7 +55,9 @@ class WalletBalanceCard extends StatelessWidget {
                 ),
                 const SizedBox(height: AppSpacing.xs),
                 Text(
-                  free
+                  !plan.walletKnown
+                      ? PayText.walletUnknownNote
+                      : free
                       ? PayText.freeChargingNote
                       : low
                       ? PayText.rechargeNeeded(minimum)

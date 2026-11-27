@@ -7,6 +7,7 @@ import com.evcharge.customer.account.CustomerPage;
 import com.evcharge.customer.account.CustomerPicture;
 import com.evcharge.customer.account.CustomerQuery;
 import com.evcharge.customer.account.CustomerRecord;
+import com.evcharge.customer.account.CustomerSignIns;
 import com.evcharge.customer.account.CustomerSupport;
 import com.evcharge.customer.admin.domain.AdminAccess;
 import com.evcharge.customer.admin.domain.Permission;
@@ -40,12 +41,13 @@ public class AdminCustomerService {
     private final CustomerSupport support;
     private final PartnerLinking linking;
     private final CustomerIdTags idTags;
+    private final CustomerSignIns signIns;
     private final AdminAudit audit;
 
     public AdminCustomerService(AdminAccessService access, CustomerDirectory customers, WalletStatistics wallets,
                                 SessionStatistics sessions, CustomerModeration moderation,
                                 ComplimentaryAccess complimentary, CustomerSupport support, PartnerLinking linking,
-                                CustomerIdTags idTags, AdminAudit audit) {
+                                CustomerIdTags idTags, CustomerSignIns signIns, AdminAudit audit) {
         this.access = access;
         this.customers = customers;
         this.wallets = wallets;
@@ -55,6 +57,7 @@ public class AdminCustomerService {
         this.support = support;
         this.linking = linking;
         this.idTags = idTags;
+        this.signIns = signIns;
         this.audit = audit;
     }
 
@@ -103,7 +106,7 @@ public class AdminCustomerService {
                     "CUSTOMER_NOT_FOUND", "Customer not found"));
             return new CustomerDetail(code, record, wallets.ofCustomer(id).orElse(null), sessions.ofCustomer(id),
                     complimentary.find(id).orElse(null), support.state(id),
-                    new NdzelaLink(linking.linked(id), idTags.existing(List.of(id)).get(id)));
+                    new NdzelaLink(linking.linked(id), idTags.existing(List.of(id)).get(id)), signIns.of(id));
         });
     }
 

@@ -19,6 +19,9 @@ class ChargeActionBar extends StatelessWidget {
   final VoidCallback onPressed;
 
   String get _label {
+    if (readiness == ChargeReadiness.walletUnknown) {
+      return PayText.refreshWallet;
+    }
     if (readiness == ChargeReadiness.needsTopup) return PayText.rechargeAccount;
     if (plan.freeCharging || !readiness.canStart) return PayText.startCharging;
     return SetupText.startFor(
@@ -34,7 +37,9 @@ class ChargeActionBar extends StatelessWidget {
   };
 
   bool get _enabled =>
-      readiness.canStart || readiness == ChargeReadiness.needsTopup;
+      readiness.canStart ||
+      readiness == ChargeReadiness.needsTopup ||
+      readiness == ChargeReadiness.walletUnknown;
 
   @override
   Widget build(BuildContext context) {

@@ -151,6 +151,8 @@ export const frCustomers = {
       notFound: "Ce client est introuvable dans le pays sélectionné.",
       sections: "Sections du client",
       identity: "Identité",
+      signIn: "Connexion",
+      signInMethods: { PASSWORD: "Mot de passe (e-mail ou téléphone)", APPLE: "Apple", GOOGLE: "Google" },
       email: "E-mail",
       phone: "Téléphone",
       country: "Pays",

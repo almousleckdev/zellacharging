@@ -9,6 +9,7 @@ import { Badge } from "@/shared/ui/Badge";
 import type { Column } from "@/shared/ui/DataTable";
 import type { CustomerDetail } from "../schemas";
 import { CustomerStatusBadge } from "./CustomerStatusBadge";
+import { SignInMethods } from "./SignInMethods";
 
 function Contact({ value, verified }: { value: string | null; verified: boolean }) {
   const { t } = useI18n();
@@ -45,6 +46,12 @@ export function useIdentityColumns(): Column<CustomerDetail>[] {
     },
     { key: "email", header: labels.email, text: (row) => row.email ?? "", cell: (row) => <Contact value={row.email} verified={row.emailVerified} /> },
     { key: "phone", header: labels.phone, text: (row) => row.phone ?? "", cell: (row) => <Contact value={row.phone} verified={row.phoneVerified} /> },
+    {
+      key: "signIn",
+      header: labels.signIn,
+      text: (row) => (row.signInMethods ?? []).map((method) => labels.signInMethods[method]).join(", "),
+      cell: (row) => <SignInMethods methods={row.signInMethods ?? []} />,
+    },
     { key: "country", header: labels.country, text: countryName, cell: countryName },
     { key: "status", header: labels.status, text: (row) => row.status, cell: (row) => <CustomerStatusBadge status={row.status} /> },
     { key: "joined", header: labels.joined, align: "right", text: (row) => format.date(row.createdAt), cell: (row) => format.date(row.createdAt) },

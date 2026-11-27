@@ -9,6 +9,7 @@ import '../../../../core/router/routes.dart';
 import '../../../../shared/widgets/async_body.dart';
 import '../../../../core/format/amount_input.dart';
 import '../../../free_sunday/presentation/free_sunday_providers.dart';
+import '../../../wallet/presentation/wallet_providers.dart';
 import '../../../stations/domain/station.dart';
 import '../../../stations/domain/station_connector.dart';
 import '../../../stations/presentation/station_providers.dart';
@@ -74,6 +75,10 @@ class _ChargeSetupPageState extends ConsumerState<ChargeSetupPage>
   Future<void> _start(ChargePlan plan, ChargeReadiness readiness) async {
     if (readiness == ChargeReadiness.needsTopup) {
       context.push(Routes.topup);
+      return;
+    }
+    if (readiness == ChargeReadiness.walletUnknown) {
+      ref.invalidate(walletProvider);
       return;
     }
     final chosen = connector;

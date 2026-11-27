@@ -61,7 +61,7 @@ class SetupForm extends StatelessWidget {
           ),
         ),
         const SizedBox(height: AppSpacing.lg),
-        if (!plan.freeCharging) ...[
+        if (plan.walletKnown && !plan.freeCharging) ...[
           ChargeAmountCard(
             controller: amount,
             plan: plan,

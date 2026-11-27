@@ -3,6 +3,7 @@ import 'charge_plan.dart';
 
 enum ChargeReadiness {
   ready,
+  walletUnknown,
   needsTopup,
   chooseConnector,
   plugIn,
@@ -15,6 +16,7 @@ enum ChargeReadiness {
     required ChargePlan plan,
     required StationConnector? connector,
   }) {
+    if (!plan.walletKnown) return walletUnknown;
     if (plan.balanceTooLow) return needsTopup;
     if (connector == null) return chooseConnector;
     if (!connector.pluggedIn) return plugIn;

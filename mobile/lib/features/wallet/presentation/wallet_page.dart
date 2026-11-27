@@ -14,6 +14,7 @@ import '../../../shared/widgets/pay/wallet_balance_card.dart';
 import '../../../shared/widgets/primary_button.dart';
 import '../../../shared/widgets/secondary_button.dart';
 import '../domain/wallet.dart';
+import 'free_charging_card.dart';
 import 'wallet_history_card.dart';
 import 'wallet_providers.dart';
 
@@ -39,6 +40,10 @@ class WalletPage extends ConsumerWidget {
             children: [
               WalletBalanceCard(wallet: wallet),
               const SizedBox(height: AppSpacing.lg),
+              if (wallet.freeCharging) ...[
+                const FreeChargingCard(),
+                const SizedBox(height: AppSpacing.lg),
+              ],
               _actions(context, wallet),
               const SizedBox(height: AppSpacing.lg),
               _history(context, ref, wallet),

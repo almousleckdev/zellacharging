@@ -153,6 +153,8 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
       notFound: "This customer was not found in the selected country.",
       sections: "Customer sections",
       identity: "Identity",
+      signIn: "Sign-in",
+      signInMethods: { PASSWORD: "Password (email or phone)", APPLE: "Apple", GOOGLE: "Google" },
       email: "Email",
       phone: "Phone",
       country: "Country",

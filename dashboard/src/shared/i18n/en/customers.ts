@@ -41,6 +41,8 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
       actions: {
         LOGIN_SUCCEEDED: "Signed in",
         LOGIN_FAILED: "Failed sign-in",
+        PASSWORD_SET_BY_SUPPORT: "Password set by support",
+        CUSTOMER_PASSWORD_CHANGED: "Customer password changed",
         ACCOUNT_CLOSED: "Account closed",
       },
     },
@@ -92,6 +94,7 @@ export const enCustomers: Pick<Dictionary, "customers"> = {
       newValueLabel: "New value",
       phoneHint: "With the country code, for example +241 06 12 34 56.",
       name: { button: "Edit name", title: "Edit the customer's name", message: "Only a super admin can change the name. The change is recorded in the audit log.", confirm: "Save", done: "Name updated." },
+      password: { button: "Change password", title: "Change the customer password", message: "The customer is signed out of their devices and gets a notice of the change. Give them the new password in a safe way.", field: "New password", confirmField: "Confirm password", rules: "At least 8 characters.", mismatch: "The two passwords do not match.", confirm: "Change", done: "Password changed." },
       deliveries: { EMAIL: "Email", WHATSAPP: "WhatsApp", SMS: "SMS" },
       dialogs: {
         "resend-code": { title: "Resend code", message: "A new 6-digit code is sent now, even if one was just sent.", confirm: "Send code" },

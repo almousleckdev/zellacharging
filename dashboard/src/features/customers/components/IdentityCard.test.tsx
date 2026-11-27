@@ -60,4 +60,28 @@ describe("IdentityCard", () => {
     expect(screen.getByText("Apple")).toBeInTheDocument();
     expect(screen.getByText("Google")).toBeInTheDocument();
   });
+
+  it("hides the password change from roles other than admin and super admin", () => {
+    renderConsole(<IdentityCard customer={customer} />, { ...profileOf(), role: "SUPPORT", permissions: ["CUSTOMERS_READ", "CUSTOMERS_MANAGE"] });
+
+    expect(screen.queryByRole("button", { name: "Changer le mot de passe" })).not.toBeInTheDocument();
+  });
+
+  it("lets an admin set a new password only once both entries match", async () => {
+    const fetchMock = vi.fn<typeof fetch>(async () => new Response(null, { status: 204 }));
+    vi.stubGlobal("fetch", fetchMock);
+    const user = userEvent.setup();
+    renderConsole(<IdentityCard customer={customer} />, { ...profileOf(), role: "ADMIN", permissions: ["CUSTOMERS_READ", "CUSTOMERS_MANAGE"] });
+
+    await user.click(screen.getByRole("button", { name: "Changer le mot de passe" }));
+    await user.type(screen.getByLabelText("Nouveau mot de passe"), "Nouveau-Pass-2026");
+    await user.type(screen.getByLabelText("Confirmer le mot de passe"), "Nouveau-Pass");
+    expect(screen.getByRole("button", { name: "Changer" })).toBeDisabled();
+    await user.type(screen.getByLabelText("Confirmer le mot de passe"), "-2026");
+    await user.click(screen.getByRole("button", { name: "Changer" }));
+
+    await waitFor(() => expect(fetchMock).toHaveBeenCalled());
+    expect(String(fetchMock.mock.calls[0][0])).toBe("/api/admin/customers/GA/c1/password");
+    expect(JSON.parse(String(fetchMock.mock.calls[0][1]?.body))).toEqual({ password: "Nouveau-Pass-2026" });
+  });
 });

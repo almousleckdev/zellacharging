@@ -29,12 +29,13 @@ class AccountSupportService implements CustomerSupport {
     private final VerificationService verification;
     private final ContactChange change;
     private final ProfileService profiles;
+    private final PasswordService credentials;
     private final Clock clock;
 
     AccountSupportService(CustomerRepository customers, PendingEmailRepository pendingEmails,
                           PendingPhoneRepository pendingPhones, VerificationCodeRepository codes,
                           VerificationService verification, ContactChange change, ProfileService profiles,
-                          Clock clock) {
+                          PasswordService credentials, Clock clock) {
         this.customers = customers;
         this.pendingEmails = pendingEmails;
         this.pendingPhones = pendingPhones;
@@ -42,6 +43,7 @@ class AccountSupportService implements CustomerSupport {
         this.verification = verification;
         this.change = change;
         this.profiles = profiles;
+        this.credentials = credentials;
         this.clock = clock;
     }
 
@@ -76,6 +78,13 @@ class AccountSupportService implements CustomerSupport {
     public void unlockLogin(UUID customerId) {
         load(customerId);
         customers.clearFailedLogins(customerId);
+    }
+
+    @Override
+    @Transactional
+    public void setPassword(UUID customerId, String newPassword) {
+        load(customerId);
+        credentials.setBySupport(customerId, newPassword);
     }
 
     @Override

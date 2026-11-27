@@ -14,6 +14,7 @@ export type SupportAction =
   | { kind: "unlock" }
   | { kind: "contact"; channel: SupportChannel; value: string }
   | { kind: "name"; firstName: string; lastName: string }
+  | { kind: "password"; password: string }
   | { kind: "link" }
   | { kind: "unlink" };
 
@@ -32,6 +33,8 @@ function request(action: SupportAction): { path: string; init: RequestInit } {
       return { path: "contact", init: { method: "PUT", headers: JSON_HEADERS, body: JSON.stringify({ channel: action.channel, value: action.value }) } };
     case "name":
       return { path: "name", init: { method: "PUT", headers: JSON_HEADERS, body: JSON.stringify({ firstName: action.firstName, lastName: action.lastName }) } };
+    case "password":
+      return { path: "password", init: { method: "PUT", headers: JSON_HEADERS, body: JSON.stringify({ password: action.password }) } };
     case "link":
       return { path: "ndzela-link", init: { method: "PUT" } };
     case "unlink":

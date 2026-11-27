@@ -95,10 +95,8 @@ abstract final class PayText {
     en: 'Your account has free charging. Nothing is taken from your wallet.',
   );
 
-  static String get walletUnknown => AppLanguage.pick(
-    fr: 'Portefeuille non chargé',
-    en: 'Wallet not loaded',
-  );
+  static String get walletUnknown =>
+      AppLanguage.pick(fr: 'Portefeuille non chargé', en: 'Wallet not loaded');
 
   static String get walletUnknownNote => AppLanguage.pick(
     fr: 'Nous n’avons pas encore pu lire votre portefeuille. Vérifiez votre connexion puis actualisez.',

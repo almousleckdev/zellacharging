@@ -12,6 +12,8 @@ public interface CustomerSupport {
 
     void unlockLogin(UUID customerId);
 
+    void setPassword(UUID customerId, String newPassword);
+
     void markVerified(UUID customerId, String channel);
 
     void changeName(UUID customerId, String firstName, String lastName);

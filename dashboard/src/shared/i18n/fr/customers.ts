@@ -39,6 +39,8 @@ export const frCustomers = {
       actions: {
         LOGIN_SUCCEEDED: "Connexion réussie",
         LOGIN_FAILED: "Connexion échouée",
+        PASSWORD_SET_BY_SUPPORT: "Mot de passe défini par le support",
+        CUSTOMER_PASSWORD_CHANGED: "Mot de passe client changé",
         ACCOUNT_CLOSED: "Compte fermé",
       },
     },
@@ -90,6 +92,7 @@ export const frCustomers = {
       newValueLabel: "Nouvelle valeur",
       phoneHint: "Avec l'indicatif du pays, par exemple +241 06 12 34 56.",
       name: { button: "Modifier le nom", title: "Modifier le nom du client", message: "Seul un super admin peut modifier le nom. La modification est enregistrée dans le journal d'audit.", confirm: "Enregistrer", done: "Nom modifié." },
+      password: { button: "Changer le mot de passe", title: "Changer le mot de passe du client", message: "Le client est déconnecté de ses appareils et reçoit un avis de changement. Transmettez-lui le nouveau mot de passe de façon sûre.", field: "Nouveau mot de passe", confirmField: "Confirmer le mot de passe", rules: "Au moins 8 caractères.", mismatch: "Les deux mots de passe ne correspondent pas.", confirm: "Changer", done: "Mot de passe changé." },
       deliveries: { EMAIL: "E-mail", WHATSAPP: "WhatsApp", SMS: "SMS" },
       dialogs: {
         "resend-code": { title: "Renvoyer le code", message: "Un nouveau code à 6 chiffres est envoyé maintenant, même si un code vient d'être envoyé.", confirm: "Envoyer le code" },

@@ -11,6 +11,8 @@ import com.evcharge.customer.shared.TenantContext;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 
+import java.util.EnumSet;
+import java.util.Set;
 import java.util.UUID;
 
 @Service
@@ -59,10 +61,13 @@ public class AdminCustomerSupportService {
     }
 
     public void changeName(AdminAccess admin, String country, UUID id, String firstName, String lastName) {
-        if (admin.role() != AdminRole.SUPER_ADMIN) {
-            throw new ApiException(HttpStatus.FORBIDDEN, "PERMISSION_DENIED", "Only a super admin can do this");
-        }
+        requireRole(admin, EnumSet.of(AdminRole.SUPER_ADMIN));
         act(admin, country, id, "CUSTOMER_NAME_CHANGED", null, () -> support.changeName(id, firstName, lastName));
+    }
+
+    public void setPassword(AdminAccess admin, String country, UUID id, String password) {
+        requireRole(admin, EnumSet.of(AdminRole.SUPER_ADMIN, AdminRole.ADMIN));
+        act(admin, country, id, "CUSTOMER_PASSWORD_CHANGED", null, () -> support.setPassword(id, password));
     }
 
     public void changeContact(AdminAccess admin, String country, UUID id, String channel, String value) {
@@ -76,6 +81,12 @@ public class AdminCustomerSupportService {
 
     public void unlinkNdzela(AdminAccess admin, String country, UUID id) {
         act(admin, country, id, "CUSTOMER_NDZELA_UNLINKED", null, () -> linking.unlink(id, admin.id()));
+    }
+
+    private static void requireRole(AdminAccess admin, Set<AdminRole> allowed) {
+        if (!allowed.contains(admin.role())) {
+            throw new ApiException(HttpStatus.FORBIDDEN, "PERMISSION_DENIED", "Your role cannot do this");
+        }
     }
 
     private void act(AdminAccess admin, String country, UUID id, String action, String detail, Runnable work) {

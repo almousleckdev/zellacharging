@@ -59,6 +59,13 @@ class AdminCustomerSupportController {
         support.changeName(admin, country, id, request.firstName(), request.lastName());
     }
 
+    @PutMapping("/password")
+    @ResponseStatus(HttpStatus.NO_CONTENT)
+    void setPassword(AdminAccess admin, @PathVariable String country, @PathVariable UUID id,
+                     @Valid @RequestBody CustomerPasswordRequest request) {
+        support.setPassword(admin, country, id, request.password());
+    }
+
     @PutMapping("/contact")
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void changeContact(AdminAccess admin, @PathVariable String country, @PathVariable UUID id,

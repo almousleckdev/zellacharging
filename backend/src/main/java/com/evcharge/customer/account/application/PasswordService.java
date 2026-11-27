@@ -40,9 +40,18 @@ public class PasswordService {
     @Transactional(noRollbackFor = ApiException.class)
     public void change(UUID customerId, String currentPassword, String newPassword) {
         confirmation.confirm(customerId, currentPassword);
+        replace(customerId, newPassword, "PASSWORD_CHANGED");
+    }
+
+    @Transactional
+    public void setBySupport(UUID customerId, String newPassword) {
+        replace(customerId, newPassword, "PASSWORD_SET_BY_SUPPORT");
+    }
+
+    private void replace(UUID customerId, String newPassword, String action) {
         customers.updatePasswordHash(customerId, passwords.hash(newPassword));
         refreshTokens.revokeAllOf(customerId, clock.instant());
-        audit.record("PASSWORD_CHANGED", customerId, "customer", null);
+        audit.record(action, customerId, "customer", null);
         notifier.notify(customerId, NotificationType.PASSWORD_CHANGED, "password:" + UUID.randomUUID(),
                 Map.of("screen", "settings"));
     }

@@ -139,16 +139,40 @@ class AdminComplimentaryIntegrationTest extends PostgresTestBase {
         data.complimentarySession("GA", guest, "7", 1400);
 
         call(get("/v1/admin/complimentary/usage?country=GA"), root).andExpect(status().isOk())
-                .andExpect(jsonPath("$.length()").value(1))
-                .andExpect(jsonPath("$[0].customerId").value(staff.toString()))
-                .andExpect(jsonPath("$[0].sessions").value(2))
-                .andExpect(jsonPath("$[0].energyKwh").value(15.0))
-                .andExpect(jsonPath("$[0].valueMinor").value(3000));
+                .andExpect(jsonPath("$[?(@.customerId == '" + guest + "')]").isEmpty())
+                .andExpect(jsonPath("$[?(@.customerId == '" + staff + "')].sessions").value(2))
+                .andExpect(jsonPath("$[?(@.customerId == '" + staff + "')].energyKwh").value(15.0))
+                .andExpect(jsonPath("$[?(@.customerId == '" + staff + "')].valueMinor").value(3000));
         call(get("/v1/admin/complimentary?country=GA"), root)
                 .andExpect(jsonPath("$[?(@.customerId == '" + staff + "')].category").value("NDZELA_STAFF"))
                 .andExpect(jsonPath("$[?(@.customerId == '" + guest + "')].category").value("OTHER"));
         call(get("/v1/admin/sessions?country=GA"), root).andExpect(status().isOk())
                 .andExpect(jsonPath("$.items[?(@.customerId == '" + staff + "')].freeCategory")
                         .value(org.hamcrest.Matchers.everyItem(org.hamcrest.Matchers.is("NDZELA_STAFF"))));
+    }
+
+    @Test
+    void ndzelaStaffWithoutAnyChargeInThePeriodAreStillListed() throws Exception {
+        UUID charged = data.customer("GA", "ACTIVE");
+        UUID waiting = data.customer("GA", "ACTIVE");
+        UUID expired = data.customer("GA", "ACTIVE");
+        for (UUID member : new UUID[] {charged, waiting, expired}) {
+            call(grant(member, "{\"reason\":\"Equipe\",\"category\":\"NDZELA_STAFF\"}"), root)
+                    .andExpect(status().isNoContent());
+        }
+        TenantContext.runAs("GA", () -> jdbc.update(
+                "update customer_complimentary set expires_at = now() - interval '1 hour' where customer_id = ?",
+                expired));
+        data.complimentarySession("GA", charged, "10.5", 2100);
+
+        call(get("/v1/admin/complimentary/usage?country=GA"), root).andExpect(status().isOk())
+                .andExpect(jsonPath("$[?(@.customerId == '" + charged + "')].sessions").value(1))
+                .andExpect(jsonPath("$[?(@.customerId == '" + waiting + "')].sessions").value(0))
+                .andExpect(jsonPath("$[?(@.customerId == '" + waiting + "')].energyKwh").value(0))
+                .andExpect(jsonPath("$[?(@.customerId == '" + waiting + "')].lastChargeAt")
+                        .value(org.hamcrest.Matchers.contains(org.hamcrest.Matchers.nullValue())))
+                .andExpect(jsonPath("$[?(@.customerId == '" + expired + "')]").isEmpty());
+        call(get("/v1/admin/complimentary/usage?country=GA&from=2099-01-01T00:00:00Z"), root)
+                .andExpect(jsonPath("$[?(@.customerId == '" + charged + "')].sessions").value(0));
     }
 }
